@@ -1,4 +1,4 @@
 orbisgis-view-plugins
 =====================
 
-A set of optional gui components provided as optionnal features of OrbisGIS 4.X
+A set of optional gui components provided as optional features of OrbisGIS 4.X
