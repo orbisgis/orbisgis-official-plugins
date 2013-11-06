@@ -25,7 +25,7 @@
                         <Private-Package>org.orbisgis.groovy.*</Private-Package>
                         <Bundle-Activator>org.orbisgis.groovy.Activator</Bundle-Activator>
                         <Bundle-Vendor>IRSTV - FR CNRS 2488</Bundle-Vendor>
-                        <Bundle-Category>OrbisGIS, Shell, Language, OSGi</Bundle-Category>
+                        <Bundle-Category>OrbisGIS, Console, Language</Bundle-Category>
                         <Bundle-Icon>icon.png;size=32</Bundle-Icon> 
                     </instructions>
                 </configuration>
@@ -83,7 +83,7 @@
         <dependency>
             <groupId>org.codehaus.groovy</groupId>
             <artifactId>groovy</artifactId>
-            <version>2.1.7</version>
+            <version>2.1.9</version>
         </dependency>
         <dependency>
             <groupId>org.xnap.commons</groupId>
