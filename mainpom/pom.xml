@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <groupId>org.orbisgis</groupId>
+    <artifactId>org.orbisgis-parent</artifactId>
+    <version>1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>Sonatype OSS Parent</name>
+    <url>http://www.orbisgis.org</url>
+    <description>org.orbisgis internal repository</description>
+    <parent>
+        <groupId>org.sonatype.oss</groupId>
+        <artifactId>oss-parent</artifactId>
+        <version>7</version>
+    </parent>
+    <distributionManagement>
+        <snapshotRepository>
+            <id>nexus-orbisgis-snapshots</id>
+            <name>Internal Snaphots</name>
+            <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-snapshot/</url>
+        </snapshotRepository>
+        <repository>
+            <id>nexus-orbisgis-release</id>
+            <name>Internal Releases</name>
+            <url>http://nexus.orbisgis.org/content/repositories/osgi-maven/</url>
+        </repository>
+    </distributionManagement>
+</project>

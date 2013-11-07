@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
         <modelVersion>4.0.0</modelVersion>
-        <groupId>org.orbisgis</groupId>
         <artifactId>orbisgis-view-plugins</artifactId>
         <packaging>pom</packaging>
         <version>1.0-SNAPSHOT</version>
@@ -11,6 +10,11 @@
                 <url>http://www.irstv.fr/</url>
         </organization>
         <url>http://www.orbisgis.org</url>
+        <parent>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>org.orbisgis-parent</artifactId>
+            <version>1</version>
+        </parent>
         <modules>
                 <module>memory</module>
         </modules>
@@ -37,18 +41,6 @@
                         <url>http://repo.orbisgis.org</url>
                 </pluginRepository>
         </pluginRepositories>
-	<distributionManagement>
-	  <snapshotRepository>
-	    <id>nexus-orbisgis-snapshots</id>
-	    <name>Internal Snaphots</name>
-	    <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-snapshot/</url>
-	  </snapshotRepository>
-	  <repository>
-	    <id>nexus-orbisgis-release</id>
-	    <name>Internal Releases</name>
-	    <url>http://nexus.orbisgis.org/content/repositories/osgi-maven/</url>
-	  </repository>
-	</distributionManagement>
         <build>
                 <plugins>
                         <plugin>
