@@ -5,14 +5,39 @@
     <artifactId>org.orbisgis-parent</artifactId>
     <version>1-SNAPSHOT</version>
     <packaging>pom</packaging>
-    <name>Sonatype OSS Parent</name>
-    <url>http://www.orbisgis.org</url>
+    <name>OrbisGIS Parent</name>
     <description>org.orbisgis internal repository</description>
+    <url>http://www.orbisgis.org</url>
+    <licenses>
+        <license>
+            <name>GNU General Public License (GPLV3+)</name>
+            <url>http://www.gnu.org/licenses/gpl-3.0.html</url>
+        </license>
+    </licenses>
+    <scm>
+        <connection>scm:git:https://github.com/irstv/orbisgis-view-plugins.git</connection>
+        <developerConnection>scm:git:https://github.com/irstv/orbisgis-view-plugins.git</developerConnection>
+        <url>git@github.com:irstv/orbisgis-view-plugins.git</url>
+    </scm>
     <parent>
         <groupId>org.sonatype.oss</groupId>
         <artifactId>oss-parent</artifactId>
         <version>7</version>
     </parent>
+    <developers>
+        <developer>
+            <name>Nicolas Fortin</name>
+            <organization>IRSTV CNRS-FR-2488</organization>
+        </developer>
+        <developer>
+            <name>Erwan Bocher</name>
+            <organization>IRSTV CNRS-FR-2488</organization>
+        </developer>
+        <developer>
+            <name>Adam Gouge</name>
+            <organization>IRSTV CNRS-FR-2488</organization>
+        </developer>
+    </developers>
     <distributionManagement>
         <snapshotRepository>
             <id>nexus-orbisgis-snapshots</id>
