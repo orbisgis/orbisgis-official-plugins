@@ -28,14 +28,22 @@
  */
 package org.orbisgis.groovy;
 
+import org.apache.log4j.Logger;
 import org.orbisgis.view.docking.DockingPanel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 /**
  * Registers the groovy console.
+ *
+ * @author Erwan Bocher
  */
 public class Activator implements BundleActivator {
+
+    private static final Logger LOGGER = Logger.getLogger("gui." + Activator.class);
+    private static final I18n I18N = I18nFactory.getI18n(Activator.class);
 
     /**
      * Starting bundle, register services.
@@ -45,6 +53,7 @@ public class Activator implements BundleActivator {
      */
     @Override
     public void start(BundleContext bc) throws Exception {
+        LOGGER.info(I18N.tr("Groovy console starting..."));
         bc.registerService(DockingPanel.class,
                 new GroovyConsolePanel(),
                 null);
@@ -59,5 +68,6 @@ public class Activator implements BundleActivator {
      */
     @Override
     public void stop(BundleContext bc) throws Exception {
+        LOGGER.info(I18N.tr("Groovy console stoping..."));
     }
 }

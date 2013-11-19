@@ -4,14 +4,14 @@
     <groupId>org.orbisgis</groupId>
     <artifactId>groovy-console</artifactId>
     <name>Groovy console</name>
-    <version>1.0</version>
+    <version>1.0.1</version>
     <url>http://orbisgis.org</url>
     <parent>
         <groupId>org.orbisgis</groupId>
         <artifactId>orbisgis-view-plugins</artifactId>
         <version>1.0-SNAPSHOT</version>
     </parent>
-    <description>A groovy console for OrbisGIS plateform.</description>
+    <description>A groovy console for OrbisGIS platform.</description>
     <packaging>bundle</packaging>
     <build>
         <plugins>

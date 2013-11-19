@@ -37,9 +37,11 @@ import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.PrintStream;
 import javax.swing.JComponent;
+import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.KeyStroke;
+import javax.swing.SwingWorker;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
@@ -96,6 +98,8 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
     private int line = 0;
     private int character = 0;
     private MapElement mapElement;
+    private static final String MESSAGEBASE = "%d | %d";
+    private JLabel statusMessage=new JLabel();
 
     /**
      * Create the groovy console panel
@@ -103,6 +107,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
     public GroovyConsolePanel() {
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
+        add(statusMessage, BorderLayout.SOUTH);
         init();
     }
 
@@ -308,6 +313,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
     public void onScriptPanelCaretUpdate() {
         line = scriptPanel.getCaretLineNumber() + 1;
         character = scriptPanel.getCaretOffsetFromLineStart();
+        statusMessage.setText(String.format(MESSAGEBASE, line, character));
     }
 
     /**
@@ -337,14 +343,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
      */
     public void onExecute() {
         String text = scriptPanel.getText().trim();
-        try {
-            groovyShell.evaluate(text);
-            infoLogger.flush();
-        } catch (CompilationFailedException e) {
-            LOGGER_POPUP.error(I18N.tr("Cannot execute the script"), e);
-        } catch (IOException e) {
-            LOGGER_POPUP.error(I18N.tr("Cannot display the output of the console"), e);
-        }
+        new GroovyExecutor(text, groovyShell, infoLogger).execute();
     }
 
     /**
@@ -411,5 +410,31 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         }
         findReplaceDialog.setAlwaysOnTop(true);
         findReplaceDialog.setVisible(true);
+    }
+
+    private static class GroovyExecutor extends SwingWorker<Object, Object> {
+
+        private String script;
+        private GroovyShell groovyShell;
+        Log4JOutputStream infoLogger;
+
+        public GroovyExecutor(String script, GroovyShell groovyShell, Log4JOutputStream infoLogger) {
+            this.script = script;
+            this.groovyShell = groovyShell;
+            this.infoLogger = infoLogger;
+        }
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            try {
+                groovyShell.evaluate(script);
+                infoLogger.flush();
+            } catch (CompilationFailedException e) {
+                LOGGER_POPUP.error(I18N.tr("Cannot execute the script"), e);
+            } catch (IOException e) {
+                LOGGER_POPUP.error(I18N.tr("Cannot display the output of the console"), e);
+            }
+            return null;
+        }
     }
 }
