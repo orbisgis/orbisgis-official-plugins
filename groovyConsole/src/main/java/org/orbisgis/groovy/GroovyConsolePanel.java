@@ -37,6 +37,7 @@ import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
+import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
 import javax.swing.JComponent;
@@ -81,7 +82,7 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Erwan Bocher
  */
-@Component
+@Component(service = EditorDockable.class)
 public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     public static final String EDITOR_NAME = "Groovy";
@@ -107,8 +108,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private MapElement mapElement;
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage=new JLabel();
-    private Map<String, Object> variables;
-    private Map<String, Object> properties;
+    private Map<String, Object> variables = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Create the groovy console panel
