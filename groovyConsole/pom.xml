@@ -95,6 +95,11 @@
             <version>2.1.9</version>
         </dependency>
         <dependency>
+            <groupId>org.codehaus.groovy</groupId>
+            <artifactId>groovy-sql</artifactId>
+            <version>2.1.9</version>
+        </dependency>
+        <dependency>
             <groupId>org.xnap.commons</groupId>
             <artifactId>gettext-commons</artifactId>
             <version>0.9.7</version>
