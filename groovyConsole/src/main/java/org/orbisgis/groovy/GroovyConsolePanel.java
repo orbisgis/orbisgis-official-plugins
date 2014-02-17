@@ -36,6 +36,10 @@ import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import javax.sql.DataSource;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
@@ -47,26 +51,29 @@ import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
-import org.codehaus.groovy.control.CompilationFailedException;
 import org.fife.rsta.ac.LanguageSupportFactory;
 import org.fife.rsta.ac.groovy.GroovyLanguageSupport;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.core.layerModel.MapContext;
+import org.orbisgis.mapeditorapi.MapElement;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
-import org.orbisgis.view.beanshell.ext.BeanShellAction;
 import org.orbisgis.view.components.Log4JOutputStream;
 import org.orbisgis.view.components.actions.ActionCommands;
-import org.orbisgis.view.components.actions.DefaultAction;
 import org.orbisgis.view.components.findReplace.FindReplaceDialog;
-import org.orbisgis.view.docking.DockingPanel;
-import org.orbisgis.view.docking.DockingPanelParameters;
 import org.orbisgis.view.icons.OrbisGISIcon;
-import org.orbisgis.view.map.MapElement;
 import org.orbisgis.view.util.CommentUtil;
+import org.orbisgis.viewapi.components.actions.DefaultAction;
+import org.orbisgis.viewapi.docking.DockingPanelParameters;
+import org.orbisgis.viewapi.edition.EditableElement;
+import org.orbisgis.viewapi.edition.EditorDockable;
+import org.orbisgis.viewapi.edition.EditorManager;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Reference;
+import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -75,18 +82,19 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Erwan Bocher
  */
-public class GroovyConsolePanel extends JPanel implements DockingPanel {
+@Component(service = EditorDockable.class)
+public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     public static final String EDITOR_NAME = "Groovy";
     private static final I18n I18N = I18nFactory.getI18n(GroovyConsolePanel.class);
     private static final Logger LOGGER = Logger.getLogger("gui." + GroovyConsolePanel.class);
     private static final Logger LOGGER_POPUP = Logger.getLogger("gui.popup" + GroovyConsolePanel.class);
     private final Log4JOutputStream infoLogger = new Log4JOutputStream(LOGGER, Level.INFO);
+    private final Log4JOutputStream errorLogger = new Log4JOutputStream(LOGGER, Level.ERROR);
     private DockingPanelParameters parameters = new DockingPanelParameters();
     private ActionCommands actions = new ActionCommands();
     private GroovyLanguageSupport gls;
     private RTextScrollPane centerPanel;
-    private static GroovyShell groovyShell = new GroovyShell();
     private RSyntaxTextArea scriptPanel;
     private DefaultAction executeAction;
     private DefaultAction clearAction;
@@ -100,6 +108,8 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
     private MapElement mapElement;
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage=new JLabel();
+    private Map<String, Object> variables = new HashMap<String, Object>();
+    private Map<String, Object> properties = new HashMap<String, Object>();
 
     /**
      * Create the groovy console panel
@@ -111,29 +121,43 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         init();
     }
 
+    public void setDataSource(DataSource ds) {
+        try {
+            variables.put("grv.ds", ds);
+        } catch (Error ex) {
+            LOGGER.error(ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
+    public void setEditorManager(EditorManager editorManager) {
+        // If a map is already loaded fetch it in the EditorManager
+        if(editorManager != null) {
+            try {
+                mapElement = MapElement.fetchFirstMapElement(editorManager);
+            } catch (Exception ex) {
+                LOGGER.error(ex.getLocalizedMessage(), ex);
+            }
+        }
+        if (mapElement != null) {
+            setMapContext(mapElement.getMapContext());
+        }
+    }
+
+    public void unsetEditorManager(EditorManager editorManager) {
+    }
+
     /**
      * Init the groovy panel with all docking parameters and set the necessary
      * properties to the console shell
      */
     private void init() {
-        groovyShell.setProperty("out", new PrintStream(infoLogger));
+        properties.put("out", new PrintStream(infoLogger));
+        properties.put("err", new PrintStream(errorLogger));
         parameters.setName(EDITOR_NAME);
         parameters.setTitle(I18N.tr("Groovy"));
         parameters.setTitleIcon(OrbisGISIcon.getIcon("page_white_cup"));
         parameters.setDockActions(getActions().getActions());
-        // If a map is already loaded fetch it in the EditorManager
-        try {
-            mapElement = MapElement.fetchFirstMapElement();
-        } catch (Exception ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-        }
-        if (mapElement != null) {
-            if (mapElement instanceof MapElement) {
-                mapElement = (MapElement) mapElement;
-                // Update the interpreter object
-                setMapContext(mapElement.getMapContext());
-            }
-        }
     }
 
     /**
@@ -181,7 +205,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
      */
     private void initActions() {
         //Execute action
-        executeAction = new DefaultAction(BeanShellAction.A_EXECUTE, I18N.tr("Execute"),
+        executeAction = new DefaultAction(GroovyConsoleActions.A_EXECUTE, I18N.tr("Execute"),
                 I18N.tr("Execute the groovy script"),
                 OrbisGISIcon.getIcon("execute"),
                 EventHandler.create(ActionListener.class, this, "onExecute"),
@@ -189,7 +213,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         actions.addAction(executeAction);
 
         //Clear action
-        clearAction = new DefaultAction(BeanShellAction.A_CLEAR,
+        clearAction = new DefaultAction(GroovyConsoleActions.A_CLEAR,
                 I18N.tr("Clear"),
                 I18N.tr("Erase the content of the editor"),
                 OrbisGISIcon.getIcon("erase"),
@@ -198,14 +222,14 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         actions.addAction(clearAction);
 
         //Open action
-        actions.addAction(new DefaultAction(BeanShellAction.A_OPEN,
+        actions.addAction(new DefaultAction(GroovyConsoleActions.A_OPEN,
                 I18N.tr("Open"),
                 I18N.tr("Load a file in this editor"),
                 OrbisGISIcon.getIcon("open"),
                 EventHandler.create(ActionListener.class, this, "onOpenFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)));
         //Save
-        saveAction = new DefaultAction(BeanShellAction.A_SAVE,
+        saveAction = new DefaultAction(GroovyConsoleActions.A_SAVE,
                 I18N.tr("Save"),
                 I18N.tr("Save the editor content into a file"),
                 OrbisGISIcon.getIcon("save"),
@@ -213,7 +237,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(saveAction);
         //Find action
-        findAction = new DefaultAction(BeanShellAction.A_SEARCH,
+        findAction = new DefaultAction(GroovyConsoleActions.A_SEARCH,
                 I18N.tr("Search.."),
                 I18N.tr("Search text in the document"),
                 OrbisGISIcon.getIcon("find"),
@@ -222,7 +246,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         actions.addAction(findAction);
 
         // Comment/Uncomment
-        commentAction = new DefaultAction(BeanShellAction.A_COMMENT,
+        commentAction = new DefaultAction(GroovyConsoleActions.A_COMMENT,
                 I18N.tr("(Un)comment"),
                 I18N.tr("(Un)comment the selected text"),
                 null,
@@ -231,7 +255,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         actions.addAction(commentAction);
 
         // Block Comment/Uncomment
-        blockCommentAction = new DefaultAction(BeanShellAction.A_BLOCKCOMMENT,
+        blockCommentAction = new DefaultAction(GroovyConsoleActions.A_BLOCKCOMMENT,
                 I18N.tr("Block (un)comment"),
                 I18N.tr("Block (un)comment the selected text."),
                 null,
@@ -265,7 +289,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
         outfilePanel.loadState();
         if (UIFactory.showDialog(outfilePanel)) {
             try {
-                FileUtils.write(outfilePanel.getSelectedFile(), scriptPanel.getText());
+                FileUtils.writeLines(outfilePanel.getSelectedFile(), Arrays.asList(scriptPanel.getText()));
             } catch (IOException e1) {
                 LOGGER.error(I18N.tr("Cannot write the script."), e1);
             }
@@ -343,16 +367,7 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
      */
     public void onExecute() {
         String text = scriptPanel.getText().trim();
-        new GroovyExecutor(text, groovyShell, infoLogger).execute();
-    }
-
-    /**
-     * Returns the GroovyShell interpreter
-     *
-     * @return
-     */
-    public GroovyShell getGroovyShell() {
-        return groovyShell;
+        new GroovyExecutor(text, properties, variables, new  Log4JOutputStream[] {infoLogger, errorLogger}).execute();
     }
 
     /**
@@ -360,11 +375,28 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
      *
      * @param mc MapContext instance
      */
-    public void setMapContext(MapContext mc) {
+    private void setMapContext(MapContext mc) {
         try {
-            groovyShell.setVariable("mc", mc);
+            variables.put("mc", mc);
         } catch (Error ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
+        }
+    }
+
+    @Override
+    public boolean match(EditableElement editableElement) {
+        return editableElement instanceof MapElement;
+    }
+
+    @Override
+    public EditableElement getEditableElement() {
+        return null;
+    }
+
+    @Override
+    public void setEditableElement(EditableElement editableElement) {
+        if(editableElement instanceof MapElement) {
+            setMapContext(((MapElement) editableElement).getMapContext());
         }
     }
 
@@ -415,26 +447,43 @@ public class GroovyConsolePanel extends JPanel implements DockingPanel {
     private static class GroovyExecutor extends SwingWorker<Object, Object> {
 
         private String script;
-        private GroovyShell groovyShell;
-        Log4JOutputStream infoLogger;
+        Log4JOutputStream[] loggers;
+        private Map<String, Object> variables;
+        private Map<String, Object> properties;
 
-        public GroovyExecutor(String script, GroovyShell groovyShell, Log4JOutputStream infoLogger) {
+        public GroovyExecutor(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers) {
             this.script = script;
-            this.groovyShell = groovyShell;
-            this.infoLogger = infoLogger;
+            this.loggers = loggers;
+            this.variables = variables;
+            this.properties = properties;
         }
 
         @Override
-        protected Object doInBackground() throws Exception {
+        protected Object doInBackground() {
             try {
+                GroovyShell groovyShell = new GroovyShell();
+                for(Map.Entry<String,Object> variable : variables.entrySet()) {
+                    groovyShell.setVariable(variable.getKey(), variable.getValue());
+                }
+                for(Map.Entry<String,Object> property : properties.entrySet()) {
+                    groovyShell.setProperty(property.getKey(), property.getValue());
+                }
                 groovyShell.evaluate(script);
-                infoLogger.flush();
-            } catch (CompilationFailedException e) {
-                LOGGER_POPUP.error(I18N.tr("Cannot execute the script"), e);
-            } catch (IOException e) {
-                LOGGER_POPUP.error(I18N.tr("Cannot display the output of the console"), e);
+            } catch (Exception e) {
+                LOGGER.error(I18N.tr("Cannot execute the script"), e);
             }
             return null;
+        }
+
+        @Override
+        protected void done() {
+            try {
+                for(Log4JOutputStream logger : loggers) {
+                    logger.flush();
+                }
+            } catch (IOException e) {
+                LOGGER.error(I18N.tr("Cannot display the output of the console"), e);
+            }
         }
     }
 }
