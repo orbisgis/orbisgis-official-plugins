@@ -365,11 +365,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
      * User click on execute script button
      */
     public void onExecute() {
-        String text = scriptPanel.getText().trim();
-        GroovyJob groovyJob = new GroovyJob(text, properties, variables,
-                new  Log4JOutputStream[] {infoLogger, errorLogger}, executeAction);
-        BackgroundManager backgroundManager = Services.getService(BackgroundManager.class);
-        backgroundManager.nonBlockingBackgroundOperation(groovyJob);
+        if(executeAction.isEnabled()) {
+            String text = scriptPanel.getText().trim();
+            GroovyJob groovyJob = new GroovyJob(text, properties, variables,
+                    new  Log4JOutputStream[] {infoLogger, errorLogger}, executeAction);
+            BackgroundManager backgroundManager = Services.getService(BackgroundManager.class);
+            backgroundManager.nonBlockingBackgroundOperation(groovyJob);
+        }
     }
 
     /**
