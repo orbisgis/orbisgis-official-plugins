@@ -186,6 +186,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             scriptPanel.addCaretListener(EventHandler.create(CaretListener.class, this, "onScriptPanelCaretUpdate"));
             scriptPanel.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "onUserSelectionChange"));
             scriptPanel.clearParsers();
+            scriptPanel.setTabsEmulated(true);
             actions.setAccelerators(scriptPanel);
             // Actions will be set on the scriptPanel PopupMenu
             scriptPanel.getPopupMenu().addSeparator();
