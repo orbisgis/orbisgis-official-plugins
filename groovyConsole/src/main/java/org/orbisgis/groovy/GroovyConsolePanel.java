@@ -34,6 +34,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.Arrays;
@@ -473,7 +474,10 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
         @Override
         public void run(ProgressMonitor progressMonitor) {
-            new GroovyExecutor(script, properties, variables, loggers, executeAction).execute();
+            GroovyExecutor groovyExecutor = new GroovyExecutor(script, properties, variables, loggers, executeAction);
+            progressMonitor.addPropertyChangeListener(ProgressMonitor.PROP_CANCEL,
+                    EventHandler.create(PropertyChangeListener.class, groovyExecutor, "stop"));
+            groovyExecutor.execute();
         }
 
         @Override
@@ -489,6 +493,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         private Map<String, Object> variables;
         private Map<String, Object> properties;
         private Action executeAction;
+        private Thread runThread;
 
         public GroovyExecutor(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
@@ -498,8 +503,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             this.executeAction = executeAction;
         }
 
+        public void stop() {
+            cancel(true);
+        }
+
         @Override
         protected Object doInBackground() {
+            runThread = Thread.currentThread();
             executeAction.setEnabled(false);
             try {
                 GroovyShell groovyShell = new GroovyShell();
