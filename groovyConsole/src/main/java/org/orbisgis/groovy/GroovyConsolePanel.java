@@ -40,12 +40,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import javax.sql.DataSource;
-import javax.swing.JComponent;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.KeyStroke;
-import javax.swing.SwingWorker;
+import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
@@ -56,11 +51,15 @@ import org.fife.rsta.ac.groovy.GroovyLanguageSupport;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
+import org.orbisgis.core.Services;
 import org.orbisgis.core.layerModel.MapContext;
 import org.orbisgis.mapeditorapi.MapElement;
+import org.orbisgis.progress.ProgressMonitor;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
+import org.orbisgis.view.background.BackgroundJob;
+import org.orbisgis.view.background.BackgroundManager;
 import org.orbisgis.view.components.Log4JOutputStream;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.view.components.findReplace.FindReplaceDialog;
@@ -107,7 +106,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private int character = 0;
     private MapElement mapElement;
     private static final String MESSAGEBASE = "%d | %d";
-    private JLabel statusMessage=new JLabel();
+    private JLabel statusMessage = new JLabel();
     private Map<String, Object> variables = new HashMap<String, Object>();
     private Map<String, Object> properties = new HashMap<String, Object>();
 
@@ -121,12 +120,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         init();
     }
 
+    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public void setDataSource(DataSource ds) {
-        try {
-            variables.put("grv.ds", ds);
-        } catch (Error ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-        }
+        variables.put("grv.ds", ds);
+    }
+
+    public void unsetDataSource(DataSource ds) {
+        variables.remove("grv.ds");
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
@@ -146,7 +146,6 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     public void unsetEditorManager(EditorManager editorManager) {
     }
-
     /**
      * Init the groovy panel with all docking parameters and set the necessary
      * properties to the console shell
@@ -156,7 +155,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         properties.put("err", new PrintStream(errorLogger));
         parameters.setName(EDITOR_NAME);
         parameters.setTitle(I18N.tr("Groovy"));
-        parameters.setTitleIcon(OrbisGISIcon.getIcon("page_white_cup"));
+        parameters.setTitleIcon(new ImageIcon(GroovyConsolePanel.class.getResource("icon.png")));
         parameters.setDockActions(getActions().getActions());
     }
 
@@ -367,7 +366,10 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
      */
     public void onExecute() {
         String text = scriptPanel.getText().trim();
-        new GroovyExecutor(text, properties, variables, new  Log4JOutputStream[] {infoLogger, errorLogger}).execute();
+        GroovyJob groovyJob = new GroovyJob(text, properties, variables,
+                new  Log4JOutputStream[] {infoLogger, errorLogger}, executeAction);
+        BackgroundManager backgroundManager = Services.getService(BackgroundManager.class);
+        backgroundManager.nonBlockingBackgroundOperation(groovyJob);
     }
 
     /**
@@ -377,7 +379,11 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
      */
     private void setMapContext(MapContext mc) {
         try {
-            variables.put("mc", mc);
+            if(mc != null) {
+                variables.put("mc", mc);
+            } else {
+                variables.remove("mc");
+            }
         } catch (Error ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
         }
@@ -444,24 +450,58 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         findReplaceDialog.setVisible(true);
     }
 
-    private static class GroovyExecutor extends SwingWorker<Object, Object> {
+    /**
+     * Execute the provided script in groovy
+     */
+    private static class GroovyJob implements BackgroundJob {
 
         private String script;
-        Log4JOutputStream[] loggers;
+        private Log4JOutputStream[] loggers;
         private Map<String, Object> variables;
         private Map<String, Object> properties;
+        private Action executeAction;
 
-        public GroovyExecutor(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers) {
+        public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
             this.loggers = loggers;
             this.variables = variables;
             this.properties = properties;
+            this.executeAction = executeAction;
+        }
+
+        @Override
+        public void run(ProgressMonitor progressMonitor) {
+            new GroovyExecutor(script, properties, variables, loggers, executeAction).execute();
+        }
+
+        @Override
+        public String getTaskName() {
+            return I18N.tr("Execute Groovy script");
+        }
+    }
+
+    private static class GroovyExecutor extends SwingWorker<Object, Object> {
+
+        private String script;
+        private Log4JOutputStream[] loggers;
+        private Map<String, Object> variables;
+        private Map<String, Object> properties;
+        private Action executeAction;
+
+        public GroovyExecutor(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers, Action executeAction) {
+            this.script = script;
+            this.loggers = loggers;
+            this.variables = variables;
+            this.properties = properties;
+            this.executeAction = executeAction;
         }
 
         @Override
         protected Object doInBackground() {
+            executeAction.setEnabled(false);
             try {
                 GroovyShell groovyShell = new GroovyShell();
+                groovyShell.evaluate("grv = []");
                 for(Map.Entry<String,Object> variable : variables.entrySet()) {
                     groovyShell.setVariable(variable.getKey(), variable.getValue());
                 }
@@ -471,6 +511,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 groovyShell.evaluate(script);
             } catch (Exception e) {
                 LOGGER.error(I18N.tr("Cannot execute the script"), e);
+            } finally {
+                executeAction.setEnabled(true);
             }
             return null;
         }
