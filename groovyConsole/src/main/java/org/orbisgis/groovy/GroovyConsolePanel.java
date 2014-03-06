@@ -28,6 +28,7 @@
  */
 package org.orbisgis.groovy;
 
+import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -123,11 +124,11 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public void setDataSource(DataSource ds) {
-        variables.put("grv.ds", ds);
+        variables.put("ds", ds);
     }
 
     public void unsetDataSource(DataSource ds) {
-        variables.remove("grv.ds");
+        variables.remove("ds");
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
@@ -384,9 +385,9 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private void setMapContext(MapContext mc) {
         try {
             if(mc != null) {
-                variables.put("grv.mc", mc);
+                variables.put("mc", mc);
             } else {
-                variables.remove("grv.mc");
+                variables.remove("mc");
             }
         } catch (Error ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
@@ -514,9 +515,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             executeAction.setEnabled(false);
             try {
                 GroovyShell groovyShell = new GroovyShell();
-                groovyShell.evaluate("grv = []");
                 for(Map.Entry<String,Object> variable : variables.entrySet()) {
-                    groovyShell.setVariable(variable.getKey(), variable.getValue());
+                    groovyShell.setVariable("grv_"+variable.getKey(), variable.getValue());
                 }
                 for(Map.Entry<String,Object> property : properties.entrySet()) {
                     groovyShell.setProperty(property.getKey(), property.getValue());
