@@ -383,9 +383,9 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private void setMapContext(MapContext mc) {
         try {
             if(mc != null) {
-                variables.put("mc", mc);
+                variables.put("grv.mc", mc);
             } else {
-                variables.remove("mc");
+                variables.remove("grv.mc");
             }
         } catch (Error ex) {
             LOGGER.error(ex.getLocalizedMessage(), ex);
