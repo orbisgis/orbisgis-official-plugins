@@ -77,7 +77,7 @@
                         <scope>provided</scope>
                 </dependency>
                 <dependency>
-                    <groupId>org.xnap.commons</groupId>
+                    <groupId>com.googlecode.gettext-commons</groupId>
                     <artifactId>gettext-commons</artifactId>
                     <version>0.9.8</version>
                 </dependency>
