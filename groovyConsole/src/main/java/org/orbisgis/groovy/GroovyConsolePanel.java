@@ -480,6 +480,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             progressMonitor.addPropertyChangeListener(ProgressMonitor.PROP_CANCEL,
                     EventHandler.create(PropertyChangeListener.class, groovyExecutor, "stop"));
             groovyExecutor.execute();
+            while(!(groovyExecutor.isDone() || groovyExecutor.isCancelled() )) {
+                try {
+                    Thread.sleep(500);
+                } catch (Exception ex) {
+                    break;
+                }
+            }
         }
 
         @Override
