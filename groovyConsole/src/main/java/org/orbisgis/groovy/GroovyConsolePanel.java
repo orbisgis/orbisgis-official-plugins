@@ -526,19 +526,15 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 LOGGER.error(I18N.tr("Cannot execute the script"), e);
             } finally {
                 executeAction.setEnabled(true);
+                for(Log4JOutputStream logger : loggers) {
+                    try {
+                        logger.flush();
+                    } catch (IOException e) {
+                        LOGGER.error(I18N.tr("Cannot display the output of the console"), e);
+                    }
+                }
             }
             return null;
-        }
-
-        @Override
-        protected void done() {
-            try {
-                for(Log4JOutputStream logger : loggers) {
-                    logger.flush();
-                }
-            } catch (IOException e) {
-                LOGGER.error(I18N.tr("Cannot display the output of the console"), e);
-            }
         }
     }
 }
