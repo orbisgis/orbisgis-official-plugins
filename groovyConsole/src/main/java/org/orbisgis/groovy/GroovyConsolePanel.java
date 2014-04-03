@@ -494,7 +494,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         }
     }
 
-    private static class GroovyExecutor extends SwingWorker<Object, Object> {
+    public static class GroovyExecutor extends SwingWorker<Object, Object> {
 
         private String script;
         private Log4JOutputStream[] loggers;
