@@ -28,7 +28,6 @@
  */
 package org.orbisgis.groovy;
 
-import groovy.lang.Binding;
 import groovy.lang.GroovyShell;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -54,7 +53,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.core.Services;
-import org.orbisgis.core.layerModel.MapContext;
+import org.orbisgis.coremap.layerModel.MapContext;
 import org.orbisgis.mapeditorapi.MapElement;
 import org.orbisgis.progress.ProgressMonitor;
 import org.orbisgis.sif.UIFactory;
