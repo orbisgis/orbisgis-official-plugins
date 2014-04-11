@@ -182,7 +182,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             scriptPanel = new RSyntaxTextArea();
             scriptPanel.setLineWrap(true);
             lsf.register(scriptPanel);
-            scriptPanel.setSyntaxEditingStyle(RSyntaxTextArea.SYNTAX_STYLE_JAVA);
+            scriptPanel.setSyntaxEditingStyle(RSyntaxTextArea.SYNTAX_STYLE_GROOVY);
             scriptPanel.addCaretListener(EventHandler.create(CaretListener.class, this, "onScriptPanelCaretUpdate"));
             scriptPanel.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "onUserSelectionChange"));
             scriptPanel.clearParsers();
