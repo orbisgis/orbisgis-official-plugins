@@ -29,21 +29,6 @@
 package org.orbisgis.groovy;
 
 import groovy.lang.GroovyShell;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.EventHandler;
-import java.beans.PropertyChangeListener;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import javax.sql.DataSource;
-import javax.swing.*;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
 import org.apache.log4j.Level;
 import org.apache.log4j.Logger;
@@ -76,6 +61,22 @@ import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+
+import javax.sql.DataSource;
+import javax.swing.*;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Create the groovy console panel
@@ -187,13 +188,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             scriptPanel.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "onUserSelectionChange"));
             scriptPanel.clearParsers();
             scriptPanel.setTabsEmulated(true);
+            scriptPanel.setTabSize(4);
             actions.setAccelerators(scriptPanel);
             // Actions will be set on the scriptPanel PopupMenu
             scriptPanel.getPopupMenu().addSeparator();
             actions.registerContainer(scriptPanel.getPopupMenu());
             centerPanel = new RTextScrollPane(scriptPanel);
             onUserSelectionChange();
-
         }
         return centerPanel;
     }
