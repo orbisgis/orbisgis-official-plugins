@@ -74,10 +74,10 @@ public abstract class GraphicalElement {
     }
     
     /**
-     * Returns all the attributes. This function need be be redefined in child class to make it public and acessible to the other classes.
+     * Returns all the attributes. This function need be be redefined in child class.
      * @return List of all the attributes.
      */
-    protected List<ConfigurationAttribute> getAllAttributes() {
+    public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(x);
         list.add(y);

@@ -36,7 +36,7 @@ public abstract class CartographicElement extends GraphicalElement{
     }
 
     @Override
-    protected List<ConfigurationAttribute> getAllAttributes() {
+    public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.addAll(this.getAllAttributes());
         list.add(source);
