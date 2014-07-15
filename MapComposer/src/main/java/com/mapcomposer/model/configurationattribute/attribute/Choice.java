@@ -1,6 +1,7 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -16,6 +17,7 @@ public class Choice extends ConfigurationAttribute<List<String>>{
      */
     public Choice(String name) {
         super(name);
+        this.setPropertyValue(new ArrayList<String>());
     }
     
     /**

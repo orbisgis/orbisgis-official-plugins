@@ -1,6 +1,7 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -12,6 +13,7 @@ public class FileList extends ConfigurationAttribute<List<String>>{
 
     public FileList(String name) {
         super(name);
+        this.setPropertyValue(new ArrayList<String>());
     }
     /**
      * Appends the specified file path to the end of this list. 
