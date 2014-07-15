@@ -1,4 +1,4 @@
-package com.mapcomposer.model.configurationattribute.utils;
+package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import javax.swing.JPanel;
