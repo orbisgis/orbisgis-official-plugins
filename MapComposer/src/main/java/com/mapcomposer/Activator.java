@@ -1,5 +1,6 @@
 package com.mapcomposer;
 
+import com.mapcomposer.view.ui.MainWindow;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -19,6 +20,8 @@ public class Activator implements BundleActivator {
                         new ServiceImplementation(),
                         null);
                 */
+            MainWindow win = MainWindow.getInstance();
+            win.setVisible(true);
         }
 
         /**
