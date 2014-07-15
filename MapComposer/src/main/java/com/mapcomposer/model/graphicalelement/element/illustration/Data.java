@@ -8,10 +8,8 @@ import java.util.List;
  */
 public class Data extends IllustrationElement{
 
-    @Override
-    protected void initialisation() {
-        this.setHeight(50);
-        this.setWidth(50);
+    public Data() {
+        super();
     }
     
     @Override

@@ -17,6 +17,7 @@ public abstract class IllustrationElement extends GraphicalElement{
     /**Main constructor.*/
     public IllustrationElement(){
         path = new Source("Path");
+        path.setPropertyValue(".");
     }
     
     /**
@@ -38,7 +39,7 @@ public abstract class IllustrationElement extends GraphicalElement{
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll(this.getAllAttributes());
+        list.addAll(super.getAllAttributes());
         list.add(path);
         return list;
     }

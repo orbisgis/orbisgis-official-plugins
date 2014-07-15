@@ -8,10 +8,8 @@ import java.util.List;
  */
 public class MapImage extends CartographicElement {
 
-    @Override
-    protected void initialisation() {
-        this.setHeight(50);
-        this.setWidth(50);
+    public MapImage() {
+        super();
     }
     
     @Override

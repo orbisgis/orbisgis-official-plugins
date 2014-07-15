@@ -17,6 +17,7 @@ public abstract class CartographicElement extends GraphicalElement{
     public CartographicElement(){
         super();
         this.source = new Source("OWS-Context path");
+        this.source.setPropertyValue(".");
     }
 
     /**
@@ -38,7 +39,7 @@ public abstract class CartographicElement extends GraphicalElement{
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll(this.getAllAttributes());
+        list.addAll(super.getAllAttributes());
         list.add(source);
         return list;
     }

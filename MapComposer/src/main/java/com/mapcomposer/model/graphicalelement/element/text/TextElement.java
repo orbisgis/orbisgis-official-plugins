@@ -27,6 +27,14 @@ public class TextElement extends GraphicalElement{
         this.alignment = new Choice("Alignment");
         this.fontSize = new Numeric("Font size");
         this.text = new Text("Text");
+        
+        this.font.add("serif");
+        this.color.add("black");
+        this.alignment.add("right");
+        this.fontSize.setPropertyValue(8);
+        this.text.setPropertyValue("no text");
+        this.setHeight(30);
+        this.setWidth(150);
     }
 
     @Override
@@ -120,12 +128,5 @@ public class TextElement extends GraphicalElement{
      */
     public String getText() {
         return this.text.getPropertyValue();
-    }
-
-    @Override
-    protected void initialisation() {
-        this.setText("no text");
-        this.setHeight(30);
-        this.setWidth(150);
     }
 }

@@ -30,7 +30,12 @@ public abstract class GraphicalElement {
         rotation=new Numeric("Rotation");
         height=new Numeric("Height");
         width=new Numeric("Width");
-        this.initialisation();
+        
+        x.setPropertyValue(0);
+        y.setPropertyValue(0);
+        rotation.setPropertyValue(0);
+        height.setPropertyValue(0);
+        width.setPropertyValue(0);
     }
 
     /**
@@ -86,10 +91,4 @@ public abstract class GraphicalElement {
         list.add(width);
         return list;
     }
-    
-    /**
-     * Abstract method for the  initialisation of a GE.
-     * This function will be called in the constructor and contain the initialisation of the GE fields.
-     */
-    protected abstract void initialisation();
 }

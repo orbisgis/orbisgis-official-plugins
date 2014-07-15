@@ -17,6 +17,7 @@ public class Orientation extends CartographicElement {
     public Orientation(){
         super();
         icon = new Source("Path");
+        icon.setPropertyValue(".");
     }
 
     /**
@@ -38,14 +39,8 @@ public class Orientation extends CartographicElement {
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll(this.getAllAttributes());
+        list.addAll(super.getAllAttributes());
         list.add(icon);
         return list;
-    }
-
-    @Override
-    protected void initialisation() {
-        this.setHeight(50);
-        this.setWidth(50);
     }
 }

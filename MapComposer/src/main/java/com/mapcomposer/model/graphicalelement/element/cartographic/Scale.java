@@ -8,10 +8,8 @@ import java.util.List;
  */
 public class Scale extends CartographicElement{
 
-    @Override
-    protected void initialisation() {
-        this.setHeight(50);
-        this.setWidth(50);
+    public Scale() {
+        super();
     }
     
     @Override
