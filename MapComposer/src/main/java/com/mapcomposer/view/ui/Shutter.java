@@ -13,35 +13,49 @@ import javax.swing.border.Border;
  */
 public abstract class Shutter extends JPanel implements MouseListener{
     
+    /** Code for the left position of the Shutter */
     public static int LEFT_SHUTTER = 1;
+    /** Code for the right position of the Shutter */
     public static int RIGHT_SHUTTER = 2;
+    /** Base width of the lateral button */
     private static final int clickWidth=20;
-    private static final int minWidth=28;
+    /** Minimum size of the Shutter to only show the lateral button */
+    private static final int minWidth=clickWidth+8;
     
-    /**Normal width ofthe shutter.*/
+    /** Normal width ofthe shutter.*/
     private final int width;
     
+    /** JPanel containing the body ofthe shutter */
     private final JPanel contentPanel;
     
+    /** JPanel of thelateral click button */
     private final JPanel click;
     
     /**Boolean representing the state of the shutter*/
     private boolean open;
     
+    /**
+     * Main constructor.
+     * @param defaultWidth Default width of the shutter when it's open.
+     * @param position Position code for the side of the Shutter. Can be LEFT_SHUTTER or RIGHT_SHUTTER.
+     */
     public Shutter(int defaultWidth, int position){
-        
+        //Border definition.
         Border raisedbevel = BorderFactory.createRaisedBevelBorder();
         Border loweredbevel = BorderFactory.createLoweredBevelBorder();
         
         contentPanel = new JPanel();
+        //Click button creation.
         click = new JPanel();
         click.setPreferredSize(new Dimension(clickWidth, 0));
         click.setBorder(raisedbevel);
         
+        //Shutter creation.
         width = defaultWidth;
         this.setPreferredSize(new Dimension(width, 0));
         this.setBorder(BorderFactory.createCompoundBorder(raisedbevel, loweredbevel));
         
+        //Positionning the shutter
         this.setLayout(new BorderLayout());
         this.add(contentPanel, BorderLayout.CENTER);
         if(position==LEFT_SHUTTER)
@@ -54,10 +68,17 @@ public abstract class Shutter extends JPanel implements MouseListener{
         click.addMouseListener(this);
     }
     
+    /**
+     * Returns the JPanel of the body of the Shutter.
+     * @return Body Jpanel.
+     */
     public JPanel getContentPanel(){
         return contentPanel;
     }
     
+    /**
+     * Toggles the state of the Shutter (open or close).
+     */
     public void toggle(){
         if(open){
             this.setPreferredSize(new Dimension(minWidth, 0));
