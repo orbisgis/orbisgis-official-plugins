@@ -115,7 +115,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
                     if(ca!=null){
                         //Test if to know where the new CA value should be fined
                         if(c instanceof JComboBox){
-                            ca.setValue(((JComboBox)c).getModel().getSelectedItem());
+                            ca.setValue(((JComboBox)c).getModel().getSelectedItem().toString());
                             ca=null;
                             break;
                         }

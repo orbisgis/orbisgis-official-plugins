@@ -6,10 +6,12 @@ import com.mapcomposer.model.configurationattribute.attribute.FileList;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
+import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
 import com.mapcomposer.view.configurationattribute.CARenderer;
 import com.mapcomposer.view.configurationattribute.ChoiceRenderer;
 import com.mapcomposer.view.configurationattribute.FileListRenderer;
 import com.mapcomposer.view.configurationattribute.NumericRenderer;
+import com.mapcomposer.view.configurationattribute.OwsContextRenderer;
 import com.mapcomposer.view.configurationattribute.SourceRenderer;
 import com.mapcomposer.view.configurationattribute.TextRenderer;
 import java.util.HashMap;
@@ -37,6 +39,7 @@ public class CAManager {
         map.put(FileList.class, new FileListRenderer());
         map.put(Source.class, new SourceRenderer());
         map.put(Text.class, new TextRenderer());
+        map.put(OwsContext.class, new OwsContextRenderer());
     }
     
     /**
