@@ -19,8 +19,8 @@ public class FileListRenderer implements CARenderer{
         
         FileList filelist = (FileList)ca;
         
-        pan.add(new JLabel(filelist.getPropertyName()));
-        JComboBox list = new JComboBox(filelist.getPropertyValue().toArray(new String[0]));
+        pan.add(new JLabel(filelist.getName()));
+        JComboBox list = new JComboBox(filelist.getValue().toArray(new String[0]));
         pan.add(list);
         
         return pan;

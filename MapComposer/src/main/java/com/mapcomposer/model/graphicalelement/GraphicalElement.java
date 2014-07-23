@@ -31,11 +31,11 @@ public abstract class GraphicalElement {
         height=new Numeric("Height");
         width=new Numeric("Width");
         
-        x.setPropertyValue(0);
-        y.setPropertyValue(0);
-        rotation.setPropertyValue(0);
-        height.setPropertyValue(0);
-        width.setPropertyValue(0);
+        x.setValue(0);
+        y.setValue(0);
+        rotation.setValue(0);
+        height.setValue(0);
+        width.setValue(0);
     }
 
     /**
@@ -43,7 +43,7 @@ public abstract class GraphicalElement {
      * @param x The x position of the GE.
      */
     public void setX(Integer x) {
-        this.x.setPropertyValue(x);
+        this.x.setValue(x);
     }
 
     /**
@@ -51,7 +51,7 @@ public abstract class GraphicalElement {
      * @param y The y position of the GE.
      */
     public void setY(int y) {
-        this.y.setPropertyValue(y);
+        this.y.setValue(y);
     }
 
     /**
@@ -59,7 +59,7 @@ public abstract class GraphicalElement {
      * @param rotation The rotation angle of the GE.
      */
     public void setRotation(int rotation) {
-        this.rotation.setPropertyValue(rotation);
+        this.rotation.setValue(rotation);
     }
 
     /**
@@ -67,7 +67,7 @@ public abstract class GraphicalElement {
      * @param height The height of the GE.
      */
     public void setHeight(int height) {
-        this.height.setPropertyValue(height);
+        this.height.setValue(height);
     }
 
     /**
@@ -75,7 +75,7 @@ public abstract class GraphicalElement {
      * @param width The width of the GE.
      */
     public void setWidth(int width) {
-        this.width.setPropertyValue(width);
+        this.width.setValue(width);
     }
     
     /**

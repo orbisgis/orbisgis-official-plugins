@@ -21,8 +21,8 @@ public class NumericRenderer implements CARenderer{
         
         Numeric num = (Numeric)ca;
         
-        pan.add(new JLabel(num.getPropertyName()));
-        SpinnerModel model =new SpinnerNumberModel((int)num.getPropertyValue(), -99999, 99999, 1);
+        pan.add(new JLabel(num.getName()));
+        SpinnerModel model =new SpinnerNumberModel((int)num.getValue(), -99999, 99999, 1);
         pan.add(new JSpinner(model));
         return pan;
     }

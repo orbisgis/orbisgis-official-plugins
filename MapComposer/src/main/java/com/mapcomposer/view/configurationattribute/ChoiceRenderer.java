@@ -19,8 +19,8 @@ public class ChoiceRenderer implements CARenderer{
         
         Choice choice = (Choice)ca;
         
-        pan.add(new JLabel(choice.getPropertyName()));
-        JComboBox list = new JComboBox(choice.getPropertyValue().toArray(new String[0]));
+        pan.add(new JLabel(choice.getName()));
+        JComboBox list = new JComboBox(choice.getValue().toArray(new String[0]));
         pan.add(list);
         
         return pan;

@@ -19,8 +19,8 @@ public class TextRenderer implements CARenderer{
         
         Text text = (Text)ca;
         
-        pan.add(new JLabel(text.getPropertyName()));
-        pan.add(new JTextField(text.getPropertyValue()));
+        pan.add(new JLabel(text.getName()));
+        pan.add(new JTextField(text.getValue()));
         
         return pan;
     }

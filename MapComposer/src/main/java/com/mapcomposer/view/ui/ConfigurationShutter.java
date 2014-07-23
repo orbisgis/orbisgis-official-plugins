@@ -104,7 +104,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
                     if(c instanceof JLabel){
                         for(ConfigurationAttribute conf : selectedGE.getAllAttributes()){
                             //The text of the label is compared to the CA of the GE selected
-                            if(conf.getPropertyName().equals(((JLabel)c).getText())){
+                            if(conf.getName().equals(((JLabel)c).getText())){
                                 //Save the CA to set
                                 ca = conf;
                                 break;
@@ -115,17 +115,17 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
                     if(ca!=null){
                         //Test if to know where the new CA value should be fined
                         if(c instanceof JComboBox){
-                            ca.setPropertyValue(((JComboBox)c).getModel().getSelectedItem());
+                            ca.setValue(((JComboBox)c).getModel().getSelectedItem());
                             ca=null;
                             break;
                         }
                         if(c instanceof JSpinner){
-                            ca.setPropertyValue(((JSpinner)c).getValue());
+                            ca.setValue(((JSpinner)c).getValue());
                             ca=null;
                             break;
                         }
                         if(c instanceof JTextField){
-                            ca.setPropertyValue(((JTextField)c).getText());
+                            ca.setValue(((JTextField)c).getText());
                             ca=null;
                             break;
                         }

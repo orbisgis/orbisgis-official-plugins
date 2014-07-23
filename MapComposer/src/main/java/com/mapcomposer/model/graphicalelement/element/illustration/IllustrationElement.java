@@ -17,7 +17,7 @@ public abstract class IllustrationElement extends GraphicalElement{
     /**Main constructor.*/
     public IllustrationElement(){
         path = new Source("Path");
-        path.setPropertyValue(".");
+        path.setValue(".");
     }
     
     /**
@@ -25,7 +25,7 @@ public abstract class IllustrationElement extends GraphicalElement{
      * @return The absolute path string to the source.
      */
     public String getPath(){
-        return path.getPropertyValue();
+        return path.getValue();
     }
     
     /**
@@ -33,7 +33,7 @@ public abstract class IllustrationElement extends GraphicalElement{
      * @param absolutePath New absolute path to the source.
      */
     public void setPath(String absolutePath){
-        this.path.setPropertyValue(absolutePath);
+        this.path.setValue(absolutePath);
     }
 
     @Override

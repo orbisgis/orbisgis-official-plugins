@@ -17,7 +17,7 @@ public class Orientation extends CartographicElement {
     public Orientation(){
         super();
         icon = new Source("Path");
-        icon.setPropertyValue(".");
+        icon.setValue(".");
     }
 
     /**
@@ -25,7 +25,7 @@ public class Orientation extends CartographicElement {
      * @return The icon source path.
      */
     public String getIconPath() {
-        return icon.getPropertyValue();
+        return icon.getValue();
     }
     
     /**
@@ -33,7 +33,7 @@ public class Orientation extends CartographicElement {
      * @param path New path of the icon.
      */
     public void setIconPath(String path) {
-        icon.setPropertyValue(path);
+        icon.setValue(path);
     }
 
     @Override

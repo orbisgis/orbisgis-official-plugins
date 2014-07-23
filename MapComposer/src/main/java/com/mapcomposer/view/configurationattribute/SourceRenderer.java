@@ -20,8 +20,8 @@ public class SourceRenderer implements CARenderer{
         
         Source source = (Source)ca;
         
-        pan.add(new JLabel(source.getPropertyName()));
-        pan.add(new JTextField(source.getPropertyValue()));
+        pan.add(new JLabel(source.getName()));
+        pan.add(new JTextField(source.getValue()));
         JButton button = new JButton("Browse");
         
         pan.add(button);

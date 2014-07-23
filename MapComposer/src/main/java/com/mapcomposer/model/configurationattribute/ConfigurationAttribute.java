@@ -25,7 +25,7 @@ public abstract class ConfigurationAttribute<T> {
      * Setter of the property value.
      * @param value New value of the property.
      */
-    public void setPropertyValue(T value){
+    public void setValue(T value){
         this.t=value;
     }
     
@@ -33,7 +33,7 @@ public abstract class ConfigurationAttribute<T> {
      * Getter returning the property value.
      * @return The property value.
      */
-    public T getPropertyValue(){
+    public T getValue(){
         return t;
     }
     
@@ -41,7 +41,7 @@ public abstract class ConfigurationAttribute<T> {
      * Getter returning the property name.
      * @return The property name.
      */
-    public String getPropertyName(){
+    public String getName(){
         return name;
     }
 }

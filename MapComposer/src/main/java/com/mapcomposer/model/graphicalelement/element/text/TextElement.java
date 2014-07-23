@@ -31,8 +31,8 @@ public class TextElement extends GraphicalElement{
         this.font.add("serif");
         this.color.add("black");
         this.alignment.add("right");
-        this.fontSize.setPropertyValue(8);
-        this.text.setPropertyValue("no text");
+        this.fontSize.setValue(8);
+        this.text.setValue("no text");
         this.setHeight(30);
         this.setWidth(150);
     }
@@ -66,8 +66,8 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
-     * Add an alignement.
-     * @param alignment A new alignement.
+     * Add an alignment.
+     * @param alignment A new alignment.
      */
     public void addAlignment(String alignment) {
         this.alignment.add(alignment);
@@ -78,7 +78,7 @@ public class TextElement extends GraphicalElement{
      * @param fontSize The new font size.
      */
     public void setFontSize(int fontSize) {
-        this.fontSize.setPropertyValue(fontSize);
+        this.fontSize.setValue(fontSize);
     }
 
     /**
@@ -86,7 +86,7 @@ public class TextElement extends GraphicalElement{
      * @param text The new text.
      */
     public void setText(String text) {
-        this.text.setPropertyValue(text);
+        this.text.setValue(text);
     }
     
     
@@ -119,7 +119,7 @@ public class TextElement extends GraphicalElement{
      * @return The font size.
      */
     public Integer getFontSize() {
-        return this.fontSize.getPropertyValue();
+        return this.fontSize.getValue();
     }
 
     /**
@@ -127,6 +127,6 @@ public class TextElement extends GraphicalElement{
      * @return The text of the element.
      */
     public String getText() {
-        return this.text.getPropertyValue();
+        return this.text.getValue();
     }
 }
