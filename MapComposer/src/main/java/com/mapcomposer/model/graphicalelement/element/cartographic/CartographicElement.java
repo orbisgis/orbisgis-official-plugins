@@ -1,11 +1,11 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import java.util.ArrayList;
-import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import java.util.ArrayList;
+import java.util.List;
+import org.orbisgis.coremap.layerModel.OwsMapContext;
 
 /**
  * This class is the root class for each cartographic element based on an OWS-Context.
@@ -22,18 +22,26 @@ public abstract class CartographicElement extends GraphicalElement{
     }
 
     /**
-     * Returns the OWS-Context source.
-     * @return The OWS-C source string.
+     * Returns the OwsMapContext.
+     * @return The OwsMapContext.
      */
-    public String getSource() {
+    public OwsMapContext getOwsMapContext() {
+        return owsc.getOwsContext();
+    }
+
+    /**
+     * Returns the OwsContext path.
+     * @return The OwsContext path.
+     */
+    public String getOwsPath() {
         return owsc.getValue();
     }
     
     /**
-     * Sets the OWS-Context source.
-     * @param owsContext New OWS-Context source.
+     * Sets the OwsContext path.
+     * @param owsContext New OwsContext path.
      */
-    public void setSource(String owsContext) {
+    public void setOwsContext(String owsContext) {
         this.owsc.setValue(owsContext);
     }
 

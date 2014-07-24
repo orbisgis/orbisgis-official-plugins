@@ -77,6 +77,46 @@ public abstract class GraphicalElement {
     public void setWidth(int width) {
         this.width.setValue(width);
     }
+
+    /**
+     * Gets the x position.
+     * @return The x position of the GE.
+     */
+    public int getX() {
+        return this.x.getValue();
+    }
+
+    /**
+     * Gets the y position.
+     * @return The y position of the GE.
+     */
+    public int getY() {
+        return this.y.getValue();
+    }
+
+    /**
+     * Gets the rotation angle.
+     * @return The rotation angle of the GE.
+     */
+    public int getRotation() {
+        return this.rotation.getValue();
+    }
+
+    /**
+     * Gets the height.
+     * @return The height of the GE.
+     */
+    public int getHeight() {
+        return this.height.getValue();
+    }
+
+    /**
+     * Gets the width.
+     * @return The width of the GE.
+     */
+    public int getWidth() {
+        return this.width.getValue();
+    }
     
     /**
      * Returns all the attributes. This function need be be redefined in child class.
