@@ -2,11 +2,15 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
+import java.awt.BorderLayout;
 import java.awt.Component;
-import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -16,11 +20,21 @@ import javax.swing.JTextField;
 /**
  * This class manager the interaction between the user, the UI and the data model.
  */
-public class UIController implements MouseListener{
+public class UIController{
     private static UIController INSTANCE = null;
+    private static Map<GraphicalElement, JPanel> map;
     
     private UIController(){
-        
+        map = new HashMap<>();
+        //as example
+        MapImage mi = new MapImage();
+        map.put(mi, new JPanel(new BorderLayout()));
+        CompositionArea.getInstance().addGE(getPanel(mi));
+        ConfigurationShutter.getInstance().dispalyConfiguration(mi);
+    }
+    
+    public static JPanel getPanel(GraphicalElement ge){
+        return map.get(ge);
     }
     
     public static UIController getInstance(){
@@ -30,12 +44,9 @@ public class UIController implements MouseListener{
         return INSTANCE;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent me) {
+    public void validate(List<JPanel> panels, GraphicalElement ge) {
         ConfigurationAttribute ca=null;
-        if(me.getSource()==ConfigurationShutter.getInstance()){
-            GraphicalElement ge = ConfigurationShutter.getInstance().getSelected();
-            for(JPanel panel : ConfigurationShutter.getInstance().getPanels()){
+            for(JPanel panel : panels){
                 //Takes every components ofthe JPanel
                 for(Component c : panel.getComponents()){
                     //Test if it's a JLabel containing the name of the field
@@ -70,28 +81,8 @@ public class UIController implements MouseListener{
                     }
                 }
             }
-        }
         ConfigurationShutter.getInstance().toggle();
         ConfigurationShutter.getInstance().setSelected(null);
-    }
-
-    @Override
-    public void mousePressed(MouseEvent me) {
-        //Unused
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent me) {
-        //Unused
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent me) {
-        //Unused
-    }
-
-    @Override
-    public void mouseExited(MouseEvent me) {
-        //Unused
+        CompositionArea.getInstance().addGE(GEManager.getInstance().render(ge.getClass()).render(ge));
     }
 }
