@@ -4,7 +4,6 @@ import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
-import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -12,7 +11,6 @@ import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -37,10 +35,10 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     private ConfigurationShutter(){
         super(300, Shutter.LEFT_SHUTTER);
         validate = new JButton("Validate");
-        validate.addMouseListener(UIController.getInstance());
+        validate.addMouseListener(this);
         pan = new JPanel();
         //Just as example
-        this.dispalyConfiguration(new Orientation());
+        //this.dispalyConfiguration(new MapImage());
     }
     
     /** 
@@ -50,14 +48,12 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     public void dispalyConfiguration(GraphicalElement ge){
         this.selectedGE = ge;
         pan = new JPanel();
-        pan.setName("body");
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
         for(ConfigurationAttribute ca : ge.getAllAttributes()){
             pan.add(CAManager.getInstance().getRenderer(ca).render(ca));
         }
         pan.add(validate);
         JScrollPane listScroller = new JScrollPane(pan);
-        listScroller.setName("scroll");
         this.getBodyPanel().add(listScroller);
     }
     
@@ -88,7 +84,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         selectedGE=ge;
     }
 
-    public List<JPanel> getPanels() {
+    private List<JPanel> getPanels() {
         ArrayList<JPanel> list = new ArrayList<>();
         for(Component comp : pan.getComponents()){
             //Verify if it's a JPanel
@@ -97,5 +93,14 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
             }
         }
         return list;
+    }
+    
+    
+    @Override
+    public void mouseClicked(MouseEvent e) {
+        super.mouseClicked(e);
+        if(e.getSource()==validate){
+            UIController.getInstance().validate(getPanels(), selectedGE);
+        }
     }
 }

@@ -1,8 +1,10 @@
 package com.mapcomposer.view.ui;
 
+import com.mapcomposer.controller.UIController;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+import org.orbisgis.view.icons.OrbisGISIcon;
 //import org.orbisgis.view.icons.OrbisGISIcon;
 
 /**
@@ -19,7 +21,7 @@ public class MainWindow extends JFrame{
         super("Map composer");
         //Sets the default size to the window
         this.setSize(600, 400);
-        //this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
+        this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
         this.setJMenuBar(new WindowMenuBar());
         
         JPanel pan = new JPanel();
@@ -28,6 +30,9 @@ public class MainWindow extends JFrame{
         pan.add(CompositionArea.getInstance(), BorderLayout.CENTER);
         pan.add(ElementShutter.getInstance(), BorderLayout.LINE_END);
         this.setContentPane(pan);
+        
+        //Instantiation of the UIController
+        UIController.getInstance();
     }
     
     /**
