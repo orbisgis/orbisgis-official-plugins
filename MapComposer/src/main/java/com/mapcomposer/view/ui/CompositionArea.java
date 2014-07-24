@@ -1,24 +1,6 @@
 package com.mapcomposer.view.ui;
 
-import com.mapcomposer.model.utils.LinkToOrbisGIS;
-import java.awt.BorderLayout;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.swing.BorderFactory;
-import javax.swing.ImageIcon;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
-import org.orbisgis.coremap.layerModel.LayerException;
-import org.orbisgis.coremap.layerModel.OwsMapContext;
-import org.orbisgis.coremap.map.MapTransform;
-import org.orbisgis.progress.NullProgressMonitor;
 
 /**
  * Area for the map document composition.

@@ -17,6 +17,7 @@ public class Orientation extends CartographicElement {
     public Orientation(){
         super();
         icon = new Source("Path");
+        //TODO : set a default value
         icon.setValue(".");
     }
 

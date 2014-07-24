@@ -36,10 +36,13 @@ public class OwsContext extends Source implements CARefresh{
     @Override
     public void setValue(String path){
         super.setValue(path);
-        try {
-            omc.read(new FileInputStream(new File(path)));
-        } catch (FileNotFoundException ex) {
-            Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
+        //verification of the file
+        if(path.contains(".ows")){
+            try {
+                omc.read(new FileInputStream(new File(path)));
+            } catch (FileNotFoundException ex) {
+                Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
     
