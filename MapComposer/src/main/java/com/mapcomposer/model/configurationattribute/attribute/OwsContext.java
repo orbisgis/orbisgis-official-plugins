@@ -46,9 +46,7 @@ public class OwsContext extends Source implements CARefresh{
             }
             try {
                 omc.read(new FileInputStream(new File(path)));
-                System.out.println("read OK");
                 omc.open(new NullProgressMonitor());
-                System.out.println("open OK");
             } catch (FileNotFoundException | LayerException ex) {
                 Logger.getLogger(CartographicRenderer.class.getName()).log(Level.SEVERE, null, ex);
             }

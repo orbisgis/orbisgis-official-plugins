@@ -39,7 +39,8 @@ public class CartographicRenderer extends GERenderer {
         //mapTransform.setExtent(omc.getBoundingBox());
         CartographicElement ce = (CartographicElement)ge;
         mapTransform.setExtent(ce.getOwsMapContext().getBoundingBox());
-        BufferedImage outImage = new BufferedImage(50, 150, BufferedImage.TYPE_INT_RGB);
+        System.out.println("bounding box : "+ce.getOwsMapContext().getBoundingBox().toString());
+        BufferedImage outImage = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_RGB);
         mapTransform.setImage(outImage);
         //omc.draw(mapTransform, new NullProgressMonitor());
         ce.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());

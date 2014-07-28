@@ -14,7 +14,7 @@ public class GERenderer {
     public JPanel render(GraphicalElement ge){
         JPanel panel = UIController.getPanel(ge);
         Insets i = panel.getInsets();
-        panel.setBounds(ge.getX() + i.left, ge.getY() + i.top, ge.getWidth(), ge.getHeight());
+        panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
         //TODO : implement a method to rotate the panel
         //((Graphics2D)panel.getGraphics()).rotate(Math.toRadians(ge.getRotation()));
         return panel;
