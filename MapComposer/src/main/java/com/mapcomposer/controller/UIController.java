@@ -6,7 +6,7 @@ import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
-import java.awt.BorderLayout;
+import com.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Component;
 import java.util.HashMap;
 import java.util.List;
@@ -21,22 +21,37 @@ import javax.swing.JTextField;
  * This class manager the interaction between the user, the UI and the data model.
  */
 public class UIController{
+    /**Unique instance of the class*/
     private static UIController INSTANCE = null;
-    private static Map<GraphicalElement, JPanel> map;
+    /**Map doing the link between GraphicalElements and their CompositionJPanel*/
+    private static Map<GraphicalElement, CompositionJPanel> map;
     
+    /**
+     * Main constructor.
+     */
     private UIController(){
         map = new HashMap<>();
         //as example
         MapImage mi = new MapImage();
-        map.put(mi, new JPanel(new BorderLayout()));
+        //map.put(mi, new JPanel(new BorderLayout()));
+        map.put(mi, new CompositionJPanel(mi));
         CompositionArea.getInstance().addGE(getPanel(mi));
-        ConfigurationShutter.getInstance().dispalyConfiguration(mi);
+        ConfigurationShutter.getInstance().setSelected(mi);
     }
     
-    public static JPanel getPanel(GraphicalElement ge){
+    /**
+     * Returns the CompositionPanel corresponding to a GraphicalElement.
+     * @param ge GraphicalElement.
+     * @return The CompositionPanel corresponding to the GraphicalElement.
+     */
+    public static CompositionJPanel getPanel(GraphicalElement ge){
         return map.get(ge);
     }
     
+    /**
+     * Returns the unique instance of the class.
+     * @return The unique instance of the class.
+     */
     public static UIController getInstance(){
         if(INSTANCE==null){
             INSTANCE=new UIController();
@@ -44,6 +59,12 @@ public class UIController{
         return INSTANCE;
     }
 
+    /**
+     * Read a List of JPanels to set the GraphicalElement ConfigurationAttribute.
+     * This action done when the button validate of the ConfigurationShutter is clicked. 
+     * @param panels List of panel to read.
+     * @param ge GraphicalElement to set.
+     */
     public void validate(List<JPanel> panels, GraphicalElement ge) {
         ConfigurationAttribute ca=null;
             for(JPanel panel : panels){
@@ -81,8 +102,7 @@ public class UIController{
                     }
                 }
             }
-        ConfigurationShutter.getInstance().toggle();
-        ConfigurationShutter.getInstance().setSelected(null);
-        CompositionArea.getInstance().addGE(GEManager.getInstance().render(ge.getClass()).render(ge));
+        ConfigurationShutter.getInstance().close();
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
     }
 }

@@ -1,5 +1,6 @@
 package com.mapcomposer.view.ui;
 
+import com.mapcomposer.view.utils.CompositionJPanel;
 import javax.swing.JPanel;
 
 /**
@@ -17,7 +18,7 @@ public class CompositionArea extends JPanel{
     
     /**
      * Returns the unique instance of the class.
-     * @return 
+     * @return The unique instance of the class.
      */
     public static CompositionArea getInstance(){
         if(INSTANCE==null){
@@ -27,10 +28,10 @@ public class CompositionArea extends JPanel{
     }
     
     /**
-     * Adds a JPanel to itself.
-     * @param panel JPanel to add.
+     * Adds a CompositionPanel to itself. Should be call only once for each GraphicalElement.
+     * @param panel CompositionPanel to add.
      */
-    public void addGE(JPanel panel){
-        this.add(panel);
+    public void addGE(CompositionJPanel panel){
+        this.add(panel.getPanel());
     }
 }

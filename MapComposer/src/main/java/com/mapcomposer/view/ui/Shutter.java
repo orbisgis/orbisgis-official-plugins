@@ -6,6 +6,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
 import javax.swing.border.Border;
 
 /**
@@ -70,17 +71,24 @@ public abstract class Shutter extends JPanel implements MouseListener{
     }
     
     /**
-     * Returns the JPanel of the body of the Shutter.
-     * @return Body JPanel.
+     * Sets the JPanel of the body of the Shutter.
+     * @param panel Body JPanel.
      */
-    public JPanel getBodyPanel(){
-        return body;
+    public void setBodyPanel(JPanel panel){
+        body.add(new JScrollPane(panel));
+    }
+    
+    /**
+     * Resets the JPanel of the body of the Shutter.
+     */
+    public void resetBodyPanel(){
+        body.removeAll();
     }
     
     /**
      * Toggles the state of the Shutter (open or close).
      */
-    public void toggle(){
+    private void toggle(){
         if(open){
             this.setPreferredSize(new Dimension(minWidth, 0));
         }
@@ -90,12 +98,29 @@ public abstract class Shutter extends JPanel implements MouseListener{
         this.revalidate();
         open =! open;
     }
+    
+    /**
+     * Open the shutter.
+     */
+    public void open(){
+        if(!open){
+            this.toggle();
+        }
+    }
+    
+    /**
+     * Close the shutter.
+     */
+    public void close(){
+        if(open){
+            this.toggle();
+        }
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
         if(e.getSource()==click){
             toggle();
-            System.out.println("click");
         }
     }
 
@@ -103,7 +128,6 @@ public abstract class Shutter extends JPanel implements MouseListener{
     public void mousePressed(MouseEvent e) {
         if(e.getSource()==click){
             click.setBorder(BorderFactory.createLoweredBevelBorder());
-            System.out.println("pressed");
         }
     }
 
@@ -111,7 +135,6 @@ public abstract class Shutter extends JPanel implements MouseListener{
     public void mouseReleased(MouseEvent e) {
         if(e.getSource()==click){
             click.setBorder(BorderFactory.createRaisedBevelBorder());
-            System.out.println("released");
         }
         
     }

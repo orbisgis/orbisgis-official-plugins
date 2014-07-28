@@ -10,9 +10,13 @@ import javax.swing.JPanel;
  * Every extention of the renderer sould call super.render(ge) to get the panel where the element is displayed.
  */
 public class GERenderer {
-    
+    /**
+     * Renders the GrapgicalElement given.
+     * @param ge GraphicalElement to render.
+     * @return JPanel of the GraphicalElement.
+     */
     public JPanel render(GraphicalElement ge){
-        JPanel panel = UIController.getPanel(ge);
+        JPanel panel = UIController.getPanel(ge).getPanel();
         Insets i = panel.getInsets();
         panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
         //TODO : implement a method to rotate the panel
