@@ -8,7 +8,7 @@ package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
-import com.mapcomposer.view.graphicalelement.CartographicRenderer;
+import com.mapcomposer.view.graphicalelement.MapImageRenderer;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -48,7 +48,7 @@ public class OwsContext extends Source implements CARefresh{
                 omc.read(new FileInputStream(new File(path)));
                 omc.open(new NullProgressMonitor());
             } catch (FileNotFoundException | LayerException ex) {
-                Logger.getLogger(CartographicRenderer.class.getName()).log(Level.SEVERE, null, ex);
+                Logger.getLogger(MapImageRenderer.class.getName()).log(Level.SEVERE, null, ex);
             }
         }
     }

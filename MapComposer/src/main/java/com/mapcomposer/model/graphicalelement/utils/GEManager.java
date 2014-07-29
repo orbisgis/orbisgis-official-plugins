@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.Map;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.view.graphicalelement.GERenderer;
-import com.mapcomposer.view.graphicalelement.CartographicRenderer;
+import com.mapcomposer.view.graphicalelement.MapImageRenderer;
+import com.mapcomposer.view.graphicalelement.ScaleRenderer;
 
 /**
  * The class manages the link between the GraphicalElements (GE) and their Renderer.
@@ -23,9 +25,9 @@ public class GEManager {
         mapRenderer = new HashMap();
         //Adding the original GE and their Renderer
         //mapRenderer.put(Key.class, GERenderer.class);
-        mapRenderer.put(MapImage.class, (GERenderer) new CartographicRenderer());
+        mapRenderer.put(MapImage.class, new MapImageRenderer());
         //mapRenderer.put(Orientation.class, GERenderer.class);
-        //mapRenderer.put(Scale.class, GERenderer.class);
+        mapRenderer.put(Scale.class, new ScaleRenderer());
         //mapRenderer.put(Data.class, GERenderer.class);
        // mapRenderer.put(Image.class, GERenderer.class);
         //mapRenderer.put(TextElement.class, GERenderer.class);

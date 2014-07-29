@@ -3,6 +3,7 @@ package com.mapcomposer.controller;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -32,11 +33,28 @@ public class UIController{
     private UIController(){
         map = new HashMap<>();
         //as example
+        // map example
         MapImage mi = new MapImage();
-        //map.put(mi, new JPanel(new BorderLayout()));
+        mi.setHeight(400);
+        mi.setWidth(400);
+        mi.setX(20);
+        mi.setY(20);
+        mi.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(mi, new CompositionJPanel(mi));
         CompositionArea.getInstance().addGE(getPanel(mi));
-        ConfigurationShutter.getInstance().setSelected(mi);
+        map.get(mi).setPanel(GEManager.getInstance().render(mi.getClass()).render(mi));
+        //ConfigurationShutter.getInstance().setSelected(mi);
+        // scale example
+        Scale s = new Scale();
+        s.setHeight(20);
+        s.setWidth(400);
+        s.setX(20);
+        s.setY(420);
+        s.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
+        map.put(s, new CompositionJPanel(s));
+        CompositionArea.getInstance().addGE(getPanel(s));
+        map.get(s).setPanel(GEManager.getInstance().render(s.getClass()).render(s));
+        //ConfigurationShutter.getInstance().setSelected(s);
     }
     
     /**

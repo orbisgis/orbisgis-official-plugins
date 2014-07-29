@@ -20,7 +20,7 @@ public class MainWindow extends JFrame{
     private MainWindow(){
         super("Map composer");
         //Sets the default size to the window
-        this.setSize(600, 400);
+        this.setSize(1024, 768);
         this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
         this.setJMenuBar(new WindowMenuBar());
         

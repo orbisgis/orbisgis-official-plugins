@@ -35,6 +35,8 @@ public class CompositionJPanel implements GEMouseListener, MouseListener{
         this.panel = panel;
         this.selected=false;
         setborders();
+        panel.revalidate();
+        panel.repaint();
     }
 
     public JPanel getPanel() {
