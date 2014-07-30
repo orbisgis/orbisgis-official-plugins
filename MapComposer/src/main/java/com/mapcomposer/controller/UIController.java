@@ -7,6 +7,7 @@ import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.model.graphicalelement.element.illustration.Image;
+import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -78,15 +79,16 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(k));
         map.get(k).setPanel(GEManager.getInstance().render(k.getClass()).render(k));
         // scale example
-        /*Text t = new Text();
+        TextElement t = new TextElement();
         t.setHeight(20);
-        t.setWidth(400);
+        t.setWidth(200);
         t.setX(20);
-        t.setY(520);
-        t.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
+        t.setY(100);
+        t.setText("Map Composer");
+        t.setFontSize(8);
         map.put(t, new CompositionJPanel(t));
         CompositionArea.getInstance().addGE(getPanel(t));
-        map.get(t).setPanel(GEManager.getInstance().render(t.getClass()).render(t));*/
+        map.get(t).setPanel(GEManager.getInstance().render(t.getClass()).render(t));
         // Image example
         Image i = new Image();
         i.setHeight(200);

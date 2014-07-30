@@ -8,6 +8,8 @@ import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.model.graphicalelement.element.illustration.Image;
+import com.mapcomposer.model.graphicalelement.element.text.TextElement;
+import com.mapcomposer.view.graphicalelement.TextRenderer;
 import com.mapcomposer.view.graphicalelement.GERenderer;
 import com.mapcomposer.view.graphicalelement.ImageRenderer;
 import com.mapcomposer.view.graphicalelement.KeyRenderer;
@@ -36,7 +38,7 @@ public class GEManager {
         mapRenderer.put(Scale.class, new ScaleRenderer());
         //mapRenderer.put(Data.class, GERenderer.class);
         mapRenderer.put(Image.class, new ImageRenderer());
-        //mapRenderer.put(TextElement.class, GERenderer.class);
+        mapRenderer.put(TextElement.class, new TextRenderer());
     }
     
     /**
