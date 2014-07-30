@@ -1,14 +1,10 @@
-/*
- * To change this license header, choose License Headers in Project Properties.
- * To change this template file, choose Tools | Templates
- * and open the template in the editor.
- */
-
-package com.mapcomposer.view.utils;
+ package com.mapcomposer.view.utils;
 
 import com.mapcomposer.controller.utils.GEMouseListener;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.view.ui.ConfigurationShutter;
+import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
@@ -18,29 +14,27 @@ import javax.swing.border.Border;
 /**
  * This panel extends from JPanel define the action to do when the user click on it.
  */
-public class CompositionJPanel implements GEMouseListener, MouseListener{
+public class CompositionJPanel extends JPanel implements GEMouseListener, MouseListener{
     
     private JPanel panel;
-    private GraphicalElement ge;
+    private final GraphicalElement ge;
     private boolean selected;
+   // private int previousZ;
     
     public CompositionJPanel(GraphicalElement ge){
+        super(new BorderLayout());
         this.ge=ge;
         panel=new JPanel();
         selected = false;
-        this.panel.addMouseListener(this);
+        this.add(panel, BorderLayout.CENTER);
+        this.addMouseListener(this);
     }
-    
     public void setPanel(JPanel panel){
         this.panel = panel;
         this.selected=false;
         setborders();
         panel.revalidate();
         panel.repaint();
-    }
-
-    public JPanel getPanel() {
-        return this.panel;
     }
 
     private void setborders() {
@@ -61,9 +55,17 @@ public class CompositionJPanel implements GEMouseListener, MouseListener{
         setborders();
         if(selected){
             ConfigurationShutter.getInstance().setSelected(ge);
+            panel.setSize((int)this.getSize().getWidth()+8, (int)this.getSize().getHeight()+8);
+            Rectangle r = panel.getBounds();
+            r.translate(-4, -4);
+            panel.setBounds(r);
         }
         else{
             ConfigurationShutter.getInstance().resetSelected();
+            panel.setSize((int)this.getSize().getWidth()-8, (int)this.getSize().getHeight()-8);
+            Rectangle r = panel.getBounds();
+            r.translate(4, 4);
+            panel.setBounds(r);
         }
     }
 

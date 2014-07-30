@@ -78,11 +78,11 @@ public class ScaleRenderer extends GERenderer{
             while(width>=resolution){
                 if(updown){
                 g.drawRect(i*resolution, 0, resolution, height/2-1);
-                g.fillRect(i*resolution, height/2-1, resolution, height-height/2-1);
+                g.fillRect(i*resolution, height/2, resolution, height-height/2);
                 }
                 else{
                     g.fillRect(i*resolution, 0, resolution, height/2-1);
-                    g.drawRect(i*resolution, height/2-1, resolution, height-height/2-1);
+                    g.drawRect(i*resolution, (height-1)/2, resolution, height-height/2);
                 }
                 updown=!updown;
                 width-=resolution;
@@ -90,11 +90,11 @@ public class ScaleRenderer extends GERenderer{
             }
             if(updown){
                 g.drawRect(i*resolution, 0, width-1, height/2-1);
-                g.fillRect(i*resolution, height/2-1, width, height-height/2-1);
+                g.fillRect(i*resolution, height/2, width, height-height/2);
             }
             else{
                 g.fillRect(i*resolution, 0, width, height/2-1);
-                g.drawRect(i*resolution, height/2-1, width-1, height-height/2-1);
+                g.drawRect(i*resolution, (height-1)/2, width-1, height-height/2);
             }
         }
     }

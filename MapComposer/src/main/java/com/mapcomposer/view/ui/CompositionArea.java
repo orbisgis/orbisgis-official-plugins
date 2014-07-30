@@ -32,6 +32,6 @@ public class CompositionArea extends JPanel{
      * @param panel CompositionPanel to add.
      */
     public void addGE(CompositionJPanel panel){
-        this.add(panel.getPanel());
+        this.add(panel);
     }
 }

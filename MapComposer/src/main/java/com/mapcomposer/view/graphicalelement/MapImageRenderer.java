@@ -3,11 +3,9 @@ package com.mapcomposer.view.graphicalelement;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.BorderLayout;
-import java.awt.image.BufferedImage;
 import javax.swing.ImageIcon;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import org.orbisgis.progress.NullProgressMonitor;
 
 /**
  * Renderer associated to the Cartographic GraphicalElement.
