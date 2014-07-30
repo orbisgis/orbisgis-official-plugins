@@ -7,7 +7,9 @@ import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
+import com.mapcomposer.model.graphicalelement.element.illustration.Image;
 import com.mapcomposer.view.graphicalelement.GERenderer;
+import com.mapcomposer.view.graphicalelement.ImageRenderer;
 import com.mapcomposer.view.graphicalelement.KeyRenderer;
 import com.mapcomposer.view.graphicalelement.MapImageRenderer;
 import com.mapcomposer.view.graphicalelement.OrientationRenderer;
@@ -33,7 +35,7 @@ public class GEManager {
         mapRenderer.put(Orientation.class, new OrientationRenderer());
         mapRenderer.put(Scale.class, new ScaleRenderer());
         //mapRenderer.put(Data.class, GERenderer.class);
-       // mapRenderer.put(Image.class, GERenderer.class);
+        mapRenderer.put(Image.class, new ImageRenderer());
         //mapRenderer.put(TextElement.class, GERenderer.class);
     }
     
