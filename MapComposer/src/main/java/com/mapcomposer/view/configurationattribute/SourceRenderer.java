@@ -7,6 +7,7 @@ import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
+import com.mapcomposer.view.utils.MouseListenerBrowse;
 
 /**
  * Renderer associated to the Source ConfigurationAttribute.
@@ -18,11 +19,13 @@ public class SourceRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout());
         
-        Source source = (Source)ca;
+        final Source source = (Source)ca;
         
         pan.add(new JLabel(source.getName()));
-        pan.add(new JTextField(source.getValue()));
+        JTextField jtf = new JTextField(source.getValue());
+        pan.add(jtf);
         JButton button = new JButton("Browse");
+        button.addMouseListener(new MouseListenerBrowse(jtf));
         
         pan.add(button);
         return pan;

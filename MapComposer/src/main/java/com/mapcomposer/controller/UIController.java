@@ -3,6 +3,7 @@ package com.mapcomposer.controller;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.view.ui.CompositionArea;
@@ -38,23 +39,32 @@ public class UIController{
         mi.setHeight(400);
         mi.setWidth(400);
         mi.setX(20);
-        mi.setY(20);
+        mi.setY(120);
         mi.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(mi, new CompositionJPanel(mi));
         CompositionArea.getInstance().addGE(getPanel(mi));
         map.get(mi).setPanel(GEManager.getInstance().render(mi.getClass()).render(mi));
-        //ConfigurationShutter.getInstance().setSelected(mi);
         // scale example
         Scale s = new Scale();
         s.setHeight(20);
         s.setWidth(400);
         s.setX(20);
-        s.setY(420);
+        s.setY(520);
         s.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(s, new CompositionJPanel(s));
         CompositionArea.getInstance().addGE(getPanel(s));
         map.get(s).setPanel(GEManager.getInstance().render(s.getClass()).render(s));
-        //ConfigurationShutter.getInstance().setSelected(s);
+        // orientation example
+        Orientation o = new Orientation();
+        o.setHeight(50);
+        o.setWidth(50);
+        o.setX(420);
+        o.setY(120);
+        o.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
+        o.setIconPath("/home/sylvain/OrbisGIS/maps/arrow.png");
+        map.put(o, new CompositionJPanel(o));
+        CompositionArea.getInstance().addGE(getPanel(o));
+        map.get(o).setPanel(GEManager.getInstance().render(o.getClass()).render(o));
     }
     
     /**
