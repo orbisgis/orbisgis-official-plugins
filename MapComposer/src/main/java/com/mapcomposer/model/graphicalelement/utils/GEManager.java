@@ -3,10 +3,12 @@ package com.mapcomposer.model.graphicalelement.utils;
 import java.util.HashMap;
 import java.util.Map;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.view.graphicalelement.GERenderer;
+import com.mapcomposer.view.graphicalelement.KeyRenderer;
 import com.mapcomposer.view.graphicalelement.MapImageRenderer;
 import com.mapcomposer.view.graphicalelement.OrientationRenderer;
 import com.mapcomposer.view.graphicalelement.ScaleRenderer;
@@ -26,7 +28,7 @@ public class GEManager {
     private GEManager(){
         mapRenderer = new HashMap();
         //Adding the original GE and their Renderer
-        //mapRenderer.put(Key.class, GERenderer.class);
+        mapRenderer.put(Key.class, new KeyRenderer());
         mapRenderer.put(MapImage.class, new MapImageRenderer());
         mapRenderer.put(Orientation.class, new OrientationRenderer());
         mapRenderer.put(Scale.class, new ScaleRenderer());

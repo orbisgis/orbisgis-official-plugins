@@ -2,6 +2,7 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
@@ -65,6 +66,26 @@ public class UIController{
         map.put(o, new CompositionJPanel(o));
         CompositionArea.getInstance().addGE(getPanel(o));
         map.get(o).setPanel(GEManager.getInstance().render(o.getClass()).render(o));
+        // scale example
+        Key k = new Key();
+        k.setHeight(200);
+        k.setWidth(80);
+        k.setX(430);
+        k.setY(320);
+        k.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
+        map.put(k, new CompositionJPanel(k));
+        CompositionArea.getInstance().addGE(getPanel(k));
+        map.get(k).setPanel(GEManager.getInstance().render(k.getClass()).render(k));
+        // scale example
+        /*Text t = new Text();
+        t.setHeight(20);
+        t.setWidth(400);
+        t.setX(20);
+        t.setY(520);
+        t.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
+        map.put(t, new CompositionJPanel(t));
+        CompositionArea.getInstance().addGE(getPanel(t));
+        map.get(t).setPanel(GEManager.getInstance().render(t.getClass()).render(t));*/
     }
     
     /**
