@@ -21,8 +21,8 @@ public class ChoiceRenderer implements CARenderer{
         
         pan.add(new JLabel(choice.getName()));
         System.out.println(choice.getValue());
-        String[] list = choice.getValue().toArray(new String[0]);
         JComboBox jcb = new JComboBox(choice.getValue().toArray(new String[0]));
+        jcb.setSelectedItem(choice.getSelected());
         pan.add(jcb);
         
         return pan;

@@ -18,7 +18,7 @@ public class TextRenderer extends GERenderer{
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_RGB);
         System.out.println(ge.getWidth()+";"+ge.getHeight());
         Graphics2D graph = bi.createGraphics();
-        graph.setFont(new Font(te.getFont(), Font.PLAIN, te.getFontSize()));
+        graph.setFont(new Font(te.getFont(), te.getStyle(), te.getFontSize()));
         //graph.setColor(Color.red);
         graph.drawString(te.getText(), 0, ge.getHeight()/2);
         return bi;

@@ -7,6 +7,7 @@ import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
 /**
@@ -16,6 +17,7 @@ public class TextElement extends GraphicalElement{
     private final Choice font;
     private final Choice color;
     private final Choice alignment;
+    private final Choice style;
     private final Numeric fontSize;
     private final Text text;
     
@@ -26,6 +28,7 @@ public class TextElement extends GraphicalElement{
         this.font = new Choice("Font");
         this.color = new Choice("Color");
         this.alignment = new Choice("Alignment");
+        this.style = new Choice("Style");
         this.fontSize = new Numeric("Font size");
         this.text = new Text("Text");
         
@@ -33,7 +36,13 @@ public class TextElement extends GraphicalElement{
             this.font.add(s);
         }
         this.color.add("black");
-        this.alignment.add("right");
+        this.alignment.add("Left");
+        this.style.add(Style.PLAIN.getName());
+        this.style.add(Style.ITALIC.getName());
+        this.style.add(Style.BOLD.getName());
+        this.style.select("plain");
+        System.out.println(this.style.getSelected());
+        System.out.println(this.style.getValue());
         this.fontSize.setValue(8);
         this.text.setValue("no text");
         this.setHeight(30);
@@ -69,14 +78,6 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
-     * Add an alignment.
-     * @param alignment A new alignment.
-     */
-    public void addAlignment(String alignment) {
-        this.alignment.add(alignment);
-    }
-
-    /**
      * Sets the font size of the text.
      * @param fontSize The new font size.
      */
@@ -90,6 +91,14 @@ public class TextElement extends GraphicalElement{
      */
     public void setText(String text) {
         this.text.setValue(text);
+    }
+
+    /**
+     * Sets the style of the element
+     * @param style The new style.
+     */
+    public void setStyle(Style style) {
+        this.style.select(style.getName());
     }
     
     
@@ -118,6 +127,14 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
+     * Returns the selected stle.
+     * @return The style selected.
+     */
+    public int getStyle() {
+        return Style.getByName(this.style.getSelected()).getValue();
+    }
+
+    /**
      * Returns the font size.
      * @return The font size.
      */
@@ -131,5 +148,37 @@ public class TextElement extends GraphicalElement{
      */
     public String getText() {
         return this.text.getValue();
+    }
+    
+    
+    public static enum Style{
+        PLAIN("plain", Font.PLAIN),
+        ITALIC("italic", Font.ITALIC),
+        BOLD("bold", Font.BOLD);
+
+        private final String name;
+        private final int value;
+        
+        private Style(final String name, final int value) {
+            this.name = name;
+            this.value = value;
+        }
+
+        public String getName() {
+            return name;
+        }
+
+        public int getValue() {
+            return value;
+        }
+
+        static Style getByName(final String name) {
+            for (final Style nvp : values()) {
+                if (nvp.getName().equals(name)) {
+                    return nvp;
+                }
+            }
+            throw new IllegalArgumentException("Invalid name: " + name);
+        }
     }
 }

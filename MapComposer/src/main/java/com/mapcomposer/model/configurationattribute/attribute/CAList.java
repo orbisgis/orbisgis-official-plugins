@@ -35,7 +35,7 @@ public abstract class CAList<T> extends ConfigurationAttribute<List<T>> {
      * @return The value selected.
      */
     public T getSelected(){
-        if(index>0 && index<this.getValue().size()){
+        if(index>=0 && index<this.getValue().size()){
             return this.getValue().get(index);
         }
         else{
