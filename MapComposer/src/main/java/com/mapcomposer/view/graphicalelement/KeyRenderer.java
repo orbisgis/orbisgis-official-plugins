@@ -2,6 +2,7 @@ package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import java.awt.Color;
+import java.awt.image.BufferedImage;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -17,5 +18,10 @@ public class KeyRenderer extends GERenderer{
         panel.add(new JLabel());
         panel.setBackground(Color.DARK_GRAY);
         return panel;
+    }
+
+    @Override
+    public BufferedImage getcontentImage(GraphicalElement ge) {
+        return null;
     }
 }

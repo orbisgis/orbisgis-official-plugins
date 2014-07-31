@@ -2,32 +2,24 @@ package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
-import java.awt.BorderLayout;
 import java.awt.Font;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 /**
  * Renderer associated to the scale GraphicalElement.
  */
 public class TextRenderer extends GERenderer{
-    
+
     @Override
-    public JPanel render(GraphicalElement ge){
-        JPanel panel = super.render(ge);
-        
+    public BufferedImage getcontentImage(GraphicalElement ge){
         TextElement te = ((TextElement)ge);
-        
-        JLabel text = new JLabel();
-        
-        //Font settings
-        //text.setFont();
-        //Text alignment
-        //Text Color
-        text.setText(te.getText());
-        
-        panel.setLayout(new BorderLayout());
-        panel.add(text, BorderLayout.CENTER);
-        return panel;
+        //Drawing on a BufferedImage the text.
+        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_RGB);
+        Graphics2D graph = bi.createGraphics();
+        graph.setFont(new Font("TimesRoman", Font.PLAIN, te.getFontSize()));
+        //graph.setColor(Color.red);
+        graph.drawString(te.getText(), 0, ge.getHeight()/2);
+        return bi;
     }
 }

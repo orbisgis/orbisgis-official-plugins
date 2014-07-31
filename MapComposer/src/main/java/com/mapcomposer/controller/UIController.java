@@ -9,6 +9,7 @@ import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import com.mapcomposer.model.graphicalelement.element.illustration.Image;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
+import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
@@ -43,6 +44,7 @@ public class UIController{
         mi.setWidth(400);
         mi.setX(20);
         mi.setY(120);
+        mi.setRotation(0);
         mi.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(mi, new CompositionJPanel(mi));
         CompositionArea.getInstance().addGE(getPanel(mi));
@@ -53,6 +55,7 @@ public class UIController{
         s.setWidth(400);
         s.setX(20);
         s.setY(520);
+        s.setRotation(0);
         s.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(s, new CompositionJPanel(s));
         CompositionArea.getInstance().addGE(getPanel(s));
@@ -63,6 +66,7 @@ public class UIController{
         o.setWidth(50);
         o.setX(420);
         o.setY(120);
+        o.setRotation(0);
         o.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         o.setIconPath("/home/sylvain/OrbisGIS/maps/arrow.png");
         map.put(o, new CompositionJPanel(o));
@@ -74,6 +78,7 @@ public class UIController{
         k.setWidth(80);
         k.setX(430);
         k.setY(320);
+        k.setRotation(0);
         k.setOwsContext("/home/sylvain/OrbisGIS/maps/MyMap.ows");
         map.put(k, new CompositionJPanel(k));
         CompositionArea.getInstance().addGE(getPanel(k));
@@ -84,6 +89,7 @@ public class UIController{
         t.setWidth(200);
         t.setX(20);
         t.setY(100);
+        t.setRotation(0);
         t.setText("Map Composer");
         t.setFontSize(8);
         map.put(t, new CompositionJPanel(t));
@@ -95,6 +101,7 @@ public class UIController{
         i.setWidth(400);
         i.setX(470);
         i.setY(20);
+        i.setRotation(0);
         i.setPath("/home/sylvain/OrbisGIS/maps/logo.png");
         map.put(i, new CompositionJPanel(i));
         CompositionArea.getInstance().addGE(getPanel(i));
@@ -165,6 +172,9 @@ public class UIController{
                 }
             }
         ConfigurationShutter.getInstance().close();
+        if(ge instanceof GERefresh){
+            ((GERefresh)ge).refresh();
+        }
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
     }
 }

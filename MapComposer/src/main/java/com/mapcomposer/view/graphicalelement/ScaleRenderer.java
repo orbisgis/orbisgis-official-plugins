@@ -2,10 +2,8 @@ package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
-import java.awt.BorderLayout;
-import java.awt.Graphics;
 import java.awt.Toolkit;
-import javax.swing.JPanel;
+import java.awt.image.BufferedImage;
 
 /**
  * Renderer associated to the scale GraphicalElement.
@@ -26,10 +24,10 @@ public class ScaleRenderer extends GERenderer{
         this.dpmm = (int)(((double)dpi)/25.4);
         System.out.println("dpi : "+dpi+"; dpmm : "+dpmm);
     }
-    
+
     @Override
-    public JPanel render(GraphicalElement ge){
-        JPanel panel = super.render(ge);
+    public BufferedImage getcontentImage(GraphicalElement ge) {
+        
         int resolution=-1;
         
         //Get the map scale
@@ -51,51 +49,34 @@ public class ScaleRenderer extends GERenderer{
         resolution/=mapScalemmR;
         resolution*=dpmm;
         
-        panel.setLayout(new BorderLayout());
-        panel.add(new drawPanel(resolution, ge.getHeight(), ge.getWidth()), BorderLayout.CENTER);
-        return panel;
-    }
-    
-    /**
-     * Private class that define the panel where the scale is drawn.
-     */
-    private class drawPanel extends JPanel{
-        private int resolution, height, width;
+        //Draw the BufferedImage
+        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_RGB);
         
-        public drawPanel(int resolution, int height, int width){
-            this.resolution = resolution;
-            this.height = height;
-            this.width = width;
-        }
-        
-        @Override
-        public void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            //Used to alternate the white and the back rectangle
-            boolean updown = false;
+        boolean updown = false;
             int i=0;
-            int width = this.width;
+            int width = ge.getWidth();
             while(width>=resolution){
                 if(updown){
-                g.drawRect(i*resolution, 0, resolution, height/2-1);
-                g.fillRect(i*resolution, height/2, resolution, height-height/2);
+                bi.createGraphics().drawRect(i*resolution, 0, resolution, ge.getHeight()/2-1);
+                bi.createGraphics().fillRect(i*resolution, ge.getHeight()/2, resolution, ge.getHeight()-ge.getHeight()/2);
                 }
                 else{
-                    g.fillRect(i*resolution, 0, resolution, height/2-1);
-                    g.drawRect(i*resolution, (height-1)/2, resolution, height-height/2);
+                    bi.createGraphics().fillRect(i*resolution, 0, resolution, ge.getHeight()/2-1);
+                    bi.createGraphics().drawRect(i*resolution, (ge.getHeight()-1)/2, resolution, ge.getHeight()-ge.getHeight()/2);
                 }
                 updown=!updown;
                 width-=resolution;
                 i++;
             }
             if(updown){
-                g.drawRect(i*resolution, 0, width-1, height/2-1);
-                g.fillRect(i*resolution, height/2, width, height-height/2);
+                bi.createGraphics().drawRect(i*resolution, 0, width-1, ge.getHeight()/2-1);
+                bi.createGraphics().fillRect(i*resolution, ge.getHeight()/2, width, ge.getHeight()-ge.getHeight()/2);
             }
             else{
-                g.fillRect(i*resolution, 0, width, height/2-1);
-                g.drawRect(i*resolution, (height-1)/2, width-1, height-height/2);
+                bi.createGraphics().fillRect(i*resolution, 0, width, ge.getHeight()/2-1);
+                bi.createGraphics().drawRect(i*resolution, (ge.getHeight()-1)/2, width-1, ge.getHeight()-ge.getHeight()/2);
             }
-        }
+        
+        return bi;
     }
 }
