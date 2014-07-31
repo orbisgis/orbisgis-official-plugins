@@ -1,12 +1,14 @@
 package com.mapcomposer.view.ui;
 
 import java.awt.BorderLayout;
+import java.awt.ComponentOrientation;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.border.Border;
 
 /**
@@ -18,6 +20,8 @@ public abstract class Shutter extends JPanel implements MouseListener{
     public static int LEFT_SHUTTER = 1;
     /** Code for the right position of the Shutter */
     public static int RIGHT_SHUTTER = 2;
+    /** Side of the shutter */
+    public int side;
     /** Base width of the lateral button */
     private static final int clickWidth=20;
     /** Minimum size of the Shutter to only show the lateral button */
@@ -41,12 +45,13 @@ public abstract class Shutter extends JPanel implements MouseListener{
      * @param position Position code for the side of the Shutter. Can be LEFT_SHUTTER or RIGHT_SHUTTER.
      */
     public Shutter(int defaultWidth, int position){
+        side = position;
         width = defaultWidth;
         //Border definition.
         Border raisedbevel = BorderFactory.createRaisedBevelBorder();
         Border loweredbevel = BorderFactory.createLoweredBevelBorder();
         
-        body = new JPanel();
+        body = new JPanel(new BorderLayout());
         
         //Click button creation.
         click = new JPanel();
@@ -75,7 +80,15 @@ public abstract class Shutter extends JPanel implements MouseListener{
      * @param panel Body JPanel.
      */
     public void setBodyPanel(JPanel panel){
-        body.add(new JScrollPane(panel));
+        body.removeAll();
+        body.revalidate();
+        body.repaint();
+        JScrollPane pane = new JScrollPane(panel);
+        if(side == LEFT_SHUTTER)
+            pane.setComponentOrientation(ComponentOrientation.RIGHT_TO_LEFT);
+        if(side == RIGHT_SHUTTER)
+            pane.setComponentOrientation(ComponentOrientation.LEFT_TO_RIGHT);
+        body.add(pane, BorderLayout.CENTER);
     }
     
     /**
