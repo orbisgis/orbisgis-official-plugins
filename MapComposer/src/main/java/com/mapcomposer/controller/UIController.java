@@ -1,6 +1,7 @@
 package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.attribute.CAList;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
@@ -154,7 +155,7 @@ public class UIController{
                     if(ca!=null){
                         //Test if to know where the new CA value should be fined
                         if(c instanceof JComboBox){
-                            ca.setValue(((JComboBox)c).getModel().getSelectedItem().toString());
+                            ((CAList)ca).select(((JComboBox)c).getModel().getSelectedItem().toString());
                             ca=null;
                             break;
                         }

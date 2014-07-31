@@ -7,6 +7,7 @@ import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import java.awt.GraphicsEnvironment;
 
 /**
  * GraphicalElement displaying a text. Several aspects can be defined such as the text color, the font,the font size ...
@@ -28,7 +29,9 @@ public class TextElement extends GraphicalElement{
         this.fontSize = new Numeric("Font size");
         this.text = new Text("Text");
         
-        this.font.add("serif");
+        for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
+            this.font.add(s);
+        }
         this.color.add("black");
         this.alignment.add("right");
         this.fontSize.setValue(8);
