@@ -15,7 +15,7 @@ public class TextRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
         JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout());
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
         Text text = (Text)ca;
         

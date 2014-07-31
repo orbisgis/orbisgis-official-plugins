@@ -17,7 +17,7 @@ public class NumericRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
         JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout());
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
         Numeric num = (Numeric)ca;
         

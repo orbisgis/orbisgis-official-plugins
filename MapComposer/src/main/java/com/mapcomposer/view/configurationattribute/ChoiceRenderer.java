@@ -15,7 +15,7 @@ public class ChoiceRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
         JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout());
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
         Choice choice = (Choice)ca;
         

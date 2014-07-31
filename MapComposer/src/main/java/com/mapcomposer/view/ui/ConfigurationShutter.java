@@ -4,6 +4,7 @@ import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
@@ -47,7 +48,11 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         pan = new JPanel();
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
         for(ConfigurationAttribute ca : ge.getAllAttributes()){
-            pan.add(CAManager.getInstance().getRenderer(ca).render(ca));
+            JPanel panel = CAManager.getInstance().getRenderer(ca).render(ca);
+            //It align the button to le left, but why ?
+            panel.setAlignmentX(JPanel.TOP_ALIGNMENT);
+            
+            pan.add(panel);
         }
         pan.add(validate);
         this.setBodyPanel(pan);

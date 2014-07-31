@@ -24,7 +24,7 @@ public class OwsContextRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
         JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout());
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
         Source source = (Source)ca;
         pan.add(new JLabel(source.getName()));
