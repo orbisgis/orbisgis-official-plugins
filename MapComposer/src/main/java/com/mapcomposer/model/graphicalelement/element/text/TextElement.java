@@ -16,35 +16,45 @@ import java.awt.GraphicsEnvironment;
  * GraphicalElement displaying a text. Several aspects can be defined such as the text color, the font,the font size ...
  */
 public class TextElement extends GraphicalElement{
+    /** Fonts allowed */
     private final Choice font;
-    private final ColorCA color;
+    /** Color of the Text */
+    private final ColorCA colorText;
+    /** Color of the background */
+    private final ColorCA colorBack;
+    /** Alignment of the text */
     private final Choice alignment;
+    /** Style (plain, italic, bold) of the text */
     private final Choice style;
+    /** Size of the font */
     private final Numeric fontSize;
+    /** Text itself */
     private final Text text;
     
     /**
      * Public main constructor.
      */
     public TextElement(){
+        //ConfigurationAttribute instantiation
         this.font = new Choice("Font");
-        this.color = new ColorCA("Color");
+        this.colorText = new ColorCA("Text color");
+        this.colorBack = new ColorCA("Background color");
         this.alignment = new Choice("Alignment");
         this.style = new Choice("Style");
         this.fontSize = new Numeric("Font size");
         this.text = new Text("Text");
         
+        //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
         }
-        this.color.setValue(Color.BLACK);
+        this.colorBack.setValue(Color.WHITE);
+        this.colorText.setValue(Color.BLACK);
         this.alignment.add("Left");
         this.style.add(Style.PLAIN.getName());
         this.style.add(Style.ITALIC.getName());
         this.style.add(Style.BOLD.getName());
         this.style.select("plain");
-        System.out.println(this.style.getSelected());
-        System.out.println(this.style.getValue());
         this.fontSize.setValue(8);
         this.text.setValue("no text");
         this.setHeight(30);
@@ -56,7 +66,8 @@ public class TextElement extends GraphicalElement{
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.addAll( super.getAllAttributes());
         list.add(font);
-        list.add(color);
+        list.add(colorBack);
+        list.add(colorText);
         list.add(alignment);
         list.add(style);
         list.add(fontSize);
@@ -73,11 +84,19 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
-     * Sets the color.
+     * Sets the color of the text.
      * @param color The new color.
      */
-    public void setColor(Color color) {
-        this.color.setValue(color);
+    public void setColorText(Color color) {
+        this.colorText.setValue(color);
+    }
+
+    /**
+     * Sets the color of the background.
+     * @param color The new color.
+     */
+    public void setColorBack(Color color) {
+        this.colorBack.setValue(color);
     }
 
     /**
@@ -114,11 +133,19 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
-     * Returns the selected color.
-     * @return The color selected.
+     * Returns the text color.
+     * @return The color of the text.
      */
-    public Color getColor() {
-        return this.color.getValue();
+    public Color getColorBack() {
+        return this.colorBack.getValue();
+    }
+
+    /**
+     * Returns the background color.
+     * @return The color of the background.
+     */
+    public Color getColorText() {
+        return this.colorText.getValue();
     }
 
     /**

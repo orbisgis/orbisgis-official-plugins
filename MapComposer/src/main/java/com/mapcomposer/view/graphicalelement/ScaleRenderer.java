@@ -22,7 +22,6 @@ public class ScaleRenderer extends GERenderer{
         //gets the screen dpi
         this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
         this.dpmm = (int)(((double)dpi)/25.4);
-        System.out.println("dpi : "+dpi+"; dpmm : "+dpmm);
     }
 
     @Override

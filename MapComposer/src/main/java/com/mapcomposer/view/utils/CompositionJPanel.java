@@ -50,7 +50,6 @@ public class CompositionJPanel extends JPanel implements GEMouseListener, MouseL
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        System.out.println("click");
         this.selected=!selected;
         setborders();
         if(selected){

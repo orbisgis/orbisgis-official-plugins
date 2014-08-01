@@ -25,17 +25,19 @@ public abstract class GraphicalElement {
      * Main constructor.
      */
     public GraphicalElement(){
+        //ConfigurationAttribute instantiation
         x=new Numeric("x");
         y=new Numeric("y");
         rotation=new Numeric("Rotation");
         height=new Numeric("Height");
         width=new Numeric("Width");
         
+        //ConfigurationAttribute initialisation
         x.setValue(0);
         y.setValue(0);
         rotation.setValue(0);
-        height.setValue(0);
-        width.setValue(0);
+        height.setValue(10);
+        width.setValue(10);
     }
 
     /**

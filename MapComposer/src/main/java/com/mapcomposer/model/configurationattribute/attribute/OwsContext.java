@@ -38,7 +38,6 @@ public class OwsContext extends Source implements CARefresh{
     @Override
     public void setValue(String path){
         super.setValue(path);
-        System.out.println(path);
         //verification of the file
         if(path.contains(".ows")){
             if(omc.isOpen()){
