@@ -4,9 +4,11 @@ import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Choice;
+import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
 
@@ -15,7 +17,7 @@ import java.awt.GraphicsEnvironment;
  */
 public class TextElement extends GraphicalElement{
     private final Choice font;
-    private final Choice color;
+    private final ColorCA color;
     private final Choice alignment;
     private final Choice style;
     private final Numeric fontSize;
@@ -26,7 +28,7 @@ public class TextElement extends GraphicalElement{
      */
     public TextElement(){
         this.font = new Choice("Font");
-        this.color = new Choice("Color");
+        this.color = new ColorCA("Color");
         this.alignment = new Choice("Alignment");
         this.style = new Choice("Style");
         this.fontSize = new Numeric("Font size");
@@ -35,7 +37,7 @@ public class TextElement extends GraphicalElement{
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
         }
-        this.color.add("black");
+        this.color.setValue(Color.BLACK);
         this.alignment.add("Left");
         this.style.add(Style.PLAIN.getName());
         this.style.add(Style.ITALIC.getName());
@@ -56,6 +58,7 @@ public class TextElement extends GraphicalElement{
         list.add(font);
         list.add(color);
         list.add(alignment);
+        list.add(style);
         list.add(fontSize);
         list.add(text);
         return list;
@@ -70,11 +73,11 @@ public class TextElement extends GraphicalElement{
     }
 
     /**
-     * Add a predefined color.
-     * @param color A new color.
+     * Sets the color.
+     * @param color The new color.
      */
-    public void addColor(String color) {
-        this.color.add(color);
+    public void setColor(Color color) {
+        this.color.setValue(color);
     }
 
     /**
@@ -114,8 +117,8 @@ public class TextElement extends GraphicalElement{
      * Returns the selected color.
      * @return The color selected.
      */
-    public String getColor() {
-        return this.color.getSelected();
+    public Color getColor() {
+        return this.color.getValue();
     }
 
     /**

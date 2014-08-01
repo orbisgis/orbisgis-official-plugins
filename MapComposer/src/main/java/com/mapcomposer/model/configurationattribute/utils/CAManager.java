@@ -2,6 +2,7 @@ package com.mapcomposer.model.configurationattribute.utils;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Choice;
+import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.attribute.FileList;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
@@ -9,6 +10,7 @@ import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
 import com.mapcomposer.view.configurationattribute.CARenderer;
 import com.mapcomposer.view.configurationattribute.ChoiceRenderer;
+import com.mapcomposer.view.configurationattribute.ColorRenderer;
 import com.mapcomposer.view.configurationattribute.FileListRenderer;
 import com.mapcomposer.view.configurationattribute.NumericRenderer;
 import com.mapcomposer.view.configurationattribute.OwsContextRenderer;
@@ -40,6 +42,7 @@ public class CAManager {
         map.put(Source.class, new SourceRenderer());
         map.put(Text.class, new TextRenderer());
         map.put(OwsContext.class, new OwsContextRenderer());
+        map.put(ColorCA.class, new ColorRenderer());
     }
     
     /**

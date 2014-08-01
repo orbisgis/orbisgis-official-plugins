@@ -19,7 +19,7 @@ public class TextRenderer extends GERenderer{
         System.out.println(ge.getWidth()+";"+ge.getHeight());
         Graphics2D graph = bi.createGraphics();
         graph.setFont(new Font(te.getFont(), te.getStyle(), te.getFontSize()));
-        //graph.setColor(Color.red);
+        graph.setColor(te.getColor());
         graph.drawString(te.getText(), 0, ge.getHeight()/2);
         return bi;
     }

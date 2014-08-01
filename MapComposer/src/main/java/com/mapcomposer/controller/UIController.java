@@ -2,6 +2,7 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.CAList;
+import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
@@ -166,6 +167,11 @@ public class UIController{
                         }
                         if(c instanceof JTextField){
                             ca.setValue(((JTextField)c).getText());
+                            ca=null;
+                            break;
+                        }
+                        if(c instanceof JLabel && ((JLabel)c).getText().equals("Text demo")){
+                            ca.setValue(c.getForeground());
                             ca=null;
                             break;
                         }
