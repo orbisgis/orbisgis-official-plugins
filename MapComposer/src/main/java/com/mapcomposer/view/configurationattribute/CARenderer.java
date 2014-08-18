@@ -15,4 +15,11 @@ public interface CARenderer {
      * @return JPanel with the representation of the attribute.
      */
     public JPanel render(ConfigurationAttribute ca);
+    
+    /**
+     * Extracts the value contained by the JPanel and set the attribute.
+     * @param panel JPanel of the ConfigurationShutter containing the value.
+     * @param attribute ConfigurationAttribute to set.
+     */
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute);
 }

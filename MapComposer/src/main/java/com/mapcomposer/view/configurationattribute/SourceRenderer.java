@@ -1,6 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
@@ -8,6 +9,8 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextField;
 import com.mapcomposer.view.utils.MouseListenerBrowse;
+import java.awt.Component;
+import javax.swing.JComboBox;
 
 /**
  * Renderer associated to the Source ConfigurationAttribute.
@@ -29,6 +32,16 @@ public class SourceRenderer implements CARenderer{
         
         pan.add(button);
         return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        Source source = (Source)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JTextField){
+                source.setValue(((JTextField)c).getText());
+            }
+        }
     }
     
 }

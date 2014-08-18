@@ -1,10 +1,13 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.view.utils.ColorChooser;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
+import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
@@ -28,6 +31,19 @@ public class ColorRenderer implements CARenderer{
         
         pan.add(button);
         return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        ColorCA color = (ColorCA)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JLabel){
+                JLabel label = (JLabel)c;
+                if(label.getText().equals("Text demo")){
+                    color.setValue(label.getForeground());
+                }
+            }
+        }
     }
     
 }

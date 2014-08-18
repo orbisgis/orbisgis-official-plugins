@@ -3,6 +3,7 @@ package com.mapcomposer.controller;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.CAList;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
+import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
@@ -138,46 +139,12 @@ public class UIController{
      */
     public void validate(List<JPanel> panels, GraphicalElement ge) {
         ConfigurationAttribute ca=null;
-            for(JPanel panel : panels){
-                //Takes every components ofthe JPanel
-                for(Component c : panel.getComponents()){
-                    //Test if it's a JLabel containing the name of the field
-                    if(c instanceof JLabel){
-                        for(ConfigurationAttribute conf : ge.getAllAttributes()){
-                            //The text of the label is compared to the CA of the GE selected
-                            if(conf.getName().equals(((JLabel)c).getText())){
-                                //Save the CA to set
-                                ca = conf;
-                                break;
-                            }
-                        }
-                    }
-                    //If the CA was fineded before
-                    if(ca!=null){
-                        //Test if to know where the new CA value should be fined
-                        if(c instanceof JComboBox){
-                            ((CAList)ca).select(((JComboBox)c).getModel().getSelectedItem().toString());
-                            ca=null;
-                            break;
-                        }
-                        if(c instanceof JSpinner){
-                            ca.setValue(((JSpinner)c).getValue());
-                            ca=null;
-                            break;
-                        }
-                        if(c instanceof JTextField){
-                            ca.setValue(((JTextField)c).getText());
-                            ca=null;
-                            break;
-                        }
-                        if(c instanceof JLabel && ((JLabel)c).getText().equals("Text demo")){
-                            ca.setValue(c.getForeground());
-                            ca=null;
-                            break;
-                        }
-                    }
-                }
-            }
+        for(int i =0; i<panels.size(); i++){
+            System.out.println("i : "+i);
+            ca=ge.getAllAttributes().get(i);
+            System.out.println("ca : "+ca);
+            CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
+        }
         ConfigurationShutter.getInstance().close();
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();

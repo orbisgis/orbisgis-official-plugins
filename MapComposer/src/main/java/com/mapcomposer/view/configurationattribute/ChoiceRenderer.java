@@ -2,6 +2,7 @@ package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Choice;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -25,6 +26,16 @@ public class ChoiceRenderer implements CARenderer{
         pan.add(jcb);
         
         return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        Choice choice = (Choice)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JComboBox){
+                choice.select(((JComboBox)c).getModel().getSelectedItem().toString());
+            }
+        }
     }
     
 }

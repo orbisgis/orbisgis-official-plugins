@@ -7,8 +7,10 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
+import java.awt.Component;
 import java.awt.FlowLayout;
 import java.io.File;
 import java.io.FilenameFilter;
@@ -49,6 +51,16 @@ public class OwsContextRenderer implements CARenderer{
         list.setSelectedItem(ca.getValue());
         pan.add(list);
         return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        Source source = (Source)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JComboBox){
+                source.setValue(((JComboBox)c).getModel().getSelectedItem().toString());
+            }
+        }
     }
     
 }
