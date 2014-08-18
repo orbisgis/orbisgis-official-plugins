@@ -25,6 +25,7 @@ public class ColorRenderer implements CARenderer{
         
         pan.add(new JLabel(color.getName()));
         JLabel label = new JLabel("Text demo");
+        label.setForeground(color.getValue());
         pan.add(label);
         JButton button = new JButton("Color Chooser");
         button.addMouseListener(new ColorChooser(label));

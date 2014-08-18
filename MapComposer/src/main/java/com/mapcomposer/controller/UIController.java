@@ -140,9 +140,7 @@ public class UIController{
     public void validate(List<JPanel> panels, GraphicalElement ge) {
         ConfigurationAttribute ca=null;
         for(int i =0; i<panels.size(); i++){
-            System.out.println("i : "+i);
             ca=ge.getAllAttributes().get(i);
-            System.out.println("ca : "+ca);
             CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
         }
         ConfigurationShutter.getInstance().close();

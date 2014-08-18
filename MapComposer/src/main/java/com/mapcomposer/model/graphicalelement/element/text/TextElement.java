@@ -30,6 +30,8 @@ public class TextElement extends GraphicalElement{
     private final Numeric fontSize;
     /** Text itself */
     private final Text text;
+    /** Alpha (transparency value) */
+    private final Numeric alpha;
     
     /**
      * Public main constructor.
@@ -43,6 +45,7 @@ public class TextElement extends GraphicalElement{
         this.style = new Choice("Style");
         this.fontSize = new Numeric("Font size");
         this.text = new Text("Text");
+        this.alpha = new Numeric("Alpha");
         
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
@@ -57,6 +60,7 @@ public class TextElement extends GraphicalElement{
         this.style.select("plain");
         this.fontSize.setValue(8);
         this.text.setValue("no text");
+        this.alpha.setValue(0);
         this.setHeight(30);
         this.setWidth(150);
     }
@@ -72,6 +76,7 @@ public class TextElement extends GraphicalElement{
         list.add(style);
         list.add(fontSize);
         list.add(text);
+        list.add(alpha);
         return list;
     }
 
@@ -113,6 +118,14 @@ public class TextElement extends GraphicalElement{
      */
     public void setText(String text) {
         this.text.setValue(text);
+    }
+
+    /**
+     * Sets the alpha value of the element
+     * @param alpha The new value.
+     */
+    public void setAlpha(int alpha) {
+        this.alpha.setValue(alpha);
     }
 
     /**
@@ -178,6 +191,14 @@ public class TextElement extends GraphicalElement{
      */
     public String getText() {
         return this.text.getValue();
+    }
+
+    /**
+     * Returns the alpha value of the element.
+     * @return The alpha value of the element.
+     */
+    public int getAlpha() {
+        return this.alpha.getValue();
     }
     
     
