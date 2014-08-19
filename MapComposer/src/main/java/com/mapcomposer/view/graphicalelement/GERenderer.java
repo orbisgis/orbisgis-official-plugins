@@ -15,7 +15,7 @@ import javax.swing.JPanel;
  * Base renderer for GraphicalElement.
  * Every extention of the renderer sould call super.render(ge) to get the panel where the element is displayed.
  */
-public abstract class GERenderer {
+public class GERenderer {
     /**
      * Renders the GrapgicalElement given.
      * @param ge GraphicalElement to render.
@@ -57,5 +57,7 @@ public abstract class GERenderer {
      * @param ge GraphicalElement
      * @return The buffered image corresponding to the GraphicalElement
      */
-    public abstract BufferedImage getcontentImage(GraphicalElement ge);
+    public BufferedImage getcontentImage(GraphicalElement ge){
+        return null;
+    }
 }

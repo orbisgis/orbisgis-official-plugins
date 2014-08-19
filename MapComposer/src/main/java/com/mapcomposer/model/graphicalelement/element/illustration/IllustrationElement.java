@@ -9,7 +9,7 @@ import com.mapcomposer.model.graphicalelement.GraphicalElement;
 /**
  * Root class for illustration GraphicalElements.
  */
-public abstract class IllustrationElement extends GraphicalElement{
+public class IllustrationElement extends GraphicalElement{
     
     /** Path to the data source of the element.*/;
     private final Source path;
@@ -18,6 +18,15 @@ public abstract class IllustrationElement extends GraphicalElement{
     public IllustrationElement(){
         path = new Source("Path");
         path.setValue(".");
+    }
+    
+    /**
+     * Clone constructor.
+     * @param ge
+     */
+    public IllustrationElement(IllustrationElement ge){
+        super(ge);
+        path = ge.path;
     }
     
     /**

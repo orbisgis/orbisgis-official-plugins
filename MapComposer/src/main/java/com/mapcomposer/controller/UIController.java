@@ -15,9 +15,17 @@ import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
+import java.lang.invoke.MethodHandle;
+import java.lang.invoke.MethodHandles;
+import java.lang.invoke.MethodType;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JPanel;
 
 /**
@@ -29,13 +37,14 @@ public class UIController{
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private static Map<GraphicalElement, CompositionJPanel> map;
     /**Selected GraphicalElement */
-    private static GraphicalElement ge;
+    private static List<GraphicalElement> listGE;
     
     /**
      * Main constructor.
      */
     private UIController(){
         map = new HashMap<>();
+        listGE = new ArrayList<>();
         //as example
         // map example
         MapImage mi = new MapImage();
@@ -132,8 +141,8 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void selectGE(GraphicalElement ge){
-        this.ge=ge;
-        ConfigurationShutter.getInstance().dispalyConfiguration(ge.getAllAttributes());
+        this.listGE.add(ge);
+        ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
     
     /**
@@ -141,7 +150,7 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
-        this.ge=null;
+        this.listGE.remove(ge);
         ConfigurationShutter.getInstance().eraseConfiguration();
     }
 
@@ -151,18 +160,37 @@ public class UIController{
      * @param panels List of panel to read.
      */
     public void validate(List<JPanel> panels) {
-        ConfigurationAttribute ca=null;
-        for(int i =0; i<panels.size(); i++){
-            ca=ge.getAllAttributes().get(i);
-            CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
-            if(ca instanceof CARefresh){
-                ((CARefresh)ca).refresh();
+        for(GraphicalElement ge : listGE){
+            ConfigurationAttribute ca=null;
+            for(int i =0; i<panels.size(); i++){
+                ca=ge.getAllAttributes().get(i);
+                CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
+                if(ca instanceof CARefresh){
+                    ((CARefresh)ca).refresh();
+                }
             }
+            ConfigurationShutter.getInstance().close();
+            if(ge instanceof GERefresh){
+                ((GERefresh)ge).refresh();
+            }
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
         }
-        ConfigurationShutter.getInstance().close();
-        if(ge instanceof GERefresh){
-            ((GERefresh)ge).refresh();
+    }
+    
+    /**
+     * Returns the list of ConfigurationAttributes that all the selected GraphicalElements have in common.
+     * @return List of common ConfigurationAttributes.
+     */
+    private List<ConfigurationAttribute> getCommonAttributes(){
+        try {
+            Class<? extends GraphicalElement> c = listGE.get(0).getClass();
+            for (GraphicalElement listGE1 : listGE) {
+                c = listGE1.getCommonClass(c);
+            }
+            return c.getConstructor(c).newInstance(listGE.get(0)).getAllAttributes();
+        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
+            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        return null;
     }
 }

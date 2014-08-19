@@ -39,6 +39,7 @@ public class GEManager {
         //mapRenderer.put(Data.class, GERenderer.class);
         mapRenderer.put(Image.class, new ImageRenderer());
         mapRenderer.put(TextElement.class, new TextRenderer());
+        mapRenderer.put(GraphicalElement.class, new GERenderer());
     }
     
     /**

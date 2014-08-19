@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
+import com.mapcomposer.model.graphicalelement.GraphicalElement;
 
 /**
  * Orientation of the map (direction of the north in the map).
@@ -19,6 +20,15 @@ public class Orientation extends CartographicElement {
         icon = new Source("Path");
         //TODO : set a default value
         icon.setValue(".");
+    }
+    
+    /**
+     * Clone constructor.
+     * @param ge
+     */
+    public Orientation(Orientation ge){
+        super(ge);
+        icon = ge.icon;
     }
 
     /**
@@ -43,5 +53,15 @@ public class Orientation extends CartographicElement {
         list.addAll(super.getAllAttributes());
         list.add(icon);
         return list;
+    }
+    
+    @Override
+    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c) {
+        if(c.isAssignableFrom(this.getClass()))
+            return c;
+        else if(c.isAssignableFrom(CartographicElement.class))
+            return CartographicElement.class;
+        else
+            return GraphicalElement.class;
     }
 }

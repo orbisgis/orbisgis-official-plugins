@@ -10,7 +10,7 @@ import org.orbisgis.coremap.layerModel.OwsMapContext;
 /**
  * This class is the root class for each cartographic element based on an OWS-Context.
  */
-public abstract class CartographicElement extends GraphicalElement{
+public class CartographicElement extends GraphicalElement{
     /** OWS-Context source.*/
     private final OwsContext owsc;
     
@@ -19,6 +19,16 @@ public abstract class CartographicElement extends GraphicalElement{
         super();
         this.owsc = new OwsContext("OWS-Context path");
         this.owsc.setValue(".");
+    }
+    
+    /**
+     * Clone constructor.
+     * @param ge
+     */
+    public CartographicElement(CartographicElement ge){
+        super(ge);
+        //ConfigurationAttribute instantiation
+        owsc=ge.owsc;
     }
 
     /**
