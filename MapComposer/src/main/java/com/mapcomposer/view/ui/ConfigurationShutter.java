@@ -22,7 +22,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     private static ConfigurationShutter INSTANCE = null;
     
     /**GraphicalElement selected in the UI */
-    private GraphicalElement selectedGE;
+   // private GraphicalElement selectedGE;
     
     /** Validation button*/
     private final JButton validate;
@@ -40,13 +40,13 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     
     /** 
      * Displays in the configurationShutter JPanel all the UI element for the configuration of he differents CA
-     * @param ge GaphicalElement to configure.
+     * @param list List of ConfigurationAttributes to display.
      */
-    private void dispalyConfiguration(GraphicalElement ge){
-        this.selectedGE = ge;
+    public void dispalyConfiguration(List<ConfigurationAttribute> list){
+        //this.selectedGE = ge;
         pan = new JPanel();
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
-        for(ConfigurationAttribute ca : ge.getAllAttributes()){
+        for(ConfigurationAttribute ca : list){
             JPanel panel = CAManager.getInstance().getRenderer(ca).render(ca);
             //It align the button to le left, but why ?
             panel.setAlignmentX(JPanel.TOP_ALIGNMENT);
@@ -55,6 +55,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         }
         pan.add(validate);
         this.setBodyPanel(pan);
+        this.open();
     }
     
     /**
@@ -72,30 +73,30 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
      * Returns the GE Selected
      * @return The selected GE
      */
-    public GraphicalElement getSelected(){
+    /*public GraphicalElement getSelected(){
         return selectedGE;
-    }
+    }*/
     
     /**
      * Sets the GE Selected
      * @param ge The selected GE
      */
-    public void setSelected(GraphicalElement ge){
+    /*public void setSelected(GraphicalElement ge){
         selectedGE=ge;
         dispalyConfiguration(ge);
         this.open();
-    }
+    }*/
     
     /**
      * Resets the GE Selected
      */
-    public void resetSelected(){
+    /*public void resetSelected(){
         selectedGE=null;
         this.resetBodyPanel();
-    }
+    }*/
 
     /** 
-     * Return all the ConfigurationAttribute JPanel contained by the shutter.
+     * Returns all the ConfigurationAttribute JPanel contained by the shutter.
      * @return List of the JPanel contained.
      */
     private List<JPanel> getPanels() {
@@ -114,8 +115,16 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     public void mouseClicked(MouseEvent e) {
         super.mouseClicked(e);
         if(e.getSource()==validate){
-            UIController.getInstance().validate(getPanels(), selectedGE);
-            this.resetSelected();
+            UIController.getInstance().validate(getPanels());
         }
+    }
+    
+    /**
+     * Erases all the element displayed in the shutter and close it.
+     */
+    public void eraseConfiguration(){
+        pan = new JPanel();
+        this.setBodyPanel(pan);
+        this.close();
     }
 }

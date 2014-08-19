@@ -1,5 +1,6 @@
  package com.mapcomposer.view.utils;
 
+import com.mapcomposer.controller.UIController;
 import com.mapcomposer.controller.utils.GEMouseListener;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -53,14 +54,14 @@ public class CompositionJPanel extends JPanel implements GEMouseListener, MouseL
         this.selected=!selected;
         setborders();
         if(selected){
-            ConfigurationShutter.getInstance().setSelected(ge);
+            UIController.getInstance().selectGE(ge);
             panel.setSize((int)this.getSize().getWidth()+8, (int)this.getSize().getHeight()+8);
             Rectangle r = panel.getBounds();
             r.translate(-4, -4);
             panel.setBounds(r);
         }
         else{
-            ConfigurationShutter.getInstance().resetSelected();
+            UIController.getInstance().unselectGE(ge);
             panel.setSize((int)this.getSize().getWidth()-8, (int)this.getSize().getHeight()-8);
             Rectangle r = panel.getBounds();
             r.translate(4, 4);

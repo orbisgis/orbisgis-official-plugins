@@ -1,8 +1,6 @@
 package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.CAList;
-import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
@@ -17,15 +15,10 @@ import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
-import java.awt.Component;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.JTextField;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -35,6 +28,8 @@ public class UIController{
     private static UIController INSTANCE = null;
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private static Map<GraphicalElement, CompositionJPanel> map;
+    /**Selected GraphicalElement */
+    private static GraphicalElement ge;
     
     /**
      * Main constructor.
@@ -131,14 +126,31 @@ public class UIController{
         }
         return INSTANCE;
     }
+    
+    /**
+     * Selects a GraphicalElement.
+     * @param ge GraphicalElement to select.
+     */
+    public void selectGE(GraphicalElement ge){
+        this.ge=ge;
+        ConfigurationShutter.getInstance().dispalyConfiguration(ge.getAllAttributes());
+    }
+    
+    /**
+     * Unselect a GraphicalElement.
+     * @param ge GraphicalElement to select.
+     */
+    public void unselectGE(GraphicalElement ge){
+        this.ge=null;
+        ConfigurationShutter.getInstance().eraseConfiguration();
+    }
 
     /**
      * Read a List of JPanels to set the GraphicalElement ConfigurationAttribute.
      * This action done when the button validate of the ConfigurationShutter is clicked. 
      * @param panels List of panel to read.
-     * @param ge GraphicalElement to set.
      */
-    public void validate(List<JPanel> panels, GraphicalElement ge) {
+    public void validate(List<JPanel> panels) {
         ConfigurationAttribute ca=null;
         for(int i =0; i<panels.size(); i++){
             ca=ge.getAllAttributes().get(i);
