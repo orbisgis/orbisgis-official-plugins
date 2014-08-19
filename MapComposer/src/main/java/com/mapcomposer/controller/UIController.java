@@ -4,6 +4,7 @@ import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.CAList;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
+import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
@@ -142,6 +143,9 @@ public class UIController{
         for(int i =0; i<panels.size(); i++){
             ca=ge.getAllAttributes().get(i);
             CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
+            if(ca instanceof CARefresh){
+                ((CARefresh)ca).refresh();
+            }
         }
         ConfigurationShutter.getInstance().close();
         if(ge instanceof GERefresh){

@@ -9,11 +9,13 @@ package com.mapcomposer.model.configurationattribute.attribute;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
 import com.mapcomposer.view.graphicalelement.MapImageRenderer;
+import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JOptionPane;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 import org.orbisgis.progress.NullProgressMonitor;
@@ -62,10 +64,21 @@ public class OwsContext extends Source implements CARefresh{
 
     @Override
     public void refresh() {
-        //TODO : redefine the refresh function
         try {
-            omc.read(new FileInputStream(new File(this.getValue())));
+            reloadOMC();
         } catch (FileNotFoundException ex) {
+            JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
+        }
+    }
+    
+    private void reloadOMC() throws FileNotFoundException{
+        try {
+            if(omc.isOpen()){
+                omc.close(new NullProgressMonitor());
+            }
+            omc.read(new FileInputStream(new File(this.getValue())));
+            omc.open(new NullProgressMonitor());
+        } catch (LayerException ex) {
             Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
