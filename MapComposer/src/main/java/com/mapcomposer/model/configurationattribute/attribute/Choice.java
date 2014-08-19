@@ -1,5 +1,7 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.model.configurationattribute.CAList;
+
 /**
  * The Choice attribute contains severals fields that can be selected.
  */

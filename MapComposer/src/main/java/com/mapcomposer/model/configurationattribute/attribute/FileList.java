@@ -1,9 +1,15 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.model.configurationattribute.CAList;
+import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import java.io.File;
+import java.util.ArrayList;
+import java.util.List;
+
 /**
  * This class represent a list of different files path.
  */
-public class FileList extends CAList<String>{
+public class FileList extends CAList<String> implements CARefresh{
     
     /**
      * Main constructor.
@@ -12,4 +18,23 @@ public class FileList extends CAList<String>{
     public FileList(String name) {
         super(name);
     }    
+
+    /**
+     * Verify if the files path still right.
+     * If the file doesn't exist, it's path is removed from the list.
+     */
+    @Override
+    public void refresh() {
+        List<String> list = new ArrayList<>();
+        //Add to a list the wrong path
+        for(String path : this.getValue()){
+            if(!(new File(path)).exists()){
+                list.add(path);
+            }
+        }
+        //Remove the files path
+        for(String path : list){
+            this.remove(path);
+        }
+    }
 }

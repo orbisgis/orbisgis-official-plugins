@@ -1,6 +1,5 @@
-package com.mapcomposer.model.configurationattribute.attribute;
+package com.mapcomposer.model.configurationattribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import java.util.ArrayList;
 import java.util.List;
 

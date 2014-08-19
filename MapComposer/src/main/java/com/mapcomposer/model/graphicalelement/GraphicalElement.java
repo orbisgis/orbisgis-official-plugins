@@ -1,9 +1,10 @@
 package com.mapcomposer.model.graphicalelement;
 
-import java.util.ArrayList;
-import java.util.List;
+import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Root class for the GraphicalElements (GraphicalElement) objects.
@@ -26,9 +27,9 @@ public abstract class GraphicalElement {
      */
     public GraphicalElement(){
         //ConfigurationAttribute instantiation
-        x=new Numeric("x");
-        y=new Numeric("y");
-        rotation=new Numeric("Rotation");
+        x=new Numeric("x", 0, Configuration.documentWidth);
+        y=new Numeric("y", 0, Configuration.documentHeight);
+        rotation=new Numeric("Rotation", -360, 360);
         height=new Numeric("Height");
         width=new Numeric("Width");
         

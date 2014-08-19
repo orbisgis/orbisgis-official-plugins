@@ -1,11 +1,9 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
@@ -25,7 +23,11 @@ public class NumericRenderer implements CARenderer{
         Numeric num = (Numeric)ca;
         
         pan.add(new JLabel(num.getName()));
-        SpinnerModel model =new SpinnerNumberModel((int)num.getValue(), -99999, 99999, 1);
+        SpinnerModel model;
+        if(num.getLimits())
+            model =new SpinnerNumberModel((int)num.getValue(), num.getMin(), num.getMax(), 1);
+        else
+            model =new SpinnerNumberModel((int)num.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
         pan.add(new JSpinner(model));
         return pan;
     }

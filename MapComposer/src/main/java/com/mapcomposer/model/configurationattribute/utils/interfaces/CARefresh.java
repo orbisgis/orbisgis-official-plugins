@@ -10,5 +10,8 @@ package com.mapcomposer.model.configurationattribute.utils.interfaces;
  * Interface for the ConfigurationAttribute to define the refresh method that will be called to refresh the value contained.
  */
 public interface CARefresh {
+    /**
+     * Refresh function.
+     */
     public void refresh();
 }

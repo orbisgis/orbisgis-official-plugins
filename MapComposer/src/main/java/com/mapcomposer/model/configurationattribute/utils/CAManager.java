@@ -1,21 +1,8 @@
 package com.mapcomposer.model.configurationattribute.utils;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
-import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
-import com.mapcomposer.model.configurationattribute.attribute.FileList;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
-import com.mapcomposer.model.configurationattribute.attribute.Text;
-import com.mapcomposer.model.configurationattribute.attribute.Numeric;
-import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
-import com.mapcomposer.view.configurationattribute.CARenderer;
-import com.mapcomposer.view.configurationattribute.ChoiceRenderer;
-import com.mapcomposer.view.configurationattribute.ColorRenderer;
-import com.mapcomposer.view.configurationattribute.FileListRenderer;
-import com.mapcomposer.view.configurationattribute.NumericRenderer;
-import com.mapcomposer.view.configurationattribute.OwsContextRenderer;
-import com.mapcomposer.view.configurationattribute.SourceRenderer;
-import com.mapcomposer.view.configurationattribute.TextRenderer;
+import com.mapcomposer.model.configurationattribute.attribute.*;
+import com.mapcomposer.view.configurationattribute.*;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -31,8 +18,8 @@ public class CAManager {
     private static Map<Class<? extends ConfigurationAttribute>, CARenderer> map;
     
     /**
-* Private void constructor.
-*/
+    * Private void constructor.
+    */
     private CAManager(){
         map = new HashMap<>();
         //Adding the original CA and their Renderer
@@ -46,9 +33,9 @@ public class CAManager {
     }
     
     /**
-* Static method giving the unique instance of the class.
-* @return The unique instance of the class.
-*/
+    * Static method giving the unique instance of the class.
+    * @return The unique instance of the class.
+    */
     public static synchronized CAManager getInstance(){
         if(INSTANCE==null){
             INSTANCE = new CAManager();
@@ -57,12 +44,12 @@ public class CAManager {
     }
     
     /**
-* Register in the Map a CA and it's Renderer. This step is essential because a CA
-* of a graphical element can't be displayed if it isn't added with its Renderer this way.
-* @param caClass Class of the CA.
-* @param rendererClass Renderer class associated with the previous class.
-* @return True if the values are successfully added, false otherwise.
-*/
+    * Register in the Map a CA and it's Renderer. This step is essential because a CA
+    * of a graphical element can't be displayed if it isn't added with its Renderer this way.
+    * @param caClass Class of the CA.
+    * @param rendererClass Renderer class associated with the previous class.
+    * @return True if the values are successfully added, false otherwise.
+    */
     public boolean registerCA(Class<? extends ConfigurationAttribute> caClass , CARenderer rendererClass){
         if(caClass != null && rendererClass != null){
             map.put(caClass, rendererClass);
@@ -73,10 +60,10 @@ public class CAManager {
     }
     
     /**
-* Give back the Renderer corresponding to the CA given as parameter.
-* @param ca ConfigurationAttribute to render.
-* @return The Renderer of the ConfigurationAttribute.
-*/
+    * Give back the Renderer corresponding to the CA given as parameter.
+    * @param ca ConfigurationAttribute to render.
+    * @return The Renderer of the ConfigurationAttribute.
+    */
     public CARenderer getRenderer(ConfigurationAttribute ca){
         return map.get(ca.getClass());
     }

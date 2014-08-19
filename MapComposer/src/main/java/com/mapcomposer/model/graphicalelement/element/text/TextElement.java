@@ -43,9 +43,9 @@ public class TextElement extends GraphicalElement{
         this.colorBack = new ColorCA("Background color");
         this.alignment = new Choice("Alignment");
         this.style = new Choice("Style");
-        this.fontSize = new Numeric("Font size");
+        this.fontSize = new Numeric("Font size", 1, 99999);
         this.text = new Text("Text");
-        this.alpha = new Numeric("Alpha");
+        this.alpha = new Numeric("Alpha", 0, 255);
         
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){

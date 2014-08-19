@@ -2,8 +2,10 @@ package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.ui.MainWindow;
 import java.io.File;
+import javax.swing.JOptionPane;
 
 /**
  * The Source attribute contain the path to a specified data source like OWS-Context, data, image ...
@@ -23,8 +25,7 @@ public class Source extends ConfigurationAttribute<String> implements CARefresh{
     public void refresh() {
         File f = new File(this.getValue());
         if(!f.exists()){
-            //TODO implement the showAlert function.
-            //MainWindow.getInstance().showAlert("The file ''"+this.getName()+" : "this.getValue()+"'' doesn't exists anymore.\n The value will be reseted");
+            JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the file '"+this.getValue()+"'.");
         }
     }
     

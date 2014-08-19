@@ -1,7 +1,7 @@
 package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.CAList;
+import com.mapcomposer.model.configurationattribute.CAList;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
