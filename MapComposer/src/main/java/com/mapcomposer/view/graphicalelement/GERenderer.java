@@ -48,7 +48,7 @@ public class GERenderer {
                 }
             });
         }
-        
+        panel.setOpaque(false);
         return panel;
     }
     

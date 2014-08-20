@@ -41,7 +41,7 @@ public class MapImage extends CartographicElement implements GERefresh{
         try {
             MapTransform mapTransform = new MapTransform();
             mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
-            image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+            image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
             mapTransform.setImage(image);
             if(!this.getOwsMapContext().isOpen())
                 this.getOwsMapContext().open(new NullProgressMonitor());
