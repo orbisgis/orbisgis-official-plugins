@@ -5,7 +5,7 @@ import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 /**
  * Numeric attribute.
  */
-public class Numeric extends ConfigurationAttribute<Integer> {
+public final class Numeric extends ConfigurationAttribute<Integer> {
     
     /** Minimum value */
     private final int min;

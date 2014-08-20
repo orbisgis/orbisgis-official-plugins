@@ -1,11 +1,11 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.CAList;
+import com.mapcomposer.model.configurationattribute.ListCA;
 
 /**
  * The Choice attribute contains severals fields that can be selected.
  */
-public class Choice extends CAList<String>{
+public final class Choice extends ListCA<String>{
     
     /**
      * Main constructor.

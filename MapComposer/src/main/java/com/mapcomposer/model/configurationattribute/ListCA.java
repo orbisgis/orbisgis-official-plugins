@@ -8,7 +8,7 @@ import java.util.List;
  * It permits to manage the list of values with basic function such as add, remove, and also to set the selected value.
  * @param <T> Type of the values contained.
  */
-public abstract class CAList<T> extends ConfigurationAttribute<List<T>> {
+public abstract class ListCA<T> extends ConfigurationAttribute<List<T>> {
     /** Index of the value selected.*/
     private int index = -1;
 
@@ -16,7 +16,7 @@ public abstract class CAList<T> extends ConfigurationAttribute<List<T>> {
      * Main constructor.
      * @param name Name of the value in its GraphicalElement.
      */
-    public CAList(String name) {
+    public ListCA(String name) {
         super(name);
         super.setValue(new ArrayList<T>());
     }

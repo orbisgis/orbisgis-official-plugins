@@ -111,9 +111,9 @@ public class UIController{
     }
     
     /**
-     * Returns the CompositionPanel corresponding to a GraphicalElement.
+     * Returns the CompositionPanel corresponding to a GraphicalElement registered in map .
      * @param ge GraphicalElement.
-     * @return The CompositionPanel corresponding to the GraphicalElement.
+     * @return The CompositionPanel corresponding to the GraphicalElement, null if it isn't registered.
      */
     public static CompositionJPanel getPanel(GraphicalElement ge){
         return map.get(ge);
@@ -131,7 +131,7 @@ public class UIController{
     }
     
     /**
-     * Selects a GraphicalElement.
+     * Selects a GraphicalElement and redisplays the ConfigurationAttributes.
      * @param ge GraphicalElement to select.
      */
     public void selectGE(GraphicalElement ge){
@@ -140,21 +140,26 @@ public class UIController{
     }
     
     /**
-     * Unselect a GraphicalElement.
+     * Unselects a GraphicalElement and redisplays the ConfigurationAttributes.
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
         UIController.listGE.remove(ge);
-        ConfigurationShutter.getInstance().eraseConfiguration();
+        if(listGE.isEmpty())
+            ConfigurationShutter.getInstance().eraseConfiguration();
+        else
+            ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
 
     /**
-     * Read a List of ConfigurationAttribute to set the GraphicalElement ConfigurationAttribute.
-     * This action done when the button validate of the ConfigurationShutter is clicked. 
+     * Read a List of ConfigurationAttribute to set the GraphicalElement.
+     * This action is done when the button validate of the ConfigurationShutter is clicked. 
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
+        //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : listGE){
+            //Sets the ConfigurationAttribute
             for(ConfigurationAttribute ca : ge.getAllAttributes()){
                 for(ConfigurationAttribute confShutterCA : listCA){
                     if(ca.getName().equals(confShutterCA.getName())){
@@ -169,11 +174,13 @@ public class UIController{
                 }
             }
             ConfigurationShutter.getInstance().close();
+            //Refreshes the GraphicalElement
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
         }
+        //Unlock all the ConfigurationAttribute
         for(GraphicalElement ge : listGE){
             for(ConfigurationAttribute ca : ge.getAllAttributes()){
                 ca.unlock();
@@ -195,7 +202,8 @@ public class UIController{
             }
             list = c.getConstructor(c).newInstance(listGE.get(0)).getAllAttributes();
             
-            //Find if attributes are in common or not
+            //Find if attributes are in common or not.
+            //If not, the CA is locked
             for(GraphicalElement ge : listGE){
                 List<ConfigurationAttribute> listCA =  c.getConstructor(c).newInstance(ge).getAllAttributes();
                 for(int i=0; i<list.size(); i++){
@@ -204,8 +212,6 @@ public class UIController{
                     }
                 }
             }
-            
-            
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }

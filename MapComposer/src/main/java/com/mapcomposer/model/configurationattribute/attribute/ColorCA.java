@@ -6,7 +6,7 @@ import java.awt.Color;
 /**
  * Color ConfigurationAttribute.
  */
-public class ColorCA extends ConfigurationAttribute<Color> {
+public final class ColorCA extends ConfigurationAttribute<Color> {
 
     /**
      * Main constructor.

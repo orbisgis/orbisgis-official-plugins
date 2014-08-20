@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Key of a map. Actually not supported because the informations aren't well defined into the OWS-C.
  */
-public class Key extends CartographicElement{
+public final class Key extends CartographicElement{
 
     public Key(){
         super();

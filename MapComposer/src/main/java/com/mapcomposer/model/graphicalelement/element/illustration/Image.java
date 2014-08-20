@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Graphical element representing a picture, an image ...
  */
-public class Image extends IllustrationElement {
+public final class Image extends IllustrationElement {
 
     public Image() {
         super();

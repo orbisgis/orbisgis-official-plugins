@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Element displaying data such as tables.
  */
-public class Data extends IllustrationElement{
+public final class Data extends IllustrationElement{
 
     public Data() {
         super();

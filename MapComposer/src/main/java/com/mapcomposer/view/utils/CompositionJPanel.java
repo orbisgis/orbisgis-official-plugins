@@ -1,9 +1,7 @@
  package com.mapcomposer.view.utils;
 
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.controller.utils.GEMouseListener;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
-import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.awt.BorderLayout;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -15,7 +13,7 @@ import javax.swing.border.Border;
 /**
  * This panel extends from JPanel define the action to do when the user click on it.
  */
-public class CompositionJPanel extends JPanel implements GEMouseListener, MouseListener{
+public class CompositionJPanel extends JPanel implements MouseListener{
     
     private JPanel panel;
     private final GraphicalElement ge;

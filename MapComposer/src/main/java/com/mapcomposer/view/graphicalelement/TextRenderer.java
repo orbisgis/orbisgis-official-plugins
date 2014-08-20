@@ -6,7 +6,13 @@ import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.Graphics2D;
+import java.awt.font.FontRenderContext;
+import java.awt.font.LineBreakMeasurer;
+import java.awt.font.TextAttribute;
+import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
+import java.text.AttributedString;
+import javax.swing.UIManager;
 
 /**
  * Renderer associated to the scale GraphicalElement.
@@ -29,9 +35,38 @@ public class TextRenderer extends GERenderer{
         graph.setColor(color);
         graph.fillRect(0, 0, te.getWidth(), te.getHeight());
         graph = bi.createGraphics();
-        graph.setFont(new Font(te.getFont(), te.getStyle(), te.getFontSize()));
-        graph.setColor(te.getColorText());
-        graph.drawString(te.getText(), 0, ge.getHeight()/2);
+        
+        //Draw the string and make it fit to the TextElement bounds
+        AttributedString attributedString = new AttributedString(te.getText());
+        attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize()));
+        color = te.getColorText();
+        attributedString.addAttribute(TextAttribute.FOREGROUND, color);
+        int x = 0;
+        int y = 0;
+        LineBreakMeasurer measurer = new LineBreakMeasurer(attributedString.getIterator(),graph.getFontRenderContext());
+        while (measurer.getPosition() < attributedString.getIterator().getEndIndex()) {
+            TextLayout textLayout = measurer.nextLayout(te.getWidth());
+            y += textLayout.getAscent();
+            switch(te.getAlignment()){
+                case LEFT:
+                    x=0;
+                    break;
+                case CENTER:
+                    x=(int) ((te.getWidth()-textLayout.getBounds().getWidth())/2);
+                    break;
+                case RIGHT:
+                    x=(int) (te.getWidth()-textLayout.getBounds().getWidth());
+                    break;
+            }
+            textLayout.draw(graph, x, y);
+            y += textLayout.getDescent() + textLayout.getLeading();
+        }
+        
+        
+        
+        
+        
+        //graph.drawString(te.getText(), 0, ge.getHeight()/2);
         return bi;
     }
 }

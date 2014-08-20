@@ -1,5 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -16,7 +17,7 @@ import org.orbisgis.progress.NullProgressMonitor;
 /**
  * ConfigurationAttribute representing a specified OwsMapContext given by OrbisGIS.
  */
-public class OwsContext extends Source implements CARefresh{
+public final class OwsContext extends ConfigurationAttribute<String> implements CARefresh{
 
     /** Instance of the OwsMapContext corresponding to the path of the Source*/
     private OwsMapContext omc;
@@ -27,6 +28,7 @@ public class OwsContext extends Source implements CARefresh{
      */
     public OwsContext(String name) {
         super(name);
+        this.setValue("/");
         omc=new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
     }
     

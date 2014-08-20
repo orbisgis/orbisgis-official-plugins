@@ -3,14 +3,13 @@ package com.mapcomposer.model.configurationattribute.attribute;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.view.ui.ConfigurationShutter;
-import com.mapcomposer.view.ui.MainWindow;
 import java.io.File;
 import javax.swing.JOptionPane;
 
 /**
  * The Source attribute contain the path to a specified data source like OWS-Context, data, image ...
  */
-public class Source extends ConfigurationAttribute<String> implements CARefresh{
+public final class Source extends ConfigurationAttribute<String> implements CARefresh{
 
     /**
      * Main constructor.

@@ -1,14 +1,12 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.JTextArea;
 
 /**
  * Renderer associated to the Text ConfigurationAttribute.
@@ -23,7 +21,8 @@ public class TextRenderer implements CARenderer{
         Text text = (Text)ca;
         
         pan.add(new JLabel(text.getName()));
-        pan.add(new JTextField(text.getValue()));
+        JTextArea area = new JTextArea(text.getValue());
+        pan.add(area);
         
         return pan;
     }
@@ -32,8 +31,8 @@ public class TextRenderer implements CARenderer{
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
         Text text = (Text)attribute;
         for(Component c : panel.getComponents()){
-            if(c instanceof JTextField){
-                text.setValue(((JTextField)c).getText());
+            if(c instanceof JTextArea){
+                text.setValue(((JTextArea)c).getText());
             }
         }
     }

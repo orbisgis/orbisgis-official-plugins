@@ -15,7 +15,7 @@ import java.awt.GraphicsEnvironment;
 /**
  * GraphicalElement displaying a text. Several aspects can be defined such as the text color, the font,the font size ...
  */
-public class TextElement extends GraphicalElement{
+public final class TextElement extends GraphicalElement{
     /** Fonts allowed */
     private final Choice font;
     /** Color of the Text */
@@ -51,13 +51,17 @@ public class TextElement extends GraphicalElement{
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
         }
+        this.font.select(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[0]);
         this.colorBack.setValue(Color.WHITE);
         this.colorText.setValue(Color.BLACK);
-        this.alignment.add("Left");
+        this.alignment.add(Alignment.LEFT.getName());
+        this.alignment.add(Alignment.CENTER.getName());
+        this.alignment.add(Alignment.RIGHT.getName());
+        this.alignment.select(Alignment.CENTER.getName());
         this.style.add(Style.PLAIN.getName());
         this.style.add(Style.ITALIC.getName());
         this.style.add(Style.BOLD.getName());
-        this.style.select("plain");
+        this.style.select(Style.PLAIN.getName());
         this.fontSize.setValue(8);
         this.text.setValue("no text");
         this.alpha.setValue(0);
@@ -152,6 +156,14 @@ public class TextElement extends GraphicalElement{
     public void setStyle(Style style) {
         this.style.select(style.getName());
     }
+
+    /**
+     * Sets the alignment of the text
+     * @param alignment The new alignment.
+     */
+    public void setStyle(Alignment alignment) {
+        this.alignment.select(alignment.getName());
+    }
     
     
     /**
@@ -182,8 +194,8 @@ public class TextElement extends GraphicalElement{
      * Returns the selected alignment.
      * @return The alignment selected.
      */
-    public String getAlignment() {
-        return this.alignment.getSelected();
+    public Alignment getAlignment() {
+        return Alignment.getByName(this.alignment.getSelected());
     }
 
     /**
@@ -218,6 +230,30 @@ public class TextElement extends GraphicalElement{
         return this.alpha.getValue();
     }
     
+    public static enum Alignment{
+        LEFT("left"),
+        CENTER("center"),
+        RIGHT("right");
+        
+        private final String name;
+        
+        private Alignment(final String name) {
+            this.name = name;
+        }
+        
+        public String getName() {
+            return name;
+        }
+        
+        static Alignment getByName(final String name) {
+            for (final Alignment nvp : values()) {
+                if (nvp.getName().equals(name)) {
+                    return nvp;
+                }
+            }
+            throw new IllegalArgumentException("Invalid name: " + name);
+        }
+    }
     
     public static enum Style{
         PLAIN("plain", Font.PLAIN),

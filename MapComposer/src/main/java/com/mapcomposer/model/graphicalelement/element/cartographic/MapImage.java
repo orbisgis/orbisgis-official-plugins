@@ -14,7 +14,7 @@ import org.orbisgis.progress.NullProgressMonitor;
 /**
  * Map image generated from an OWS-Context.
  */
-public class MapImage extends CartographicElement implements GERefresh{
+public final class MapImage extends CartographicElement implements GERefresh{
     
     private BufferedImage image = null;
 

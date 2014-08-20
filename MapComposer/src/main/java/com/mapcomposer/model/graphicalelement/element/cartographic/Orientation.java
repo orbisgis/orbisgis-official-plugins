@@ -9,7 +9,7 @@ import com.mapcomposer.model.graphicalelement.GraphicalElement;
 /**
  * Orientation of the map (direction of the north in the map).
  */
-public class Orientation extends CartographicElement {
+public final class Orientation extends CartographicElement {
     
     /** Icon of the orientation*/
     private final Source icon;

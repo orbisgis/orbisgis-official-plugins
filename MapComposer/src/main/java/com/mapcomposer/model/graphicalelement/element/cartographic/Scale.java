@@ -14,7 +14,7 @@ import org.orbisgis.progress.NullProgressMonitor;
 /**
  * Scale of the map. 
  */
-public class Scale extends CartographicElement implements GERefresh{
+public final class Scale extends CartographicElement implements GERefresh{
     
     private MapTransform mapTransform;
 

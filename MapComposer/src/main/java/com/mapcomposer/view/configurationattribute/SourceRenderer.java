@@ -1,7 +1,6 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
@@ -10,7 +9,6 @@ import javax.swing.JPanel;
 import javax.swing.JTextField;
 import com.mapcomposer.view.utils.MouseListenerBrowse;
 import java.awt.Component;
-import javax.swing.JComboBox;
 
 /**
  * Renderer associated to the Source ConfigurationAttribute.
