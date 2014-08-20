@@ -11,6 +11,8 @@ public abstract class ConfigurationAttribute<T> {
     private final String name;
     /** Property itself */
     private T t;
+    /** Lock. If the property is locked, it can't be changed. */
+    private boolean lock;
     
     /**
      * Main public constructor doing the initialisation of the property and setting the name.
@@ -19,14 +21,41 @@ public abstract class ConfigurationAttribute<T> {
     public ConfigurationAttribute(String name){
         this.name = name;
         t=null;
+        lock=false;
+    }
+    
+    /**
+     * Lock the ConfigurationAttribute.
+     */
+    public void lock(){
+        lock=true;
+    }
+    
+    
+    /**
+     * Unlock the ConfigurationAttribute.
+     */
+    public void unlock(){
+        lock=false;
+    }
+    
+    /**
+     * Return the lock state of the ConfigurationAttribute
+     * @return The lock state.
+     */
+    public boolean isLocked(){
+        return lock;
     }
     
     /**
      * Setter of the property value.
      * @param value New value of the property.
+     * @return True if the value was setted, false otherwise.
      */
-    public void setValue(T value){
-        this.t=value;
+    public boolean setValue(T value){
+        if(!lock)
+            this.t=value;
+        return lock;
     }
     
     /**

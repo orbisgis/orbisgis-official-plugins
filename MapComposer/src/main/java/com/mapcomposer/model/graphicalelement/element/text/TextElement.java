@@ -70,6 +70,7 @@ public class TextElement extends GraphicalElement{
      * @param ge
      */
     public TextElement(TextElement ge){
+        super(ge);
         //ConfigurationAttribute instantiation
         this.font = ge.font;
         this.colorText = ge.colorText;

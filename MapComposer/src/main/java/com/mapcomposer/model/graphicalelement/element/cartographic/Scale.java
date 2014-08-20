@@ -5,6 +5,9 @@ import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.progress.NullProgressMonitor;
 
@@ -36,10 +39,16 @@ public class Scale extends CartographicElement implements GERefresh{
 
     @Override
     public void refresh() {
-        mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
-        BufferedImage outImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-        mapTransform.setImage(outImage);
-        this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
+        try {
+            mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
+            BufferedImage outImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
+            mapTransform.setImage(outImage);
+            if(!this.getOwsMapContext().isOpen())
+                this.getOwsMapContext().open(new NullProgressMonitor());
+            this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
+        } catch (LayerException ex) {
+            Logger.getLogger(Scale.class.getName()).log(Level.SEVERE, null, ex);
+        }
     }
     
     public double getMapScale(){

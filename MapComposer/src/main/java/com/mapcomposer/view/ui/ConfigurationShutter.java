@@ -3,14 +3,16 @@ package com.mapcomposer.view.ui;
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import java.awt.Component;
+import java.awt.event.ItemEvent;
+import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.BoxLayout;
 import javax.swing.JButton;
+import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 
 /**
@@ -21,18 +23,19 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     /**Unique instance of the class*/
     private static ConfigurationShutter INSTANCE = null;
     
-    /**GraphicalElement selected in the UI */
-   // private GraphicalElement selectedGE;
-    
     /** Validation button*/
     private final JButton validate;
     
     /** JPanel of the configuration elements */
     private JPanel pan;
     
+    /** List of ConfPanel displayed */
+    private List<ConfPanel> listPanels;
+    
     /**Private constructor*/
     private ConfigurationShutter(){
         super(300, Shutter.LEFT_SHUTTER);
+        listPanels = new ArrayList<>();
         validate = new JButton("Validate");
         validate.addMouseListener(this);
         pan = new JPanel();
@@ -43,15 +46,16 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
      * @param list List of ConfigurationAttributes to display.
      */
     public void dispalyConfiguration(List<ConfigurationAttribute> list){
-        //this.selectedGE = ge;
+        listPanels = new ArrayList<>();
         pan = new JPanel();
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
         for(ConfigurationAttribute ca : list){
             JPanel panel = CAManager.getInstance().getRenderer(ca).render(ca);
             //It align the button to le left, but why ?
             panel.setAlignmentX(JPanel.TOP_ALIGNMENT);
-            
-            pan.add(panel);
+            ConfPanel cp = new ConfPanel(panel, ca);
+            listPanels.add(cp);
+            pan.add(cp);
         }
         pan.add(validate);
         this.setBodyPanel(pan);
@@ -69,53 +73,17 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         return INSTANCE;
     }
     
-    /**
-     * Returns the GE Selected
-     * @return The selected GE
-     */
-    /*public GraphicalElement getSelected(){
-        return selectedGE;
-    }*/
-    
-    /**
-     * Sets the GE Selected
-     * @param ge The selected GE
-     */
-    /*public void setSelected(GraphicalElement ge){
-        selectedGE=ge;
-        dispalyConfiguration(ge);
-        this.open();
-    }*/
-    
-    /**
-     * Resets the GE Selected
-     */
-    /*public void resetSelected(){
-        selectedGE=null;
-        this.resetBodyPanel();
-    }*/
-
-    /** 
-     * Returns all the ConfigurationAttribute JPanel contained by the shutter.
-     * @return List of the JPanel contained.
-     */
-    private List<JPanel> getPanels() {
-        ArrayList<JPanel> list = new ArrayList<>();
-        for(Component comp : pan.getComponents()){
-            //Verify if it's a JPanel
-            if(comp instanceof JPanel){
-                list.add((JPanel)comp);
-            }
-        }
-        return list;
-    }
-    
     
     @Override
     public void mouseClicked(MouseEvent e) {
         super.mouseClicked(e);
         if(e.getSource()==validate){
-            UIController.getInstance().validate(getPanels());
+            List<ConfigurationAttribute> listca = new ArrayList<>();
+            for(ConfPanel cp : listPanels){
+                listca.add(cp.getCA());
+            }
+            UIController.getInstance().validate(listca);
+            eraseConfiguration();
         }
     }
     
@@ -124,7 +92,54 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
      */
     public void eraseConfiguration(){
         pan = new JPanel();
+        listPanels = new ArrayList<>();
         this.setBodyPanel(pan);
         this.close();
+    }
+    
+    
+    private class ConfPanel extends JPanel implements ItemListener{
+        private final JPanel pan;
+        private final JCheckBox box;
+        private final ConfigurationAttribute ca;
+        public ConfPanel(JPanel pan, ConfigurationAttribute ca){
+            super();
+            this.pan=pan;
+            this.ca = ca;
+            this.setLayout(new BoxLayout(this, BoxLayout.PAGE_AXIS));
+            box = new JCheckBox();
+            box.addItemListener(this);
+            box.setSelected(ca.isLocked());
+            this.add(box);
+            this.add(pan);
+            if(ca.isLocked()){
+                pan.disable();
+                for(Component c : pan.getComponents())
+                    c.disable();
+            }
+        }
+        
+        public ConfigurationAttribute getCA(){
+            CAManager.getInstance().getRenderer(ca).extractValue(pan, ca);
+            return ca;
+        }
+
+        @Override
+        public void itemStateChanged(ItemEvent ie) {
+            if(!((JCheckBox)ie.getSource()).isSelected()){
+                pan.enable();
+                for(Component c : pan.getComponents())
+                    c.enable();
+                ca.unlock();
+            }
+            if(((JCheckBox)ie.getSource()).isSelected()){
+                pan.disable();
+                for(Component c : pan.getComponents())
+                    c.disable();
+                ca.lock();
+            }
+            this.repaint();
+            this.revalidate();
+        }
     }
 }

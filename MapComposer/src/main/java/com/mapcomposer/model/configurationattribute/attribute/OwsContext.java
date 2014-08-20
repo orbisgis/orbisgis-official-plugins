@@ -31,17 +31,20 @@ public class OwsContext extends Source implements CARefresh{
     }
     
     @Override
-    public void setValue(String path){
-        super.setValue(path);
-        //verification of the file
-        if(path.contains(".ows")){
-            try {
-                reloadOMC();
-            } catch (FileNotFoundException ex) {
-                Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
-                JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
+    public boolean setValue(String path){
+        if(super.setValue(path)){
+            //verification of the file
+            if(path.contains(".ows")){
+                try {
+                    reloadOMC();
+                } catch (FileNotFoundException ex) {
+                    Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
+                    JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
+                }
             }
+            return true;
         }
+        return false;
     }
     
     /**

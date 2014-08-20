@@ -1,7 +1,6 @@
 package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
@@ -15,18 +14,13 @@ import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
-import java.lang.invoke.MethodHandle;
-import java.lang.invoke.MethodHandles;
-import java.lang.invoke.MethodType;
 import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JPanel;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -141,7 +135,7 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void selectGE(GraphicalElement ge){
-        this.listGE.add(ge);
+        UIController.listGE.add(ge);
         ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
     
@@ -150,23 +144,28 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
-        this.listGE.remove(ge);
+        UIController.listGE.remove(ge);
         ConfigurationShutter.getInstance().eraseConfiguration();
     }
 
     /**
-     * Read a List of JPanels to set the GraphicalElement ConfigurationAttribute.
+     * Read a List of ConfigurationAttribute to set the GraphicalElement ConfigurationAttribute.
      * This action done when the button validate of the ConfigurationShutter is clicked. 
-     * @param panels List of panel to read.
+     * @param listCA List of ConfigurationAttributes to read.
      */
-    public void validate(List<JPanel> panels) {
+    public void validate(List<ConfigurationAttribute> listCA) {
         for(GraphicalElement ge : listGE){
-            ConfigurationAttribute ca=null;
-            for(int i =0; i<panels.size(); i++){
-                ca=ge.getAllAttributes().get(i);
-                CAManager.getInstance().getRenderer(ca).extractValue(panels.get(i), ca);
-                if(ca instanceof CARefresh){
-                    ((CARefresh)ca).refresh();
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                for(ConfigurationAttribute confShutterCA : listCA){
+                    if(ca.getName().equals(confShutterCA.getName())){
+                        if(!confShutterCA.isLocked()){
+                            ca.setValue(confShutterCA.getValue());
+                            if(ca instanceof CARefresh){
+                                ((CARefresh)ca).refresh();
+                            }
+                        }
+                        break;
+                    }
                 }
             }
             ConfigurationShutter.getInstance().close();
@@ -175,6 +174,12 @@ public class UIController{
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
         }
+        for(GraphicalElement ge : listGE){
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                ca.unlock();
+            }
+        }
+        listGE=new ArrayList<>();
     }
     
     /**
@@ -182,15 +187,29 @@ public class UIController{
      * @return List of common ConfigurationAttributes.
      */
     private List<ConfigurationAttribute> getCommonAttributes(){
+        List<ConfigurationAttribute> list = new ArrayList<>();
         try {
             Class<? extends GraphicalElement> c = listGE.get(0).getClass();
             for (GraphicalElement listGE1 : listGE) {
                 c = listGE1.getCommonClass(c);
             }
-            return c.getConstructor(c).newInstance(listGE.get(0)).getAllAttributes();
+            list = c.getConstructor(c).newInstance(listGE.get(0)).getAllAttributes();
+            
+            //Find if attributes are in common or not
+            for(GraphicalElement ge : listGE){
+                List<ConfigurationAttribute> listCA =  c.getConstructor(c).newInstance(ge).getAllAttributes();
+                for(int i=0; i<list.size(); i++){
+                    if(list.get(i).getValue()!=listCA.get(i).getValue()){
+                        list.get(i).lock();
+                    }
+                }
+            }
+            
+            
         } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
-        return null;
+        
+        return list;
     }
 }
