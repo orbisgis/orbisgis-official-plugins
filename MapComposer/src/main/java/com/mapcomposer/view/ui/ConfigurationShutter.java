@@ -4,6 +4,7 @@ import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.MouseEvent;
@@ -25,6 +26,8 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     
     /** Validation button*/
     private final JButton validate;
+    /** Remove button*/
+    private final JButton remove;
     
     /** JPanel of the configuration elements */
     private JPanel pan;
@@ -38,6 +41,8 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         listPanels = new ArrayList<>();
         validate = new JButton("Validate");
         validate.addMouseListener(this);
+        remove = new JButton("Remove");
+        remove.addMouseListener(this);
         pan = new JPanel();
     }
     
@@ -57,7 +62,11 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
             listPanels.add(cp);
             pan.add(cp);
         }
-        pan.add(validate);
+        JPanel button = new JPanel(new FlowLayout());
+        button.add(remove);
+        button.add(validate);
+        button.setAlignmentX(JPanel.TOP_ALIGNMENT);
+        pan.add(button);
         this.setBodyPanel(pan);
         this.open();
     }
@@ -83,6 +92,10 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
                 listca.add(cp.getCA());
             }
             UIController.getInstance().validate(listca);
+            eraseConfiguration();
+        }
+        if(e.getSource()==remove){
+            UIController.getInstance().remove();
             eraseConfiguration();
         }
     }

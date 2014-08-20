@@ -150,6 +150,17 @@ public class UIController{
         else
             ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
+    
+    /**
+     * Remove all the selecte GraphicalElement
+     */
+    public void remove(){
+        for(GraphicalElement ge : listGE){
+            CompositionArea.getInstance().removeGE(map.get(ge));
+            CompositionArea.getInstance().refresh();
+        }
+        listGE= new ArrayList<>();
+    }
 
     /**
      * Read a List of ConfigurationAttribute to set the GraphicalElement.
