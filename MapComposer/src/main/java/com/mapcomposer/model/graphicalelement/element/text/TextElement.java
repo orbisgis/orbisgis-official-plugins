@@ -1,5 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.text;
 
+import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
@@ -51,22 +52,15 @@ public final class TextElement extends GraphicalElement{
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
         }
-        this.font.select(GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[0]);
-        this.colorBack.setValue(Color.WHITE);
-        this.colorText.setValue(Color.BLACK);
         this.alignment.add(Alignment.LEFT.getName());
         this.alignment.add(Alignment.CENTER.getName());
         this.alignment.add(Alignment.RIGHT.getName());
-        this.alignment.select(Alignment.CENTER.getName());
         this.style.add(Style.PLAIN.getName());
         this.style.add(Style.ITALIC.getName());
         this.style.add(Style.BOLD.getName());
-        this.style.select(Style.PLAIN.getName());
-        this.fontSize.setValue(8);
-        this.text.setValue("no text");
-        this.alpha.setValue(0);
-        this.setHeight(30);
-        this.setWidth(150);
+        
+        setDefaultValue();
+        
     }
     
     /**
@@ -292,5 +286,27 @@ public final class TextElement extends GraphicalElement{
             return c;
         else 
             return GraphicalElement.class;
+    }
+    
+    private void setDefaultValue(){
+        this.font.select(Configuration.defaultFont);
+        this.colorBack.setValue(Configuration.defaultColorBack);
+        this.colorText.setValue(Configuration.defaultColorText);
+        this.alignment.select(Configuration.defaultAlignment);
+        this.style.select(Configuration.defaultStyle);
+        this.fontSize.setValue(Configuration.defaultFontSize);
+        this.text.setValue(Configuration.defaultText);
+        this.alpha.setValue(Configuration.defaultAlpha);
+    }
+    
+    public void setDefaultElementShutter(){
+        this.font.select(Configuration.defaultESFont);
+        this.colorBack.setValue(Configuration.defaultESColorBack);
+        this.colorText.setValue(Configuration.defaultESColorText);
+        this.alignment.select(Configuration.defaultESAlignment);
+        this.style.select(Configuration.defaultESStyle);
+        this.fontSize.setValue(Configuration.defaultESFontSize);
+        this.text.setValue(Configuration.defaultESText);
+        this.alpha.setValue(Configuration.defaultESAlpha);
     }
 }

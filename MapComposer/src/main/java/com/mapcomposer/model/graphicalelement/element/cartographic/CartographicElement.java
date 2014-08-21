@@ -1,5 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
+import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
@@ -18,7 +19,7 @@ public class CartographicElement extends GraphicalElement{
     public CartographicElement(){
         super();
         this.owsc = new OwsContext("OWS-Context path");
-        this.owsc.setValue(".");
+        setDefaultValue();
     }
     
     /**
@@ -61,5 +62,14 @@ public class CartographicElement extends GraphicalElement{
         list.addAll(super.getAllAttributes());
         list.add(owsc);
         return list;
+    }
+    
+    private void setDefaultValue(){
+        owsc.setValue(Configuration.defaultOwscPath);
+    }
+    
+    public void setDefaultElementShutter(){
+        super.setDefaultElementShutter();
+        owsc.setValue(Configuration.defaultESOwscPath);
     }
 }

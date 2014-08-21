@@ -1,5 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
+import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
@@ -63,5 +64,14 @@ public final class Orientation extends CartographicElement {
             return CartographicElement.class;
         else
             return GraphicalElement.class;
+    }
+    
+    private void setDefaultValue(){
+        icon.setValue(Configuration.defaultIconPath);
+    }
+    
+    public void setDefaultElementShutter(){
+        super.setDefaultElementShutter();
+        icon.setValue(Configuration.defaultESIconPath);
     }
 }

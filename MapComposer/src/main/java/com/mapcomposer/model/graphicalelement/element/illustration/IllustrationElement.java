@@ -1,5 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.illustration;
 
+import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
@@ -17,7 +18,8 @@ public class IllustrationElement extends GraphicalElement{
     /**Main constructor.*/
     public IllustrationElement(){
         path = new Source("Path");
-        path.setValue(".");
+        
+        setDefaultValue();
     }
     
     /**
@@ -51,5 +53,14 @@ public class IllustrationElement extends GraphicalElement{
         list.addAll(super.getAllAttributes());
         list.add(path);
         return list;
+    }
+    
+    private void setDefaultValue(){
+        path.setValue(Configuration.defaultImagePath);
+    }
+    
+    public void setDefaultElementShutter(){
+        super.setDefaultElementShutter();
+        path.setValue(Configuration.defaultESImagePath);
     }
 }

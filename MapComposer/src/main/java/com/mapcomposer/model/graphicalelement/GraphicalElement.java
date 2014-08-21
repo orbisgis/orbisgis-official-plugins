@@ -33,12 +33,7 @@ public class GraphicalElement {
         height=new Numeric("Height");
         width=new Numeric("Width");
         
-        //ConfigurationAttribute initialisation
-        x.setValue(0);
-        y.setValue(0);
-        rotation.setValue(0);
-        height.setValue(10);
-        width.setValue(10);
+        setDefaultValue();
     }
     
     /**
@@ -150,5 +145,21 @@ public class GraphicalElement {
     
     public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c){
         return GraphicalElement.class;
+    }
+    
+    private void setDefaultValue(){
+        x.setValue(Configuration.defaultX);
+        y.setValue(Configuration.defaultY);
+        rotation.setValue(Configuration.defaultRotation);
+        height.setValue(Configuration.defaultHeight);
+        width.setValue(Configuration.defaultWidth);
+    }
+    
+    public void setDefaultElementShutter(){
+        x.setValue(Configuration.defaultESX);
+        y.setValue(Configuration.defaultESY);
+        rotation.setValue(Configuration.defaultESRotation);
+        height.setValue(Configuration.defaultESHeight);
+        width.setValue(Configuration.defaultESWidth);
     }
 }
