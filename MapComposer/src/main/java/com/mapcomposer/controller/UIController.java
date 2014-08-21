@@ -16,9 +16,9 @@ import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
-import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Map;
+import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
@@ -29,16 +29,19 @@ public class UIController{
     /**Unique instance of the class*/
     private static UIController INSTANCE = null;
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
-    private static Map<GraphicalElement, CompositionJPanel> map;
+    private static LinkedHashMap<GraphicalElement, CompositionJPanel> map;
     /**Selected GraphicalElement */
     private static List<GraphicalElement> listGE;
+    /**GraphicalElement stack giving the Z-index information*/
+    private static Stack<GraphicalElement> stack;
     
     /**
      * Main constructor.
      */
     private UIController(){
-        map = new HashMap<>();
+        map = new LinkedHashMap<>();
         listGE = new ArrayList<>();
+        stack = new Stack<>();
         //as example
         // map example
         MapImage mi = new MapImage();
@@ -51,6 +54,8 @@ public class UIController{
         map.put(mi, new CompositionJPanel(mi));
         CompositionArea.getInstance().addGE(getPanel(mi));
         map.get(mi).setPanel(GEManager.getInstance().render(mi.getClass()).render(mi));
+        stack.push(mi);
+        CompositionArea.getInstance().setComponentZOrder(map.get(mi), 0);
         // scale example
         Scale s = new Scale();
         s.setHeight(20);
@@ -62,6 +67,8 @@ public class UIController{
         map.put(s, new CompositionJPanel(s));
         CompositionArea.getInstance().addGE(getPanel(s));
         map.get(s).setPanel(GEManager.getInstance().render(s.getClass()).render(s));
+        stack.push(s);
+        CompositionArea.getInstance().setComponentZOrder(map.get(s), 1);
         // orientation example
         Orientation o = new Orientation();
         o.setHeight(50);
@@ -74,6 +81,8 @@ public class UIController{
         map.put(o, new CompositionJPanel(o));
         CompositionArea.getInstance().addGE(getPanel(o));
         map.get(o).setPanel(GEManager.getInstance().render(o.getClass()).render(o));
+        stack.push(o);
+        CompositionArea.getInstance().setComponentZOrder(map.get(o), 2);
         // Key example
         Key k = new Key();
         k.setHeight(200);
@@ -85,6 +94,8 @@ public class UIController{
         map.put(k, new CompositionJPanel(k));
         CompositionArea.getInstance().addGE(getPanel(k));
         map.get(k).setPanel(GEManager.getInstance().render(k.getClass()).render(k));
+        stack.push(k);
+        CompositionArea.getInstance().setComponentZOrder(map.get(k), 3);
         // scale example
         TextElement t = new TextElement();
         t.setHeight(20);
@@ -97,6 +108,8 @@ public class UIController{
         map.put(t, new CompositionJPanel(t));
         CompositionArea.getInstance().addGE(getPanel(t));
         map.get(t).setPanel(GEManager.getInstance().render(t.getClass()).render(t));
+        stack.push(t);
+        CompositionArea.getInstance().setComponentZOrder(map.get(t), 4);
         // Image example
         Image i = new Image();
         i.setHeight(200);
@@ -108,6 +121,8 @@ public class UIController{
         map.put(i, new CompositionJPanel(i));
         CompositionArea.getInstance().addGE(getPanel(i));
         map.get(i).setPanel(GEManager.getInstance().render(i.getClass()).render(i));
+        stack.push(i);
+        CompositionArea.getInstance().setComponentZOrder(map.get(i), 5);
     }
     
     /**
@@ -128,6 +143,100 @@ public class UIController{
             INSTANCE=new UIController();
         }
         return INSTANCE;
+    }
+    
+    /**
+     * Change the Z-index of the displayed GraphicalElement.
+     * @param deltaZ Change of the Z-index.
+     */
+    public void zindexChange(int deltaZ){
+        for(GraphicalElement ge : listGE){
+            if(stack.contains(ge)){
+                Stack<GraphicalElement> temp = new Stack<>();
+                if(deltaZ==-2){
+                    temp.push(ge);
+                    while(!stack.empty()){
+                        if(stack.peek()!=ge)
+                            temp.push(stack.pop());
+                        else
+                            stack.pop();
+                    }
+                    while(!temp.empty()){
+                        stack.push(temp.pop());
+                    }
+                }
+                else if(deltaZ==2){
+                    while(!stack.empty()){
+                        if(stack.peek()!=ge)
+                            temp.push(stack.pop());
+                        else
+                            stack.pop();
+                    }
+                    temp.add(ge);
+                    while(!temp.empty()){
+                        stack.push(temp.pop());
+                    }
+                }
+                else if(deltaZ==1){
+                    if(stack.indexOf(ge)>0){
+                        int target = stack.indexOf(ge)-1;
+                        stack.remove(ge);
+                        int i=0;
+                        
+                        while(!stack.empty()){
+                            temp.push(stack.pop());
+                        }
+                        
+                        while(!temp.empty()){
+                            if(i==target)
+                                stack.push(ge);
+                            if(temp.peek()!=ge){
+                                stack.push(temp.pop());
+                            }
+                            i++;
+                        }
+                    }
+                }
+                else if(deltaZ==-1){
+                    if(stack.indexOf(ge)<stack.size()-1){
+                        int target = stack.indexOf(ge)+1;
+                        stack.remove(ge);
+                        int i=0;
+                        
+                        while(!stack.empty()){
+                            temp.push(stack.pop());
+                        }
+                        
+                        while(!temp.empty()){
+                            if(i==target){
+                                stack.push(ge);
+                            }
+                            if(temp.peek()!=ge){
+                                stack.push(temp.pop());
+                            }
+                            i++;
+                        }
+                        if(target==i){
+                            stack.push(ge);
+                        }
+                    }
+                }
+                actuZIndex();
+            }
+        }
+    }
+    
+    private void actuZIndex(){
+        Stack<GraphicalElement> temp = new Stack<>();
+        while(!stack.empty()){
+            temp.push(stack.pop());
+        }
+        int i=0;
+        while(!temp.empty()){
+            CompositionArea.getInstance().setComponentZOrder(map.get(temp.peek()), i);
+            stack.push(temp.pop());
+            i++;
+        }
     }
     
     /**

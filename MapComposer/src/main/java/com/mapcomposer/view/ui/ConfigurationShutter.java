@@ -28,6 +28,14 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     private final JButton validate;
     /** Remove button*/
     private final JButton remove;
+    /** To the front button*/
+    private JButton toFront;
+    /** Front button*/
+    private JButton front;
+    /** To the back button*/
+    private JButton toBack;
+    /** Back button*/
+    private JButton back;
     
     /** JPanel of the configuration elements */
     private JPanel pan;
@@ -62,10 +70,27 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
             listPanels.add(cp);
             pan.add(cp);
         }
+        //ZIndex panel
+        JPanel zindex = new JPanel(new FlowLayout());
+        toFront = new JButton("To the front");
+        toFront.addMouseListener(this);
+        front = new JButton("Front");
+        front.addMouseListener(this);
+        toBack = new JButton("To the back");
+        toBack.addMouseListener(this);
+        back = new JButton("Back");
+        back.addMouseListener(this);
+        zindex.add(toFront);
+        zindex.add(front);
+        zindex.add(toBack);
+        zindex.add(back);
+        zindex.setAlignmentX(JPanel.LEFT_ALIGNMENT);
+        pan.add(zindex);
+        //Button panel
         JPanel button = new JPanel(new FlowLayout());
         button.add(remove);
         button.add(validate);
-        button.setAlignmentX(JPanel.TOP_ALIGNMENT);
+        button.setAlignmentX(JPanel.LEFT_ALIGNMENT);
         pan.add(button);
         this.setBodyPanel(pan);
         this.open();
@@ -97,6 +122,18 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         if(e.getSource()==remove){
             UIController.getInstance().remove();
             eraseConfiguration();
+        }
+        if(e.getSource()==toFront){
+            UIController.getInstance().zindexChange(2);
+        }
+        if(e.getSource()==front){
+            UIController.getInstance().zindexChange(1);
+        }
+        if(e.getSource()==toBack){
+            UIController.getInstance().zindexChange(-2);
+        }
+        if(e.getSource()==back){
+            UIController.getInstance().zindexChange(-1);
         }
     }
     
