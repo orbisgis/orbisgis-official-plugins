@@ -26,7 +26,6 @@ public class Configuration {
     public static String defaultText = "Map Composer";
     public static int defaultAlpha = 0;
     public static String defaultImagePath = Configuration.class.getClassLoader().getResource("defaultData/image.png").getPath();
-    public static String defaultOwscPath = Configuration.class.getClassLoader().getResource("defaultData/map.ows").getPath();
     public static String defaultIconPath = Configuration.class.getClassLoader().getResource("defaultData/orientation.png").getPath();
     
     public static int defaultESX = 0;
@@ -43,6 +42,5 @@ public class Configuration {
     public static String defaultESText = "Map Composer";
     public static int defaultESAlpha = 127;
     public static String defaultESImagePath = Configuration.class.getClassLoader().getResource("defaultData/image.png").getPath();
-    public static String defaultESOwscPath = Configuration.class.getClassLoader().getResource("defaultData/map.ows").getPath();
     public static String defaultESIconPath = Configuration.class.getClassLoader().getResource("defaultData/orientation.png").getPath();
 }

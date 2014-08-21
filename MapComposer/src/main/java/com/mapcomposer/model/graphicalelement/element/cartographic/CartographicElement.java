@@ -1,6 +1,5 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
@@ -65,11 +64,12 @@ public class CartographicElement extends GraphicalElement{
     }
     
     private void setDefaultValue(){
-        owsc.setValue(Configuration.defaultOwscPath);
+        //Nothing because the OWSContext initiate itself
     }
     
+    @Override
     public void setDefaultElementShutter(){
         super.setDefaultElementShutter();
-        owsc.setValue(Configuration.defaultESOwscPath);
+        //Nothing because the OWSContext initiate itself
     }
 }

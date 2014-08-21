@@ -338,4 +338,25 @@ public class UIController{
         
         return list;
     }
+
+    public void addGE(Class<? extends GraphicalElement> aClass) {
+        try {
+            GraphicalElement ge = aClass.newInstance();
+            map.put(ge, new CompositionJPanel(ge));
+            CompositionArea.getInstance().addGE(getPanel(ge));
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            stack.push(ge);
+            CompositionArea.getInstance().setComponentZOrder(map.get(ge), stack.size()-1);
+            if(ge instanceof GERefresh){
+                ((GERefresh)ge).refresh();
+            }
+            List<GraphicalElement> temp = listGE;
+            listGE = new ArrayList<>();
+            listGE.add(ge);
+            validate(ge.getAllAttributes());
+            listGE=temp;
+        } catch (InstantiationException | IllegalAccessException ex) {
+            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
 }
