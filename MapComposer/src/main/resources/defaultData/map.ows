@@ -1,0 +1,357 @@
+<?xml version="1.0" encoding="UTF-8" standalone="yes"?>
+<ns3:OWSContext xmlns:ns1="http://www.opengis.net/ows/2.0" xmlns:ns2="http://www.w3.org/1999/xlink" xmlns:ns3="http://www.opengis.net/ows-context" xmlns:ns4="http://www.opengis.net/se/2.0/core" xmlns:ns5="http://www.opengis.net/wfs/2.1" xmlns:ns6="http://www.opengis.net/fes/2.1" xmlns:ns7="http://www.opengis.net/gml" xmlns:ns8="http://www.opengis.net/kml/2.2" xmlns:ns9="http://www.w3.org/2005/Atom" xmlns:ns10="urn:oasis:names:tc:ciq:xsdschema:xAL:2.0" xmlns:ns11="http://www.opengis.net/sld/1.2" xmlns:ns12="http://www.opengis.net/se/2.0/thematic" xmlns:ns13="http://www.w3.org/2001/SMIL20/" xmlns:ns14="http://www.opengis.net/wms" xmlns:ns15="http://www.opengis.net/se/2.0/raster" xmlns:ns16="http://www.w3.org/2001/SMIL20/Language" version="0.4.2">
+    <ns3:General>
+        <ns1:BoundingBox>
+            <ns1:LowerCorner>383106.8410733405 2105400.8250133833</ns1:LowerCorner>
+            <ns1:UpperCorner>670642.3410733405 2369653.3250133833</ns1:UpperCorner>
+        </ns1:BoundingBox>
+        <ns1:Title xml:lang="fr-FR">MyMap</ns1:Title>
+    </ns3:General>
+    <ns3:ResourceList>
+        <ns3:Layer hidden="true">
+            <ns1:Title xml:lang="fr-FR">TRONCON_HYDROGRAPHIQUE_1</ns1:Title>
+            <ns3:DataURL>
+                <ns3:OnlineResource ns2:type="simple" ns2:href="jdbc:h2:/home/sylvain/OrbisGIS/database?catalog=&amp;schema=&amp;table=TRONCON_HYDROGRAPHIQUE_1"/>
+            </ns3:DataURL>
+            <ns3:StyleList>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Unnamed Style</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Description/>
+<ns4:LineSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Line Symbolizer</ns4:Name>
+    <ns4:PenStroke>
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:LineSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Ligne</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:LineSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Line Symbolizer</ns4:Name>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#3300FF</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.65</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:LineSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+            </ns3:StyleList>
+        </ns3:Layer>
+        <ns3:Layer hidden="true">
+            <ns1:Title xml:lang="fr-FR">CLC06_1</ns1:Title>
+            <ns3:DataURL>
+                <ns3:OnlineResource ns2:type="simple" ns2:href="jdbc:h2:/home/sylvain/OrbisGIS/database?catalog=&amp;schema=&amp;table=CLC06_1"/>
+            </ns3:DataURL>
+            <ns3:StyleList>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Unnamed Style</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#E90719</ns4:Color>
+        <ns4:Opacity>1.0</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke>
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Aire</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#669900</ns4:Color>
+        <ns4:Opacity>0.2</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Ligne</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:LineSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Line Symbolizer</ns4:Name>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.04999999999999999</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:LineSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+            </ns3:StyleList>
+        </ns3:Layer>
+        <ns3:Layer hidden="false">
+            <ns1:Title xml:lang="fr-FR">DEP_FRANCE</ns1:Title>
+            <ns3:DataURL>
+                <ns3:OnlineResource ns2:type="simple" ns2:href="jdbc:h2:/home/sylvain/OrbisGIS/database?catalog=&amp;schema=&amp;table=DEP_FRANCE"/>
+            </ns3:DataURL>
+            <ns3:StyleList>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Unnamed Style</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#EF05F4</ns4:Color>
+        <ns4:Opacity>1.0</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke>
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Ligne</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:LineSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Line Symbolizer</ns4:Name>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#FF3366</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:LineSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Aire</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#55D1E7</ns4:Color>
+        <ns4:Opacity>1.0</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#99CC00</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Aire</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#990099</ns4:Color>
+        <ns4:Opacity>1.0</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+                <ns3:Style>
+                    <ns3:SLD>
+                        <ns4:Style version="2.0.0">
+                            <ns4:Name>Symbole unique - Aire</ns4:Name>
+                            <ns4:Description/>
+                            <ns4:Rule>
+<ns4:Name></ns4:Name>
+<ns4:Description/>
+<ns4:AreaSymbolizer uom="urn:ogc:def:uom:se::px" version="2.0.0">
+    <ns4:Name>Area Symbolizer</ns4:Name>
+    <ns4:SolidFill>
+        <ns4:Color>#A4979B</ns4:Color>
+        <ns4:Opacity>0.4</ns4:Opacity>
+    </ns4:SolidFill>
+    <ns4:PenStroke uom="urn:ogc:def:uom:se::px">
+        <ns4:LinearRapport>false</ns4:LinearRapport>
+        <ns4:Extension>
+            <ns4:ExtensionParameter name="offsetRapport">off</ns4:ExtensionParameter>
+        </ns4:Extension>
+        <ns4:SolidFill>
+            <ns4:Color>#000000</ns4:Color>
+            <ns4:Opacity>1.0</ns4:Opacity>
+        </ns4:SolidFill>
+        <ns4:Width>0.25</ns4:Width>
+        <ns4:LineJoin>mitre</ns4:LineJoin>
+        <ns4:LineCap>butt</ns4:LineCap>
+        <ns4:DashArray></ns4:DashArray>
+        <ns4:DashOffset>0.0</ns4:DashOffset>
+    </ns4:PenStroke>
+</ns4:AreaSymbolizer>
+                            </ns4:Rule>
+                        </ns4:Style>
+                    </ns3:SLD>
+                </ns3:Style>
+            </ns3:StyleList>
+        </ns3:Layer>
+    </ns3:ResourceList>
+</ns3:OWSContext>

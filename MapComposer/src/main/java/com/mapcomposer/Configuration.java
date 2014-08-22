@@ -3,6 +3,7 @@ package com.mapcomposer;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import java.awt.Color;
 import java.awt.GraphicsEnvironment;
+import java.net.URL;
 
 /**
  *  Configuration values.
@@ -25,8 +26,10 @@ public class Configuration {
     public static int defaultFontSize =8;
     public static String defaultText = "Map Composer";
     public static int defaultAlpha = 0;
-    public static String defaultImagePath = Configuration.class.getClassLoader().getResource("defaultData/image.png").getPath();
-    public static String defaultIconPath = Configuration.class.getClassLoader().getResource("defaultData/orientation.png").getPath();
+    public static String defaultImagePath = ".";
+    public static String defaultIconPath = ".";
+    public static URL defaultImageURL = Configuration.class.getClassLoader().getResource("defaultData/image.png");
+    public static URL defaultOrientationURL = Configuration.class.getClassLoader().getResource("defaultData/orientation.png");
     
     public static int defaultESX = 0;
     public static int defaultESY = 0;

@@ -17,7 +17,7 @@ public final class Source extends ConfigurationAttribute<String> implements CARe
      */
     public Source(String name) {
         super(name);
-        this.setValue("/");
+        this.setValue(".");
     }
 
     @Override
