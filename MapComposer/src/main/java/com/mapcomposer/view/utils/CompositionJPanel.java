@@ -18,7 +18,9 @@ public class CompositionJPanel extends JPanel implements MouseListener{
     private JPanel panel;
     private final GraphicalElement ge;
     private boolean selected;
-   // private int previousZ;
+    
+    private int startX;
+    private int startY;
     
     public CompositionJPanel(GraphicalElement ge){
         super(new BorderLayout());
@@ -27,13 +29,15 @@ public class CompositionJPanel extends JPanel implements MouseListener{
         selected = false;
         this.add(panel, BorderLayout.CENTER);
         this.addMouseListener(this);
+        startX=0;
+        startY=0;
     }
     public void setPanel(JPanel panel){
         this.panel = panel;
         this.selected=false;
         setborders();
-        panel.revalidate();
-        panel.repaint();
+        //panel.revalidate();
+        //panel.repaint();
     }
 
     private void setborders() {
@@ -69,21 +73,22 @@ public class CompositionJPanel extends JPanel implements MouseListener{
 
     @Override
     public void mousePressed(MouseEvent me) {
-        
+        startX = me.getX();
+        startY = me.getY();
     }
 
     @Override
     public void mouseReleased(MouseEvent me) {
-        
+        if(!selected){
+            ge.setX(ge.getX()-startX+me.getX());
+            ge.setY(ge.getY()-startY+me.getY());
+            this.panel.setLocation(ge.getX(), ge.getY());
+        }
     }
 
     @Override
-    public void mouseEntered(MouseEvent me) {
-        
-    }
+    public void mouseEntered(MouseEvent me) {}
 
     @Override
-    public void mouseExited(MouseEvent me) {
-        
-    }
+    public void mouseExited(MouseEvent me) {}
 }

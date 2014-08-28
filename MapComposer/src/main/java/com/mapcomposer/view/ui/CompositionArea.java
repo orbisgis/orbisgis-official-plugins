@@ -38,9 +38,4 @@ public class CompositionArea extends JPanel{
     public void removeGE(CompositionJPanel panel){
         this.remove(panel);
     }
-    
-    public void refresh(){
-        this.repaint();
-        this.revalidate();
-    }
 }

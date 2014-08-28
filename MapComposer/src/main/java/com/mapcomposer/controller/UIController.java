@@ -266,7 +266,6 @@ public class UIController{
     public void remove(){
         for(GraphicalElement ge : listGE){
             CompositionArea.getInstance().removeGE(map.get(ge));
-            CompositionArea.getInstance().refresh();
         }
         listGE= new ArrayList<>();
     }
