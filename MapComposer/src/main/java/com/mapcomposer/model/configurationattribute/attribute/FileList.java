@@ -26,7 +26,7 @@ public final class FileList extends ListCA<String> implements CARefresh{
     @Override
     public void refresh() {
         List<String> list = new ArrayList<>();
-        //Add to a list the wrong path
+        //Add to a list all the wrong path
         for(String path : this.getValue()){
             if(!(new File(path)).exists()){
                 list.add(path);

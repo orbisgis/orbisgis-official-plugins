@@ -24,7 +24,7 @@ import org.orbisgis.progress.NullProgressMonitor;
 public final class OwsContext extends ConfigurationAttribute<String> implements CARefresh{
 
     /** Instance of the OwsMapContext corresponding to the path of the Source*/
-    private OwsMapContext omc;
+    private final OwsMapContext omc;
     /** Mist of OWS-Context in the workspace folder*/
     private List<File> list;
     
@@ -97,6 +97,9 @@ public final class OwsContext extends ConfigurationAttribute<String> implements 
         }
     }
     
+    /**
+     * Set list field with all the files with the oxs extension
+     */
     private void reloadListFiles(){
         File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()+"/maps/");
         //Definition of the FilenameFilter
@@ -111,6 +114,10 @@ public final class OwsContext extends ConfigurationAttribute<String> implements 
         list = Arrays.asList(f.listFiles(filter));
     }
     
+    /**
+     * Returns the file list.
+     * @return The file list.
+     */
     public List<File> getList(){
         return list;
     }

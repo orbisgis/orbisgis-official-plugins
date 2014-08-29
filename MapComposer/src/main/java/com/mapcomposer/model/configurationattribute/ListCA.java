@@ -10,7 +10,7 @@ import java.util.List;
  */
 public abstract class ListCA<T> extends ConfigurationAttribute<List<T>> {
     /** Index of the value selected.*/
-    private int index = -1;
+    private int index;
 
     /**
      * Main constructor.
@@ -19,6 +19,7 @@ public abstract class ListCA<T> extends ConfigurationAttribute<List<T>> {
     public ListCA(String name) {
         super(name);
         super.setValue(new ArrayList<T>());
+        this.index = -1;
     }
     
     /**
