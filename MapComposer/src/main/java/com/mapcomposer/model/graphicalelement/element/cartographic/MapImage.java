@@ -1,7 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -20,15 +19,6 @@ public final class MapImage extends CartographicElement implements GERefresh{
 
     public MapImage() {
         super();
-    }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public MapImage(MapImage ge){
-        super(ge);
-        image = ge.image;
     }
     
     @Override
@@ -53,15 +43,5 @@ public final class MapImage extends CartographicElement implements GERefresh{
     
     public BufferedImage getImage(){
         return image;
-    }
-    
-    @Override
-    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c) {
-        if(c.isAssignableFrom(this.getClass()))
-            return c;
-        else if(c.isAssignableFrom(CartographicElement.class))
-            return CartographicElement.class;
-        else
-            return GraphicalElement.class;
     }
 }

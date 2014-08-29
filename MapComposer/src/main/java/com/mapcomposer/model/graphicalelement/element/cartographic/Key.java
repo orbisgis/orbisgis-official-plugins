@@ -9,31 +9,13 @@ import java.util.List;
  */
 public final class Key extends CartographicElement{
 
+    /**Main constructor*/
     public Key(){
         super();
-    }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public Key(Key ge){
-        super(ge);
     }
     
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         return super.getAllAttributes();
     }
-
-    @Override
-    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c) {
-        if(c.isAssignableFrom(this.getClass()))
-            return c;
-        else if(c.isAssignableFrom(CartographicElement.class))
-            return CartographicElement.class;
-        else
-            return GraphicalElement.class;
-    }
-    
 }

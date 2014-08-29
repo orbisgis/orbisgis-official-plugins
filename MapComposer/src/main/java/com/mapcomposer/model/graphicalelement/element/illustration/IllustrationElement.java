@@ -23,15 +23,6 @@ public class IllustrationElement extends GraphicalElement{
     }
     
     /**
-     * Clone constructor.
-     * @param ge
-     */
-    public IllustrationElement(IllustrationElement ge){
-        super(ge);
-        path = ge.path;
-    }
-    
-    /**
      * Returns the absolute path value.
      * @return The absolute path string to the source.
      */

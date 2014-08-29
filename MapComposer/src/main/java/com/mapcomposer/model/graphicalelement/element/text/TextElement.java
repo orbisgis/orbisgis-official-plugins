@@ -62,23 +62,6 @@ public final class TextElement extends GraphicalElement{
         setDefaultValue();
         
     }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public TextElement(TextElement ge){
-        super(ge);
-        //ConfigurationAttribute instantiation
-        this.font = ge.font;
-        this.colorText = ge.colorText;
-        this.colorBack = ge.colorBack;
-        this.alignment = ge.alignment;
-        this.style = ge.style;
-        this.fontSize = ge.fontSize;
-        this.text = ge.text;
-        this.alpha = ge.alpha;
-    }
 
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
@@ -278,14 +261,6 @@ public final class TextElement extends GraphicalElement{
             }
             throw new IllegalArgumentException("Invalid name: " + name);
         }
-    }
-    
-    @Override
-    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c) {
-        if(c.isAssignableFrom(this.getClass()))
-            return c;
-        else 
-            return GraphicalElement.class;
     }
     
     private void setDefaultValue(){

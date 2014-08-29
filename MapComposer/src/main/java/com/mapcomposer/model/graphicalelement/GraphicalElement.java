@@ -10,7 +10,7 @@ import java.util.List;
  * Root class for the GraphicalElements (GraphicalElement) objects.
  * It contains all the main ConfigurationAttributes (CA) and their setter and getters.
  */
-public class GraphicalElement {
+public abstract class GraphicalElement {
     /** x position of the GE.*/
     private final Numeric x;
     /** y position of the GE.*/
@@ -34,19 +34,6 @@ public class GraphicalElement {
         width=new Numeric("Width");
         
         setDefaultValue();
-    }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public GraphicalElement(GraphicalElement ge){
-        //ConfigurationAttribute instantiation
-        x=ge.x;
-        y=ge.y;
-        rotation=ge.rotation;
-        height=ge.height;
-        width=ge.width;
     }
 
     /**
@@ -141,10 +128,6 @@ public class GraphicalElement {
         list.add(height);
         list.add(width);
         return list;
-    }
-    
-    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c){
-        return GraphicalElement.class;
     }
     
     private void setDefaultValue(){

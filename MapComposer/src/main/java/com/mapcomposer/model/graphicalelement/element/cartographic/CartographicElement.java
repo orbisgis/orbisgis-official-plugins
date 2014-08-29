@@ -20,16 +20,6 @@ public class CartographicElement extends GraphicalElement{
         this.owsc = new OwsContext("OWS-Context path");
         setDefaultValue();
     }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public CartographicElement(CartographicElement ge){
-        super(ge);
-        //ConfigurationAttribute instantiation
-        owsc=ge.owsc;
-    }
 
     /**
      * Returns the OwsMapContext.

@@ -1,7 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.awt.image.BufferedImage;
 import java.util.List;
@@ -16,20 +15,11 @@ import org.orbisgis.progress.NullProgressMonitor;
  */
 public final class Scale extends CartographicElement implements GERefresh{
     
-    private MapTransform mapTransform;
+    private final MapTransform mapTransform;
 
     public Scale() {
         super();
         mapTransform = new MapTransform();
-    }
-    
-    /**
-     * Clone constructor.
-     * @param ge
-     */
-    public Scale(Scale ge){
-        super(ge);
-        mapTransform = ge.mapTransform;
     }
     
     @Override
@@ -53,16 +43,5 @@ public final class Scale extends CartographicElement implements GERefresh{
     
     public double getMapScale(){
         return mapTransform.getScaleDenominator();
-    }
-    
-    
-    @Override
-    public Class<? extends GraphicalElement> getCommonClass(Class<? extends GraphicalElement> c) {
-        if(c.isAssignableFrom(this.getClass()))
-            return c;
-        else if(c.isAssignableFrom(CartographicElement.class))
-            return CartographicElement.class;
-        else
-            return GraphicalElement.class;
     }
 }

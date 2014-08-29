@@ -308,29 +308,34 @@ public class UIController{
     
     /**
      * Returns the list of ConfigurationAttributes that all the selected GraphicalElements have in common.
-     * @return List of common ConfigurationAttributes.
+     * @return List of common ConfigurationAttributes (common about the names and not values).
      */
     private List<ConfigurationAttribute> getCommonAttributes(){
-        List<ConfigurationAttribute> list = new ArrayList<>();
-        try {
-            Class<? extends GraphicalElement> c = listGE.get(0).getClass();
-            for (GraphicalElement listGE1 : listGE) {
-                c = listGE1.getCommonClass(c);
-            }
-            list = c.getConstructor(c).newInstance(listGE.get(0)).getAllAttributes();
-            
-            //Find if attributes are in common or not.
-            //If not, the CA is locked
+        List<ConfigurationAttribute> list = listGE.get(0).getAllAttributes();
+        List<ConfigurationAttribute> listRemove = new ArrayList<>();
+        //Compare each the CA of the list to those of the GE from listGE
+        boolean flag=false;
+        for(ConfigurationAttribute caList : list){
+            System.out.println("caList : "+caList.getName());
             for(GraphicalElement ge : listGE){
-                List<ConfigurationAttribute> listCA =  c.getConstructor(c).newInstance(ge).getAllAttributes();
-                for(int i=0; i<list.size(); i++){
-                    if(list.get(i).getValue()!=listCA.get(i).getValue()){
-                        list.get(i).lock();
+                flag=false;
+                for(ConfigurationAttribute caGE : ge.getAllAttributes()){
+            System.out.println("caGE : "+caGE.getName());
+                    if(caList.getName().equals(caGE.getName())){
+                        flag=true;
+                        if(!caList.getValue().equals(caGE.getValue()))
+                            caList.lock();
                     }
                 }
             }
-        } catch (NoSuchMethodException | SecurityException | InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            //If the CA isn't in common, it's added to a list to be removed after
+            if(!flag){
+                listRemove.add(caList);
+                System.out.println("to remove");
+            }
+        }
+        for(ConfigurationAttribute ca : listRemove){
+            list.remove(ca);
         }
         
         return list;
