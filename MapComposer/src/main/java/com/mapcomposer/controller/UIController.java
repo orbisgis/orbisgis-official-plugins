@@ -39,6 +39,7 @@ public class UIController{
      * Main constructor.
      */
     private UIController(){
+        //Initialize the different attributes
         map = new LinkedHashMap<>();
         listGE = new ArrayList<>();
         stack = new Stack<>();
@@ -147,95 +148,92 @@ public class UIController{
     
     /**
      * Change the Z-index of the displayed GraphicalElement.
+     * -2 means the GE are brought to the back,
+     * -1 means the GE are brought one step to the back
+     * 1 means the GE are brought one step to the front
+     * 2 means the GE are brought to the front.
      * @param deltaZ Change of the Z-index.
      */
     public void zindexChange(int deltaZ){
         for(GraphicalElement ge : listGE){
             if(stack.contains(ge)){
                 Stack<GraphicalElement> temp = new Stack<>();
-                if(deltaZ==-2){
-                    temp.push(ge);
-                    while(!stack.empty()){
-                        if(stack.peek()!=ge)
-                            temp.push(stack.pop());
-                        else
-                            stack.pop();
-                    }
-                    while(!temp.empty()){
-                        stack.push(temp.pop());
-                    }
+                switch (deltaZ){
+                    case -2:
+                        temp.push(ge);
+                        toBackFront(deltaZ, ge, temp);
+                        break;
+                    case 2:
+                        toBackFront(deltaZ, ge, temp);
+                        temp.push(ge);
+                        break;
+                    case 1:
+                        if(stack.indexOf(ge)>0){
+                            backFront(deltaZ, ge, temp);
+                        }
+                    break;
+                    case -1:
+                        if(stack.indexOf(ge)<stack.size()-1){
+                            backFront(deltaZ, ge, temp);
+                        }
+                        break;
                 }
-                else if(deltaZ==2){
-                    while(!stack.empty()){
-                        if(stack.peek()!=ge)
-                            temp.push(stack.pop());
-                        else
-                            stack.pop();
-                    }
-                    temp.add(ge);
-                    while(!temp.empty()){
-                        stack.push(temp.pop());
-                    }
-                }
-                else if(deltaZ==1){
-                    if(stack.indexOf(ge)>0){
-                        int target = stack.indexOf(ge)-1;
-                        stack.remove(ge);
-                        int i=0;
-                        
-                        while(!stack.empty()){
-                            temp.push(stack.pop());
-                        }
-                        
-                        while(!temp.empty()){
-                            if(i==target)
-                                stack.push(ge);
-                            if(temp.peek()!=ge){
-                                stack.push(temp.pop());
-                            }
-                            i++;
-                        }
-                    }
-                }
-                else if(deltaZ==-1){
-                    if(stack.indexOf(ge)<stack.size()-1){
-                        int target = stack.indexOf(ge)+1;
-                        stack.remove(ge);
-                        int i=0;
-                        
-                        while(!stack.empty()){
-                            temp.push(stack.pop());
-                        }
-                        
-                        while(!temp.empty()){
-                            if(i==target){
-                                stack.push(ge);
-                            }
-                            if(temp.peek()!=ge){
-                                stack.push(temp.pop());
-                            }
-                            i++;
-                        }
-                        if(target==i){
-                            stack.push(ge);
-                        }
-                    }
-                }
+                while(!temp.empty())
+                    stack.push(temp.pop());
                 actuZIndex();
             }
         }
     }
     
-    private void actuZIndex(){
-        Stack<GraphicalElement> temp = new Stack<>();
+    /**
+     * Move the GraphicalElement one step to the front or back and set its index.
+     * @param deltaZ Variation of the Z-index of the GE.
+     * @param ge GraphicalElement to move.
+     * @param temp Temporary stack.
+     */
+    private void backFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> temp){
+        //Get the target index in the temporary stack (reverse order of the class stack)
+        int target = stack.size()-(stack.indexOf(ge)-deltaZ);
+        stack.remove(ge);
+        int i=1;
+
+        //While the object stack isn't empty, push element in the temporary stack.
         while(!stack.empty()){
-            temp.push(stack.pop());
-        }
-        int i=0;
-        while(!temp.empty()){
-            CompositionArea.getInstance().setComponentZOrder(map.get(temp.peek()), i);
-            stack.push(temp.pop());
+            //Push the GE at the write index.
+            if(i==target){
+                temp.push(ge);
+            }
+            else
+                temp.push(stack.pop());
             i++;
+        }
+        //If the GE has the higher index, it isn't already pushed.
+        if(!temp.contains(ge)){
+            temp.push(ge);
+        }
+    }   
+    
+    /**
+     * Move the GraphicalElement to the front or back and set its index.
+     * @param deltaZ Variation of the Z-index of the GE.
+     * @param ge GraphicalElement to move.
+     * @param temp Temporary stack.
+     */
+    private void toBackFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> temp){
+        while(!stack.empty()){
+            if(stack.peek()!=ge)
+                temp.push(stack.pop());
+            else
+                stack.pop();
+        }
+    }
+    
+    /**
+     * Set the Z-index of the panels displayed in the CompositionArea
+     */
+    private void actuZIndex(){
+        for(GraphicalElement ge : stack){
+            CompositionArea.getInstance().setComponentZOrder(map.get(ge), stack.indexOf(ge));
         }
     }
     
@@ -261,7 +259,7 @@ public class UIController{
     }
     
     /**
-     * Remove all the selecte GraphicalElement
+     * Remove all the selected GraphicalElement
      */
     public void remove(){
         for(GraphicalElement ge : listGE){
@@ -338,14 +336,20 @@ public class UIController{
         return list;
     }
 
+    /**
+     * Adds a new GraphicalElement to the UIController and its JPanel to the COmpositionArea.
+     * @param aClass Class of the new GraphicalElement.
+     */
     public void addGE(Class<? extends GraphicalElement> aClass) {
         try {
             GraphicalElement ge = aClass.newInstance();
+            //Register the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge));
             CompositionArea.getInstance().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             stack.push(ge);
             CompositionArea.getInstance().setComponentZOrder(map.get(ge), stack.size()-1);
+            //Refresh the GE and redraw it.
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
