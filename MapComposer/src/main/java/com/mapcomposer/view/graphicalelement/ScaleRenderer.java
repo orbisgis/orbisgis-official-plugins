@@ -11,9 +11,9 @@ import java.awt.image.BufferedImage;
 public class ScaleRenderer extends GERenderer{
     
     /**Dot per inch screen resolution. */
-    private final int dpi;
+    private final double dpi;
     /**Dot per millimeter screen resolution. */
-    private final int dpmm;
+    private final double dpmm;
     
     /**
      * Main constructor
@@ -21,7 +21,7 @@ public class ScaleRenderer extends GERenderer{
     public ScaleRenderer(){
         //gets the screen dpi
         this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-        this.dpmm = (int)(((double)dpi)/25.4);
+        this.dpmm = (((double)dpi)/25.4);
     }
 
     @Override
@@ -30,7 +30,6 @@ public class ScaleRenderer extends GERenderer{
         int resolution=-1;
         
         //Get the map scale
-        ((Scale)ge).refresh();
         double mapScalemmR = ((Scale)ge).getMapScale();
         //Calculate the real distance in milimeter that the Scale panel width represent.
         double panelWidthmmR = (ge.getWidth()/dpmm)*mapScalemmR;

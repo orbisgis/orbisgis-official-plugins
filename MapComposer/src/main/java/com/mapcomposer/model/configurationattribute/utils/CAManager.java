@@ -30,6 +30,7 @@ public class CAManager {
         map.put(Text.class, new TextRenderer());
         map.put(OwsContext.class, new OwsContextRenderer());
         map.put(ColorCA.class, new ColorRenderer());
+        map.put(LinkToMapImage.class, new LinkToMapImageRenderer());
     }
     
     /**

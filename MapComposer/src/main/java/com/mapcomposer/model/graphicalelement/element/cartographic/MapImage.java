@@ -16,9 +16,11 @@ import org.orbisgis.progress.NullProgressMonitor;
 public final class MapImage extends CartographicElement implements GERefresh{
     
     private BufferedImage image = null;
+    private MapTransform mapTransform;
 
     public MapImage() {
         super();
+        mapTransform = new MapTransform();
     }
     
     @Override
@@ -29,7 +31,7 @@ public final class MapImage extends CartographicElement implements GERefresh{
     @Override
     public void refresh() {
         try {
-            MapTransform mapTransform = new MapTransform();
+            mapTransform = new MapTransform();
             mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
             image = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB);
             mapTransform.setImage(image);
@@ -43,5 +45,9 @@ public final class MapImage extends CartographicElement implements GERefresh{
     
     public BufferedImage getImage(){
         return image;
+    }
+    
+    public MapTransform getMapTransform(){
+        return mapTransform;
     }
 }

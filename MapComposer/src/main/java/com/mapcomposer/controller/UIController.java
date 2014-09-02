@@ -327,14 +327,18 @@ public class UIController{
         //Compare each the CA of the list to those of the GE from listGE
         boolean flag=false;
         for(ConfigurationAttribute caList : list){
-            System.out.println("caList : "+caList.getName());
             for(GraphicalElement ge : listGE){
                 flag=false;
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
-            System.out.println("caGE : "+caGE.getName());
+                    //refresh the attributes
+                    if(caGE instanceof CARefresh)
+                        ((CARefresh)caGE).refresh();
+                    
                     if(caList.getName().equals(caGE.getName())){
                         flag=true;
-                        if(!caList.getValue().equals(caGE.getValue()))
+                        if(caList.getValue()==null ||caGE.getValue()==null)
+                            caList.lock();
+                        else if(!caList.getValue().equals(caGE.getValue()))
                             caList.lock();
                     }
                 }
@@ -342,7 +346,6 @@ public class UIController{
             //If the CA isn't in common, it's added to a list to be removed after
             if(!flag){
                 listRemove.add(caList);
-                System.out.println("to remove");
             }
         }
         for(ConfigurationAttribute ca : listRemove){
@@ -377,5 +380,9 @@ public class UIController{
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
+    }
+    
+    public LinkedHashMap<GraphicalElement, CompositionJPanel> getGEMap(){
+        return map;
     }
 }

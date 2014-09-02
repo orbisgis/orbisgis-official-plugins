@@ -1,47 +1,34 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
-import java.awt.image.BufferedImage;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import org.orbisgis.coremap.layerModel.LayerException;
-import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.progress.NullProgressMonitor;
 
 /**
  * Scale of the map. 
  */
-public final class Scale extends CartographicElement implements GERefresh{
+public final class Scale extends CartographicElement{
     
-    private final MapTransform mapTransform;
+    private final LinkToMapImage ltmi;
 
     public Scale() {
         super();
-        mapTransform = new MapTransform();
+        ltmi = new LinkToMapImage("Link to MapImage");
     }
     
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
-        return super.getAllAttributes();
-    }
-
-    @Override
-    public void refresh() {
-        try {
-            mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
-            BufferedImage outImage = new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_RGB);
-            mapTransform.setImage(outImage);
-            if(!this.getOwsMapContext().isOpen())
-                this.getOwsMapContext().open(new NullProgressMonitor());
-            this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
-        } catch (LayerException ex) {
-            Logger.getLogger(Scale.class.getName()).log(Level.SEVERE, null, ex);
-        }
+        List<ConfigurationAttribute> ret = super.getAllAttributes();
+        ret.add(ltmi);
+        return ret;
     }
     
     public double getMapScale(){
-        return mapTransform.getScaleDenominator();
+        if(ltmi.getSelected()!=null)
+            return ltmi.getSelected().getMapTransform().getScaleDenominator();
+        else
+            return 1;
     }
 }

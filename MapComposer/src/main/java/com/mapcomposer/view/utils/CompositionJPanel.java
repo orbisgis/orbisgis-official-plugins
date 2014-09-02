@@ -9,6 +9,9 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import static java.lang.Thread.sleep;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.border.Border;
@@ -156,29 +159,6 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
                 ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-                
-                
-            
-            
-            /*
-            case 1:
-                ge.setWidth(startX-me.getLocationOnScreen().x+ge.getWidth());
-                ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
-                panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
-                break;
-            case 2:
-                ge.setWidth(-(startX-me.getLocationOnScreen().x)+ge.getWidth());
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
-                break;
-            case 3:
-                ge.setHeight(startY-me.getLocationOnScreen().y);
-                ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
-                break;
-            case 4:
-                ge.setHeight(-(startY-me.getLocationOnScreen().y));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
-                break;*/
             case 9:
                 ge.setX(ge.getX()-startX+me.getLocationOnScreen().x);
                 ge.setY(ge.getY()-startY+me.getLocationOnScreen().y);
@@ -239,6 +219,18 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         }
         else{
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
+        }
+    }
+    
+    public void hightlight(){
+        try {
+            Rectangle r = new Rectangle(this.getLocation(), this.getSize());
+            panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
+            this.paintImmediately(this.getVisibleRect());
+            sleep(1000);
+            setBorders();
+        } catch (InterruptedException ex) {
+            Logger.getLogger(CompositionJPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
 }
