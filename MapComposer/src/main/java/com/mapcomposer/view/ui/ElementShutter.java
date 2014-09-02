@@ -9,6 +9,7 @@ import com.mapcomposer.model.graphicalelement.element.illustration.Image;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import java.awt.Dimension;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -17,7 +18,7 @@ import javax.swing.JPanel;
 /**
  * Lateral shutter containing the GraphicalElements.
  */
-public class ElementShutter extends Shutter{
+public class ElementShutter extends Shutter implements MouseListener{
     
     /**Unique instance of the class*/
     private static ElementShutter INSTANCE = null;
@@ -36,7 +37,7 @@ public class ElementShutter extends Shutter{
     
     /**Private constructor*/
     private ElementShutter(){
-        super(200, Shutter.RIGHT_SHUTTER);
+        super();
         JPanel pan = new JPanel();
         pan.setLayout(new BoxLayout(pan, BoxLayout.PAGE_AXIS));
         mapImage = new JButton(new ImageIcon(this.getClass().getClassLoader().getResource("defaultData/map.png")));
@@ -79,7 +80,6 @@ public class ElementShutter extends Shutter{
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        super.mouseClicked(e);
         if(e.getSource()==mapImage){
             UIController.getInstance().addGE(MapImage.class);
         }
@@ -99,4 +99,16 @@ public class ElementShutter extends Shutter{
             UIController.getInstance().addGE(Image.class);
         }
     }
+
+    @Override
+    public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseReleased(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {}
+
+    @Override
+    public void mouseExited(MouseEvent me) {}
 }

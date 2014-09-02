@@ -45,7 +45,7 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     
     /**Private constructor*/
     private ConfigurationShutter(){
-        super(300, Shutter.LEFT_SHUTTER);
+        super();
         listPanels = new ArrayList<>();
         validate = new JButton("Validate");
         validate.addMouseListener(this);
@@ -110,7 +110,6 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
     
     @Override
     public void mouseClicked(MouseEvent e) {
-        super.mouseClicked(e);
         if(e.getSource()==validate){
             List<ConfigurationAttribute> listca = new ArrayList<>();
             for(ConfPanel cp : listPanels){
@@ -146,6 +145,18 @@ public class ConfigurationShutter extends Shutter implements MouseListener{
         this.setBodyPanel(pan);
         this.close();
     }
+
+    @Override
+    public void mousePressed(MouseEvent me) {}
+
+    @Override
+    public void mouseReleased(MouseEvent me) {}
+
+    @Override
+    public void mouseEntered(MouseEvent me) {}
+
+    @Override
+    public void mouseExited(MouseEvent me) {}
     
     
     private class ConfPanel extends JPanel implements ItemListener{

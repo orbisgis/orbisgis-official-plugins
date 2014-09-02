@@ -3,6 +3,7 @@
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import java.awt.BorderLayout;
+import java.awt.Color;
 import java.awt.Cursor;
 import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
@@ -46,12 +47,10 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
 
     private void setBorders() {
        if(selected){
-        Border raisedbevel = BorderFactory.createRaisedBevelBorder();
-        Border loweredbevel = BorderFactory.createLoweredBevelBorder();
-        this.panel.setBorder(BorderFactory.createCompoundBorder(raisedbevel, loweredbevel));
+           panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
        }
        else{
-           panel.setBorder(null);
+           panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
        }
     }
 
@@ -61,18 +60,11 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         setBorders();
         if(selected){
             UIController.getInstance().selectGE(ge);
-            panel.setSize((int)this.getSize().getWidth()+8, (int)this.getSize().getHeight()+8);
-            Rectangle r = panel.getBounds();
-            r.translate(-4, -4);
-            panel.setBounds(r);
         }
         else{
             UIController.getInstance().unselectGE(ge);
-            panel.setSize((int)this.getSize().getWidth()-8, (int)this.getSize().getHeight()-8);
-            Rectangle r = panel.getBounds();
-            r.translate(4, 4);
-            panel.setBounds(r);
         }
+        setBorders();
     }
 
     @Override

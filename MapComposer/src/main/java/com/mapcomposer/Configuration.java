@@ -46,4 +46,5 @@ public class Configuration {
     public static int defaultESAlpha = 127;
     public static String defaultESImagePath = Configuration.class.getClassLoader().getResource("defaultData/image.png").getPath();
     public static String defaultESIconPath = Configuration.class.getClassLoader().getResource("defaultData/orientation.png").getPath();
+    public static int defaultShutterSize = 250;
 }

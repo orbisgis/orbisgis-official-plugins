@@ -270,7 +270,10 @@ public class UIController{
     public void remove(){
         for(GraphicalElement ge : listGE){
             CompositionArea.getInstance().removeGE(map.get(ge));
+            map.remove(ge);
+            stack.remove(ge);
         }
+        actuZIndex();
         listGE= new ArrayList<>();
     }
 
