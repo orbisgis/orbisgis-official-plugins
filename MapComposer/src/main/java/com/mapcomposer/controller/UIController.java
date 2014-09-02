@@ -3,6 +3,7 @@ package com.mapcomposer.controller;
 import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
@@ -14,13 +15,13 @@ import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
-import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.swing.JPanel;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -44,6 +45,11 @@ public class UIController{
         listGE = new ArrayList<>();
         stack = new Stack<>();
         //as example
+        //document example
+        Document d = new Document();
+        map.put(d, new CompositionJPanel(d));
+        CompositionArea.getInstance().setPanel(new JPanel(), d.getFormat().getPixelDimension());
+        map.get(d).setPanel(GEManager.getInstance().render(d.getClass()).render(d));
         // map example
         MapImage mi = new MapImage();
         mi.setHeight(400);
@@ -56,7 +62,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(mi));
         map.get(mi).setPanel(GEManager.getInstance().render(mi.getClass()).render(mi));
         stack.push(mi);
-        CompositionArea.getInstance().setComponentZOrder(map.get(mi), 0);
+        CompositionArea.getInstance().setZIndex(map.get(mi), 0);
         // scale example
         Scale s = new Scale();
         s.setHeight(20);
@@ -69,7 +75,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(s));
         map.get(s).setPanel(GEManager.getInstance().render(s.getClass()).render(s));
         stack.push(s);
-        CompositionArea.getInstance().setComponentZOrder(map.get(s), 1);
+        CompositionArea.getInstance().setZIndex(map.get(s), 1);
         // orientation example
         Orientation o = new Orientation();
         o.setHeight(50);
@@ -83,7 +89,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(o));
         map.get(o).setPanel(GEManager.getInstance().render(o.getClass()).render(o));
         stack.push(o);
-        CompositionArea.getInstance().setComponentZOrder(map.get(o), 2);
+        CompositionArea.getInstance().setZIndex(map.get(o), 2);
         // Key example
         Key k = new Key();
         k.setHeight(200);
@@ -96,7 +102,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(k));
         map.get(k).setPanel(GEManager.getInstance().render(k.getClass()).render(k));
         stack.push(k);
-        CompositionArea.getInstance().setComponentZOrder(map.get(k), 3);
+        CompositionArea.getInstance().setZIndex(map.get(k), 3);
         // scale example
         TextElement t = new TextElement();
         t.setHeight(20);
@@ -110,7 +116,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(t));
         map.get(t).setPanel(GEManager.getInstance().render(t.getClass()).render(t));
         stack.push(t);
-        CompositionArea.getInstance().setComponentZOrder(map.get(t), 4);
+        CompositionArea.getInstance().setZIndex(map.get(t), 4);
         // Image example
         Image i = new Image();
         i.setHeight(200);
@@ -123,7 +129,7 @@ public class UIController{
         CompositionArea.getInstance().addGE(getPanel(i));
         map.get(i).setPanel(GEManager.getInstance().render(i.getClass()).render(i));
         stack.push(i);
-        CompositionArea.getInstance().setComponentZOrder(map.get(i), 5);
+        CompositionArea.getInstance().setZIndex(map.get(i), 5);
     }
     
     /**
@@ -233,7 +239,7 @@ public class UIController{
      */
     private void actuZIndex(){
         for(GraphicalElement ge : stack){
-            CompositionArea.getInstance().setComponentZOrder(map.get(ge), stack.indexOf(ge));
+            CompositionArea.getInstance().setZIndex(map.get(ge), stack.indexOf(ge));
         }
     }
     
@@ -296,6 +302,8 @@ public class UIController{
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            if(ge instanceof Document)
+                CompositionArea.getInstance().setPanel(GEManager.getInstance().render(ge.getClass()).render(ge), ((Document)ge).getFormat().getPixelDimension());
         }
         //Unlock all the ConfigurationAttribute
         for(GraphicalElement ge : listGE){
@@ -353,7 +361,7 @@ public class UIController{
             CompositionArea.getInstance().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             stack.push(ge);
-            CompositionArea.getInstance().setComponentZOrder(map.get(ge), stack.size()-1);
+            CompositionArea.getInstance().setZIndex(map.get(ge), stack.size()-1);
             //Refresh the GE and redraw it.
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
