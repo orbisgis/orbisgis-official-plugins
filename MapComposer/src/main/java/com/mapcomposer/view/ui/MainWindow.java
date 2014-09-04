@@ -1,6 +1,5 @@
 package com.mapcomposer.view.ui;
 
-import com.mapcomposer.Configuration;
 import com.mapcomposer.controller.UIController;
 import java.awt.BorderLayout;
 import javax.swing.JFrame;
@@ -30,9 +29,7 @@ public class MainWindow extends JFrame{
         pan.setLayout(new BorderLayout());
         JSplitPane pane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ConfigurationShutter.getInstance(), CompositionArea.getInstance());
         pane1.setOneTouchExpandable(true);
-        JSplitPane pane2 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, pane1, ElementShutter.getInstance());
-        pane2.setOneTouchExpandable(true);
-        this.setContentPane(pane2);
+        this.setContentPane(pane1);
         
         //Instantiation of the UIController
         UIController.getInstance();

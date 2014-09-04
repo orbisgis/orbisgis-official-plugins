@@ -6,6 +6,9 @@
     <name>MapComposer</name>
     <version>1.0-SNAPSHOT</version>
     <packaging>bundle</packaging>
+    <description>
+        OrbisGIS plugin for the composition of cartographic documents.
+    </description>
     <build>
         <plugins>
             <plugin>
