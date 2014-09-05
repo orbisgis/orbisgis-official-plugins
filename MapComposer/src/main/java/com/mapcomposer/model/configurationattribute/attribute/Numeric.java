@@ -1,11 +1,9 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-
 /**
  * Numeric attribute.
  */
-public final class Numeric extends ConfigurationAttribute<Integer> {
+public final class Numeric extends SimpleCA<Integer> {
     
     /** Minimum value */
     private final int min;

@@ -1,7 +1,7 @@
 package com.mapcomposer.model.graphicalelement;
 
 import com.mapcomposer.Configuration;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import java.util.ArrayList;
 import java.util.List;

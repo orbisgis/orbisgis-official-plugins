@@ -1,6 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import java.util.ArrayList;

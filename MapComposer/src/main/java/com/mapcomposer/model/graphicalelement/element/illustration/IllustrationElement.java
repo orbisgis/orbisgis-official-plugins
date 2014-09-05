@@ -3,7 +3,7 @@ package com.mapcomposer.model.graphicalelement.element.illustration;
 import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 

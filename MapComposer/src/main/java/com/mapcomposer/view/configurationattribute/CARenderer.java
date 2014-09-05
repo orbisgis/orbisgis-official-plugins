@@ -1,6 +1,6 @@
 package com.mapcomposer.view.configurationattribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import javax.swing.JPanel;
 
 /**

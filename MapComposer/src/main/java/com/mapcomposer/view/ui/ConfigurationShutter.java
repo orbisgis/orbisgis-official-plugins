@@ -2,7 +2,7 @@ package com.mapcomposer.view.ui;
 
 import com.mapcomposer.Configuration;
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.utils.CAManager;
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -127,7 +127,10 @@ public class ConfigurationShutter extends JPanel implements MouseListener{
     @Override
     public void mouseExited(MouseEvent me) {}
     
-    
+    /**
+     * Extenson of the JPanel used to display the ConfigurationAttributes.
+     * It also permite to lock and unlock the fields. 
+     */
     private class ConfPanel extends JPanel implements ItemListener{
         private final JPanel pan;
         private final JCheckBox box;
@@ -156,18 +159,11 @@ public class ConfigurationShutter extends JPanel implements MouseListener{
 
         @Override
         public void itemStateChanged(ItemEvent ie) {
-            if(!((JCheckBox)ie.getSource()).isSelected()){
-                pan.setEnabled(true);
-                for(Component c : pan.getComponents())
-                    c.setEnabled(true);
-                ca.unlock();
-            }
-            if(((JCheckBox)ie.getSource()).isSelected()){
-                pan.setEnabled(false);
-                for(Component c : pan.getComponents())
-                    c.setEnabled(false);
-                ca.lock();
-            }
+            boolean b = !((JCheckBox)ie.getSource()).isSelected();
+            pan.setEnabled(b);
+            for(Component c : pan.getComponents())
+                c.setEnabled(b);
+            ca.setLock(b);
             this.repaint();
             this.revalidate();
         }

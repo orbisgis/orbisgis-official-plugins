@@ -1,7 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import java.util.List;
 
 /**

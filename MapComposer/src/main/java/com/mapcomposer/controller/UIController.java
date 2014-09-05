@@ -1,7 +1,7 @@
 package com.mapcomposer.controller;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
@@ -201,8 +201,8 @@ public class UIController{
                     if(ca.getName().equals(confShutterCA.getName())){
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
-                            if(ca instanceof CARefresh){
-                                ((CARefresh)ca).refresh();
+                            if(ca instanceof RefreshCA){
+                                ((RefreshCA)ca).refresh();
                             }
                         }
                         break;
@@ -221,7 +221,7 @@ public class UIController{
         //Unlock all the ConfigurationAttribute
         for(GraphicalElement ge : selectedGE){
             for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.unlock();
+                ca.setLock(false);
             }
         }
         selectedGE=new ArrayList<>();
@@ -241,15 +241,11 @@ public class UIController{
                 flag=false;
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
                     //refresh the attributes
-                    if(caGE instanceof CARefresh)
-                        ((CARefresh)caGE).refresh();
+                    if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh();
                     
-                    if(caList.getName().equals(caGE.getName())){
+                    if(caList.isSameProperty(caGE)){
                         flag=true;
-                        if(caList.getValue()==null ||caGE.getValue()==null)
-                            caList.lock();
-                        else if(!caList.getValue().equals(caGE.getValue()))
-                            caList.lock();
+                        caList.setLock(!caList.equals(caGE));
                     }
                 }
             }

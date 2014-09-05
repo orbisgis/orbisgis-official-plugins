@@ -3,7 +3,7 @@ package com.mapcomposer.model.graphicalelement.element.text;
 import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.attribute.Text;

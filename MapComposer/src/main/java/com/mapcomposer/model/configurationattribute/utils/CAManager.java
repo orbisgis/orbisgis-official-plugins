@@ -1,6 +1,6 @@
 package com.mapcomposer.model.configurationattribute.utils;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.*;
 import com.mapcomposer.view.configurationattribute.*;
 import java.util.HashMap;

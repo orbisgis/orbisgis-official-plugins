@@ -1,10 +1,8 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
-import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.util.List;
-import org.orbisgis.progress.NullProgressMonitor;
 
 /**
  * Scale of the map. 
