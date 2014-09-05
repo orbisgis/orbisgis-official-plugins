@@ -2,9 +2,8 @@ package com.mapcomposer.model.graphicalelement.utils;
 
 import java.util.HashMap;
 import java.util.Map;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.Document;
-import com.mapcomposer.model.graphicalelement.element.cartographic.Key;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
@@ -14,7 +13,6 @@ import com.mapcomposer.view.graphicalelement.DocumentRenderer;
 import com.mapcomposer.view.graphicalelement.TextRenderer;
 import com.mapcomposer.view.graphicalelement.GERenderer;
 import com.mapcomposer.view.graphicalelement.ImageRenderer;
-import com.mapcomposer.view.graphicalelement.KeyRenderer;
 import com.mapcomposer.view.graphicalelement.MapImageRenderer;
 import com.mapcomposer.view.graphicalelement.OrientationRenderer;
 import com.mapcomposer.view.graphicalelement.ScaleRenderer;
@@ -34,14 +32,11 @@ public class GEManager {
     private GEManager(){
         mapRenderer = new HashMap();
         //Adding the original GE and their Renderer
-        mapRenderer.put(Key.class, new KeyRenderer());
         mapRenderer.put(MapImage.class, new MapImageRenderer());
         mapRenderer.put(Orientation.class, new OrientationRenderer());
         mapRenderer.put(Scale.class, new ScaleRenderer());
-        //mapRenderer.put(Data.class, GERenderer.class);
         mapRenderer.put(Image.class, new ImageRenderer());
         mapRenderer.put(TextElement.class, new TextRenderer());
-        mapRenderer.put(GraphicalElement.class, new GERenderer());
         mapRenderer.put(Document.class, new DocumentRenderer());
     }
     

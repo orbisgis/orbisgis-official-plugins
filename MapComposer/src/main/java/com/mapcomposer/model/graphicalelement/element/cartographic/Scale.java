@@ -7,7 +7,7 @@ import java.util.List;
 /**
  * Scale of the map. 
  */
-public final class Scale extends CartographicElement{
+public final class Scale extends SimpleCartoGE{
     
     private final LinkToMapImage ltmi;
 
@@ -23,6 +23,9 @@ public final class Scale extends CartographicElement{
         return ret;
     }
     
+    /** 
+     * Returns the map scale if there is a link to a mapImage, else return 1.
+     */
     public double getMapScale(){
         if(ltmi.getSelected()!=null)
             return ltmi.getSelected().getMapTransform().getScaleDenominator();

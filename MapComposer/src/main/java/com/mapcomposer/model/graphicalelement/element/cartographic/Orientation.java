@@ -9,7 +9,7 @@ import com.mapcomposer.model.configurationattribute.attribute.Source;
 /**
  * Orientation of the map (direction of the north in the map).
  */
-public final class Orientation extends CartographicElement {
+public final class Orientation extends SimpleCartoGE {
     
     /** Icon of the orientation*/
     private final Source icon;
@@ -18,8 +18,7 @@ public final class Orientation extends CartographicElement {
     public Orientation(){
         super();
         icon = new Source("Path");
-        //TODO : set a default value
-        setDefaultValue();
+        icon.setValue(Configuration.defaultIconPath);
     }
 
     /**
@@ -44,14 +43,5 @@ public final class Orientation extends CartographicElement {
         list.addAll(super.getAllAttributes());
         list.add(icon);
         return list;
-    }
-    
-    private void setDefaultValue(){
-        icon.setValue(Configuration.defaultIconPath);
-    }
-    
-    public void setDefaultElementShutter(){
-        super.setDefaultElementShutter();
-        icon.setValue(Configuration.defaultESIconPath);
     }
 }

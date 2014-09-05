@@ -1,6 +1,6 @@
 package com.mapcomposer.view.graphicalelement;
 
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.awt.Color;

@@ -2,7 +2,6 @@ package com.mapcomposer.model.graphicalelement.element;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Choice;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -10,11 +9,11 @@ import java.util.List;
 /**
  * GraphicalElement representing the document.
  */
-public class Document extends GraphicalElement{
+public class Document extends SimpleGE{
     /**true : portrait, false : landscape*/
-    private Choice orientation;
+    private final Choice orientation;
     
-    private Choice format;
+    private final Choice format;
     
     public Document(){
         orientation=new Choice("Orientation");
@@ -52,9 +51,9 @@ public class Document extends GraphicalElement{
         A3(297, 420, "A3"),
         CUSTOM(0, 0, "CUSTOM");
         
-        private int w;
-        private int h;
-        private String name;
+        private final int w;
+        private final int h;
+        private final String name;
         
         private Format(int w, int h, String name){
             this.w=w;

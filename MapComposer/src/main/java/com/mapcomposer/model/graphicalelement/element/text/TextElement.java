@@ -8,7 +8,7 @@ import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.attribute.Text;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -16,7 +16,7 @@ import java.awt.GraphicsEnvironment;
 /**
  * GraphicalElement displaying a text. Several aspects can be defined such as the text color, the font,the font size ...
  */
-public final class TextElement extends GraphicalElement{
+public final class TextElement extends SimpleGE{
     /** Fonts allowed */
     private final Choice font;
     /** Color of the Text */

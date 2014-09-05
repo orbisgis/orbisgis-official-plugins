@@ -1,7 +1,7 @@
  package com.mapcomposer.view.utils;
 
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;

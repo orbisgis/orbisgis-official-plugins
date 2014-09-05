@@ -2,7 +2,7 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;

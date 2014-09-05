@@ -1,6 +1,6 @@
 package com.mapcomposer.view.graphicalelement;
 
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.image.BufferedImage;
 

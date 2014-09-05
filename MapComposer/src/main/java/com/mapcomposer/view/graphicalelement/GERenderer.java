@@ -1,7 +1,7 @@
 package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
