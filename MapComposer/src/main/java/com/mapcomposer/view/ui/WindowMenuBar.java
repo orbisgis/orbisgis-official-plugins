@@ -2,6 +2,7 @@ package com.mapcomposer.view.ui;
 
 //import javax.swing.Icon;
 import com.mapcomposer.controller.UIController;
+import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Scale;
@@ -17,6 +18,8 @@ import javax.swing.JMenuItem;
  * Menu bar of the main window. It contains all the menu element such as open new document, save document, export document ...
  */
 public class WindowMenuBar extends JMenuBar implements ActionListener{  
+    
+    private final JMenuItem newDoc;
     
     private final JMenuItem toFront;
     private final JMenuItem front;
@@ -35,7 +38,9 @@ public class WindowMenuBar extends JMenuBar implements ActionListener{
     public WindowMenuBar(){
         super();
         JMenu menu1 = new JMenu("Files");
-        menu1.add(new JMenuItem("New"/*, (Icon) OrbisGISIcon.getIconImage("open")*/));
+        newDoc = new JMenuItem("New");
+        newDoc.addActionListener(this);
+        menu1.add(newDoc);
         menu1.add(new JMenuItem("Save"/*, (Icon) OrbisGISIcon.getIconImage("save")*/));
         menu1.add(new JMenuItem("Export"/*, (Icon) OrbisGISIcon.getIconImage("export_image")*/));
         this.add(menu1);
@@ -79,6 +84,13 @@ public class WindowMenuBar extends JMenuBar implements ActionListener{
     }
     @Override
     public void actionPerformed(ActionEvent ae) {
+        
+        if(ae.getSource()==newDoc){
+            UIController.getInstance().removeAllGE();
+            UIController.getInstance().addGE(Document.class);
+        }
+        
+        
         if(ae.getSource()==toFront)
             UIController.getInstance().zindexChange(UIController.toFront);
         if(ae.getSource()==front)

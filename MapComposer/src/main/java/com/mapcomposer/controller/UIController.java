@@ -2,20 +2,22 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.Document;
+import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
+import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
+import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
-import javax.swing.JPanel;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -41,10 +43,6 @@ public class UIController{
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
-        Document d = new Document();
-        map.put(d, new CompositionJPanel(d));
-        CompositionArea.getInstance().setPanel(new JPanel(), d.getFormat().getPixelDimension());
-        map.get(d).setPanel(GEManager.getInstance().render(d.getClass()).render(d));
     }
     
     /**
@@ -80,9 +78,30 @@ public class UIController{
      * @param deltaZ Change of the Z-index.
      */
     public void zindexChange(int deltaZ){
+        Stack<GraphicalElement> temp = new Stack<>();
+        Stack<GraphicalElement> tempBack = new Stack<>();
+        Stack<GraphicalElement> tempFront = new Stack<>();
+        //Get the GE implementing the AlwaysOnBack interface and put them at the back
+        for(GraphicalElement ge : zIndexStack){
+            if(ge instanceof AlwaysOnBack){
+                tempBack.push(ge);
+                temp.add(ge);
+            }
+        }
+        //Get the GE implementing the AlwaysOnFront interface and put them at the front
+        for(GraphicalElement ge : zIndexStack){
+            if(ge instanceof AlwaysOnFront){
+                tempFront.push(ge);
+                temp.add(ge);
+            }
+        }
+        //Remove the previous detected elements
+        for(GraphicalElement ge : temp){
+            zIndexStack.remove(ge);
+        }
+        //Move the others GE
         for(GraphicalElement ge : selectedGE){
             if(zIndexStack.contains(ge)){
-                Stack<GraphicalElement> temp = new Stack<>();
                 switch (deltaZ){
                     case toBack:
                         temp.push(ge);
@@ -101,9 +120,15 @@ public class UIController{
                             backFront(deltaZ, ge, temp);
                         break;
                 }
-                while(!temp.empty()){
+                //Add to the stack the GE of the back
+                while(!tempBack.empty())
+                    zIndexStack.push(tempBack.pop());
+                while(!temp.empty())
                     zIndexStack.push(temp.pop());
-                }
+                //Add to the stack the GE of the front
+                while(!tempFront.empty())
+                    zIndexStack.push(tempFront.pop());
+                //Set the z-index of the GE from their stack position
                 for(GraphicalElement g : zIndexStack){
                     CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
                 }
@@ -126,17 +151,15 @@ public class UIController{
         //While the object stack isn't empty, push element in the temporary stack.
         while(!zIndexStack.empty()){
             //Push the GE at the write index.
-            if(i==target){
+            if(i==target)
                 temp.push(ge);
-            }
             else
                 temp.push(zIndexStack.pop());
             i++;
         }
         //If the GE has the higher index, it isn't already pushed.
-        if(!temp.contains(ge)){
+        if(!temp.contains(ge))
             temp.push(ge);
-        }
     }   
     
     /**
@@ -173,7 +196,7 @@ public class UIController{
     }
     
     /**
-     * Remove all the selected GraphicalElement
+     * Remove all the selected GraphicalElement.
      */
     public void remove(){
         for(GraphicalElement ge : selectedGE){
@@ -195,10 +218,12 @@ public class UIController{
     public void validate(List<ConfigurationAttribute> listCA) {
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
-            //Sets the ConfigurationAttribute
+            //Takes each ConfigurationAttribute from the GraphicalElement
             for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                //Takes each CA from the list of CA to validate
                 for(ConfigurationAttribute confShutterCA : listCA){
-                    if(ca.getName().equals(confShutterCA.getName())){
+                    //If the two CA are the same property and are unlocked, set the new CA value
+                    if(ca.isSameProperty(confShutterCA)){
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
                             if(ca instanceof RefreshCA){
@@ -209,14 +234,13 @@ public class UIController{
                     }
                 }
             }
-            //ConfigurationShutter.getInstance().close();
             //Refreshes the GraphicalElement
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             if(ge instanceof Document)
-                CompositionArea.getInstance().setPanel(GEManager.getInstance().render(ge.getClass()).render(ge), ((Document)ge).getFormat().getPixelDimension());
+                CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         }
         //Unlock all the ConfigurationAttribute
         for(GraphicalElement ge : selectedGE){
@@ -273,22 +297,34 @@ public class UIController{
             CompositionArea.getInstance().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             zIndexStack.push(ge);
-            CompositionArea.getInstance().setZIndex(map.get(ge), zIndexStack.size()-1);
             //Refresh the GE and redraw it.
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
-            List<GraphicalElement> temp = selectedGE;
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
+            zindexChange(toFront);
             validate(ge.getAllAttributes());
-            selectedGE=temp;
+            this.selectGE(ge);
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
+    /**
+     * Breaks the encapsulation and should be removed.
+     */
     public LinkedHashMap<GraphicalElement, CompositionJPanel> getGEMap(){
         return map;
+    }
+
+    /**
+     * Remove all the displayed GE from the panel.
+     */
+    public void removeAllGE() {
+        CompositionArea.getInstance().removeAllGE();
+        map = new LinkedHashMap<>();
+        selectedGE = new ArrayList<>();
+        zIndexStack = new Stack<>();
     }
 }

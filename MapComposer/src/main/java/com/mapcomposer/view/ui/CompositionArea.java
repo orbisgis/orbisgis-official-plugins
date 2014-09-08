@@ -2,12 +2,9 @@ package com.mapcomposer.view.ui;
 
 import com.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
-import java.awt.Color;
 import java.awt.Dimension;
-import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
-import javax.swing.border.Border;
 
 /**
  * Area for the map document composition.
@@ -18,14 +15,19 @@ public class CompositionArea extends JPanel{
     private static CompositionArea INSTANCE=null;
     /**JscrollPane of the CompositionArea*/
     private JScrollPane pane;
-    private JPanel panel;
+    /**Main JPanel of the CompositionArea*/
+    private final JPanel panel;
     
-    /**Private constructor.*/
+    /**
+     * Private constructor.
+     */
     private CompositionArea(){
         super(new BorderLayout());
-        panel = new JPanel();
-        pane = new JScrollPane(panel);
-        //this.add(pane, BorderLayout.CENTER);
+        panel = new JPanel(null);
+        JPanel body = new JPanel(new BorderLayout());
+        body.add(panel, BorderLayout.CENTER);
+        pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        this.add(pane, BorderLayout.CENTER);
     }
     
     /**
@@ -47,30 +49,38 @@ public class CompositionArea extends JPanel{
         this.panel.add(panel);
     }
     
+    /**
+     * Removes the given panel representing a GE.
+     * @param panel Panel to remove.
+     */
     public void removeGE(CompositionJPanel panel){
         this.panel.remove(panel);
         this.panel.repaint(panel.getBounds());
         this.panel.revalidate();
     }
-
-    public void setPanel(JPanel render, Dimension dim) {
-        panel = render;
-        panel.setOpaque(true);
-        panel.setBackground(Color.WHITE);
-        panel.setLayout(null);
-        pane = new JScrollPane(render);
-        panel.setPreferredSize(dim);
-        panel.setLocation(0, 0);
-        Border raisedbevel = BorderFactory.createRaisedBevelBorder();
-        Border loweredbevel = BorderFactory.createLoweredBevelBorder();
-        panel.setBorder(BorderFactory.createCompoundBorder(raisedbevel, loweredbevel));
-        JPanel body = new JPanel();
-        body.add(panel);
-        JScrollPane pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        this.add(pane, BorderLayout.CENTER);
+    
+    /**
+     * Sets the dimension of the document in the compositionArea.
+     * This method should be called on the document properties definition.
+     * @param dim Dimension of the document.
+     */
+    public void setDocumentDimension(Dimension dim){
+        this.panel.setPreferredSize(dim);
     }
 
+    /**
+     * Sets the z-index of an element in the compositionArea.
+     * @param comp Component to set.
+     * @param i New z-index.
+     */
     public void setZIndex(CompositionJPanel comp, int i) {
-        panel.setComponentZOrder(comp, i);
+        pane.setComponentZOrder(comp, i);
+    }
+
+    /**
+     * Removes all the drawn elements on the CompositionArea.
+     */
+    public void removeAllGE() {
+        panel.removeAll();
     }
 }

@@ -2,6 +2,7 @@ package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
@@ -15,7 +16,7 @@ import javax.swing.JPanel;
  * Base renderer for GraphicalElement.
  * Every extention of the renderer sould call super.render(ge) to get the panel where the element is displayed.
  */
-public class GERenderer {
+public abstract class GERenderer {
     /**
      * Renders the GrapgicalElement given.
      * @param ge GraphicalElement to render.
@@ -29,6 +30,7 @@ public class GERenderer {
         double newWidth = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
         //Sets the panel absolute position
         panel.setBounds(ge.getX(), ge.getY(), (int)newHeight, (int)newWidth);
+        panel.setPreferredSize(new Dimension((int)newHeight, (int)newWidth));
         
         //Empty the panel to redisplay the element.
         panel.removeAll();
@@ -57,7 +59,5 @@ public class GERenderer {
      * @param ge GraphicalElement
      * @return The buffered image corresponding to the GraphicalElement
      */
-    public BufferedImage getcontentImage(GraphicalElement ge){
-        return null;
-    }
+    public abstract BufferedImage getcontentImage(GraphicalElement ge);
 }

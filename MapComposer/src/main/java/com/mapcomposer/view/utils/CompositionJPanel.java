@@ -1,6 +1,7 @@
  package com.mapcomposer.view.utils;
 
 import com.mapcomposer.controller.UIController;
+import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -14,22 +15,29 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
-import javax.swing.border.Border;
 
 /**
  * This panel extends from JPanel define the action to do when the user click on it.
  */
 public class CompositionJPanel extends JPanel implements MouseListener, MouseMotionListener{
     
+    /**Panel contained by the CompositionJPanel.*/
     private JPanel panel;
+    /**GraphicalElement displayed*/
     private final GraphicalElement ge;
+    /**Select state of the panel*/
     private boolean selected;
-    
+    /**X initial position when user want to move the panel.*/
     private int startX;
+    /**Y initial position when user want to move the panel.*/
     private int startY;
-    
+    /**Type of move the user want to do.*/
     private char moveMod;
     
+    /**
+     * Main constructor.
+     * @param ge GraphicalElement to display.
+     */
     public CompositionJPanel(GraphicalElement ge){
         super(new BorderLayout());
         moveMod = 0;
@@ -37,17 +45,30 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         panel=new JPanel();
         selected = false;
         this.add(panel, BorderLayout.CENTER);
-        this.addMouseListener(this);
-        this.addMouseMotionListener(this);
         startX=0;
         startY=0;
+        //Disable listeners if it's a Document panel.
+        if(ge instanceof Document)
+            this.setEnabled(false);
+        else{
+            this.addMouseListener(this);
+            this.addMouseMotionListener(this);
+        }
     }
+    
+    /**
+     * Sets the panel contained by the object.
+     * @param panel New panel.
+     */
     public void setPanel(JPanel panel){
         this.panel = panel;
         this.selected=false;
         setBorders();
     }
 
+    /**
+     * Draw border if the CompositionJPanel is selected.
+     */
     private void setBorders() {
        if(selected){
            panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
@@ -222,6 +243,9 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         }
     }
     
+    /**
+     * Draw red border to the element for one second.
+     */
     public void hightlight(){
         try {
             Rectangle r = new Rectangle(this.getLocation(), this.getSize());
