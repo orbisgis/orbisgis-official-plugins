@@ -74,7 +74,7 @@ public class CompositionArea extends JPanel{
      * @param i New z-index.
      */
     public void setZIndex(CompositionJPanel comp, int i) {
-        pane.setComponentZOrder(comp, i);
+        panel.setComponentZOrder(comp, i);
     }
 
     /**
