@@ -28,8 +28,8 @@ public abstract class SimpleGE implements GraphicalElement{
      */
     public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x=new Numeric("x", 0, Configuration.documentWidth);
-        y=new Numeric("y", 0, Configuration.documentHeight);
+        x=new Numeric("x");
+        y=new Numeric("y");
         rotation=new Numeric("Rotation", -360, 360);
         height=new Numeric("Height");
         width=new Numeric("Width");
