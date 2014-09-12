@@ -54,7 +54,8 @@ public class CompositionArea extends JPanel{
      * @param panel Panel to remove.
      */
     public void removeGE(CompositionJPanel panel){
-        this.panel.remove(panel);
+        if(this.panel.isAncestorOf(panel))
+            this.panel.remove(panel);
         this.panel.repaint(panel.getBounds());
         this.panel.revalidate();
     }
