@@ -2,6 +2,7 @@ package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import java.util.List;
 
 /**
@@ -13,8 +14,7 @@ public final class Scale extends SimpleCartoGE{
 
     public Scale() {
         super();
-        milka = new MapImageListCA();
-        milka.setName("Link to MapImage");
+        milka = CAFactory.createMapImageListCA("Link to MapImage");
     }
     
     @Override

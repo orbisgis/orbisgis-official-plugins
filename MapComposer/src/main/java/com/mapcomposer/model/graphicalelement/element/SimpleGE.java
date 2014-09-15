@@ -4,6 +4,7 @@ import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,15 +29,11 @@ public abstract class SimpleGE implements GraphicalElement{
      */
     public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x=new IntegerCA();
-        x.setName("x");
-        y=new IntegerCA();
-        y.setName("y");
-        rotation=new IntegerCA("Rotation", -360, 360);
-        height=new IntegerCA();
-        height.setName("Height");
-        width=new IntegerCA();
-        width.setName("Width");
+        x=CAFactory.createIntegerCA("x");
+        y=CAFactory.createIntegerCA("y");
+        rotation=CAFactory.createIntegerCA("Rotation", -360, 360);
+        height=CAFactory.createIntegerCA("Height");
+        width=CAFactory.createIntegerCA("Width");
         
         setDefaultValue();
     }

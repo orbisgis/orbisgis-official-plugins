@@ -2,7 +2,6 @@ package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -17,7 +16,6 @@ public class SourceListCA extends BaseListCA<String>{
     
     public SourceListCA(){
         index=-1;
-        list=new ArrayList<>();
     }
 
     @Override public void setValue(List<String> value) {this.list=value;}

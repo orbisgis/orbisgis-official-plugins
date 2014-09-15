@@ -18,7 +18,6 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
     
     public MapImageListCA(){
         index=-1;
-        list=new ArrayList<>();
     }
         
     @Override public void setValue(List<MapImage> value) {this.list=value;}

@@ -30,7 +30,6 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     
     /**
      * Main constructor.
-     * @param name Name of the OwsContext in its GraphicalElement.
      */
     public OwsContextCA() {
         super();
@@ -63,14 +62,16 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
      * @throws FileNotFoundException 
      */
     private void reloadSelectedOMC() throws FileNotFoundException{
-        try {
-            if(omc.isOpen()){
-                omc.close(new NullProgressMonitor());
+        if(index!=-1){
+            try {
+                if(omc.isOpen()){
+                    omc.close(new NullProgressMonitor());
+                }
+                omc.read(new FileInputStream(new File(getSelected())));
+                omc.open(new NullProgressMonitor());
+            } catch (LayerException ex) {
+                Logger.getLogger(OwsContextCA.class.getName()).log(Level.SEVERE, null, ex);
             }
-            omc.read(new FileInputStream(new File(getSelected())));
-            omc.open(new NullProgressMonitor());
-        } catch (LayerException ex) {
-            Logger.getLogger(OwsContextCA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
@@ -90,8 +91,11 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         String s = getSelected();
         list=new ArrayList<>();
         for(File file : f.listFiles(filter)){
-            if(file.getAbsolutePath().toLowerCase().contains(".ows"))
+            System.out.println("file : "+f.toPath());
+            if(file.getAbsolutePath().toLowerCase().contains(".ows")){
+                System.out.println("ows : "+f.toPath());
                 list.add(file.getAbsolutePath());
+            }
         }
         select(s);
     }

@@ -2,6 +2,7 @@ package com.mapcomposer.model.graphicalelement.element;
 
 import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.awt.Dimension;
@@ -21,10 +22,8 @@ public class Document extends SimpleGE implements GERefresh, AlwaysOnBack{
      * Main constructor.
      */
     public Document(){
-        orientation=new SourceListCA();
-        orientation.setName("Orientation");
-        format=new SourceListCA();
-        format.setName("Format");
+        orientation=CAFactory.createSourceListCA("Orientation");
+        format=CAFactory.createSourceListCA("Format");
         
         orientation.add("Landscape");
         orientation.add("Portrait");

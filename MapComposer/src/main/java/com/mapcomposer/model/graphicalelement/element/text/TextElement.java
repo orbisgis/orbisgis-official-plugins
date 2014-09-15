@@ -8,6 +8,7 @@ import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import com.mapcomposer.model.configurationattribute.attribute.StringCA;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.awt.Color;
 import java.awt.Font;
@@ -39,20 +40,14 @@ public final class TextElement extends SimpleGE{
      */
     public TextElement(){
         //ConfigurationAttribute instantiation
-        this.font = new SourceListCA();
-        this.font.setName("Font");
-        this.colorText = new ColorCA();
-        this.colorText.setName("Text color");
-        this.colorBack = new ColorCA();
-        this.colorBack.setName("Background color");
-        this.alignment = new SourceListCA();
-        this.alignment.setName("Alignment");
-        this.style = new SourceListCA();
-        this.style.setName("Style");
-        this.fontSize = new IntegerCA("Font size", 1, 99999);
-        this.text = new StringCA();
-        this.text.setName("Text");
-        this.alpha = new IntegerCA("Alpha", 0, 255);
+        this.font =CAFactory.createSourceListCA("Font");
+        this.colorText = CAFactory.createColorCA("Text color");
+        this.colorBack = CAFactory.createColorCA("Background color");
+        this.alignment = CAFactory.createSourceListCA("Alignment");
+        this.style = CAFactory.createSourceListCA("Style");
+        this.fontSize = CAFactory.createIntegerCA("Font size", 1, 99999);
+        this.text = CAFactory.createStringCA("Text");
+        this.alpha = CAFactory.createIntegerCA("Alpha", 0, 255);
         
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){

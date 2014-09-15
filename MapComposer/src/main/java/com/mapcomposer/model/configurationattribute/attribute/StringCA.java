@@ -10,7 +10,6 @@ public final class StringCA extends BaseCA<String>{
     private String value;
     
     public StringCA(){
-        value="no_name";
     }
     
     @Override public void setValue(String value) {this.value=value;}

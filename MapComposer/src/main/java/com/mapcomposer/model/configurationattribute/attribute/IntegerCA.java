@@ -14,29 +14,12 @@ public final class IntegerCA extends BaseCA<Integer> {
     private int max;
     /** Boolean to enable or not the max and min value */
     private boolean limits;
-
-    /**
-     * Main constructor.
-     * @param name Name of the Numeric in its GraphicalElement.
-     * @param minimum Minimum value.
-     * @param maximum Maximum value.
-     */
-    public IntegerCA(String name, int minimum, int maximum) {
-        super();
-        this.setName(name);
-        min = minimum;
-        max = maximum;
-        limits=true;
-    }
     
     /**
      * Main constructor.
      */
     public IntegerCA() {
         super();
-        min=0;
-        max=0;
-        limits=false;
     }
     
     @Override public void setValue(Integer value) {this.value=value;}

@@ -3,6 +3,7 @@ package com.mapcomposer.model.graphicalelement.element.cartographic;
 import com.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
@@ -18,8 +19,7 @@ public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
-        this.owsc = new OwsContextCA();
-        this.owsc.setName("OWS-Context path");
+        this.owsc = CAFactory.createOwsContextCA("OWS-Context path");
     }
 
     /**

@@ -13,9 +13,7 @@ public final class SourceCA extends BaseCA<String> implements RefreshCA{
     /** Property itself */
     private String value;
     
-    public SourceCA(){
-        value="no_name";
-    }
+    public SourceCA(){}
     
     @Override public void setValue(String value) {this.value=value;}
 
@@ -29,7 +27,7 @@ public final class SourceCA extends BaseCA<String> implements RefreshCA{
     public void refresh() {
         File f = new File(this.getValue());
         if(!f.exists()){
-            JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the file '"+this.getValue()+"'.");
+           System.out.println("Cannot load the file '"+this.getValue()+"'.");
         }
     }
 }
