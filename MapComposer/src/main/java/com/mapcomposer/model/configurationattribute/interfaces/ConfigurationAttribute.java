@@ -25,7 +25,7 @@ public interface ConfigurationAttribute<T> {
      * @param value New value of the property.
      * @return True if the value was setted, false otherwise.
      */
-    public boolean setValue(T value);
+    public void setValue(T value);
     
     /**
      * Getter returning the property value.
@@ -34,21 +34,28 @@ public interface ConfigurationAttribute<T> {
     public T getValue();
     
     /**
+     * Sets the property name.
+     * @param name The property name.
+     */
+    public void setName(String name);
+    
+    /**
      * Getter returning the property name.
      * @return The property name.
      */
     public String getName();
     
     /**
-     * Compare if two ConfigurationAttributes represents the same property.
+     * Compare if two ConfigurationAttributes represents the same property (same name).
      * @param ca ConbfigurationAttribute to compare with
      * @return True if the property represented is the same, false otherwise.
      */
-    public boolean isSameProperty(ConfigurationAttribute ca);
+    public boolean isSameName(ConfigurationAttribute ca);
     
-    @Override
-    public boolean equals(Object other);
-    
-    @Override
-    public int hashCode();
+    /**
+     * Compare if two ConfigurationAttributes represents the same attribute (same name and value).
+     * @param ca ConbfigurationAttribute to compare with
+     * @return True if the attribute represented is the same, false otherwise.
+     */
+    public boolean isSameValue(ConfigurationAttribute ca);
 }

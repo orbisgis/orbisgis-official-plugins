@@ -5,7 +5,7 @@ import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
+import com.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 
 /**
@@ -14,11 +14,12 @@ import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 public class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     
     /** Path to the data source of the element.*/;
-    private final Source path;
+    private final SourceCA path;
     
     /**Main constructor.*/
     public SimpleIllustrationGE(){
-        path = new Source("Path");
+        path = new SourceCA();
+        path.setName("Path");
         
         setDefaultValue();
     }

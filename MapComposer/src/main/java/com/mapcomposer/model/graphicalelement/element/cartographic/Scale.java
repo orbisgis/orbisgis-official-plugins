@@ -1,7 +1,7 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
+import com.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import java.util.List;
 
 /**
@@ -9,17 +9,18 @@ import java.util.List;
  */
 public final class Scale extends SimpleCartoGE{
     
-    private final LinkToMapImage ltmi;
+    private final MapImageListCA milka;
 
     public Scale() {
         super();
-        ltmi = new LinkToMapImage("Link to MapImage");
+        milka = new MapImageListCA();
+        milka.setName("Link to MapImage");
     }
     
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> ret = super.getAllAttributes();
-        ret.add(ltmi);
+        ret.add(milka);
         return ret;
     }
     
@@ -27,8 +28,8 @@ public final class Scale extends SimpleCartoGE{
      * Returns the map scale if there is a link to a mapImage, else return 1.
      */
     public double getMapScale(){
-        if(ltmi.getSelected()!=null)
-            return ltmi.getSelected().getMapTransform().getScaleDenominator();
+        if(milka.getSelected()!=null)
+            return milka.getSelected().getMapTransform().getScaleDenominator();
         else
             return 1;
     }

@@ -2,7 +2,7 @@ package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
+import com.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -22,10 +22,10 @@ public class LinkToMapImageRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        final LinkToMapImage ltmi = (LinkToMapImage)ca;
+        final MapImageListCA milka = (MapImageListCA)ca;
         
-        pan.add(new JLabel(ltmi.getName()));
-        final JComboBox list = new JComboBox(ltmi.getValue().toArray(new MapImage[0]));
+        pan.add(new JLabel(milka.getName()));
+        final JComboBox list = new JComboBox(milka.getValue().toArray(new MapImage[0]));
         list.addActionListener(new ActionListener() {
             @Override public void actionPerformed(ActionEvent ae) {
                 System.out.println("action : "+ae.getActionCommand());
@@ -39,7 +39,7 @@ public class LinkToMapImageRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        LinkToMapImage ltmi = (LinkToMapImage)attribute;
+        MapImageListCA milka = (MapImageListCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 int i=1;
@@ -48,7 +48,7 @@ public class LinkToMapImageRenderer implements CARenderer{
                     if(ge instanceof MapImage){
                         System.out.println("mapImage");
                         if(i==((JComboBox)c).getItemCount()){
-                            ltmi.select(((MapImage)ge));
+                            milka.select(((MapImage)ge));
                             System.out.println("setted");
                             break;
                         }

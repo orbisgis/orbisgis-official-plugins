@@ -4,10 +4,10 @@ import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
 import com.mapcomposer.model.configurationattribute.attribute.ColorCA;
-import com.mapcomposer.model.configurationattribute.attribute.Text;
-import com.mapcomposer.model.configurationattribute.attribute.Numeric;
+import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
+import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
+import com.mapcomposer.model.configurationattribute.attribute.StringCA;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.awt.Color;
 import java.awt.Font;
@@ -18,35 +18,41 @@ import java.awt.GraphicsEnvironment;
  */
 public final class TextElement extends SimpleGE{
     /** Fonts allowed */
-    private final Choice font;
+    private final SourceListCA font;
     /** Color of the Text */
     private final ColorCA colorText;
     /** Color of the background */
     private final ColorCA colorBack;
     /** Alignment of the text */
-    private final Choice alignment;
+    private final SourceListCA alignment;
     /** Style (plain, italic, bold) of the text */
-    private final Choice style;
+    private final SourceListCA style;
     /** Size of the font */
-    private final Numeric fontSize;
+    private final IntegerCA fontSize;
     /** Text itself */
-    private final Text text;
+    private final StringCA text;
     /** Alpha (transparency value) */
-    private final Numeric alpha;
+    private final IntegerCA alpha;
     
     /**
      * Public main constructor.
      */
     public TextElement(){
         //ConfigurationAttribute instantiation
-        this.font = new Choice("Font");
-        this.colorText = new ColorCA("Text color");
-        this.colorBack = new ColorCA("Background color");
-        this.alignment = new Choice("Alignment");
-        this.style = new Choice("Style");
-        this.fontSize = new Numeric("Font size", 1, 99999);
-        this.text = new Text("Text");
-        this.alpha = new Numeric("Alpha", 0, 255);
+        this.font = new SourceListCA();
+        this.font.setName("Font");
+        this.colorText = new ColorCA();
+        this.colorText.setName("Text color");
+        this.colorBack = new ColorCA();
+        this.colorBack.setName("Background color");
+        this.alignment = new SourceListCA();
+        this.alignment.setName("Alignment");
+        this.style = new SourceListCA();
+        this.style.setName("Style");
+        this.fontSize = new IntegerCA("Font size", 1, 99999);
+        this.text = new StringCA();
+        this.text.setName("Text");
+        this.alpha = new IntegerCA("Alpha", 0, 255);
         
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){

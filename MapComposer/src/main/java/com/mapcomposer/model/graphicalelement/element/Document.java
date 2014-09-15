@@ -1,6 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element;
 
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
+import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.utils.GERefresh;
@@ -13,16 +13,18 @@ import java.util.List;
  */
 public class Document extends SimpleGE implements GERefresh, AlwaysOnBack{
     /**CA representing the document orientation*/
-    private final Choice orientation;
+    private final SourceListCA orientation;
     /**Size of the document*/
-    private final Choice format;
+    private final SourceListCA format;
     
     /**
      * Main constructor.
      */
     public Document(){
-        orientation=new Choice("Orientation");
-        format=new Choice("Format");
+        orientation=new SourceListCA();
+        orientation.setName("Orientation");
+        format=new SourceListCA();
+        format.setName("Format");
         
         orientation.add("Landscape");
         orientation.add("Portrait");

@@ -2,7 +2,7 @@ package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
+import com.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,12 +13,13 @@ import org.orbisgis.coremap.layerModel.OwsMapContext;
  */
 public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /** OWS-Context source.*/
-    private final OwsContext owsc;
+    private final OwsContextCA owsc;
     
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
-        this.owsc = new OwsContext("OWS-Context path");
+        this.owsc = new OwsContextCA();
+        this.owsc.setName("OWS-Context path");
     }
 
     /**
@@ -27,25 +28,25 @@ public class SimpleCartoGE extends SimpleGE implements CartographicElement{
      */
     @Override
     public OwsMapContext getOwsMapContext() {
-        return owsc.getOwsContext();
+        return owsc.getOwsMapContext();
     }
 
     /**
-     * Returns the OwsContext path.
-     * @return The OwsContext path.
+     * Returns the OwsContextCA path.
+     * @return The OwsContextCA path.
      */
     @Override
     public String getOwsPath() {
-        return owsc.getValue();
+        return owsc.getSelected();
     }
     
     /**
-     * Sets the OwsContext path.
-     * @param owsContext New OwsContext path.
+     * Sets the OwsContextCA path.
+     * @param owsContext New OwsContextCA path.
      */
     @Override
     public void setOwsContext(String owsContext) {
-        this.owsc.setValue(owsContext);
+        this.owsc.select(owsContext);
     }
 
     @Override

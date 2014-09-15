@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Text;
+import com.mapcomposer.model.configurationattribute.attribute.StringCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JLabel;
@@ -18,7 +18,7 @@ public class TextRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        Text text = (Text)ca;
+        StringCA text = (StringCA)ca;
         
         pan.add(new JLabel(text.getName()));
         JTextArea area = new JTextArea(text.getValue());
@@ -29,7 +29,7 @@ public class TextRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        Text text = (Text)attribute;
+        StringCA text = (StringCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JTextArea){
                 text.setValue(((JTextArea)c).getText());

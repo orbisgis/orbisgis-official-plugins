@@ -23,14 +23,14 @@ public class CAManager {
     private CAManager(){
         map = new HashMap<>();
         //Adding the original CA and their Renderer
-        map.put(Numeric.class, new NumericRenderer());
-        map.put(Choice.class, new ChoiceRenderer());
-        map.put(FileList.class, new FileListRenderer());
-        map.put(Source.class, new SourceRenderer());
-        map.put(Text.class, new TextRenderer());
-        map.put(OwsContext.class, new OwsContextRenderer());
+        map.put(IntegerCA.class, new NumericRenderer());
+        map.put(SourceListCA.class, new ChoiceRenderer());
+        map.put(FileListCA.class, new FileListRenderer());
+        map.put(SourceCA.class, new SourceRenderer());
+        map.put(StringCA.class, new TextRenderer());
+        map.put(OwsContextCA.class, new OwsContextRenderer());
         map.put(ColorCA.class, new ColorRenderer());
-        map.put(LinkToMapImage.class, new LinkToMapImageRenderer());
+        map.put(MapImageListCA.class, new LinkToMapImageRenderer());
     }
     
     /**

@@ -4,7 +4,7 @@ import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
+import com.mapcomposer.model.configurationattribute.attribute.SourceCA;
 
 /**
  * Orientation of the map (direction of the north in the map).
@@ -12,12 +12,13 @@ import com.mapcomposer.model.configurationattribute.attribute.Source;
 public final class Orientation extends SimpleCartoGE {
     
     /** Icon of the orientation*/
-    private final Source icon;
+    private final SourceCA icon;
     
     /**Main constructor*/
     public Orientation(){
         super();
-        icon = new Source("Path");
+        icon = new SourceCA();
+        icon.setName("Path");
         icon.setValue(Configuration.defaultIconPath);
     }
 

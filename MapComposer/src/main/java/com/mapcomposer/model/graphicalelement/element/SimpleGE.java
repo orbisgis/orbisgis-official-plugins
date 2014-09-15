@@ -3,7 +3,7 @@ package com.mapcomposer.model.graphicalelement.element;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Numeric;
+import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -13,26 +13,30 @@ import java.util.List;
  */
 public abstract class SimpleGE implements GraphicalElement{
     /** x position of the GE.*/
-    private final Numeric x;
+    private final IntegerCA x;
     /** y position of the GE.*/
-    private final Numeric y;
+    private final IntegerCA y;
     /** Inclination of the GE.*/
-    private final Numeric rotation;
+    private final IntegerCA rotation;
     /** Heght of the GE.*/
-    private final Numeric height;
+    private final IntegerCA height;
     /** Width of the GE.*/
-    private final Numeric width;
+    private final IntegerCA width;
     
     /**
      * Main constructor.
      */
     public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x=new Numeric("x");
-        y=new Numeric("y");
-        rotation=new Numeric("Rotation", -360, 360);
-        height=new Numeric("Height");
-        width=new Numeric("Width");
+        x=new IntegerCA();
+        x.setName("x");
+        y=new IntegerCA();
+        y.setName("y");
+        rotation=new IntegerCA("Rotation", -360, 360);
+        height=new IntegerCA();
+        height.setName("Height");
+        width=new IntegerCA();
+        width.setName("Width");
         
         setDefaultValue();
     }

@@ -1,6 +1,7 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -13,7 +14,6 @@ import java.util.List;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 import org.orbisgis.progress.NullProgressMonitor;
@@ -21,61 +21,38 @@ import org.orbisgis.progress.NullProgressMonitor;
 /**
  * ConfigurationAttribute representing a specified OwsMapContext given by OrbisGIS.
  */
-public final class OwsContext extends SimpleCA<String> implements RefreshCA{
-
-    /** Instance of the OwsMapContext corresponding to the path of the Source*/
+public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
+    /** Index of the value selected.*/
+    private int index;
+    /** Property itself */
+    private List<String> list;
     private final OwsMapContext omc;
-    /** Mist of OWS-Context in the workspace folder*/
-    private List<File> list;
     
     /**
      * Main constructor.
      * @param name Name of the OwsContext in its GraphicalElement.
      */
-    public OwsContext(String name) {
-        super(name);
+    public OwsContextCA() {
+        super();
         list = new ArrayList<>();
-        reloadListFiles();
+        loadListFiles();
         if(list.isEmpty())
-            this.setValue("/");
+            this.add("/");
         else
-            this.setValue(list.get(0).getAbsolutePath());
+            this.select(list.get(0));
         omc=new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
         this.refresh();
     }
     
-    @Override
-    public boolean setValue(String path){
-        if(super.setValue(path)){
-            //verification of the file
-            if(path.contains(".ows")){
-                try {
-                    reloadOMC();
-                } catch (FileNotFoundException ex) {
-                    Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
-                    JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
-                }
-            }
-            return true;
-        }
-        return false;
-    }
-    
-    /**
-     * Returns the OwsMapContext generated with it's source path.
-     * @return The OwsMapContext corresponding to the source.
-     */
-    public OwsMapContext getOwsContext(){
-        return omc;
-    }
+    public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
     public void refresh() {
         //Refresh of the file list
-        reloadListFiles();
+        loadListFiles();
         //Refresh of the selected file
         try {
-            reloadOMC();
+            reloadSelectedOMC();
         } catch (FileNotFoundException ex) {
             JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
         }
@@ -85,41 +62,69 @@ public final class OwsContext extends SimpleCA<String> implements RefreshCA{
      * Reload the OWS-Context corresponding to the value of ConfigurationAttribute. 
      * @throws FileNotFoundException 
      */
-    private void reloadOMC() throws FileNotFoundException{
+    private void reloadSelectedOMC() throws FileNotFoundException{
         try {
             if(omc.isOpen()){
                 omc.close(new NullProgressMonitor());
             }
-            omc.read(new FileInputStream(new File(this.getValue())));
+            omc.read(new FileInputStream(new File(getSelected())));
             omc.open(new NullProgressMonitor());
         } catch (LayerException ex) {
-            Logger.getLogger(OwsContext.class.getName()).log(Level.SEVERE, null, ex);
+            Logger.getLogger(OwsContextCA.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
     
     /**
      * Set list field with all the files with the oxs extension
      */
-    private void reloadListFiles(){
+    private void loadListFiles(){
         File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()+"/maps/");
         //Definition of the FilenameFilter
         FilenameFilter filter = new FilenameFilter() {
-
             @Override
             public boolean accept(File file, String string) {
                 String name = string.toLowerCase();
                 return name.contains(".ows");
             }
         };
-        list = Arrays.asList(f.listFiles(filter));
+        String s = getSelected();
+        list=new ArrayList<>();
+        for(File file : f.listFiles(filter)){
+            if(file.getAbsolutePath().toLowerCase().contains(".ows"))
+                list.add(file.getAbsolutePath());
+        }
+        select(s);
     }
-    
-    /**
-     * Returns the file list.
-     * @return The file list.
-     */
-    public List<File> getList(){
-        return list;
+
+    @Override
+    public void add(String value) {list.add(value);}
+
+    @Override
+    public String getSelected() {
+        if(index>=0 && index<list.size())
+            return list.get(index);
+        else
+            return null;
     }
-    
+
+    @Override
+    public void select(String choice) {index=list.indexOf(choice);}
+
+    @Override
+    public boolean remove(String value) {return list.remove(value);}
+
+    @Override
+    public void setValue(List<String> value) {this.list=value;}
+
+    @Override
+    public List<String> getValue() {return list;}
+
+    @Override public boolean isSameValue(ConfigurationAttribute ca) {
+        if(ca instanceof ListCA){
+            if(getSelected()==null)
+                return false;
+            return getSelected().equals(((ListCA)ca).getSelected());
+        }
+        return false;
+    }
 }

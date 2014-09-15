@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
+import com.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import java.awt.FlowLayout;
 import javax.swing.JButton;
 import javax.swing.JLabel;
@@ -20,7 +20,7 @@ public class SourceRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        final Source source = (Source)ca;
+        final SourceCA source = (SourceCA)ca;
         
         pan.add(new JLabel(source.getName()));
         JTextField jtf = new JTextField(source.getValue());
@@ -34,7 +34,7 @@ public class SourceRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        Source source = (Source)attribute;
+        SourceCA source = (SourceCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JTextField){
                 source.setValue(((JTextField)c).getText());
