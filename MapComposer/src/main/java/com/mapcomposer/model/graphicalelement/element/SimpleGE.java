@@ -1,16 +1,17 @@
-package com.mapcomposer.model.graphicalelement;
+package com.mapcomposer.model.graphicalelement.element;
 
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.Configuration;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Numeric;
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Root class for the GraphicalElements (GraphicalElement) objects.
- * It contains all the main ConfigurationAttributes (CA) and their setter and getters.
+ * Simple GE implementation.
+ * It contains all the main ConfigurationAttributes (CA) and the implementations of the interface functions.
  */
-public abstract class GraphicalElement {
+public abstract class SimpleGE implements GraphicalElement{
     /** x position of the GE.*/
     private final Numeric x;
     /** y position of the GE.*/
@@ -25,10 +26,10 @@ public abstract class GraphicalElement {
     /**
      * Main constructor.
      */
-    public GraphicalElement(){
+    public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x=new Numeric("x", 0, Configuration.documentWidth);
-        y=new Numeric("y", 0, Configuration.documentHeight);
+        x=new Numeric("x");
+        y=new Numeric("y");
         rotation=new Numeric("Rotation", -360, 360);
         height=new Numeric("Height");
         width=new Numeric("Width");
@@ -136,13 +137,5 @@ public abstract class GraphicalElement {
         rotation.setValue(Configuration.defaultRotation);
         height.setValue(Configuration.defaultHeight);
         width.setValue(Configuration.defaultWidth);
-    }
-    
-    public void setDefaultElementShutter(){
-        x.setValue(Configuration.defaultESX);
-        y.setValue(Configuration.defaultESY);
-        rotation.setValue(Configuration.defaultESRotation);
-        height.setValue(Configuration.defaultESHeight);
-        width.setValue(Configuration.defaultESWidth);
     }
 }

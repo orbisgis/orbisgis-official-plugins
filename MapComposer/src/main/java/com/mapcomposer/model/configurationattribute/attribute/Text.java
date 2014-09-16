@@ -1,11 +1,9 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-
 /**
  * Text attribute representing a simple text.
  */
-public final class Text extends ConfigurationAttribute<String>{
+public final class Text extends SimpleCA<String>{
 
     /**
      * Main constructor.

@@ -1,15 +1,13 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
-import com.mapcomposer.model.graphicalelement.utils.GERefresh;
 import java.util.List;
-import org.orbisgis.progress.NullProgressMonitor;
 
 /**
  * Scale of the map. 
  */
-public final class Scale extends CartographicElement{
+public final class Scale extends SimpleCartoGE{
     
     private final LinkToMapImage ltmi;
 
@@ -25,6 +23,9 @@ public final class Scale extends CartographicElement{
         return ret;
     }
     
+    /** 
+     * Returns the map scale if there is a link to a mapImage, else return 1.
+     */
     public double getMapScale(){
         if(ltmi.getSelected()!=null)
             return ltmi.getSelected().getMapTransform().getScaleDenominator();

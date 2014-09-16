@@ -1,30 +1,31 @@
 package com.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 
 /**
- * This class is the root class for each cartographic element based on an OWS-Context.
+ * Simple implementation of the CartographicElement.
  */
-public class CartographicElement extends GraphicalElement{
+public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /** OWS-Context source.*/
     private final OwsContext owsc;
     
     /**Main constructor.*/
-    public CartographicElement(){
+    public SimpleCartoGE(){
         super();
         this.owsc = new OwsContext("OWS-Context path");
-        setDefaultValue();
     }
 
     /**
      * Returns the OwsMapContext.
      * @return The OwsMapContext.
      */
+    @Override
     public OwsMapContext getOwsMapContext() {
         return owsc.getOwsContext();
     }
@@ -33,6 +34,7 @@ public class CartographicElement extends GraphicalElement{
      * Returns the OwsContext path.
      * @return The OwsContext path.
      */
+    @Override
     public String getOwsPath() {
         return owsc.getValue();
     }
@@ -41,6 +43,7 @@ public class CartographicElement extends GraphicalElement{
      * Sets the OwsContext path.
      * @param owsContext New OwsContext path.
      */
+    @Override
     public void setOwsContext(String owsContext) {
         this.owsc.setValue(owsContext);
     }
@@ -51,15 +54,5 @@ public class CartographicElement extends GraphicalElement{
         list.addAll(super.getAllAttributes());
         list.add(owsc);
         return list;
-    }
-    
-    private void setDefaultValue(){
-        //Nothing because the OWSContext initiate itself
-    }
-    
-    @Override
-    public void setDefaultElementShutter(){
-        super.setDefaultElementShutter();
-        //Nothing because the OWSContext initiate itself
     }
 }

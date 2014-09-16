@@ -1,7 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.ListCA;
-import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
@@ -9,7 +8,7 @@ import java.util.List;
 /**
  * This class represent a list of different files path.
  */
-public final class FileList extends ListCA<String> implements CARefresh{
+public final class FileList extends SimpleListCA<String> implements RefreshCA{
     
     /**
      * Main constructor.

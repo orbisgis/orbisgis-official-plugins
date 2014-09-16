@@ -1,24 +1,22 @@
 package com.mapcomposer.view.graphicalelement;
 
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
-import com.mapcomposer.model.graphicalelement.element.Document;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.awt.Color;
-import javax.swing.JPanel;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 
 /**
- * Renderer associated to teh Document
+ * Renderer associated to the Document GraphicalElement.
  */
 public class DocumentRenderer extends GERenderer{
-    
+
     @Override
-    public JPanel render(final GraphicalElement ge){
-        JPanel panel = new JPanel();
-        panel.setOpaque(true);
-        panel.setLayout(null);
-        panel.setBackground(Color.yellow);
-        System.out.println(((Document)ge).getFormat().getPixelDimension());
-        panel.setPreferredSize(((Document)ge).getFormat().getPixelDimension());
-        
-        return panel;
+    public BufferedImage getcontentImage(GraphicalElement ge) {
+        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = bi.createGraphics();
+
+        graphics.setPaint(new Color(210, 210, 210));
+        graphics.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+        return bi;
     }
 }

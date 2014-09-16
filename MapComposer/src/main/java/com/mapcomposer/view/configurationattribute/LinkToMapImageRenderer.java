@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.LinkToMapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.Component;

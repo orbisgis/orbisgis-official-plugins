@@ -1,7 +1,7 @@
 package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.Configuration;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;

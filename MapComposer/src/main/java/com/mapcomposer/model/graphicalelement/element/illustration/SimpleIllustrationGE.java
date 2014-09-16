@@ -1,22 +1,23 @@
 package com.mapcomposer.model.graphicalelement.element.illustration;
 
+import com.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import com.mapcomposer.Configuration;
 import java.util.ArrayList;
 import java.util.List;
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.Source;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 
 /**
  * Root class for illustration GraphicalElements.
  */
-public class IllustrationElement extends GraphicalElement{
+public class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     
     /** Path to the data source of the element.*/;
     private final Source path;
     
     /**Main constructor.*/
-    public IllustrationElement(){
+    public SimpleIllustrationGE(){
         path = new Source("Path");
         
         setDefaultValue();
@@ -48,10 +49,5 @@ public class IllustrationElement extends GraphicalElement{
     
     private void setDefaultValue(){
         path.setValue(Configuration.defaultImagePath);
-    }
-    
-    public void setDefaultElementShutter(){
-        super.setDefaultElementShutter();
-        path.setValue(Configuration.defaultESImagePath);
     }
 }

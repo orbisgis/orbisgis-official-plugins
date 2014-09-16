@@ -1,13 +1,13 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 import com.mapcomposer.controller.UIController;
-import com.mapcomposer.model.configurationattribute.ListCA;
-import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
+import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 
 /**
  * The attribute contain the link to a MapImage
  */
-public class LinkToMapImage extends ListCA<MapImage> implements CARefresh{
+public class LinkToMapImage extends SimpleListCA<MapImage> implements RefreshCA{
 
     public LinkToMapImage(String name) {
         super(name);

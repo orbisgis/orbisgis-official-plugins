@@ -1,14 +1,12 @@
 package com.mapcomposer.view.graphicalelement;
 
 import com.mapcomposer.Configuration;
-import com.mapcomposer.model.graphicalelement.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.illustration.Image;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;

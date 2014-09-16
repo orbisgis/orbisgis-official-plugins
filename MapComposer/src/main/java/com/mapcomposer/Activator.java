@@ -2,6 +2,7 @@ package com.mapcomposer;
 
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
 import com.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
@@ -16,14 +17,8 @@ public class Activator implements BundleActivator {
          */
         @Override
         public void start(BundleContext bc) throws Exception {
-                /*
-                bc.registerService(ServiceClass.class,
-                        new ServiceImplementation(),
-                        null);
-                */
+            bc.registerService(MainFrameAction.class,MainWindow.getInstance(),null);
             LinkToOrbisGIS.setBundleContext(bc);
-            MainWindow win = MainWindow.getInstance();
-            win.setVisible(true);
         }
 
         /**

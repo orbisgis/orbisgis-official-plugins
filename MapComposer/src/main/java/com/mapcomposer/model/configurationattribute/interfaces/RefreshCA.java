@@ -4,12 +4,12 @@
  * and open the template in the editor.
  */
 
-package com.mapcomposer.model.configurationattribute.utils.interfaces;
+package com.mapcomposer.model.configurationattribute.interfaces;
 
 /**
  * Interface for the ConfigurationAttribute to define the refresh method that will be called to refresh the value contained.
  */
-public interface CARefresh {
+public interface RefreshCA {
     /**
      * Refresh function.
      */

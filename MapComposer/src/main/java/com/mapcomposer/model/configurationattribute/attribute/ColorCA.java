@@ -1,12 +1,11 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
 import java.awt.Color;
 
 /**
  * Color ConfigurationAttribute.
  */
-public final class ColorCA extends ConfigurationAttribute<Color> {
+public final class ColorCA extends SimpleCA<Color> {
 
     /**
      * Main constructor.

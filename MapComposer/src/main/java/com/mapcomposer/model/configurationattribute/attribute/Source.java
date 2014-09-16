@@ -1,7 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.model.configurationattribute.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.utils.interfaces.CARefresh;
+import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.io.File;
 import javax.swing.JOptionPane;
@@ -9,7 +8,7 @@ import javax.swing.JOptionPane;
 /**
  * The Source attribute contain the path to a specified data source like OWS-Context, data, image ...
  */
-public final class Source extends ConfigurationAttribute<String> implements CARefresh{
+public final class Source extends SimpleCA<String> implements RefreshCA{
 
     /**
      * Main constructor.
