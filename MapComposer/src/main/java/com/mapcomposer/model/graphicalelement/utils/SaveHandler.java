@@ -65,35 +65,24 @@ public class SaveHandler {
         list.removeAll(list);
         
         Stack<GraphicalElement> temp = new Stack<>();
-        System.out.println("stack size : "+stack.size());
-        for(int i=stack.size()-1; i>=0; i--){
-            System.out.println("i : "+i);
-            System.out.println("get : "+stack.get(i));
-            temp.push(stack.get(i));
+        for (GraphicalElement ge : stack) {
+            temp.push(ge);
         }
-        System.out.println("save size : "+temp.size());
+        int i=0;
         while(!temp.empty()){
-            int i=0;
             temp.peek().setZ(i);
-            if(temp.peek() instanceof SimpleMapImageGE){
-                System.out.println("mapImage");
+            if(temp.peek() instanceof SimpleMapImageGE)
                 listMI.add((MapImage)temp.peek());
-            }
-            if(temp.peek() instanceof Orientation){
+            if(temp.peek() instanceof Orientation)
                 listO.add((Orientation)temp.peek());
-            }
-            if(temp.peek() instanceof Scale){
+            if(temp.peek() instanceof Scale)
                 listS.add((Scale)temp.peek());
-            }
-            if(temp.peek() instanceof Image){
+            if(temp.peek() instanceof Image)
                 listI.add((Image)temp.peek());
-            }
-            if(temp.peek() instanceof TextElement){
+            if(temp.peek() instanceof TextElement)
                 listT.add((TextElement)temp.peek());
-            }
-            if(temp.peek() instanceof Document){
+            if(temp.peek() instanceof Document)
                 listD.add((Document)temp.peek());
-            }
             i++;
             temp.pop();
         }
@@ -103,9 +92,11 @@ public class SaveHandler {
         fc.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
         fc.showOpenDialog(new JFrame());
         String path;
+        System.out.println(listD.size());
         if(listD.size()>0)
             path = fc.getSelectedFile().getAbsolutePath()+"/"+listD.get(0).getName()+"_save.xml";
-        path = fc.getSelectedFile().getAbsolutePath()+"/save.xml";
+        else
+            path = fc.getSelectedFile().getAbsolutePath()+"/save.xml";
         
         IBindingFactory bfact = BindingDirectory.getFactory(SaveHandler.class);
         IMarshallingContext mctx = bfact.createMarshallingContext();
