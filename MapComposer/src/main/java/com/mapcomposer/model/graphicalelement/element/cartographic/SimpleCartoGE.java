@@ -14,40 +14,26 @@ import org.orbisgis.coremap.layerModel.OwsMapContext;
  */
 public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /** OWS-Context source.*/
-    private final OwsContextCA owsc;
+    private OwsContextCA owsc;
     
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
         this.owsc = CAFactory.createOwsContextCA("OWS-Context path");
     }
-
-    /**
-     * Returns the OwsMapContext.
-     * @return The OwsMapContext.
-     */
-    @Override
-    public OwsMapContext getOwsMapContext() {
-        return owsc.getOwsMapContext();
-    }
-
-    /**
-     * Returns the OwsContextCA path.
-     * @return The OwsContextCA path.
-     */
-    @Override
-    public String getOwsPath() {
-        return owsc.getSelected();
-    }
     
     /**
-     * Sets the OwsContextCA path.
-     * @param owsContext New OwsContextCA path.
+     * Copy constructor.
+     * @param scge SimpleCartoGE to copy.
      */
-    @Override
-    public void setOwsContext(String owsContext) {
-        this.owsc.select(owsContext);
+    public SimpleCartoGE(SimpleCartoGE scge){
+        super(scge);
+        this.owsc = scge.owsc;
     }
+
+    @Override public OwsMapContext getOwsMapContext()   {return owsc.getOwsMapContext();}
+    @Override public String getOwsPath()                {return owsc.getSelected();}
+    @Override public void setOwsContext(String owsContext){this.owsc.select(owsContext);}
 
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {

@@ -1,7 +1,6 @@
 package com.mapcomposer.model.graphicalelement.element;
 
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import com.mapcomposer.Configuration;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import com.mapcomposer.model.configurationattribute.utils.CAFactory;
@@ -14,15 +13,16 @@ import java.util.List;
  */
 public abstract class SimpleGE implements GraphicalElement{
     /** x position of the GE.*/
-    private final IntegerCA x;
+    private IntegerCA x;
     /** y position of the GE.*/
-    private final IntegerCA y;
+    private IntegerCA y;
     /** Inclination of the GE.*/
-    private final IntegerCA rotation;
+    private IntegerCA rotation;
     /** Heght of the GE.*/
-    private final IntegerCA height;
+    private IntegerCA height;
     /** Width of the GE.*/
-    private final IntegerCA width;
+    private IntegerCA width;
+    private int z;
     
     /**
      * Main constructor.
@@ -34,94 +34,38 @@ public abstract class SimpleGE implements GraphicalElement{
         rotation=CAFactory.createIntegerCA("Rotation", -360, 360);
         height=CAFactory.createIntegerCA("Height");
         width=CAFactory.createIntegerCA("Width");
-        
-        setDefaultValue();
+        this.setWidth(50);
+        this.setHeight(50);
     }
-
     /**
-     * Sets the x position.
-     * @param x The x position of the GE.
+     * Copy constructor.
+     * @param sge SimpleGE to copy.
      */
-    public void setX(Integer x) {
-        this.x.setValue(x);
-    }
-
-    /**
-     * Sets the y position.
-     * @param y The y position of the GE.
-     */
-    public void setY(int y) {
-        this.y.setValue(y);
-    }
-
-    /**
-     * Sets the rotation angle.
-     * @param rotation The rotation angle of the GE.
-     */
-    public void setRotation(int rotation) {
-        this.rotation.setValue(rotation);
-    }
-
-    /**
-     * Sets the height.
-     * @param height The height of the GE.
-     */
-    public void setHeight(int height) {
-        this.height.setValue(height);
-    }
-
-    /**
-     * Sets the width.
-     * @param width The width of the GE.
-     */
-    public void setWidth(int width) {
-        this.width.setValue(width);
-    }
-
-    /**
-     * Gets the x position.
-     * @return The x position of the GE.
-     */
-    public int getX() {
-        return this.x.getValue();
-    }
-
-    /**
-     * Gets the y position.
-     * @return The y position of the GE.
-     */
-    public int getY() {
-        return this.y.getValue();
-    }
-
-    /**
-     * Gets the rotation angle.
-     * @return The rotation angle of the GE.
-     */
-    public int getRotation() {
-        return this.rotation.getValue();
-    }
-
-    /**
-     * Gets the height.
-     * @return The height of the GE.
-     */
-    public int getHeight() {
-        return this.height.getValue();
-    }
-
-    /**
-     * Gets the width.
-     * @return The width of the GE.
-     */
-    public int getWidth() {
-        return this.width.getValue();
+    public SimpleGE(SimpleGE sge){
+        //ConfigurationAttribute instantiation
+        x=sge.x;
+        y=sge.y;
+        rotation=sge.rotation;
+        height=sge.height;
+        width=sge.width;
     }
     
-    /**
-     * Returns all the attributes. This function need be be redefined in child class.
-     * @return List of all the attributes.
-     */
+
+    @Override public void setX(int x)   {this.x.setValue(x);}
+    @Override public void setY(int y)   {this.y.setValue(y);}
+    @Override public void setZ(int z)   {this.z=z; }
+    @Override public void setRotation(int rotation) {this.rotation.setValue(rotation);}
+    @Override public void setHeight(int height)     {this.height.setValue(height);}
+    @Override public void setWidth(int width)       {this.width.setValue(width);}
+    
+    @Override public int getX() {return this.x.getValue();}
+    @Override public int getY() {return this.y.getValue();}
+    @Override public int getZ() {return z;}
+    @Override public int getRotation()  {return this.rotation.getValue();}
+    @Override public int getHeight()    {return this.height.getValue();}
+    @Override public int getWidth()     {return this.width.getValue();}
+    
+    @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(x);
@@ -130,13 +74,5 @@ public abstract class SimpleGE implements GraphicalElement{
         list.add(height);
         list.add(width);
         return list;
-    }
-    
-    private void setDefaultValue(){
-        x.setValue(Configuration.defaultX);
-        y.setValue(Configuration.defaultY);
-        rotation.setValue(Configuration.defaultRotation);
-        height.setValue(Configuration.defaultHeight);
-        width.setValue(Configuration.defaultWidth);
     }
 }
