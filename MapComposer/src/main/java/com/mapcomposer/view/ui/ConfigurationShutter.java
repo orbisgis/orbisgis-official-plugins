@@ -159,10 +159,10 @@ public class ConfigurationShutter extends JPanel implements MouseListener{
 
         @Override
         public void itemStateChanged(ItemEvent ie) {
-            boolean b = !((JCheckBox)ie.getSource()).isSelected();
-            pan.setEnabled(b);
+            boolean b = ((JCheckBox)ie.getSource()).isSelected();
+            pan.setEnabled(!b);
             for(Component c : pan.getComponents())
-                c.setEnabled(b);
+                c.setEnabled(!b);
             ca.setLock(b);
             this.repaint();
             this.revalidate();
