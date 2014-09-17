@@ -6,7 +6,7 @@
         <groupId>org.orbisgis</groupId>
         <artifactId>orbisgis-memory</artifactId>
         <name>JVM Memory Information</name>
-        <version>1.0</version>
+        <version>1.1.0</version>
         <url>http://orbisgis.org</url>
         <parent>
             <groupId>org.orbisgis</groupId>
