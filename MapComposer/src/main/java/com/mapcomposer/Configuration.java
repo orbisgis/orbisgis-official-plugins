@@ -21,8 +21,8 @@ public class Configuration {
     public static String defaultFont = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[0];
     public static Color defaultColorBack =Color.WHITE;
     public static Color defaultColorText =Color.BLACK;
-    public static String defaultAlignment =TextElement.Alignment.CENTER.getName();
-    public static String defaultStyle =TextElement.Style.PLAIN.getName();
+    public static String defaultAlignment =TextElement.Alignment.CENTER.name();
+    public static String defaultStyle =TextElement.Style.PLAIN.name();
     public static int defaultFontSize =8;
     public static String defaultText = "Map Composer";
     public static int defaultAlpha = 0;
@@ -39,8 +39,8 @@ public class Configuration {
     public static String defaultESFont = GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()[0];
     public static Color defaultESColorBack =Color.WHITE;
     public static Color defaultESColorText =Color.BLACK;
-    public static String defaultESAlignment =TextElement.Alignment.LEFT.getName();
-    public static String defaultESStyle =TextElement.Style.PLAIN.getName();
+    public static String defaultESAlignment =TextElement.Alignment.LEFT.name();
+    public static String defaultESStyle =TextElement.Style.PLAIN.name();
     public static int defaultESFontSize =8;
     public static String defaultESText = "Map Composer";
     public static int defaultESAlpha = 127;

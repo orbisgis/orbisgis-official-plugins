@@ -20,6 +20,8 @@ import javax.swing.JMenuItem;
 public class WindowMenuBar extends JMenuBar implements ActionListener{  
     
     private final JMenuItem newDoc;
+    private final JMenuItem save;
+    private final JMenuItem load;
     
     private final JMenuItem toFront;
     private final JMenuItem front;
@@ -41,7 +43,12 @@ public class WindowMenuBar extends JMenuBar implements ActionListener{
         newDoc = new JMenuItem("New");
         newDoc.addActionListener(this);
         menu1.add(newDoc);
-        menu1.add(new JMenuItem("Save"/*, (Icon) OrbisGISIcon.getIconImage("save")*/));
+        save = new JMenuItem("Save");
+        save.addActionListener(this);
+        menu1.add(save);
+        load = new JMenuItem("Load");
+        load.addActionListener(this);
+        menu1.add(load);
         menu1.add(new JMenuItem("Export"/*, (Icon) OrbisGISIcon.getIconImage("export_image")*/));
         this.add(menu1);
         
@@ -89,6 +96,10 @@ public class WindowMenuBar extends JMenuBar implements ActionListener{
             UIController.getInstance().removeAllGE();
             UIController.getInstance().addGE(Document.class);
         }
+        if(ae.getSource()==save)
+            UIController.getInstance().save();
+        if(ae.getSource()==load)
+            UIController.getInstance().load();
         
         
         if(ae.getSource()==toFront)

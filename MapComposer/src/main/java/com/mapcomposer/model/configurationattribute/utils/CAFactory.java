@@ -8,7 +8,7 @@ import com.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import com.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import com.mapcomposer.model.configurationattribute.attribute.StringCA;
-import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
 import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
@@ -64,7 +64,7 @@ public class CAFactory {
         MapImageListCA milka = new MapImageListCA();
         milka.setLock(false);
         milka.setName(name);
-        milka.setValue(new ArrayList<MapImage>());
+        milka.setValue(new ArrayList<SimpleMapImageGE>());
         return milka;
     }
     

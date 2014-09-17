@@ -1,0 +1,699 @@
+<xs:schema xmlns:xs="http://www.w3.org/2001/XMLSchema" xmlns:tns="http://mapcomposer.com/model/graphicalelement/utils" elementFormDefault="qualified" targetNamespace="http://mapcomposer.com/model/graphicalelement/utils">
+  <xs:complexType name="saveHandler">
+    <xs:sequence>
+      <xs:element name="mapImage" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:sequence>
+                <xs:element name="x" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="y" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="rotation" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="height" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="width" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:element name="owsc" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" use="required" name="index"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="integer" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" name="value"/>
+                <xs:attribute type="xs:int" use="required" name="min"/>
+                <xs:attribute type="xs:int" use="required" name="max"/>
+                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="orientation" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:sequence>
+                <xs:element name="x" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="y" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="rotation" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="height" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="width" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:element name="owsc" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" use="required" name="index"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="icon" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="value" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="scale" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:sequence>
+                <xs:element name="x" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="y" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="rotation" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="height" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+                <xs:element name="width" minOccurs="0">
+                  <xs:complexType>
+                    <xs:sequence>
+                      <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    </xs:sequence>
+                    <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                    <xs:attribute type="xs:int" name="value"/>
+                    <xs:attribute type="xs:int" use="required" name="min"/>
+                    <xs:attribute type="xs:int" use="required" name="max"/>
+                    <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                  </xs:complexType>
+                </xs:element>
+              </xs:sequence>
+              <xs:element name="owsc" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                    <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" use="required" name="index"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="milka" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element name="simpleMapImageGE" minOccurs="0" maxOccurs="unbounded">
+                    <xs:complexType>
+                      <xs:sequence>
+                        <xs:sequence>
+                          <xs:sequence>
+                            <xs:element name="x" minOccurs="0">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                                <xs:attribute type="xs:int" name="value"/>
+                                <xs:attribute type="xs:int" use="required" name="min"/>
+                                <xs:attribute type="xs:int" use="required" name="max"/>
+                                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element name="y" minOccurs="0">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                                <xs:attribute type="xs:int" name="value"/>
+                                <xs:attribute type="xs:int" use="required" name="min"/>
+                                <xs:attribute type="xs:int" use="required" name="max"/>
+                                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element name="rotation" minOccurs="0">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                                <xs:attribute type="xs:int" name="value"/>
+                                <xs:attribute type="xs:int" use="required" name="min"/>
+                                <xs:attribute type="xs:int" use="required" name="max"/>
+                                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element name="height" minOccurs="0">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                                <xs:attribute type="xs:int" name="value"/>
+                                <xs:attribute type="xs:int" use="required" name="min"/>
+                                <xs:attribute type="xs:int" use="required" name="max"/>
+                                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                              </xs:complexType>
+                            </xs:element>
+                            <xs:element name="width" minOccurs="0">
+                              <xs:complexType>
+                                <xs:sequence>
+                                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                </xs:sequence>
+                                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                                <xs:attribute type="xs:int" name="value"/>
+                                <xs:attribute type="xs:int" use="required" name="min"/>
+                                <xs:attribute type="xs:int" use="required" name="max"/>
+                                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                              </xs:complexType>
+                            </xs:element>
+                          </xs:sequence>
+                          <xs:element name="owsc" minOccurs="0">
+                            <xs:complexType>
+                              <xs:sequence>
+                                <xs:element type="xs:string" name="name" minOccurs="0"/>
+                                <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                              </xs:sequence>
+                              <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                              <xs:attribute type="xs:int" use="required" name="index"/>
+                            </xs:complexType>
+                          </xs:element>
+                        </xs:sequence>
+                        <xs:element name="integer" minOccurs="0">
+                          <xs:complexType>
+                            <xs:sequence>
+                              <xs:element type="xs:string" name="name" minOccurs="0"/>
+                            </xs:sequence>
+                            <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                            <xs:attribute type="xs:int" name="value"/>
+                            <xs:attribute type="xs:int" use="required" name="min"/>
+                            <xs:attribute type="xs:int" use="required" name="max"/>
+                            <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                          </xs:complexType>
+                        </xs:element>
+                      </xs:sequence>
+                      <xs:attribute type="xs:int" use="required" name="z"/>
+                    </xs:complexType>
+                  </xs:element>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="image" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:element name="x" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="y" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="rotation" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="height" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="width" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="path" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="value" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="textElement" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:element name="x" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="y" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="rotation" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="height" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="width" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="font" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="colorText" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:int" name="int" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="colorBack" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:int" name="int" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="alignment" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="style" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="fontSize" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" name="value"/>
+                <xs:attribute type="xs:int" use="required" name="min"/>
+                <xs:attribute type="xs:int" use="required" name="max"/>
+                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="text" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="value" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="alpha" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" name="value"/>
+                <xs:attribute type="xs:int" use="required" name="min"/>
+                <xs:attribute type="xs:int" use="required" name="max"/>
+                <xs:attribute type="xs:boolean" use="required" name="limits"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+      <xs:element name="document" minOccurs="0" maxOccurs="unbounded">
+        <xs:complexType>
+          <xs:sequence>
+            <xs:sequence>
+              <xs:element name="x" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="y" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="rotation" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="height" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+              <xs:element name="width" minOccurs="0">
+                <xs:complexType>
+                  <xs:sequence>
+                    <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  </xs:sequence>
+                  <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                  <xs:attribute type="xs:int" name="value"/>
+                  <xs:attribute type="xs:int" use="required" name="min"/>
+                  <xs:attribute type="xs:int" use="required" name="max"/>
+                  <xs:attribute type="xs:boolean" use="required" name="limits"/>
+                </xs:complexType>
+              </xs:element>
+            </xs:sequence>
+            <xs:element name="orientation" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="format" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="string" minOccurs="0" maxOccurs="unbounded"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+                <xs:attribute type="xs:int" use="required" name="index"/>
+              </xs:complexType>
+            </xs:element>
+            <xs:element name="name" minOccurs="0">
+              <xs:complexType>
+                <xs:sequence>
+                  <xs:element type="xs:string" name="name" minOccurs="0"/>
+                  <xs:element type="xs:string" name="value" minOccurs="0"/>
+                </xs:sequence>
+                <xs:attribute type="xs:boolean" use="required" name="lock"/>
+              </xs:complexType>
+            </xs:element>
+          </xs:sequence>
+          <xs:attribute type="xs:int" use="required" name="z"/>
+        </xs:complexType>
+      </xs:element>
+    </xs:sequence>
+  </xs:complexType>
+  <xs:element type="tns:saveHandler" name="saveHandler"/>
+</xs:schema>

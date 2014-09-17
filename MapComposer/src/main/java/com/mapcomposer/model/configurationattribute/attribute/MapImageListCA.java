@@ -4,24 +4,24 @@ import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttr
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
-import java.util.ArrayList;
+import com.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
 import java.util.List;
 
 /**
  * The attribute contain the link to a MapImage
  */
-public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
+public class MapImageListCA extends BaseListCA<SimpleMapImageGE> implements RefreshCA{
     /** Index of the value selected.*/
     private int index;
     /** Property itself */
-    private List<MapImage> list;
+    private List<SimpleMapImageGE> list;
     
     public MapImageListCA(){
         index=-1;
     }
         
-    @Override public void setValue(List<MapImage> value) {this.list=value;}
-    @Override public List<MapImage> getValue() {return list;}
+    @Override public void setValue(List<SimpleMapImageGE> value) {this.list=value;}
+    @Override public List<SimpleMapImageGE> getValue() {return list;}
 
     @Override public boolean isSameValue(ConfigurationAttribute ca) {
         if(ca instanceof ListCA){
@@ -32,16 +32,16 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
         return false;
     }
 
-    @Override public void       add(MapImage value)       {list.add(value);}
-    @Override public boolean    remove(MapImage value)    {return this.list.remove(value);}
+    @Override public void       add(SimpleMapImageGE value)       {list.add(value);}
+    @Override public boolean    remove(SimpleMapImageGE value)    {return this.list.remove(value);}
     
-    @Override public MapImage     getSelected(){
+    @Override public SimpleMapImageGE     getSelected(){
         if(index>=0 && index<list.size())
             return list.get(index);
         else
             return null;
     }
-    @Override public void       select(MapImage choice)   {index=list.indexOf(choice);}
+    @Override public void       select(SimpleMapImageGE choice)   {index=list.indexOf(choice);}
 
     /**
      * Verify if the files path still right.
@@ -49,15 +49,15 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
      */
     @Override
     public void refresh() {
-        for(MapImage mi : this.getValue()){
+        for(SimpleMapImageGE mi : this.getValue()){
             if(!UIController.getInstance().getGEMap().containsKey(mi)){
-                this.remove(((MapImage)mi));
+                this.remove(((SimpleMapImageGE)mi));
             }
         }
         
         for(Object ge : UIController.getInstance().getGEMap().keySet().toArray()){
             if(ge instanceof MapImage){
-                if(!this.getValue().contains((MapImage)ge)){
+                if(!this.getValue().contains((SimpleMapImageGE)ge)){
                     this.add(((MapImage)ge));
                 }
             }

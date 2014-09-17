@@ -28,6 +28,25 @@
                     </instructions>
                 </configuration>
             </plugin>
+            <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>jibx-maven-plugin</artifactId>
+                <version>1.2.5</version>
+                <configuration>
+                    <schemaBindingDirectory>/home/sylvain/workspace/map-composer/MapComposer/src/main/jibx</schemaBindingDirectory>
+                    <includeSchemaBindings>
+                        <includeSchemaBindings>binding.xml</includeSchemaBindings>
+                    </includeSchemaBindings>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bind</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
         </plugins>
     </build>
     <dependencies>
@@ -53,6 +72,11 @@
             <artifactId>mapeditor</artifactId>
             <version>4.1.0-SNAPSHOT</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-maven-plugin</artifactId>
+            <version>1.2.5</version>
         </dependency>
     </dependencies>
     <properties>
