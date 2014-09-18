@@ -367,4 +367,77 @@ public class UIController{
         zindexChange(toFront);
         validate(ge.getAllAttributes());
     }
+    
+    public void setAlign( Align a) {
+        if(selectedGE.size()>0){
+            int xMin;
+            int xMax;
+            int yMin;
+            int yMax;
+            switch(a){
+                case LEFT:
+                    xMin=selectedGE.get(0).getX();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getX() < xMin)
+                            xMin = ge.getX();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setX(xMin);
+                    break;
+                case CENTER:
+                    xMin=selectedGE.get(0).getX();
+                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    for (GraphicalElement ge : selectedGE) {
+                        if (ge.getX() < xMin)
+                            xMin = ge.getX();
+                        if (ge.getX()+ge.getWidth() > xMax)
+                            xMax = ge.getX()+ge.getWidth();
+                    }
+                    int xMid = (xMax-xMin)/2;
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setX(xMid-ge.getWidth()/2);
+                    break;
+                case RIGHT:
+                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getX()+ge.getWidth() > xMax)
+                            xMax = ge.getX()+ge.getWidth();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setX(xMax-ge.getWidth());
+                    break;
+                case TOP:
+                    yMin=selectedGE.get(0).getY();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getY() < yMin)
+                            yMin = ge.getY();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMin);
+                    break;
+                case MIDDLE:
+                    yMin=selectedGE.get(0).getY();
+                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    for (GraphicalElement ge : selectedGE) {
+                        if (ge.getY() < yMin)
+                            yMin = ge.getY();
+                        if (ge.getY()+ge.getHeight() > yMax)
+                            yMax = ge.getY()+ge.getHeight();
+                    }
+                    int yMid = (yMax-yMin)/2;
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMid-ge.getHeight()/2);
+                    break;
+                case BOTTOM:
+                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getY()+ge.getHeight() > yMax)
+                            yMax = ge.getY()+ge.getHeight();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMax-ge.getHeight());
+                    break;
+            }
+        }
+    }
+    
+    public enum Align{
+        LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
+    }
 }

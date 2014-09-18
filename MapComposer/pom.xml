@@ -25,6 +25,7 @@
                     <instructions>
                         <Private-Package>com.mapcomposer.*</Private-Package>
                         <Bundle-Activator>com.mapcomposer.Activator</Bundle-Activator>
+                        <Bundle-Category>orbisgis</Bundle-Category>
                     </instructions>
                 </configuration>
             </plugin>
@@ -33,7 +34,7 @@
                 <artifactId>jibx-maven-plugin</artifactId>
                 <version>1.2.5</version>
                 <configuration>
-                    <schemaBindingDirectory>/home/sylvain/workspace/map-composer/MapComposer/src/main/jibx</schemaBindingDirectory>
+                    <schemaBindingDirectory>${basedir}/src/main/jibx</schemaBindingDirectory>
                     <includeSchemaBindings>
                         <includeSchemaBindings>binding.xml</includeSchemaBindings>
                     </includeSchemaBindings>
@@ -75,7 +76,7 @@
         </dependency>
         <dependency>
             <groupId>org.jibx</groupId>
-            <artifactId>jibx-maven-plugin</artifactId>
+            <artifactId>jibx-run</artifactId>
             <version>1.2.5</version>
         </dependency>
     </dependencies>
