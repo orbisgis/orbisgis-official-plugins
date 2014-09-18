@@ -186,9 +186,14 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
                 this.panel.setLocation(ge.getX(), ge.getY());
                 break;
         }
+        UIController.getInstance().validateGE(ge);
         if(selected){
             UIController.getInstance().unselectGE(ge);
             UIController.getInstance().selectGE(ge);
+        }
+        else{
+            UIController.getInstance().selectGE(ge);
+            UIController.getInstance().unselectGE(ge);
         }
         setBorders();
         moveMod=0;

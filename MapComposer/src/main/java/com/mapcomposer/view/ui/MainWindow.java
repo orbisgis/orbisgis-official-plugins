@@ -2,6 +2,7 @@ package com.mapcomposer.view.ui;
 
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.controller.UIController.Align;
+import static com.mapcomposer.controller.UIController.ZIndex;
 import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
@@ -16,9 +17,9 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
-import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import javax.swing.JToolBar;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.view.icons.OrbisGISIcon;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
@@ -62,7 +63,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static String DELETE = "DELETE";
     
     private ActionCommands actions = new ActionCommands();
-    private JMenuBar menuBar = new JMenuBar();
+    private JToolBar toolBar = new JToolBar();
     
     /**Private constructor.*/
     private MainWindow(){
@@ -71,8 +72,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.setSize(1024, 768);
         this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
         //this.setJMenuBar(new WindowMenuBar());
-        actions.registerContainer(menuBar);
-        this.setJMenuBar(menuBar);
+        actions.registerContainer(toolBar);
+        this.add(toolBar, BorderLayout.PAGE_START);
+        //this.setJMenuBar(menuBar);
         actions.addAction(createAction(NEW_COMPOSER, "", "new_composer.png", "newComposer"));
         actions.addAction(createAction(CONFIGURATION, "", "configuration.png", "configuration"));
         actions.addAction(createAction(SAVE, "", "save.png", "save"));
@@ -101,7 +103,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         pan.setLayout(new BorderLayout());
         JSplitPane pane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ConfigurationShutter.getInstance(), CompositionArea.getInstance());
         pane1.setOneTouchExpandable(true);
-        this.setContentPane(pane1);
+        this.add(pane1, BorderLayout.CENTER);
         
         //Instantiation of the UIController
         UIController.getInstance();
@@ -173,16 +175,16 @@ public class MainWindow extends JFrame implements MainFrameAction{
         
     }
     public void moveBack(){
-        UIController.getInstance().zindexChange(UIController.toBack);
+        UIController.getInstance().zindexChange(ZIndex.TO_BACK);
     }
     public void moveDown(){
-        UIController.getInstance().zindexChange(UIController.back);
+        UIController.getInstance().zindexChange(ZIndex.BACK);
     }
     public void moveOn(){
-        UIController.getInstance().zindexChange(UIController.front);
+        UIController.getInstance().zindexChange(ZIndex.FRONT);
     }
     public void moveFront(){
-        UIController.getInstance().zindexChange(UIController.toFront);
+        UIController.getInstance().zindexChange(ZIndex.TO_FRONT);
     }
     public void alignToLeft(){
         UIController.getInstance().setAlign(Align.LEFT);

@@ -1,13 +1,14 @@
 package com.mapcomposer.controller;
 
+import static com.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
+import com.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
-import com.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
@@ -71,19 +72,11 @@ public class UIController{
         return INSTANCE;
     }
     
-    public final static int toFront=2;
-    public final static int front=1;
-    public final static int back=-1;
-    public final static int toBack=-2;
     /**
      * Change the Z-index of the displayed GraphicalElement.
-     * -2 means the GE are brought to the back,
-     * -1 means the GE are brought one step to the back
-     * 1 means the GE are brought one step to the front
-     * 2 means the GE are brought to the front.
-     * @param deltaZ Change of the Z-index.
+     * @param z Change of the Z-index.
      */
-    public void zindexChange(int deltaZ){
+    public void zindexChange(ZIndex z){
         Stack<GraphicalElement> temp = new Stack<>();
         Stack<GraphicalElement> tempBack = new Stack<>();
         Stack<GraphicalElement> tempFront = new Stack<>();
@@ -109,22 +102,22 @@ public class UIController{
         //Move the others GE
         for(GraphicalElement ge : selectedGE){
             if(zIndexStack.contains(ge)){
-                switch (deltaZ){
-                    case toBack:
+                switch (z){
+                    case TO_BACK:
                         temp.push(ge);
                         toBackFront(ge, temp);
                         break;
-                    case toFront:
+                    case TO_FRONT:
                         toBackFront(ge, temp);
                         temp.push(ge);
                         break;
-                    case front:
+                    case FRONT:
                         if(zIndexStack.indexOf(ge)>0)
-                            backFront(deltaZ, ge, temp);
+                            backFront(1, ge, temp);
                         break;
-                    case back:
+                    case BACK:
                         if(zIndexStack.indexOf(ge)<zIndexStack.size()-1)
-                            backFront(deltaZ, ge, temp);
+                            backFront(-1, ge, temp);
                         break;
                 }
             }
@@ -141,6 +134,7 @@ public class UIController{
         for(GraphicalElement g : zIndexStack){
             CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
         }
+        validateSelectedGE();
     }
     
     /**
@@ -236,6 +230,20 @@ public class UIController{
         selectedGE=new ArrayList<>();
         ConfigurationShutter.getInstance().eraseConfiguration();
     }
+    
+    public void validateGE(GraphicalElement ge){
+        if(ge instanceof GERefresh){
+            ((GERefresh)ge).refresh();
+        }
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        if(ge instanceof SimpleDocumentGE)
+            CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+
+        //Unlock all the ConfigurationAttribute
+        for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            ca.setLock(false);
+        }
+    }
 
     /**
      * Read a List of ConfigurationAttribute to set the GraphicalElement.
@@ -330,7 +338,7 @@ public class UIController{
             }
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
-            zindexChange(toFront);
+            zindexChange(TO_FRONT);
             validate(ge.getAllAttributes());
             this.selectGE(ge);
         } catch (InstantiationException | IllegalAccessException ex) {
@@ -384,7 +392,7 @@ public class UIController{
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
-        zindexChange(toFront);
+        zindexChange(TO_FRONT);
         validate(ge.getAllAttributes());
     }
     
@@ -415,7 +423,6 @@ public class UIController{
                             xMax = ge.getX()+ge.getWidth();
                     }
                     int xMid = (xMax+xMin)/2;
-                    System.out.println("xMin : "+xMin+", xMid : "+xMid+", xMax : "+xMax);
                     for(GraphicalElement ge : selectedGE)
                         ge.setX(xMid-ge.getWidth()/2);
                     break;
@@ -459,6 +466,10 @@ public class UIController{
             }
             validateSelectedGE();
         }
+    }
+    
+    public enum ZIndex{
+        TO_FRONT, FRONT, BACK, TO_BACK;
     }
     
     public enum Align{
