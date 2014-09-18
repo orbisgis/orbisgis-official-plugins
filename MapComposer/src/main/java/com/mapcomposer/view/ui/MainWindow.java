@@ -9,8 +9,10 @@ import java.util.List;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
+import javax.swing.JMenuBar;
 import javax.swing.JPanel;
 import javax.swing.JSplitPane;
+import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.view.icons.OrbisGISIcon;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
@@ -28,6 +30,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
     
     public static String MENU_MAPCOMPOSER = "MapComposer";
     
+    private ActionCommands actions = new ActionCommands();
+    private JMenuBar menuBar = new JMenuBar();
+    
     /**Private constructor.*/
     private MainWindow(){
         super("Map composer");
@@ -35,6 +40,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.setSize(1024, 768);
         this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
         this.setJMenuBar(new WindowMenuBar());
+        //this.setJMenuBar(menuBar);
+        //actions.addAction(new DefaultAction("MENU_FILE","File",new ImageIcon(MainWindow.class.getResource("MENU_FILE")));
         
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());

@@ -2,13 +2,15 @@ package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
+import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
  * String List ConfigurationAttribute.
  * StringListCA implements ListCA and contain String fields.
  */
-public class SourceListCA extends BaseListCA<String>{
+public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
     private int index;
     /** Property itself */
@@ -35,4 +37,12 @@ public class SourceListCA extends BaseListCA<String>{
     
     @Override public String     getSelected()           {return list.get(index);}
     @Override public void       select(String choice)   {index=list.indexOf(choice);}
+
+    @Override
+    public void refresh() {
+        List<String> temp = new ArrayList<>();
+        for(String s : list)
+            if(!temp.contains(s)) temp.add(s);
+        list=temp;
+    }
 }

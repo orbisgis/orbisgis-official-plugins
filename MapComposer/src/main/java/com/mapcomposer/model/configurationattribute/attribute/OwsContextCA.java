@@ -91,11 +91,8 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         String s = getSelected();
         list=new ArrayList<>();
         for(File file : f.listFiles(filter)){
-            System.out.println("file : "+f.toPath());
-            if(file.getAbsolutePath().toLowerCase().contains(".ows")){
-                System.out.println("ows : "+f.toPath());
+            if(file.getAbsolutePath().toLowerCase().contains(".ows"))
                 list.add(file.getAbsolutePath());
-            }
         }
         select(s);
     }

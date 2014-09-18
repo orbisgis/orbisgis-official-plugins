@@ -125,6 +125,14 @@ public class SaveHandler {
     }
     
     public void load() throws JiBXException, FileNotFoundException{
+        //Resets the elements list
+        listMI=new ArrayList<>();
+        listO=new ArrayList<>();
+        listS=new ArrayList<>();
+        listI=new ArrayList<>();
+        listT=new ArrayList<>();
+        listD=new ArrayList<>();
+        list.removeAll(list);
         //Open the file chooser window
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
@@ -151,7 +159,6 @@ public class SaveHandler {
 
             //Do the loading
             int size=0;
-            System.out.println("size : "+size);
             if(sh.listI!=null)
                 size+= sh.listI.size();
             if(sh.listMI!=null)
