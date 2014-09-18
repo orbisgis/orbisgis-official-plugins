@@ -216,6 +216,26 @@ public class UIController{
         selectedGE= new ArrayList<>();
         ConfigurationShutter.getInstance().eraseConfiguration();
     }
+    
+    
+    public void validateSelectedGE(){
+        for(GraphicalElement ge : selectedGE){
+            if(ge instanceof GERefresh){
+                ((GERefresh)ge).refresh();
+            }
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            if(ge instanceof SimpleDocumentGE)
+                CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        }
+        //Unlock all the ConfigurationAttribute
+        for(GraphicalElement ge : selectedGE){
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                ca.setLock(false);
+            }
+        }
+        selectedGE=new ArrayList<>();
+        ConfigurationShutter.getInstance().eraseConfiguration();
+    }
 
     /**
      * Read a List of ConfigurationAttribute to set the GraphicalElement.
@@ -358,11 +378,11 @@ public class UIController{
     private void addLoadedGE(GraphicalElement ge) {
         map.put(ge, new CompositionJPanel(ge));
         CompositionArea.getInstance().addGE(getPanel(ge));
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-        zIndexStack.push(ge);
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         zindexChange(toFront);
         validate(ge.getAllAttributes());
@@ -377,11 +397,13 @@ public class UIController{
             switch(a){
                 case LEFT:
                     xMin=selectedGE.get(0).getX();
-                    for (GraphicalElement ge : selectedGE)
+                    for (GraphicalElement ge : selectedGE){
                         if (ge.getX() < xMin)
                             xMin = ge.getX();
-                    for(GraphicalElement ge : selectedGE)
+                    }
+                    for(GraphicalElement ge : selectedGE){
                         ge.setX(xMin);
+                    }
                     break;
                 case CENTER:
                     xMin=selectedGE.get(0).getX();
@@ -392,7 +414,8 @@ public class UIController{
                         if (ge.getX()+ge.getWidth() > xMax)
                             xMax = ge.getX()+ge.getWidth();
                     }
-                    int xMid = (xMax-xMin)/2;
+                    int xMid = (xMax+xMin)/2;
+                    System.out.println("xMin : "+xMin+", xMid : "+xMid+", xMax : "+xMax);
                     for(GraphicalElement ge : selectedGE)
                         ge.setX(xMid-ge.getWidth()/2);
                     break;
@@ -421,7 +444,7 @@ public class UIController{
                         if (ge.getY()+ge.getHeight() > yMax)
                             yMax = ge.getY()+ge.getHeight();
                     }
-                    int yMid = (yMax-yMin)/2;
+                    int yMid = (yMax+yMin)/2;
                     for(GraphicalElement ge : selectedGE)
                         ge.setY(yMid-ge.getHeight()/2);
                     break;
@@ -434,6 +457,7 @@ public class UIController{
                         ge.setY(yMax-ge.getHeight());
                     break;
             }
+            validateSelectedGE();
         }
     }
     

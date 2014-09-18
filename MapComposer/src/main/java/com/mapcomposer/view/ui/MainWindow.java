@@ -185,16 +185,22 @@ public class MainWindow extends JFrame implements MainFrameAction{
         UIController.getInstance().zindexChange(UIController.toFront);
     }
     public void alignToLeft(){
+        UIController.getInstance().setAlign(Align.LEFT);
     }
     public void alignToCenter(){
+        UIController.getInstance().setAlign(Align.CENTER);
     }
     public void alignToRight(){
+        UIController.getInstance().setAlign(Align.RIGHT);
     }
     public void alignToBottom(){
+        UIController.getInstance().setAlign(Align.BOTTOM);
     }
     public void alignToMiddle(){
+        UIController.getInstance().setAlign(Align.MIDDLE);
     }
     public void alignToTop(){
+        UIController.getInstance().setAlign(Align.TOP);
     }
     public void properties(){
         
