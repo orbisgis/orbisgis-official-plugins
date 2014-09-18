@@ -56,7 +56,7 @@ public class CompositionArea extends JPanel{
     public void removeGE(CompositionJPanel panel){
         if(this.panel.isAncestorOf(panel))
             this.panel.remove(panel);
-        this.panel.repaint(panel.getBounds());
+        this.panel.repaint();
         this.panel.revalidate();
     }
     
@@ -83,5 +83,7 @@ public class CompositionArea extends JPanel{
      */
     public void removeAllGE() {
         panel.removeAll();
+        this.repaint();
+        this.revalidate();
     }
 }

@@ -15,7 +15,7 @@ public class DocumentRenderer extends GERenderer{
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics = bi.createGraphics();
 
-        graphics.setPaint(new Color(210, 210, 210));
+        graphics.setPaint(new Color(255, 255, 255));
         graphics.fillRect(0, 0, bi.getWidth(), bi.getHeight());
         return bi;
     }

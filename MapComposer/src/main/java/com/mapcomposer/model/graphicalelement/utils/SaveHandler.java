@@ -14,7 +14,6 @@ import com.mapcomposer.model.graphicalelement.element.text.SimpleTextGE;
 import com.mapcomposer.model.graphicalelement.element.text.TextElement;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
-import com.mapcomposer.view.ui.MainWindow;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -24,7 +23,6 @@ import java.util.List;
 import java.util.Stack;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JOptionPane;
 import javax.swing.filechooser.FileFilter;
 import org.jibx.runtime.BindingDirectory;
 import org.jibx.runtime.IBindingFactory;
@@ -118,10 +116,7 @@ public class SaveHandler {
             IBindingFactory bfact = BindingDirectory.getFactory(SaveHandler.class);
             IMarshallingContext mctx = bfact.createMarshallingContext();
             mctx.marshalDocument(this, "UTF-8", null, new FileOutputStream(path));
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Save done.");
         }
-        else
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Save abord.");
     }
     
     public void load() throws JiBXException, FileNotFoundException{
@@ -173,7 +168,6 @@ public class SaveHandler {
                 size+= sh.listD.size();
 
             for(int i=size-1; i>=0; i--){
-                System.out.println("i : "+i);
                 if(sh.listMI!=null)
                     for(SimpleMapImageGE ge : sh.listMI)
                         if(ge.getZ()==i)
@@ -199,9 +193,6 @@ public class SaveHandler {
                         if(ge.getZ()==i)
                             list.add(new Image(ge));
             }
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Load done.");
         }
-        else
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Load abord.");
     }
 }
