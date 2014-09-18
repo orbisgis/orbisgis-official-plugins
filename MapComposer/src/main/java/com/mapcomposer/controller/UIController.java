@@ -2,22 +2,25 @@ package com.mapcomposer.controller;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import com.mapcomposer.model.graphicalelement.element.Document;
+import com.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
-import com.mapcomposer.model.graphicalelement.utils.GERefresh;
+import com.mapcomposer.model.graphicalelement.interfaces.GERefresh;
+import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Dimension;
+import java.io.FileNotFoundException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.jibx.runtime.JiBXException;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -35,6 +38,8 @@ public class UIController{
     /**GraphicalElement stack giving the Z-index information*/
     private static Stack<GraphicalElement> zIndexStack;
     
+    private static SaveHandler listGE;
+    
     /**
      * Main constructor.
      */
@@ -43,6 +48,7 @@ public class UIController{
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
+        listGE = new SaveHandler();
     }
     
     /**
@@ -99,6 +105,7 @@ public class UIController{
         for(GraphicalElement ge : temp){
             zIndexStack.remove(ge);
         }
+        temp = new Stack<>();
         //Move the others GE
         for(GraphicalElement ge : selectedGE){
             if(zIndexStack.contains(ge)){
@@ -120,19 +127,19 @@ public class UIController{
                             backFront(deltaZ, ge, temp);
                         break;
                 }
-                //Add to the stack the GE of the back
-                while(!tempBack.empty())
-                    zIndexStack.push(tempBack.pop());
-                while(!temp.empty())
-                    zIndexStack.push(temp.pop());
-                //Add to the stack the GE of the front
-                while(!tempFront.empty())
-                    zIndexStack.push(tempFront.pop());
-                //Set the z-index of the GE from their stack position
-                for(GraphicalElement g : zIndexStack){
-                    CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
-                }
             }
+        }
+        //Add to the stack the GE of the front
+        while(!tempFront.empty())
+            zIndexStack.push(tempFront.pop());
+        while(!temp.empty())
+            zIndexStack.push(temp.pop());
+        //Add to the stack the GE of the back
+        while(!tempBack.empty())
+            zIndexStack.push(tempBack.pop());
+        //Set the z-index of the GE from their stack position
+        for(GraphicalElement g : zIndexStack){
+            CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
         }
     }
     
@@ -223,7 +230,7 @@ public class UIController{
                 //Takes each CA from the list of CA to validate
                 for(ConfigurationAttribute confShutterCA : listCA){
                     //If the two CA are the same property and are unlocked, set the new CA value
-                    if(ca.isSameProperty(confShutterCA)){
+                    if(ca.isSameName(confShutterCA)){
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
                             if(ca instanceof RefreshCA){
@@ -239,7 +246,7 @@ public class UIController{
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-            if(ge instanceof Document)
+            if(ge instanceof SimpleDocumentGE)
                 CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         }
         //Unlock all the ConfigurationAttribute
@@ -267,9 +274,9 @@ public class UIController{
                     //refresh the attributes
                     if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh();
                     
-                    if(caList.isSameProperty(caGE)){
+                    if(caList.isSameName(caGE)){
                         flag=true;
-                        caList.setLock(!caList.equals(caGE));
+                        caList.setLock(!caList.isSameValue(caGE));
                     }
                 }
             }
@@ -326,5 +333,38 @@ public class UIController{
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
+    }
+    
+    public void save(){
+        try {
+            listGE.save(zIndexStack);
+        } catch (JiBXException | FileNotFoundException ex) {
+            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    public void load(){
+        try {
+            removeAllGE();
+            listGE.load();
+            for(GraphicalElement ge : listGE.getList()){
+                addLoadedGE(ge);
+            }
+        } catch (JiBXException | FileNotFoundException ex) {
+            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+        }
+    }
+    
+    private void addLoadedGE(GraphicalElement ge) {
+        map.put(ge, new CompositionJPanel(ge));
+        CompositionArea.getInstance().addGE(getPanel(ge));
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        zIndexStack.push(ge);
+        if(ge instanceof GERefresh){
+            ((GERefresh)ge).refresh();
+        }
+        selectedGE = new ArrayList<>();
+        zindexChange(toFront);
+        validate(ge.getAllAttributes());
     }
 }

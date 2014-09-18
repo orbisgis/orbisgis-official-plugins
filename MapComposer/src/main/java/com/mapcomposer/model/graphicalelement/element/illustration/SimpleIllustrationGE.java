@@ -1,12 +1,12 @@
 package com.mapcomposer.model.graphicalelement.element.illustration;
 
+import com.mapcomposer.model.configurationattribute.attribute.SourceCA;
+import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import com.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
-import com.mapcomposer.Configuration;
+import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
-import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Source;
-import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 
 /**
  * Root class for illustration GraphicalElements.
@@ -14,13 +14,18 @@ import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 public class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     
     /** Path to the data source of the element.*/;
-    private final Source path;
+    private SourceCA path;
     
     /**Main constructor.*/
     public SimpleIllustrationGE(){
-        path = new Source("Path");
-        
-        setDefaultValue();
+        super();
+        path = CAFactory.createSourceCA("Path");
+    }
+    
+    /**Copy constructor.*/
+    public SimpleIllustrationGE(SimpleIllustrationGE sige){
+        super(sige);
+        path = sige.path;
     }
     
     /**
@@ -45,9 +50,5 @@ public class SimpleIllustrationGE extends SimpleGE implements IllustrationElemen
         list.addAll(super.getAllAttributes());
         list.add(path);
         return list;
-    }
-    
-    private void setDefaultValue(){
-        path.setValue(Configuration.defaultImagePath);
     }
 }

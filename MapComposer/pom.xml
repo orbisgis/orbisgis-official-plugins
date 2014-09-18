@@ -25,8 +25,28 @@
                     <instructions>
                         <Private-Package>com.mapcomposer.*</Private-Package>
                         <Bundle-Activator>com.mapcomposer.Activator</Bundle-Activator>
+                        <Bundle-Category>orbisgis</Bundle-Category>
                     </instructions>
                 </configuration>
+            </plugin>
+            <plugin>
+                <groupId>org.jibx</groupId>
+                <artifactId>jibx-maven-plugin</artifactId>
+                <version>1.2.5</version>
+                <configuration>
+                    <schemaBindingDirectory>${basedir}/src/main/jibx</schemaBindingDirectory>
+                    <includeSchemaBindings>
+                        <includeSchemaBindings>binding.xml</includeSchemaBindings>
+                    </includeSchemaBindings>
+                    <verbose>true</verbose>
+                </configuration>
+                <executions>
+                    <execution>
+                        <goals>
+                            <goal>bind</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
@@ -53,6 +73,11 @@
             <artifactId>mapeditor</artifactId>
             <version>4.1.0-SNAPSHOT</version>
             <type>jar</type>
+        </dependency>
+        <dependency>
+            <groupId>org.jibx</groupId>
+            <artifactId>jibx-run</artifactId>
+            <version>1.2.5</version>
         </dependency>
     </dependencies>
     <properties>

@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Choice;
+import com.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JComboBox;
@@ -18,7 +18,7 @@ public class ChoiceRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        Choice choice = (Choice)ca;
+        SourceListCA choice = (SourceListCA)ca;
         
         pan.add(new JLabel(choice.getName()));
         JComboBox jcb = new JComboBox(choice.getValue().toArray(new String[0]));
@@ -30,7 +30,7 @@ public class ChoiceRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        Choice choice = (Choice)attribute;
+        SourceListCA choice = (SourceListCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 choice.select(((JComboBox)c).getModel().getSelectedItem().toString());

@@ -8,18 +8,25 @@ import java.util.List;
  * It contains all the main function for the definition of the .
  */
 public interface GraphicalElement {
-
+    
     /**
      * Sets the x position.
      * @param x The x position of the GE.
      */
-    public void setX(Integer x);
+    public void setX(int x);
 
     /**
      * Sets the y position.
      * @param y The y position of the GE.
      */
     public void setY(int y);
+    
+    /**
+     * Sets the z position.
+     * Only used on save and load to keep the z position.
+     * @param z The z position.
+     */
+    public void setZ(int z);
 
     /**
      * Sets the rotation angle.
@@ -50,6 +57,13 @@ public interface GraphicalElement {
      * @return The y position of the GE.
      */
     public int getY();
+    
+    /**
+     * Returns the z position.
+     * Only used on save and load to keep the z position.
+     * @return The z position.
+     */
+    public int getZ();
 
     /**
      * Gets the rotation angle.

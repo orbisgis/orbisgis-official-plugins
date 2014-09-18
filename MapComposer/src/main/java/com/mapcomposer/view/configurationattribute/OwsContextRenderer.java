@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
+import com.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JComboBox;
@@ -9,7 +9,7 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * Renderer associated to the OwsContext ConfigurationAttribute.
+ * Renderer associated to the OwsContextCA ConfigurationAttribute.
  */
 public class OwsContextRenderer implements CARenderer{
 
@@ -18,10 +18,10 @@ public class OwsContextRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        OwsContext source = (OwsContext)ca;
+        OwsContextCA source = (OwsContextCA)ca;
         pan.add(new JLabel(source.getName()));
         
-        JComboBox list = new JComboBox(source.getList().toArray());
+        JComboBox list = new JComboBox(source.getValue().toArray());
         list.setSelectedItem(ca.getValue());
         pan.add(list);
         return pan;
@@ -29,10 +29,10 @@ public class OwsContextRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        OwsContext source = (OwsContext)attribute;
+        OwsContextCA source = (OwsContextCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
-                source.setValue(((JComboBox)c).getModel().getSelectedItem().toString());
+                source.select(((JComboBox)c).getModel().getSelectedItem().toString());
             }
         }
     }

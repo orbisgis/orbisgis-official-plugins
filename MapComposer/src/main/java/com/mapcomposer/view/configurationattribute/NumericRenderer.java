@@ -1,7 +1,7 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.Numeric;
+import com.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JLabel;
@@ -11,7 +11,7 @@ import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
 
 /**
- * Renderer associated to the Numeric ConfigurationAttribute.
+ * Renderer associated to the IntegerCA ConfigurationAttribute.
  */
 public class NumericRenderer implements CARenderer{
 
@@ -20,7 +20,7 @@ public class NumericRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        Numeric num = (Numeric)ca;
+        IntegerCA num = (IntegerCA)ca;
         
         pan.add(new JLabel(num.getName()));
         SpinnerModel model;
@@ -34,7 +34,7 @@ public class NumericRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        Numeric num = (Numeric)attribute;
+        IntegerCA num = (IntegerCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JSpinner){
                 num.setValue(((Integer)((JSpinner)c).getValue()));

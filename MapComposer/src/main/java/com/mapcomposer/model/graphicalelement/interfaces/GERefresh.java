@@ -4,7 +4,7 @@
  * and open the template in the editor.
  */
 
-package com.mapcomposer.model.graphicalelement.utils;
+package com.mapcomposer.model.graphicalelement.interfaces;
 
 /**
  * Interface that will permite to implement the refresh of data contained by the GraphicalElement.

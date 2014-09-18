@@ -1,15 +1,16 @@
 package com.mapcomposer.view.configurationattribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.FileList;
+import com.mapcomposer.model.configurationattribute.attribute.FileListCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.io.File;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 
 /**
- * Renderer associated to the FileList ConfigurationAttribute.
+ * Renderer associated to the FileListCA ConfigurationAttribute.
  */
 public class FileListRenderer implements CARenderer{
 
@@ -18,7 +19,7 @@ public class FileListRenderer implements CARenderer{
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
         
-        FileList filelist = (FileList)ca;
+        FileListCA filelist = (FileListCA)ca;
         
         pan.add(new JLabel(filelist.getName()));
         JComboBox list = new JComboBox(filelist.getValue().toArray(new String[0]));
@@ -29,10 +30,10 @@ public class FileListRenderer implements CARenderer{
 
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        FileList filelist = (FileList)attribute;
+        FileListCA filelist = (FileListCA)attribute;
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
-                filelist.select(((JComboBox)c).getModel().getSelectedItem().toString());
+                filelist.select(new File(((JComboBox)c).getModel().getSelectedItem().toString()));
             }
         }
     }

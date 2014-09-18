@@ -2,7 +2,8 @@ package com.mapcomposer.model.graphicalelement.element.cartographic;
 
 import com.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.attribute.OwsContext;
+import com.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
+import com.mapcomposer.model.configurationattribute.utils.CAFactory;
 import com.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
@@ -13,40 +14,26 @@ import org.orbisgis.coremap.layerModel.OwsMapContext;
  */
 public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /** OWS-Context source.*/
-    private final OwsContext owsc;
+    private OwsContextCA owsc;
     
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
-        this.owsc = new OwsContext("OWS-Context path");
-    }
-
-    /**
-     * Returns the OwsMapContext.
-     * @return The OwsMapContext.
-     */
-    @Override
-    public OwsMapContext getOwsMapContext() {
-        return owsc.getOwsContext();
-    }
-
-    /**
-     * Returns the OwsContext path.
-     * @return The OwsContext path.
-     */
-    @Override
-    public String getOwsPath() {
-        return owsc.getValue();
+        this.owsc = CAFactory.createOwsContextCA("OWS-Context path");
     }
     
     /**
-     * Sets the OwsContext path.
-     * @param owsContext New OwsContext path.
+     * Copy constructor.
+     * @param scge SimpleCartoGE to copy.
      */
-    @Override
-    public void setOwsContext(String owsContext) {
-        this.owsc.setValue(owsContext);
+    public SimpleCartoGE(SimpleCartoGE scge){
+        super(scge);
+        this.owsc = scge.owsc;
     }
+
+    @Override public OwsMapContext getOwsMapContext()   {return owsc.getOwsMapContext();}
+    @Override public String getOwsPath()                {return owsc.getSelected();}
+    @Override public void setOwsContext(String owsContext){this.owsc.select(owsContext);}
 
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
