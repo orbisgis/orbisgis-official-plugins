@@ -3,6 +3,7 @@ package com.mapcomposer.controller;
 import static com.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
@@ -11,8 +12,8 @@ import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import com.mapcomposer.view.ui.CompositionArea;
-import com.mapcomposer.view.ui.ConfigurationShutter;
 import com.mapcomposer.view.utils.CompositionJPanel;
+import com.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
@@ -181,7 +182,6 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
-        ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
     
     /**
@@ -189,11 +189,10 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
+        for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            ca.setLock(false);
+        }
         selectedGE.remove(ge);
-        if(selectedGE.isEmpty())
-            ConfigurationShutter.getInstance().eraseConfiguration();
-        else
-            ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
     }
     
     /**
@@ -207,8 +206,8 @@ public class UIController{
         }
         for(GraphicalElement ge : zIndexStack)
             CompositionArea.getInstance().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
-        selectedGE= new ArrayList<>();
-        ConfigurationShutter.getInstance().eraseConfiguration();
+        selectedGE=new ArrayList<>();
+        CompositionArea.getInstance().refresh();
     }
     
     
@@ -227,8 +226,6 @@ public class UIController{
                 ca.setLock(false);
             }
         }
-        selectedGE=new ArrayList<>();
-        ConfigurationShutter.getInstance().eraseConfiguration();
     }
     
     public void validateGE(GraphicalElement ge){
@@ -243,6 +240,7 @@ public class UIController{
         for(ConfigurationAttribute ca : ge.getAllAttributes()){
             ca.setLock(false);
         }
+        CompositionArea.getInstance().refresh();
     }
 
     /**
@@ -269,21 +267,16 @@ public class UIController{
                     }
                 }
             }
-            //Refreshes the GraphicalElement
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-            if(ge instanceof SimpleDocumentGE)
-                CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-        }
-        //Unlock all the ConfigurationAttribute
-        for(GraphicalElement ge : selectedGE){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
+            if(ge instanceof Document){
+                CompositionArea.getInstance().setDocumentDimension(((Document)zIndexStack.peek()).getFormat().getPixelDimension());
+                unselectGE(ge);
             }
         }
-        selectedGE=new ArrayList<>();
+        CompositionArea.getInstance().refresh();
     }
     
     /**
@@ -336,11 +329,12 @@ public class UIController{
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
+            List<GraphicalElement> temp = selectedGE;
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
             zindexChange(TO_FRONT);
-            validate(ge.getAllAttributes());
-            this.selectGE(ge);
+            validateGE(ge);
+            selectedGE=temp;
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -393,7 +387,7 @@ public class UIController{
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         zindexChange(TO_FRONT);
-        validate(ge.getAllAttributes());
+        validateGE(ge);
     }
     
     public void setAlign( Align a) {
@@ -466,6 +460,20 @@ public class UIController{
             }
             validateSelectedGE();
         }
+    }
+    
+    public void showProperties(){
+        DialogProperties dp = null;
+        if(selectedGE.size()>0)
+            dp = new DialogProperties(getCommonAttributes());
+        else 
+            for(GraphicalElement ge : zIndexStack)
+                if(ge instanceof Document){
+                    selectGE(ge);
+                    dp = new DialogProperties(ge.getAllAttributes());
+                }
+        if(dp!=null)
+            dp.setVisible(true);
     }
     
     public enum ZIndex{

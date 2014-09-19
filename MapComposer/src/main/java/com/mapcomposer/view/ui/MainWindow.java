@@ -18,7 +18,6 @@ import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
-import javax.swing.JSplitPane;
 import javax.swing.JToolBar;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.view.icons.OrbisGISIcon;
@@ -101,9 +100,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());
-        JSplitPane pane1 = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, ConfigurationShutter.getInstance(), CompositionArea.getInstance());
-        pane1.setOneTouchExpandable(true);
-        this.add(pane1, BorderLayout.CENTER);
+        this.add(CompositionArea.getInstance(), BorderLayout.CENTER);
         
         //Instantiation of the UIController
         UIController.getInstance();
@@ -205,7 +202,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         UIController.getInstance().setAlign(Align.TOP);
     }
     public void properties(){
-        
+        UIController.getInstance().showProperties();
     }
     public void delete(){
         UIController.getInstance().remove();

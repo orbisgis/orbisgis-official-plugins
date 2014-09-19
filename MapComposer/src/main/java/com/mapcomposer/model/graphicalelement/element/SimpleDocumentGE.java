@@ -190,7 +190,6 @@ public class SimpleDocumentGE extends SimpleGE implements GERefresh{
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll( super.getAllAttributes());
         list.add(format);
         list.add(orientation);
         list.add(name);

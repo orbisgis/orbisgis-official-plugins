@@ -3,6 +3,7 @@
 import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import com.mapcomposer.view.ui.CompositionArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -62,20 +63,21 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
      */
     public void setPanel(JPanel panel){
         this.panel = panel;
-        this.selected=false;
         setBorders();
+        CompositionArea.getInstance().refresh();
     }
 
     /**
      * Draw border if the CompositionJPanel is selected.
      */
     private void setBorders() {
-       if(selected){
+        if(selected){
            panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
-       }
-       else{
+        }
+        else{
            panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-       }
+        }
+        CompositionArea.getInstance().refresh();
     }
 
     @Override
@@ -199,6 +201,8 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         moveMod=0;
         
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
+        this.revalidate();
+        this.repaint();
     }
 
     @Override

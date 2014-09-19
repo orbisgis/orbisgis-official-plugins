@@ -64,15 +64,4 @@ public abstract class SimpleGE implements GraphicalElement{
     @Override public int getRotation()  {return this.rotation.getValue();}
     @Override public int getHeight()    {return this.height.getValue();}
     @Override public int getWidth()     {return this.width.getValue();}
-    
-    @Override
-    public List<ConfigurationAttribute> getAllAttributes() {
-        List<ConfigurationAttribute> list = new ArrayList<>();
-        list.add(x);
-        list.add(y);
-        list.add(rotation);
-        list.add(height);
-        list.add(width);
-        return list;
-    }
 }

@@ -102,7 +102,6 @@ public class ConfigurationShutter extends JPanel implements MouseListener{
                 listca.add(cp.getCA());
             }
             UIController.getInstance().validate(listca);
-            eraseConfiguration();
         }
     }
     

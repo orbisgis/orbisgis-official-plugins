@@ -38,7 +38,6 @@ public class SimpleCartoGE extends SimpleGE implements CartographicElement{
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll(super.getAllAttributes());
         list.add(owsc);
         return list;
     }

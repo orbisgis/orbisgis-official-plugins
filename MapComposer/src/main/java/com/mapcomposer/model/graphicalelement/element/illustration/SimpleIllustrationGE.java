@@ -47,7 +47,6 @@ public class SimpleIllustrationGE extends SimpleGE implements IllustrationElemen
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll(super.getAllAttributes());
         list.add(path);
         return list;
     }
