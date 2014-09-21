@@ -24,6 +24,7 @@ import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import org.jibx.runtime.JiBXException;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -187,22 +188,27 @@ public class UIController{
     }
     
     public void refreshSpin(){
+        boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
+        int x=0, y=0, w=0, h=0, r=0; 
         if(!selectedGE.isEmpty()){
-            int x=selectedGE.get(0).getX(), y=selectedGE.get(0).getY(), w=selectedGE.get(0).getWidth(), h=selectedGE.get(0).getHeight(), r=selectedGE.get(0).getRotation();
-            boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
+            x=selectedGE.get(0).getX();
+            y=selectedGE.get(0).getY();
+            w=selectedGE.get(0).getWidth();
+            h=selectedGE.get(0).getHeight();
+            r=selectedGE.get(0).getRotation();
             for(GraphicalElement graph : selectedGE){
-                if(x!=graph.getX()) boolX=true;
-                if(y!=graph.getY()) boolY=true;
-                if(w!=graph.getWidth()) boolW=true;
-                if(h!=graph.getHeight()) boolH=true;
-                if(r!=graph.getRotation()) boolR=true;
+                if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
+                if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
+                if(w!=graph.getWidth()){ boolW=true;w=selectedGE.get(0).getWidth();}
+                if(h!=graph.getHeight()){ boolH=true;h=selectedGE.get(0).getHeight();}
+                if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
             }
-            MainWindow.getInstance().setSpinnerX(boolX, selectedGE.get(0).getX());
-            MainWindow.getInstance().setSpinnerY(boolY, selectedGE.get(0).getY());
-            MainWindow.getInstance().setSpinnerW(boolW, selectedGE.get(0).getWidth());
-            MainWindow.getInstance().setSpinnerH(boolH, selectedGE.get(0).getHeight());
-            MainWindow.getInstance().setSpinnerR(boolR, selectedGE.get(0).getRotation());
         }
+        MainWindow.getInstance().setSpinnerX(boolX, x);
+        MainWindow.getInstance().setSpinnerY(boolY, y);
+        MainWindow.getInstance().setSpinnerW(boolW, w);
+        MainWindow.getInstance().setSpinnerH(boolH, h);
+        MainWindow.getInstance().setSpinnerR(boolR, r);
     }
     
     /**
@@ -214,6 +220,18 @@ public class UIController{
             ca.setLock(false);
         }
         selectedGE.remove(ge);
+        refreshSpin();
+    }
+    
+    
+    public void unselectAllGE(){
+        List<GraphicalElement> temp = Arrays.asList(selectedGE.toArray());
+        for(GraphicalElement ge : temp){
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                ca.setLock(false);
+            }
+            selectedGE.remove(ge);
+        }
         refreshSpin();
     }
     
@@ -272,6 +290,7 @@ public class UIController{
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
+        boolean document = false;
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
             //Takes each ConfigurationAttribute from the GraphicalElement
@@ -295,11 +314,12 @@ public class UIController{
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             if(ge instanceof Document){
+                document=true;
                 CompositionArea.getInstance().setDocumentDimension(((Document)zIndexStack.peek()).getFormat().getPixelDimension());
-                unselectGE(ge);
             }
         }
         CompositionArea.getInstance().refresh();
+        if(document) unselectAllGE();
     }
     
     /**
@@ -486,17 +506,23 @@ public class UIController{
     }
     
     public void showProperties(){
-        DialogProperties dp = null;
-        if(selectedGE.size()>0)
-            dp = new DialogProperties(getCommonAttributes());
-        else 
-            for(GraphicalElement ge : zIndexStack)
-                if(ge instanceof Document){
-                    selectGE(ge);
-                    dp = new DialogProperties(ge.getAllAttributes());
-                }
-        if(dp!=null)
+        if(selectedGE.size()>0){
+            DialogProperties dp = new DialogProperties(getCommonAttributes());
             dp.setVisible(true);
+        }
+    }
+    
+    public void showDocProperties(){
+        for(GraphicalElement ge : zIndexStack){
+            System.out.println(ge);
+            if(ge instanceof Document){
+                for(GraphicalElement graph : selectedGE)
+                    unselectGE(graph);
+                selectGE(ge);
+                DialogProperties dp = new DialogProperties(ge.getAllAttributes());
+                dp.setVisible(true);
+            }
+        }
     }
     
     public enum ZIndex{

@@ -214,7 +214,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
     
     public void configuration(){
-        
+        UIController.getInstance().showDocProperties();
     }
     
     public void save(){
@@ -222,7 +222,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
     
     public void exportComposer(){
-        
     }
     
     public void addMap(){
@@ -249,10 +248,10 @@ public class MainWindow extends JFrame implements MainFrameAction{
         UIController.getInstance().addGE(Image.class);
     }
     public void drawCircle(){
-        
+        //Unsupported yet
     }
     public void drawPolygon(){
-        
+        //Unsupported yet
     }
     public void moveBack(){
         UIController.getInstance().zindexChange(ZIndex.TO_BACK);
