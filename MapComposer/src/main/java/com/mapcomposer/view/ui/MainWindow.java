@@ -100,6 +100,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(ADD_LEGEND, "", "add_legend.png", "addLegend"));
         actions.addAction(createAction(ADD_ORIENTATION, "", "compass.png", "addOrientation"));
         actions.addAction(createAction(ADD_SCALE, "", "add_scale.png", "addScale"));
+        actions.addAction(createAction(ADD_PICTURE, "", "add_picture.png", "addPicture"));
         toolBar.addSeparator();
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
         actions.addAction(createAction(DRAW_CIRCLE, "", "draw_circle.png", "drawCircle"));
@@ -211,6 +212,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void newComposer(){
         UIController.getInstance().removeAllGE();
         UIController.getInstance().addGE(Document.class);
+        UIController.getInstance().showDocProperties();
     }
     
     public void configuration(){
@@ -244,7 +246,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         UIController.getInstance().addGE(Scale.class);
     }
     
-    public void addImage(){
+    public void addPicture(){
         UIController.getInstance().addGE(Image.class);
     }
     public void drawCircle(){

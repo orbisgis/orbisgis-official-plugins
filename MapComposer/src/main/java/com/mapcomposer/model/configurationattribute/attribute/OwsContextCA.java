@@ -4,7 +4,6 @@ import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttr
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import com.mapcomposer.model.utils.LinkToOrbisGIS;
-import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
@@ -53,7 +52,7 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         try {
             reloadSelectedOMC();
         } catch (FileNotFoundException ex) {
-            JOptionPane.showMessageDialog(ConfigurationShutter.getInstance(), "Cannot load the OWS-Context '"+this.getValue()+"'.");
+            //Show an alert message ?
         }
     }
     

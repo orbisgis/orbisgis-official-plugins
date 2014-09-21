@@ -2,9 +2,7 @@ package com.mapcomposer.model.configurationattribute.attribute;
 
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import com.mapcomposer.view.ui.ConfigurationShutter;
 import java.io.File;
-import javax.swing.JOptionPane;
 
 /**
  * The Source attribute contain the path to a specified data source like OWS-Context, data, image ...

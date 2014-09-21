@@ -1,8 +1,8 @@
 package com.mapcomposer.view.graphicalelement;
 
-import com.mapcomposer.Configuration;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
+import com.mapcomposer.view.ui.MainWindow;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,7 +30,7 @@ public class OrientationRenderer extends GERenderer{
         }
         else{
             //Use ImageIcon to convert the file URL into a buffered image
-            ImageIcon icon = new ImageIcon(Configuration.defaultOrientationURL);
+            ImageIcon icon = new ImageIcon(MainWindow.class.getResource("compass.png"));
             BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
             Graphics g = bi.createGraphics();
             icon.paintIcon(null, g, 0,0);
