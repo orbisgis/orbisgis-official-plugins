@@ -12,6 +12,7 @@ import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import com.mapcomposer.view.ui.CompositionArea;
+import com.mapcomposer.view.ui.MainWindow;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import com.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
@@ -182,6 +183,26 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
+        refreshSpin();
+    }
+    
+    public void refreshSpin(){
+        if(!selectedGE.isEmpty()){
+            int x=selectedGE.get(0).getX(), y=selectedGE.get(0).getY(), w=selectedGE.get(0).getWidth(), h=selectedGE.get(0).getHeight(), r=selectedGE.get(0).getRotation();
+            boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
+            for(GraphicalElement graph : selectedGE){
+                if(x!=graph.getX()) boolX=true;
+                if(y!=graph.getY()) boolY=true;
+                if(w!=graph.getWidth()) boolW=true;
+                if(h!=graph.getHeight()) boolH=true;
+                if(r!=graph.getRotation()) boolR=true;
+            }
+            MainWindow.getInstance().setSpinnerX(boolX, selectedGE.get(0).getX());
+            MainWindow.getInstance().setSpinnerY(boolY, selectedGE.get(0).getY());
+            MainWindow.getInstance().setSpinnerW(boolW, selectedGE.get(0).getWidth());
+            MainWindow.getInstance().setSpinnerH(boolH, selectedGE.get(0).getHeight());
+            MainWindow.getInstance().setSpinnerR(boolR, selectedGE.get(0).getRotation());
+        }
     }
     
     /**
@@ -193,6 +214,7 @@ public class UIController{
             ca.setLock(false);
         }
         selectedGE.remove(ge);
+        refreshSpin();
     }
     
     /**
@@ -226,6 +248,7 @@ public class UIController{
                 ca.setLock(false);
             }
         }
+        refreshSpin();
     }
     
     public void validateGE(GraphicalElement ge){
@@ -482,5 +505,28 @@ public class UIController{
     
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
+    }
+    
+    public void changeProperty(GraphicalElement.Property prop, int i){
+        for(GraphicalElement ge : selectedGE){
+            switch(prop){
+                case X:
+                    ge.setX(i);
+                    break;
+                case Y:
+                    ge.setY(i);
+                    break;
+                case WIDTH:
+                    ge.setWidth(i);
+                    break;
+                case HEIGHT:
+                    ge.setHeight(i);
+                    break;
+                case ROTATION:
+                    ge.setRotation(i);
+                    break;
+            }
+            validateGE(ge);
+        }
     }
 }
