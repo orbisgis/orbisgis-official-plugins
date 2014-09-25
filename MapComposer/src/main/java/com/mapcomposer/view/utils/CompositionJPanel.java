@@ -35,12 +35,18 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
     /**Type of move the user want to do.*/
     private char moveMod;
     
+    private UIController uic;
+    
+    private CompositionArea compArea;
+    
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
      */
-    public CompositionJPanel(GraphicalElement ge){
+    public CompositionJPanel(GraphicalElement ge, UIController uic, CompositionArea compArea){
         super(new BorderLayout());
+        this.uic=uic;
+        this.compArea=compArea;
         moveMod = 0;
         this.ge=ge;
         panel=new JPanel();
@@ -64,7 +70,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
     public void setPanel(JPanel panel){
         this.panel = panel;
         setBorders();
-        CompositionArea.getInstance().refresh();
+        compArea.refresh();
     }
 
     /**
@@ -77,7 +83,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         else{
            panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         }
-        CompositionArea.getInstance().refresh();
+        compArea.refresh();
     }
 
     @Override
@@ -85,10 +91,10 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         this.selected=!selected;
         setBorders();
         if(selected){
-            UIController.getInstance().selectGE(ge);
+            uic.selectGE(ge);
         }
         else{
-            UIController.getInstance().unselectGE(ge);
+            uic.unselectGE(ge);
         }
         setBorders();
     }
@@ -188,14 +194,14 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
                 this.panel.setLocation(ge.getX(), ge.getY());
                 break;
         }
-        UIController.getInstance().validateGE(ge);
+        uic.validateGE(ge);
         if(selected){
-            UIController.getInstance().unselectGE(ge);
-            UIController.getInstance().selectGE(ge);
+            uic.unselectGE(ge);
+            uic.selectGE(ge);
         }
         else{
-            UIController.getInstance().selectGE(ge);
-            UIController.getInstance().unselectGE(ge);
+            uic.selectGE(ge);
+            uic.unselectGE(ge);
         }
         setBorders();
         moveMod=0;

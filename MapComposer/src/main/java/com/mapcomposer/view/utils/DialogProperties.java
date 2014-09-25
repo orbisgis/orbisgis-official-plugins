@@ -38,11 +38,13 @@ public class DialogProperties extends JFrame{
     /** List of ConfPanel displayed */
     private List<ConfPanel> listPanels;
     
+    private UIController uic;
+    
     /**main constructor
      * @param list List of ConfigurationAttributes to display.*/
-    public DialogProperties(List<ConfigurationAttribute> list){
+    public DialogProperties(List<ConfigurationAttribute> list, UIController uic){
         body = new JPanel(new MigLayout("wrap 2"));
-        
+        this.uic=uic;
         //Positionning the shutter
         this.setLayout(new BorderLayout());
         this.add(body, BorderLayout.CENTER);
@@ -71,7 +73,7 @@ public class DialogProperties extends JFrame{
         for(ConfPanel cp : listPanels){
             listca.add(cp.getCA());
         }
-        UIController.getInstance().validate(listca);
+        uic.validate(listca);
         clearAndHide();
     }
 

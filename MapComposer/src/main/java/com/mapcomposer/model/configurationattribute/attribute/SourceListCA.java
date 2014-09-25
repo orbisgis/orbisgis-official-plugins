@@ -1,5 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -39,7 +40,7 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     @Override public void       select(String choice)   {index=list.indexOf(choice);}
 
     @Override
-    public void refresh() {
+    public void refresh(UIController uic) {
         List<String> temp = new ArrayList<>();
         for(String s : list)
             if(!temp.contains(s)) temp.add(s);

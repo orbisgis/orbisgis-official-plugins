@@ -1,5 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import java.io.File;
@@ -22,7 +23,7 @@ public final class SourceCA extends BaseCA<String> implements RefreshCA{
     }
 
     @Override
-    public void refresh() {
+    public void refresh(UIController uic) {
         File f = new File(this.getValue());
         if(!f.exists()){
            System.out.println("Cannot load the file '"+this.getValue()+"'.");

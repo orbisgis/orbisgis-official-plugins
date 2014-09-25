@@ -40,9 +40,6 @@ import static org.orbisgis.viewapi.main.frames.ext.MainFrameAction.MENU_TOOLS;
  */
 public class MainWindow extends JFrame implements MainFrameAction{
     
-    /**Unique instance of the class.*/
-    private static MainWindow INSTANCE=null;
-    
     public static final String MENU_MAPCOMPOSER = "MapComposer";
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
     public static final String CONFIGURATION = "CONFIGURATION";
@@ -72,15 +69,20 @@ public class MainWindow extends JFrame implements MainFrameAction{
     private final ActionCommands actions = new ActionCommands();
     private final JToolBar toolBar = new JToolBar();
     
-    private final JSpinner spinX=null;
-    private final JSpinner spinY=null;
-    private final JSpinner spinW=null;
-    private final JSpinner spinH=null;
-    private final JSpinner spinR=null;
+    private JSpinner spinX=null;
+    private JSpinner spinY=null;
+    private JSpinner spinW=null;
+    private JSpinner spinH=null;
+    private JSpinner spinR=null;
+    
+    private UIController uic;
+    private CompositionArea compArea;
     
     /**Private constructor.*/
-    private MainWindow(){
+    public MainWindow(UIController uic){
         super("Map composer");
+        this.uic=uic;
+        this.compArea = new CompositionArea();
         //Sets the default size to the window
         this.setSize(1024, 768);
         this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
@@ -88,8 +90,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.setAccelerators(rootPane);
         actions.registerContainer(toolBar);
         actions.addAction(createAction(NEW_COMPOSER, "", "new_composer.png", this, "newComposer"));
-        actions.addAction(createAction(CONFIGURATION, "", "configuration.png", UIController.getInstance(), "showDocProperties"));
-        actions.addAction(createAction(SAVE, "", "save.png", UIController.getInstance(), "save"));
+        actions.addAction(createAction(CONFIGURATION, "", "configuration.png", uic, "showDocProperties"));
+        actions.addAction(createAction(SAVE, "", "save.png", uic, "save"));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "export_composer.png", this, "exportComposer"));
         toolBar.addSeparator();
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
@@ -119,45 +121,45 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(ALIGN_TO_TOP, "", "align_to_top.png", this, "alignToTop"));
         toolBar.addSeparator();
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
-        setSpinner(" X : ", spinX, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        setSpinner(" Y : ", spinY, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        setSpinner(" W : ", spinR, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        setSpinner(" H : ", spinH, 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinX = createSpinner(" X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinY = createSpinner(" Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinW = createSpinner(" W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinH = createSpinner(" H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         toolBar.add(new JLabel(new ImageIcon(MainWindow.class.getResource("rotation.png"))));
-        setSpinner("", spinR, 0, -360, 360);
+        spinR = createSpinner("", 0, -360, 360);
         toolBar.addSeparator();
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
-        actions.addAction(createAction(PROPERTIE, "", "properties.png", UIController.getInstance(), "showProperties"));
-        actions.addAction(createAction(DELETE, "", "delete.png", UIController.getInstance(), "remove"));
+        actions.addAction(createAction(PROPERTIE, "", "properties.png", uic, "showProperties"));
+        actions.addAction(createAction(DELETE, "", "delete.png", uic, "remove"));
         
         JPanel pan = new JPanel();
         pan.setLayout(new BorderLayout());
-        this.add(CompositionArea.getInstance(), BorderLayout.CENTER);
-        
-        //Instantiation of the UIController
-        UIController.getInstance();
+        this.add(compArea, BorderLayout.CENTER);
     }
     
-    private void setSpinner(String label, JSpinner spin, int value, int minValue, int maxValue){
+    public CompositionArea getCompositionArea(){return compArea;}
+    
+    private JSpinner createSpinner(String label, int value, int minValue, int maxValue){
         toolBar.add(new JLabel(label));
-        spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
+        JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
         spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
         spin.setPreferredSize(new Dimension(32, 32));
         spin.setEnabled(false);
         toolBar.add(spin);
+        return spin;
     }
     
     public void spinChange(Object o){
         if(o.equals(spinX))
-            if(spinX.isEnabled()) UIController.getInstance().changeProperty(GraphicalElement.Property.X, (Integer)spinX.getModel().getValue());
+            if(spinX.isEnabled()) uic.changeProperty(GraphicalElement.Property.X, (Integer)spinX.getModel().getValue());
         if(o.equals(spinY))
-            if(spinY.isEnabled()) UIController.getInstance().changeProperty(GraphicalElement.Property.Y, (Integer)spinY.getModel().getValue());
+            if(spinY.isEnabled()) uic.changeProperty(GraphicalElement.Property.Y, (Integer)spinY.getModel().getValue());
         if(o.equals(spinW))
-            if(spinW.isEnabled()) UIController.getInstance().changeProperty(GraphicalElement.Property.WIDTH, (Integer)spinW.getModel().getValue());
+            if(spinW.isEnabled()) uic.changeProperty(GraphicalElement.Property.WIDTH, (Integer)spinW.getModel().getValue());
         if(o.equals(spinH))
-            if(spinH.isEnabled()) UIController.getInstance().changeProperty(GraphicalElement.Property.HEIGHT, (Integer)spinH.getModel().getValue());
+            if(spinH.isEnabled()) uic.changeProperty(GraphicalElement.Property.HEIGHT, (Integer)spinH.getModel().getValue());
         if(o.equals(spinR))
-            if(spinR.isEnabled()) UIController.getInstance().changeProperty(GraphicalElement.Property.ROTATION, (Integer)spinR.getModel().getValue());
+            if(spinR.isEnabled()) uic.changeProperty(GraphicalElement.Property.ROTATION, (Integer)spinR.getModel().getValue());
     }
     
     private DefaultAction createAction(String actionID, String actionLabel, String actionIconName, Object target, String ActionFunctionName){
@@ -167,16 +169,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
                             new ImageIcon(MainWindow.class.getResource(actionIconName)),
                             EventHandler.create(ActionListener.class, target, ActionFunctionName)
                         );
-    }
-    
-    /**
-     * Returns the unique instance of the class.
-     * @return The instanceof the class.
-     */
-    public static MainWindow getInstance(){
-        if(INSTANCE==null)
-            INSTANCE = new MainWindow();
-        return INSTANCE;
     }
     
     public void setSpinner(boolean b, int i, Property prop){
@@ -206,20 +198,20 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
     
     public void newComposer(){
-        UIController.getInstance().removeAllGE();
-        UIController.getInstance().addGE(Document.class);
-        UIController.getInstance().showDocProperties();
+        uic.removeAllGE();
+        uic.addGE(Document.class);
+        uic.showDocProperties();
     }
     
     public void exportComposer(){
     }
     
     public void addMap(){
-        UIController.getInstance().addGE(MapImage.class);
+        uic.addGE(MapImage.class);
     }
     
     public void addText(){
-        UIController.getInstance().addGE(TextElement.class);
+        uic.addGE(TextElement.class);
     }
     
     public void addLegend(){
@@ -227,15 +219,15 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
     
     public void addOrientation(){
-        UIController.getInstance().addGE(Orientation.class);
+        uic.addGE(Orientation.class);
     }
     
     public void addScale(){
-        UIController.getInstance().addGE(Scale.class);
+        uic.addGE(Scale.class);
     }
     
     public void addPicture(){
-        UIController.getInstance().addGE(Image.class);
+        uic.addGE(Image.class);
     }
     public void drawCircle(){
         //Unsupported yet
@@ -244,34 +236,34 @@ public class MainWindow extends JFrame implements MainFrameAction{
         //Unsupported yet
     }
     public void moveBack(){
-        UIController.getInstance().zindexChange(ZIndex.TO_BACK);
+        uic.zindexChange(ZIndex.TO_BACK);
     }
     public void moveDown(){
-        UIController.getInstance().zindexChange(ZIndex.BACK);
+        uic.zindexChange(ZIndex.BACK);
     }
     public void moveOn(){
-        UIController.getInstance().zindexChange(ZIndex.FRONT);
+        uic.zindexChange(ZIndex.FRONT);
     }
     public void moveFront(){
-        UIController.getInstance().zindexChange(ZIndex.TO_FRONT);
+        uic.zindexChange(ZIndex.TO_FRONT);
     }
     public void alignToLeft(){
-        UIController.getInstance().setAlign(Align.LEFT);
+        uic.setAlign(Align.LEFT);
     }
     public void alignToCenter(){
-        UIController.getInstance().setAlign(Align.CENTER);
+        uic.setAlign(Align.CENTER);
     }
     public void alignToRight(){
-        UIController.getInstance().setAlign(Align.RIGHT);
+        uic.setAlign(Align.RIGHT);
     }
     public void alignToBottom(){
-        UIController.getInstance().setAlign(Align.BOTTOM);
+        uic.setAlign(Align.BOTTOM);
     }
     public void alignToMiddle(){
-        UIController.getInstance().setAlign(Align.MIDDLE);
+        uic.setAlign(Align.MIDDLE);
     }
     public void alignToTop(){
-        UIController.getInstance().setAlign(Align.TOP);
+        uic.setAlign(Align.TOP);
     }
 
     @Override

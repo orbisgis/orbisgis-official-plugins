@@ -1,5 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -53,7 +54,7 @@ public final class FileListCA extends BaseListCA<File> implements RefreshCA{
      * If the file doesn't exist, it's path is removed from the list.
      */
     @Override
-    public void refresh() {
+    public void refresh(UIController uic) {
         List<File> listT = new ArrayList<>();
         //Add to a list all the wrong path
         for(File f : this.getValue()){

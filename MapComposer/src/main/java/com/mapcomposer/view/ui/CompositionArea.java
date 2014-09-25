@@ -10,9 +10,6 @@ import javax.swing.JScrollPane;
  * Area for the map document composition.
  */
 public class CompositionArea extends JPanel{
-    
-    /**Unique instance of the class.*/
-    private static CompositionArea INSTANCE=null;
     /**JscrollPane of the CompositionArea*/
     private JScrollPane pane;
     /**Main JPanel of the CompositionArea*/
@@ -21,24 +18,13 @@ public class CompositionArea extends JPanel{
     /**
      * Private constructor.
      */
-    private CompositionArea(){
+    public CompositionArea(){
         super(new BorderLayout());
         panel = new JPanel(null);
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.add(pane, BorderLayout.CENTER);
-    }
-    
-    /**
-     * Returns the unique instance of the class.
-     * @return The unique instance of the class.
-     */
-    public static CompositionArea getInstance(){
-        if(INSTANCE==null){
-            INSTANCE = new CompositionArea();
-        }
-        return INSTANCE;
     }
     
     /**

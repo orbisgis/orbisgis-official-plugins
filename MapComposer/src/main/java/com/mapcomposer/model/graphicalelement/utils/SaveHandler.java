@@ -118,10 +118,7 @@ public class SaveHandler {
             IBindingFactory bfact = BindingDirectory.getFactory(SaveHandler.class);
             IMarshallingContext mctx = bfact.createMarshallingContext();
             mctx.marshalDocument(this, "UTF-8", null, new FileOutputStream(path));
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Save done.");
         }
-        else
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Save abord.");
     }
     
     public void load() throws JiBXException, FileNotFoundException{
@@ -199,9 +196,6 @@ public class SaveHandler {
                         if(ge.getZ()==i)
                             list.add(new Image(ge));
             }
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Load done.");
         }
-        else
-            JOptionPane.showMessageDialog(MainWindow.getInstance(), "Load abord.");
     }
 }

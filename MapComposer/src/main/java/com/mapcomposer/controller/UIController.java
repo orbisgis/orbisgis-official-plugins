@@ -12,7 +12,6 @@ import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
-import com.mapcomposer.view.ui.CompositionArea;
 import com.mapcomposer.view.ui.MainWindow;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import com.mapcomposer.view.utils.DialogProperties;
@@ -31,8 +30,6 @@ import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
  * This class manager the interaction between the user, the UI and the data model.
  */
 public class UIController{
-    /**Unique instance of the class*/
-    private static UIController INSTANCE = null;
     
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private static LinkedHashMap<GraphicalElement, CompositionJPanel> map;
@@ -45,15 +42,22 @@ public class UIController{
     
     private static SaveHandler listGE;
     
+    private MainWindow mainWindow;
+    
     /**
      * Main constructor.
      */
-    private UIController(){
+    public UIController(){
         //Initialize the different attributes
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
         listGE = new SaveHandler();
+        mainWindow = new MainWindow(this);
+    }
+    
+    public MainWindow getMainWindow(){
+        return mainWindow;
     }
     
     /**
@@ -63,17 +67,6 @@ public class UIController{
      */
     public static CompositionJPanel getPanel(GraphicalElement ge){
         return map.get(ge);
-    }
-    
-    /**
-     * Returns the unique instance of the class.
-     * @return The unique instance of the class.
-     */
-    public static UIController getInstance(){
-        if(INSTANCE==null){
-            INSTANCE=new UIController();
-        }
-        return INSTANCE;
     }
     
     /**
@@ -136,7 +129,7 @@ public class UIController{
             zIndexStack.push(tempBack.pop());
         //Set the z-index of the GE from their stack position
         for(GraphicalElement g : zIndexStack){
-            CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
+            mainWindow.getCompositionArea().setZIndex(map.get(g), zIndexStack.indexOf(g));
         }
         validateSelectedGE();
     }
@@ -205,11 +198,11 @@ public class UIController{
                 if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
             }
         }
-        MainWindow.getInstance().setSpinner(boolX, x, Property.X);
-        MainWindow.getInstance().setSpinner(boolY, y, Property.Y);
-        MainWindow.getInstance().setSpinner(boolW, w, Property.WIDTH);
-        MainWindow.getInstance().setSpinner(boolH, h, Property.HEIGHT);
-        MainWindow.getInstance().setSpinner(boolR, r, Property.ROTATION);
+        mainWindow.setSpinner(boolX, x, Property.X);
+        mainWindow.setSpinner(boolY, y, Property.Y);
+        mainWindow.setSpinner(boolW, w, Property.WIDTH);
+        mainWindow.setSpinner(boolH, h, Property.HEIGHT);
+        mainWindow.setSpinner(boolR, r, Property.ROTATION);
     }
     
     /**
@@ -241,14 +234,14 @@ public class UIController{
      */
     public void remove(){
         for(GraphicalElement ge : selectedGE){
-            CompositionArea.getInstance().removeGE(map.get(ge));
+            mainWindow.getCompositionArea().removeGE(map.get(ge));
             map.remove(ge);
             zIndexStack.remove(ge);
         }
         for(GraphicalElement ge : zIndexStack)
-            CompositionArea.getInstance().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
+            mainWindow.getCompositionArea().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
-        CompositionArea.getInstance().refresh();
+        mainWindow.getCompositionArea().refresh();
     }
     
     
@@ -259,7 +252,7 @@ public class UIController{
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             if(ge instanceof SimpleDocumentGE)
-                CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+                mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         }
         //Unlock all the ConfigurationAttribute
         for(GraphicalElement ge : selectedGE){
@@ -276,13 +269,13 @@ public class UIController{
         }
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
         if(ge instanceof SimpleDocumentGE)
-            CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
 
         //Unlock all the ConfigurationAttribute
         for(ConfigurationAttribute ca : ge.getAllAttributes()){
             ca.setLock(false);
         }
-        CompositionArea.getInstance().refresh();
+        mainWindow.getCompositionArea().refresh();
     }
 
     /**
@@ -303,7 +296,7 @@ public class UIController{
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
                             if(ca instanceof RefreshCA){
-                                ((RefreshCA)ca).refresh();
+                                ((RefreshCA)ca).refresh(this);
                             }
                         }
                         break;
@@ -316,10 +309,10 @@ public class UIController{
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             if(ge instanceof Document){
                 document=true;
-                CompositionArea.getInstance().setDocumentDimension(((Document)zIndexStack.peek()).getFormat().getPixelDimension());
+                mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getFormat().getPixelDimension());
             }
         }
-        CompositionArea.getInstance().refresh();
+        mainWindow.getCompositionArea().refresh();
         if(document) unselectAllGE();
     }
     
@@ -337,7 +330,7 @@ public class UIController{
                 flag=false;
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
                     //refresh the attributes
-                    if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh();
+                    if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh(this);
                     
                     if(caList.isSameName(caGE)){
                         flag=true;
@@ -365,8 +358,8 @@ public class UIController{
         try {
             GraphicalElement ge = aClass.newInstance();
             //Register the GE and its CompositionJPanel.
-            map.put(ge, new CompositionJPanel(ge));
-            CompositionArea.getInstance().addGE(getPanel(ge));
+            map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+            mainWindow.getCompositionArea().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             zIndexStack.push(ge);
             //Refresh the GE and redraw it.
@@ -395,7 +388,7 @@ public class UIController{
      * Remove all the displayed GE from the panel.
      */
     public void removeAllGE() {
-        CompositionArea.getInstance().removeAllGE();
+        mainWindow.getCompositionArea().removeAllGE();
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
@@ -422,8 +415,8 @@ public class UIController{
     }
     
     private void addLoadedGE(GraphicalElement ge) {
-        map.put(ge, new CompositionJPanel(ge));
-        CompositionArea.getInstance().addGE(getPanel(ge));
+        map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+        mainWindow.getCompositionArea().addGE(getPanel(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
@@ -508,19 +501,18 @@ public class UIController{
     
     public void showProperties(){
         if(selectedGE.size()>0){
-            DialogProperties dp = new DialogProperties(getCommonAttributes());
+            DialogProperties dp = new DialogProperties(getCommonAttributes(), this);
             dp.setVisible(true);
         }
     }
     
     public void showDocProperties(){
         for(GraphicalElement ge : zIndexStack){
-            System.out.println(ge);
             if(ge instanceof Document){
                 for(GraphicalElement graph : selectedGE)
                     unselectGE(graph);
                 selectGE(ge);
-                DialogProperties dp = new DialogProperties(ge.getAllAttributes());
+                DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this);
                 dp.setVisible(true);
             }
         }

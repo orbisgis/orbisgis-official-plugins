@@ -1,5 +1,6 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
+import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -39,13 +40,21 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         else
             this.select(list.get(0));
         omc=new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
-        this.refresh();
+        
+        //Refresh of the file list
+        loadListFiles();
+        //Refresh of the selected file
+        try {
+            reloadSelectedOMC();
+        } catch (FileNotFoundException ex) {
+            //Show an alert message ?
+        }
     }
     
     public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
-    public void refresh() {
+    public void refresh(UIController uic) {
         //Refresh of the file list
         loadListFiles();
         //Refresh of the selected file
