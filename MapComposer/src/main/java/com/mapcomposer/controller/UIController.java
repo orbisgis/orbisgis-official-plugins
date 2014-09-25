@@ -9,6 +9,7 @@ import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import com.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import com.mapcomposer.view.ui.CompositionArea;
@@ -204,11 +205,11 @@ public class UIController{
                 if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
             }
         }
-        MainWindow.getInstance().setSpinnerX(boolX, x);
-        MainWindow.getInstance().setSpinnerY(boolY, y);
-        MainWindow.getInstance().setSpinnerW(boolW, w);
-        MainWindow.getInstance().setSpinnerH(boolH, h);
-        MainWindow.getInstance().setSpinnerR(boolR, r);
+        MainWindow.getInstance().setSpinner(boolX, x, Property.X);
+        MainWindow.getInstance().setSpinner(boolY, y, Property.Y);
+        MainWindow.getInstance().setSpinner(boolW, w, Property.WIDTH);
+        MainWindow.getInstance().setSpinner(boolH, h, Property.HEIGHT);
+        MainWindow.getInstance().setSpinner(boolR, r, Property.ROTATION);
     }
     
     /**
