@@ -11,6 +11,8 @@ import java.awt.Rectangle;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import static java.lang.Thread.sleep;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -33,11 +35,13 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
     /**Y initial position when user want to move the panel.*/
     private int startY;
     /**Type of move the user want to do.*/
-    private char moveMod;
+    private enum MoveMod{TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, CENTER, NONE;}
     
-    private UIController uic;
+    private MoveMod moveMod;
+            
+    private final UIController uic;
     
-    private CompositionArea compArea;
+    private final CompositionArea compArea;
     
     /**
      * Main constructor.
@@ -47,7 +51,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         super(new BorderLayout());
         this.uic=uic;
         this.compArea=compArea;
-        moveMod = 0;
+        moveMod = MoveMod.NONE;
         this.ge=ge;
         panel=new JPanel();
         selected = false;
@@ -101,94 +105,98 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
 
     @Override
     public void mousePressed(MouseEvent me) {
+        double rad = Math.toRadians(ge.getRotation());
+        double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        
         startX = me.getLocationOnScreen().x;
         startY = me.getLocationOnScreen().y;
         
         if((me.getY()>=0 && me.getY()<=10) && (me.getX()>=0 && me.getX()<=10)){
-            moveMod=2;
+            moveMod=MoveMod.TOP_LEFT;
             this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
         }
-        else if((me.getX()>=0 && me.getX()<=10) && (me.getY()>=ge.getHeight()-10 && me.getY()<=ge.getHeight())){
-            moveMod=4;
+        else if((me.getX()>=0 && me.getX()<=10) && (me.getY()>=newHeight-10 && me.getY()<=newHeight)){
+            moveMod=MoveMod.BOTTOM_LEFT;
             this.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
         }
-        else if((me.getY()>=ge.getHeight()-10 && me.getY()<=ge.getHeight()) &&
-                (me.getX()>=ge.getWidth()-10 && me.getX()<=ge.getWidth())){
-            moveMod=6;
+        else if((me.getY()>=newHeight-10 && me.getY()<=newHeight) &&
+                (me.getX()>=newWidth-10 && me.getX()<=newWidth)){
+            moveMod=MoveMod.BOTTOM_RIGHT;
             this.setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
         }
-        else if((me.getX()>=ge.getWidth()-10 && me.getX()<=ge.getWidth()) && (me.getY()>=0 && me.getY()<=10)){
-            moveMod=8;
+        else if((me.getX()>=newWidth-10 && me.getX()<=newWidth) && (me.getY()>=0 && me.getY()<=10)){
+            moveMod=MoveMod.TOP_RIGHT;
             this.setCursor(new Cursor(Cursor.NE_RESIZE_CURSOR));
         }
         else if(me.getY()>=0 && me.getY()<=10){
-            moveMod=1;
+            moveMod=MoveMod.TOP;
             this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
         }
         else if(me.getX()>=0 && me.getX()<=10){
-            moveMod=3;
+            moveMod=MoveMod.LEFT;
             this.setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
         }
-        else if(me.getY()>=ge.getHeight()-10 && me.getY()<=ge.getHeight()){
-            moveMod=5;
+        else if(me.getY()>=newHeight-10 && me.getY()<=newHeight){
+            moveMod=MoveMod.BOTTOM;
             this.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
         }
-        else if(me.getX()>=ge.getWidth()-10 && me.getX()<=ge.getWidth()){
-            moveMod=7;
+        else if(me.getX()>=newWidth-10 && me.getX()<=newWidth){
+            moveMod=MoveMod.RIGHT;
             this.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         }
         else{
             this.setCursor(new Cursor(Cursor.MOVE_CURSOR));
-            moveMod=9;
+            moveMod=MoveMod.CENTER;
         }
     }
 
     @Override
     public void mouseReleased(MouseEvent me) {
         switch(moveMod){
-            case 1:
+            case TOP:
                 ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
                 ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 2:
+            case TOP_LEFT:
                 ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
                 ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
                 ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
                 ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 3:
+            case LEFT:
                 ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
                 ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
                 panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
                 break;
-            case 4:
+            case BOTTOM_LEFT:
                 ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
                 ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
                 ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 5:
+            case BOTTOM:
                 ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 6:
+            case BOTTOM_RIGHT:
                 ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
                 ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
                 panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
                 break;
-            case 7:
+            case RIGHT:
                 ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 8 :
+            case TOP_RIGHT :
                 ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
                 ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
                 ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
                 panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
                 break;
-            case 9:
+            case CENTER:
                 ge.setX(ge.getX()-startX+me.getLocationOnScreen().x);
                 ge.setY(ge.getY()-startY+me.getLocationOnScreen().y);
                 this.panel.setLocation(ge.getX(), ge.getY());
@@ -204,7 +212,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
             uic.unselectGE(ge);
         }
         setBorders();
-        moveMod=0;
+        moveMod=MoveMod.NONE;
         
         this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
         this.revalidate();
@@ -219,7 +227,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
 
     @Override
     public void mouseDragged(MouseEvent me) {
-        if(moveMod==9){
+        if(moveMod==MoveMod.CENTER){
             panel.setLocation(ge.getX()-(startX-me.getLocationOnScreen().x), ge.getY()-(startY-me.getLocationOnScreen().y));
         }
     }
@@ -228,17 +236,22 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
     public void mouseMoved(MouseEvent me) {
         int x = me.getX();
         int y = me.getY();
+        //Need to recalculate the GE width and height beacause of the rotation
+        double rad = Math.toRadians(ge.getRotation());
+        double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        
         if((y>=0 && y<=10) && (x>=0 && x<=10)){
             this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
         }
-        else if((x>=0 && x<=10) && (y>=ge.getHeight()-5 && y<=ge.getHeight())){
+        else if((x>=0 && x<=10) && (y>=newHeight-5 && y<=newHeight)){
             this.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
         }
-        else if((y>=ge.getHeight()-10 && y<=ge.getHeight()) &&
-                (x>=ge.getWidth()-10 && x<=ge.getWidth())){
+        else if((y>=newHeight-10 && y<=newHeight) &&
+                (x>=newWidth-10 && x<=newWidth)){
             this.setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
         }
-        else if((x>=ge.getWidth()-10 && x<=ge.getWidth()) && (y>=0 && y<=10)){
+        else if((x>=newWidth-10 && x<=newWidth) && (y>=0 && y<=10)){
             this.setCursor(new Cursor(Cursor.NE_RESIZE_CURSOR));
         }
         else if(x>=0 && y<=10){
@@ -247,10 +260,10 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         else if(x>=0 && x<=10){
             this.setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
         }
-        else if(y>=ge.getHeight()-5 && y<=ge.getHeight()){
+        else if(y>=newHeight-5 && y<=newHeight){
             this.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
         }
-        else if(x>=ge.getWidth()-5 && x<=ge.getWidth()){
+        else if(x>=newWidth-5 && x<=newWidth){
             this.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
         }
         else{
