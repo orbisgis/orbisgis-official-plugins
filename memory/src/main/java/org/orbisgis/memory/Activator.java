@@ -28,7 +28,8 @@
  */
 package org.orbisgis.memory;
 
-import org.orbisgis.view.docking.DockingPanel;
+
+import org.orbisgis.viewapi.docking.DockingPanel;
 import org.osgi.framework.BundleActivator;
 import org.osgi.framework.BundleContext;
 
