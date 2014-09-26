@@ -79,6 +79,15 @@ public class SimpleDocumentGE extends SimpleGE implements GERefresh{
      * @param o New document orientation.
      */
     public void setOrientation(String o){orientation.select(o);}
+    
+    public Dimension getDimension(){
+        Dimension dim;
+        if(orientation.getSelected().equals("Portrait"))
+            dim = new Dimension(Format.getByName(format.getSelected()).getPixelWidth(), Format.getByName(format.getSelected()).getPixelHeight());
+        else
+            dim = new Dimension(Format.getByName(format.getSelected()).getPixelHeight(), Format.getByName(format.getSelected()).getPixelWidth());
+        return dim;
+    }
 
     @Override
     public void refresh() {

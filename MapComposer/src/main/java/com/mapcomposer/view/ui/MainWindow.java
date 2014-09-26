@@ -203,7 +203,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
         uic.showDocProperties();
     }
     
+    //change to handler
     public void exportComposer(){
+        uic.export();
     }
     
     public void addMap(){

@@ -12,17 +12,30 @@ import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
+import com.mapcomposer.model.utils.LinkToOrbisGIS;
 import com.mapcomposer.view.ui.MainWindow;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import com.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -309,7 +322,7 @@ public class UIController{
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             if(ge instanceof Document){
                 document=true;
-                mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getFormat().getPixelDimension());
+                mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
             }
         }
         mainWindow.getCompositionArea().refresh();
@@ -546,6 +559,37 @@ public class UIController{
                     break;
             }
             validateGE(ge);
+        }
+    }
+    
+    public void export(){
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
+        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
+        fc.setDialogTitle("Export document into PNG");
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setFileFilter(new FileFilter() {
+
+            @Override public boolean accept(File file) {
+                if(file.isDirectory()) return true;
+                return file.getAbsolutePath().toLowerCase().contains(".png");
+            }
+
+            @Override public String getDescription() {return "PNG Files (.png)";}
+        });
+        //If the save is validated, do the marshall
+        if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
+            String path;
+            if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
+                path=fc.getSelectedFile().getAbsolutePath();
+            else 
+                path=fc.getSelectedFile().getAbsolutePath()+".png";
+
+            try{
+                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+            } catch (IOException ex) {
+                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            }
         }
     }
 }
