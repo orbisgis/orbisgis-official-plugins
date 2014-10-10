@@ -1,14 +1,11 @@
 package com.mapcomposer.model.configurationattribute.attribute;
 
-import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import java.io.File;
 
 /**
  * The Source attribute contain the path to a specified data source like OWS-Context, data, image ...
  */
-public final class SourceCA extends BaseCA<String> implements RefreshCA{
+public final class SourceCA extends BaseCA<String>{
     /** Property itself */
     private String value;
     
@@ -20,13 +17,5 @@ public final class SourceCA extends BaseCA<String> implements RefreshCA{
 
     @Override public boolean isSameValue(ConfigurationAttribute ca) {
         return ca.getValue().equals(value);
-    }
-
-    @Override
-    public void refresh(UIController uic) {
-        File f = new File(this.getValue());
-        if(!f.exists()){
-           System.out.println("Cannot load the file '"+this.getValue()+"'.");
-        }
     }
 }
