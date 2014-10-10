@@ -65,13 +65,13 @@
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>core-jdbc</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>5.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>
             <artifactId>mapeditor</artifactId>
-            <version>4.1.0-SNAPSHOT</version>
+            <version>5.0.0-SNAPSHOT</version>
             <type>jar</type>
         </dependency>
         <dependency>
