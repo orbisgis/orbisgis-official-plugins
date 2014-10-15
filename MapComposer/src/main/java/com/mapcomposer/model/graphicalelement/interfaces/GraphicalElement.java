@@ -88,4 +88,6 @@ public interface GraphicalElement {
      * @return List of all the attributes.
      */
     public List<ConfigurationAttribute> getAllAttributes();
+    
+    public enum Property{X, Y, WIDTH, HEIGHT, ROTATION;}
 }

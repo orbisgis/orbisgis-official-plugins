@@ -6,6 +6,8 @@
 
 package com.mapcomposer.model.configurationattribute.interfaces;
 
+import com.mapcomposer.controller.UIController;
+
 /**
  * Interface for the ConfigurationAttribute to define the refresh method that will be called to refresh the value contained.
  */
@@ -13,5 +15,5 @@ public interface RefreshCA {
     /**
      * Refresh function.
      */
-    public void refresh();
+    public void refresh(UIController uic);
 }

@@ -48,14 +48,14 @@ public class MapImageListCA extends BaseListCA<SimpleMapImageGE> implements Refr
      * If the file doesn't exist, it's path is removed from the list.
      */
     @Override
-    public void refresh() {
+    public void refresh(UIController uic) {
         for(SimpleMapImageGE mi : this.getValue()){
-            if(!UIController.getInstance().getGEMap().containsKey(mi)){
+            if(!uic.getGEMap().containsKey(mi)){
                 this.remove(((SimpleMapImageGE)mi));
             }
         }
         
-        for(Object ge : UIController.getInstance().getGEMap().keySet().toArray()){
+        for(Object ge : uic.getGEMap().keySet().toArray()){
             if(ge instanceof MapImage){
                 if(!this.getValue().contains((SimpleMapImageGE)ge)){
                     this.add(((MapImage)ge));

@@ -4,10 +4,10 @@ import com.mapcomposer.controller.UIController;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import com.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import com.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
 import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
+import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -25,13 +25,10 @@ public class LinkToMapImageRenderer implements CARenderer{
         final MapImageListCA milka = (MapImageListCA)ca;
         
         pan.add(new JLabel(milka.getName()));
-        final JComboBox list = new JComboBox(milka.getValue().toArray(new MapImage[0]));
-        list.addActionListener(new ActionListener() {
-            @Override public void actionPerformed(ActionEvent ae) {
-                System.out.println("action : "+ae.getActionCommand());
-                UIController.getInstance().getGEMap().get(list.getModel().getSelectedItem()).hightlight();
-            }
-        });
+        ArrayList<String> names = new ArrayList<>();
+        for(SimpleMapImageGE mi : milka.getValue())
+            names.add(mi.getOwsMapContext().getTitle());
+        final JComboBox list = new JComboBox(names.toArray());
         pan.add(list);
         return pan;
     }
@@ -43,9 +40,11 @@ public class LinkToMapImageRenderer implements CARenderer{
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 int i=1;
-                for(Object ge : UIController.getInstance().getGEMap().keySet().toArray()){
+                for(SimpleMapImageGE ge : milka.getValue()){
                     System.out.println(ge);
-                    if(ge instanceof MapImage){
+                    if(ge.getOwsMapContext().getTitle().equals(((JComboBox)c).getSelectedItem()))
+                        milka.select(((MapImage)ge));
+                    /*if(ge instanceof MapImage){
                         System.out.println("mapImage");
                         if(i==((JComboBox)c).getItemCount()){
                             milka.select(((MapImage)ge));
@@ -53,7 +52,7 @@ public class LinkToMapImageRenderer implements CARenderer{
                             break;
                         }
                         i++;
-                    }
+                    }*/
                 }
             }
         }

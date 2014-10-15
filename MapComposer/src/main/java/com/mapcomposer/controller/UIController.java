@@ -1,33 +1,48 @@
 package com.mapcomposer.controller;
 
+import static com.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import com.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import com.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import com.mapcomposer.model.graphicalelement.element.Document;
 import com.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import com.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
-import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.interfaces.GERefresh;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import com.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
+import com.mapcomposer.model.graphicalelement.utils.GEManager;
 import com.mapcomposer.model.graphicalelement.utils.SaveHandler;
-import com.mapcomposer.view.ui.CompositionArea;
-import com.mapcomposer.view.ui.ConfigurationShutter;
+import com.mapcomposer.model.utils.LinkToOrbisGIS;
+import com.mapcomposer.view.ui.MainWindow;
 import com.mapcomposer.view.utils.CompositionJPanel;
+import com.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Stack;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import javax.imageio.ImageIO;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
+import javax.swing.filechooser.FileFilter;
+import org.jibx.runtime.BindingDirectory;
+import org.jibx.runtime.IBindingFactory;
+import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
  */
 public class UIController{
-    /**Unique instance of the class*/
-    private static UIController INSTANCE = null;
     
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private static LinkedHashMap<GraphicalElement, CompositionJPanel> map;
@@ -40,15 +55,22 @@ public class UIController{
     
     private static SaveHandler listGE;
     
+    private MainWindow mainWindow;
+    
     /**
      * Main constructor.
      */
-    private UIController(){
+    public UIController(){
         //Initialize the different attributes
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
         listGE = new SaveHandler();
+        mainWindow = new MainWindow(this);
+    }
+    
+    public MainWindow getMainWindow(){
+        return mainWindow;
     }
     
     /**
@@ -61,29 +83,10 @@ public class UIController{
     }
     
     /**
-     * Returns the unique instance of the class.
-     * @return The unique instance of the class.
-     */
-    public static UIController getInstance(){
-        if(INSTANCE==null){
-            INSTANCE=new UIController();
-        }
-        return INSTANCE;
-    }
-    
-    public final static int toFront=2;
-    public final static int front=1;
-    public final static int back=-1;
-    public final static int toBack=-2;
-    /**
      * Change the Z-index of the displayed GraphicalElement.
-     * -2 means the GE are brought to the back,
-     * -1 means the GE are brought one step to the back
-     * 1 means the GE are brought one step to the front
-     * 2 means the GE are brought to the front.
-     * @param deltaZ Change of the Z-index.
+     * @param z Change of the Z-index.
      */
-    public void zindexChange(int deltaZ){
+    public void zindexChange(ZIndex z){
         Stack<GraphicalElement> temp = new Stack<>();
         Stack<GraphicalElement> tempBack = new Stack<>();
         Stack<GraphicalElement> tempFront = new Stack<>();
@@ -109,22 +112,22 @@ public class UIController{
         //Move the others GE
         for(GraphicalElement ge : selectedGE){
             if(zIndexStack.contains(ge)){
-                switch (deltaZ){
-                    case toBack:
+                switch (z){
+                    case TO_BACK:
                         temp.push(ge);
                         toBackFront(ge, temp);
                         break;
-                    case toFront:
+                    case TO_FRONT:
                         toBackFront(ge, temp);
                         temp.push(ge);
                         break;
-                    case front:
+                    case FRONT:
                         if(zIndexStack.indexOf(ge)>0)
-                            backFront(deltaZ, ge, temp);
+                            backFront(1, ge, temp);
                         break;
-                    case back:
+                    case BACK:
                         if(zIndexStack.indexOf(ge)<zIndexStack.size()-1)
-                            backFront(deltaZ, ge, temp);
+                            backFront(-1, ge, temp);
                         break;
                 }
             }
@@ -139,8 +142,9 @@ public class UIController{
             zIndexStack.push(tempBack.pop());
         //Set the z-index of the GE from their stack position
         for(GraphicalElement g : zIndexStack){
-            CompositionArea.getInstance().setZIndex(map.get(g), zIndexStack.indexOf(g));
+            mainWindow.getCompositionArea().setZIndex(map.get(g), zIndexStack.indexOf(g));
         }
+        validateSelectedGE();
     }
     
     /**
@@ -187,7 +191,31 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
-        ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
+        refreshSpin();
+    }
+    
+    public void refreshSpin(){
+        boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
+        int x=0, y=0, w=0, h=0, r=0; 
+        if(!selectedGE.isEmpty()){
+            x=selectedGE.get(0).getX();
+            y=selectedGE.get(0).getY();
+            w=selectedGE.get(0).getWidth();
+            h=selectedGE.get(0).getHeight();
+            r=selectedGE.get(0).getRotation();
+            for(GraphicalElement graph : selectedGE){
+                if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
+                if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
+                if(w!=graph.getWidth()){ boolW=true;w=selectedGE.get(0).getWidth();}
+                if(h!=graph.getHeight()){ boolH=true;h=selectedGE.get(0).getHeight();}
+                if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
+            }
+        }
+        mainWindow.setSpinner(boolX, x, Property.X);
+        mainWindow.setSpinner(boolY, y, Property.Y);
+        mainWindow.setSpinner(boolW, w, Property.WIDTH);
+        mainWindow.setSpinner(boolH, h, Property.HEIGHT);
+        mainWindow.setSpinner(boolR, r, Property.ROTATION);
     }
     
     /**
@@ -195,11 +223,23 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
+        for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            ca.setLock(false);
+        }
         selectedGE.remove(ge);
-        if(selectedGE.isEmpty())
-            ConfigurationShutter.getInstance().eraseConfiguration();
-        else
-            ConfigurationShutter.getInstance().dispalyConfiguration(getCommonAttributes());
+        refreshSpin();
+    }
+    
+    
+    public void unselectAllGE(){
+        List<GraphicalElement> temp = Arrays.asList(selectedGE.toArray());
+        for(GraphicalElement ge : temp){
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                ca.setLock(false);
+            }
+            selectedGE.remove(ge);
+        }
+        refreshSpin();
     }
     
     /**
@@ -207,14 +247,48 @@ public class UIController{
      */
     public void remove(){
         for(GraphicalElement ge : selectedGE){
-            CompositionArea.getInstance().removeGE(map.get(ge));
+            mainWindow.getCompositionArea().removeGE(map.get(ge));
             map.remove(ge);
             zIndexStack.remove(ge);
         }
         for(GraphicalElement ge : zIndexStack)
-            CompositionArea.getInstance().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
-        selectedGE= new ArrayList<>();
-        ConfigurationShutter.getInstance().eraseConfiguration();
+            mainWindow.getCompositionArea().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
+        selectedGE=new ArrayList<>();
+        mainWindow.getCompositionArea().refresh();
+    }
+    
+    
+    public void validateSelectedGE(){
+        for(GraphicalElement ge : selectedGE){
+            if(ge instanceof GERefresh){
+                ((GERefresh)ge).refresh();
+            }
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            if(ge instanceof SimpleDocumentGE)
+                mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        }
+        //Unlock all the ConfigurationAttribute
+        for(GraphicalElement ge : selectedGE){
+            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                ca.setLock(false);
+            }
+        }
+        refreshSpin();
+    }
+    
+    public void validateGE(GraphicalElement ge){
+        if(ge instanceof GERefresh){
+            ((GERefresh)ge).refresh();
+        }
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        if(ge instanceof SimpleDocumentGE)
+            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+
+        //Unlock all the ConfigurationAttribute
+        for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            ca.setLock(false);
+        }
+        mainWindow.getCompositionArea().refresh();
     }
 
     /**
@@ -223,6 +297,7 @@ public class UIController{
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
+        boolean document = false;
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
             //Takes each ConfigurationAttribute from the GraphicalElement
@@ -234,28 +309,24 @@ public class UIController{
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
                             if(ca instanceof RefreshCA){
-                                ((RefreshCA)ca).refresh();
+                                ((RefreshCA)ca).refresh(this);
                             }
                         }
                         break;
                     }
                 }
             }
-            //Refreshes the GraphicalElement
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-            if(ge instanceof SimpleDocumentGE)
-                CompositionArea.getInstance().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-        }
-        //Unlock all the ConfigurationAttribute
-        for(GraphicalElement ge : selectedGE){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
+            if(ge instanceof Document){
+                document=true;
+                mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
             }
         }
-        selectedGE=new ArrayList<>();
+        mainWindow.getCompositionArea().refresh();
+        if(document) unselectAllGE();
     }
     
     /**
@@ -272,7 +343,7 @@ public class UIController{
                 flag=false;
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
                     //refresh the attributes
-                    if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh();
+                    if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh(this);
                     
                     if(caList.isSameName(caGE)){
                         flag=true;
@@ -300,19 +371,20 @@ public class UIController{
         try {
             GraphicalElement ge = aClass.newInstance();
             //Register the GE and its CompositionJPanel.
-            map.put(ge, new CompositionJPanel(ge));
-            CompositionArea.getInstance().addGE(getPanel(ge));
+            map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+            mainWindow.getCompositionArea().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             zIndexStack.push(ge);
             //Refresh the GE and redraw it.
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
+            List<GraphicalElement> temp = selectedGE;
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
-            zindexChange(toFront);
-            validate(ge.getAllAttributes());
-            this.selectGE(ge);
+            zindexChange(TO_FRONT);
+            validateGE(ge);
+            selectedGE=temp;
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -329,7 +401,7 @@ public class UIController{
      * Remove all the displayed GE from the panel.
      */
     public void removeAllGE() {
-        CompositionArea.getInstance().removeAllGE();
+        mainWindow.getCompositionArea().removeAllGE();
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
@@ -356,15 +428,168 @@ public class UIController{
     }
     
     private void addLoadedGE(GraphicalElement ge) {
-        map.put(ge, new CompositionJPanel(ge));
-        CompositionArea.getInstance().addGE(getPanel(ge));
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-        zIndexStack.push(ge);
+        map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+        mainWindow.getCompositionArea().addGE(getPanel(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
-        zindexChange(toFront);
-        validate(ge.getAllAttributes());
+        zindexChange(TO_FRONT);
+        validateGE(ge);
+    }
+    
+    public void setAlign( Align a) {
+        if(selectedGE.size()>0){
+            int xMin;
+            int xMax;
+            int yMin;
+            int yMax;
+            switch(a){
+                case LEFT:
+                    xMin=selectedGE.get(0).getX();
+                    for (GraphicalElement ge : selectedGE){
+                        if (ge.getX() < xMin)
+                            xMin = ge.getX();
+                    }
+                    for(GraphicalElement ge : selectedGE){
+                        ge.setX(xMin);
+                    }
+                    break;
+                case CENTER:
+                    xMin=selectedGE.get(0).getX();
+                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    for (GraphicalElement ge : selectedGE) {
+                        if (ge.getX() < xMin)
+                            xMin = ge.getX();
+                        if (ge.getX()+ge.getWidth() > xMax)
+                            xMax = ge.getX()+ge.getWidth();
+                    }
+                    int xMid = (xMax+xMin)/2;
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setX(xMid-ge.getWidth()/2);
+                    break;
+                case RIGHT:
+                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getX()+ge.getWidth() > xMax)
+                            xMax = ge.getX()+ge.getWidth();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setX(xMax-ge.getWidth());
+                    break;
+                case TOP:
+                    yMin=selectedGE.get(0).getY();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getY() < yMin)
+                            yMin = ge.getY();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMin);
+                    break;
+                case MIDDLE:
+                    yMin=selectedGE.get(0).getY();
+                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    for (GraphicalElement ge : selectedGE) {
+                        if (ge.getY() < yMin)
+                            yMin = ge.getY();
+                        if (ge.getY()+ge.getHeight() > yMax)
+                            yMax = ge.getY()+ge.getHeight();
+                    }
+                    int yMid = (yMax+yMin)/2;
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMid-ge.getHeight()/2);
+                    break;
+                case BOTTOM:
+                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    for (GraphicalElement ge : selectedGE)
+                        if (ge.getY()+ge.getHeight() > yMax)
+                            yMax = ge.getY()+ge.getHeight();
+                    for(GraphicalElement ge : selectedGE)
+                        ge.setY(yMax-ge.getHeight());
+                    break;
+            }
+            validateSelectedGE();
+        }
+    }
+    
+    public void showProperties(){
+        if(selectedGE.size()>0){
+            DialogProperties dp = new DialogProperties(getCommonAttributes(), this);
+            dp.setVisible(true);
+        }
+    }
+    
+    public void showDocProperties(){
+        for(GraphicalElement ge : zIndexStack){
+            if(ge instanceof Document){
+                for(GraphicalElement graph : selectedGE)
+                    unselectGE(graph);
+                selectGE(ge);
+                DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this);
+                dp.setVisible(true);
+            }
+        }
+    }
+    
+    public enum ZIndex{
+        TO_FRONT, FRONT, BACK, TO_BACK;
+    }
+    
+    public enum Align{
+        LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
+    }
+    
+    public void changeProperty(GraphicalElement.Property prop, int i){
+        for(GraphicalElement ge : selectedGE){
+            switch(prop){
+                case X:
+                    ge.setX(i);
+                    break;
+                case Y:
+                    ge.setY(i);
+                    break;
+                case WIDTH:
+                    ge.setWidth(i);
+                    break;
+                case HEIGHT:
+                    ge.setHeight(i);
+                    break;
+                case ROTATION:
+                    ge.setRotation(i);
+                    break;
+            }
+            validateGE(ge);
+        }
+    }
+    
+    public void export(){
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
+        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
+        fc.setDialogTitle("Export document into PNG");
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setFileFilter(new FileFilter() {
+
+            @Override public boolean accept(File file) {
+                if(file.isDirectory()) return true;
+                return file.getAbsolutePath().toLowerCase().contains(".png");
+            }
+
+            @Override public String getDescription() {return "PNG Files (.png)";}
+        });
+        //If the save is validated, do the marshall
+        if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
+            String path;
+            if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
+                path=fc.getSelectedFile().getAbsolutePath();
+            else 
+                path=fc.getSelectedFile().getAbsolutePath()+".png";
+
+            try{
+                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+            } catch (IOException ex) {
+                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            }
+        }
     }
 }

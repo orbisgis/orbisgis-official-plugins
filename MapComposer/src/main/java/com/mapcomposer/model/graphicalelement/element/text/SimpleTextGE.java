@@ -82,7 +82,6 @@ public class SimpleTextGE extends SimpleGE{
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
-        list.addAll( super.getAllAttributes());
         list.add(font);
         list.add(colorBack);
         list.add(colorText);

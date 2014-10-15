@@ -3,6 +3,8 @@ package com.mapcomposer.view.ui;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
+import java.awt.Graphics;
+import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 
@@ -10,35 +12,24 @@ import javax.swing.JScrollPane;
  * Area for the map document composition.
  */
 public class CompositionArea extends JPanel{
-    
-    /**Unique instance of the class.*/
-    private static CompositionArea INSTANCE=null;
     /**JscrollPane of the CompositionArea*/
     private JScrollPane pane;
     /**Main JPanel of the CompositionArea*/
     private final JPanel panel;
     
+    private Dimension dim;
+    
     /**
      * Private constructor.
      */
-    private CompositionArea(){
+    public CompositionArea(){
         super(new BorderLayout());
+        dim=new Dimension(50, 50);
         panel = new JPanel(null);
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.add(pane, BorderLayout.CENTER);
-    }
-    
-    /**
-     * Returns the unique instance of the class.
-     * @return The unique instance of the class.
-     */
-    public static CompositionArea getInstance(){
-        if(INSTANCE==null){
-            INSTANCE = new CompositionArea();
-        }
-        return INSTANCE;
     }
     
     /**
@@ -58,6 +49,7 @@ public class CompositionArea extends JPanel{
             this.panel.remove(panel);
         this.panel.repaint();
         this.panel.revalidate();
+        refresh();
     }
     
     /**
@@ -66,7 +58,10 @@ public class CompositionArea extends JPanel{
      * @param dim Dimension of the document.
      */
     public void setDocumentDimension(Dimension dim){
+        this.dim=dim;
         this.panel.setPreferredSize(dim);
+        this.revalidate();
+        this.repaint();
     }
 
     /**
@@ -85,5 +80,18 @@ public class CompositionArea extends JPanel{
         panel.removeAll();
         this.repaint();
         this.revalidate();
+    }
+    
+    public void refresh(){
+        panel.revalidate();
+        panel.repaint();
+    }
+    
+    public BufferedImage getDocBufferedImage(){
+        BufferedImage bi = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        panel.paint(g);
+        g.dispose();
+        return bi;
     }
 }
