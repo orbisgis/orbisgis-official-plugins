@@ -1,5 +1,6 @@
 package org.orbisgis.mailto;
 
+import org.orbisgis.coreapi.workspace.CoreWorkspace;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.sqlconsole.ui.ext.SQLAction;
 import org.orbisgis.viewapi.sqlconsole.ui.ext.SQLConsoleEditor;
@@ -28,8 +29,9 @@ import java.util.List;
 public class MailToExt implements SQLAction {
     private static final I18n I18N = I18nFactory.getI18n(MailToExt.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MailToExt.class);
-    public static final String A_MAILTO = "A_MAILTO";
-    private static final String DEFAULT_SUBJECT = "SQL Script";
+    public static final String A_MAILTO = "A_MAILTO";Syntax highlighting
+    private static final String DEFAULT_SUBJECT = "SQL Script from OrbisGIS "
+            + CoreWorkspace.MAJOR_VERSION + "." + CoreWorkspace.MINOR_VERSION + "." + CoreWorkspace.REVISION_VERSION;
 
     @Override
     public List<Action> createActions(SQLConsoleEditor sqlConsoleEditor) {
