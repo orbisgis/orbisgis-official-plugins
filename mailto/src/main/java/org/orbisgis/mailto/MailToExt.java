@@ -29,7 +29,7 @@ import java.util.List;
 public class MailToExt implements SQLAction {
     private static final I18n I18N = I18nFactory.getI18n(MailToExt.class);
     private static final Logger LOGGER = LoggerFactory.getLogger(MailToExt.class);
-    public static final String A_MAILTO = "A_MAILTO";Syntax highlighting
+    public static final String A_MAILTO = "A_MAILTO";
     private static final String DEFAULT_SUBJECT = "SQL Script from OrbisGIS "
             + CoreWorkspace.MAJOR_VERSION + "." + CoreWorkspace.MINOR_VERSION + "." + CoreWorkspace.REVISION_VERSION;
 
