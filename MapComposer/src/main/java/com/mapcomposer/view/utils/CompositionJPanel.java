@@ -285,4 +285,12 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
             Logger.getLogger(CompositionJPanel.class.getName()).log(Level.SEVERE, null, ex);
         }
     }
+    
+    /**
+     * Unselect the CompositionJPanel (remove the orange borders).
+     */
+    public void unselect(){
+        this.selected=false;
+        setBorders();
+    }
 }

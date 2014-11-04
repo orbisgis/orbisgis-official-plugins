@@ -243,7 +243,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void newComposer(){
         uic.removeAllGE();
         uic.addGE(Document.class);
-        uic.showDocProperties();
     }
     
     //change to handler

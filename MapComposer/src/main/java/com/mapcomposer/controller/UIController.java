@@ -17,11 +17,8 @@ import com.mapcomposer.view.ui.MainWindow;
 import com.mapcomposer.view.utils.CompositionJPanel;
 import com.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -33,9 +30,6 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IMarshallingContext;
 import org.jibx.runtime.JiBXException;
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
@@ -230,16 +224,23 @@ public class UIController{
         refreshSpin();
     }
     
-    
+    /**
+     * Unselect all the GraphicalElement.
+     * Reset the selectedGE list and unselect all the CompositionJPanel in the compositionArea.
+     */
     public void unselectAllGE(){
         List<GraphicalElement> temp = Arrays.asList(selectedGE.toArray());
+        //Unlock all the ConfigurationAttributes
         for(GraphicalElement ge : temp){
             for(ConfigurationAttribute ca : ge.getAllAttributes()){
                 ca.setLock(false);
             }
-            selectedGE.remove(ge);
         }
         refreshSpin();
+        //Unselect all the GraphicalElements
+        for(GraphicalElement ge : selectedGE)
+            map.get(ge).unselect();
+        selectedGE= new ArrayList<>();
     }
     
     /**
@@ -326,7 +327,7 @@ public class UIController{
             }
         }
         mainWindow.getCompositionArea().refresh();
-        if(document) unselectAllGE();
+        unselectAllGE();
     }
     
     /**
@@ -369,22 +370,30 @@ public class UIController{
      */
     public void addGE(Class<? extends GraphicalElement> aClass) {
         try {
+            //Creates the GraphicalElement.
             GraphicalElement ge = aClass.newInstance();
-            //Register the GE and its CompositionJPanel.
+            
+            //Registers the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
             mainWindow.getCompositionArea().addGE(getPanel(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
             zIndexStack.push(ge);
-            //Refresh the GE and redraw it.
+            
+            //Refreshes the GE.
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
-            List<GraphicalElement> temp = selectedGE;
+            
+            //Selects only the GE
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
+            
+            //Bring it to the front an validate its default properties.
             zindexChange(TO_FRONT);
             validateGE(ge);
-            selectedGE=temp;
+            
+            //Show the configuration dialog
+            showProperties();
         } catch (InstantiationException | IllegalAccessException ex) {
             Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
         }
@@ -514,7 +523,8 @@ public class UIController{
     
     public void showProperties(){
         if(selectedGE.size()>0){
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, true);
+            //If the only one GraphicalElement is selected, the locking checkboxes are hidden
+            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
             dp.setVisible(true);
         }
     }
