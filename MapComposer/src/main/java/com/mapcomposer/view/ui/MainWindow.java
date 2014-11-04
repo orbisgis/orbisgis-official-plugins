@@ -18,6 +18,7 @@ import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -40,6 +41,7 @@ import static org.orbisgis.viewapi.main.frames.ext.MainFrameAction.MENU_TOOLS;
  */
 public class MainWindow extends JFrame implements MainFrameAction{
     
+    //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
     public static final String CONFIGURATION = "CONFIGURATION";
@@ -66,19 +68,30 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String PROPERTIE = "PROPERTIE";
     public static final String DELETE = "DELETE";
     
+    /** ActionCommands for the buttons. */
     private final ActionCommands actions = new ActionCommands();
+    /** JToolBar for the buttons. It's registered in the action ActionCommands. */
     private final JToolBar toolBar = new JToolBar();
     
+    /** JToolBar for the spinners.
+     * The spinners are used to change the position, the size and the rotation of selected GraphicalElements. */
+    private final JToolBar toolBarSpin = new JToolBar();
+    
+    /** Spinner for the x position. */
     private JSpinner spinX=null;
+    /** Spinner for the y position. */
     private JSpinner spinY=null;
+    /** Spinner for the width. */
     private JSpinner spinW=null;
+    /** Spinner for the height. */
     private JSpinner spinH=null;
+    /** Spinner for the rotation. */
     private JSpinner spinR=null;
     
     private UIController uic;
     private CompositionArea compArea;
     
-    /**Private constructor.*/
+    /** Public main constructor. */
     public MainWindow(UIController uic){
         super("Map composer");
         this.uic=uic;
@@ -86,66 +99,96 @@ public class MainWindow extends JFrame implements MainFrameAction{
         //Sets the default size to the window
         this.setSize(1024, 768);
         this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
-        this.add(toolBar, BorderLayout.PAGE_START);
+        
+        //Creates the panel containing the two tool bars.
+        JPanel top = new JPanel();
+        top.setLayout(new BoxLayout(top, BoxLayout.Y_AXIS));
+        top.add(toolBar);
+        top.add(toolBarSpin);
+        this.add(top, BorderLayout.PAGE_START);
+        
+        //Sets the button tool bar.
+        toolBar.setFloatable(false);
+        toolBarSpin.setFloatable(false);
         actions.setAccelerators(rootPane);
         actions.registerContainer(toolBar);
+        
         actions.addAction(createAction(NEW_COMPOSER, "", "new_composer.png", this, "newComposer"));
         actions.addAction(createAction(CONFIGURATION, "", "configuration.png", uic, "showDocProperties"));
         actions.addAction(createAction(SAVE, "", "save.png", uic, "save"));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "export_composer.png", this, "exportComposer"));
-        toolBar.addSeparator();
-        toolBar.add(new JSeparator(SwingConstants.VERTICAL));
+        addSeparatortTo(toolBar);
         actions.addAction(createAction(ADD_MAP, "", "add_map.png", this, "addMap"));
         actions.addAction(createAction(ADD_TEXT, "", "add_text.png", this, "addText"));
         actions.addAction(createAction(ADD_LEGEND, "", "add_legend.png", this, "addLegend"));
         actions.addAction(createAction(ADD_ORIENTATION, "", "compass.png", this, "addOrientation"));
         actions.addAction(createAction(ADD_SCALE, "", "add_scale.png", this, "addScale"));
         actions.addAction(createAction(ADD_PICTURE, "", "add_picture.png", this, "addPicture"));
-        toolBar.addSeparator();
-        toolBar.add(new JSeparator(SwingConstants.VERTICAL));
+        addSeparatortTo(toolBar);
         actions.addAction(createAction(DRAW_CIRCLE, "", "draw_circle.png", this, "drawCircle"));
         actions.addAction(createAction(DRAW_POLYGON, "", "draw_polygon.png", this, "drawPolygon"));
-        toolBar.addSeparator();
-        toolBar.add(new JSeparator(SwingConstants.VERTICAL));
+        addSeparatortTo(toolBar);
         actions.addAction(createAction(MOVE_BACK, "", "move_back.png", this, "moveBack"));
         actions.addAction(createAction(MOVE_DOWN, "", "move_down.png", this, "moveDown"));
         actions.addAction(createAction(MOVE_ON, "", "move_on.png", this, "moveOn"));
         actions.addAction(createAction(MOVE_FRONT, "", "move_front.png", this, "moveFront"));
-        toolBar.addSeparator();
-        toolBar.add(new JSeparator(SwingConstants.VERTICAL));
+        addSeparatortTo(toolBar);
         actions.addAction(createAction(ALIGN_TO_LEFT, "", "align_to_left.png", this, "alignToLeft"));
         actions.addAction(createAction(ALIGN_TO_CENTER, "", "align_to_center.png", this, "alignToCenter"));
         actions.addAction(createAction(ALIGN_TO_RIGHT, "", "align_to_right.png", this, "alignToRight"));
         actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "align_to_bottom.png", this, "alignToBottom"));
         actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "align_to_middle.png", this, "alignToMiddle"));
         actions.addAction(createAction(ALIGN_TO_TOP, "", "align_to_top.png", this, "alignToTop"));
-        toolBar.addSeparator();
+        addSeparatortTo(toolBar);
+        actions.addAction(createAction(PROPERTIE, "", "properties.png", uic, "showProperties"));
+        actions.addAction(createAction(DELETE, "", "delete.png", uic, "remove"));
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
+        
+        //Sets the spinners tool bar.
         spinX = createSpinner(" X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinY = createSpinner(" Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinW = createSpinner(" W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinH = createSpinner(" H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        toolBar.add(new JLabel(new ImageIcon(MainWindow.class.getResource("rotation.png"))));
+        toolBarSpin.add(new JLabel(new ImageIcon(MainWindow.class.getResource("rotation.png"))));
         spinR = createSpinner("", 0, -360, 360);
-        toolBar.addSeparator();
-        toolBar.add(new JSeparator(SwingConstants.VERTICAL));
-        actions.addAction(createAction(PROPERTIE, "", "properties.png", uic, "showProperties"));
-        actions.addAction(createAction(DELETE, "", "delete.png", uic, "remove"));
+        toolBarSpin.add(new JSeparator(SwingConstants.VERTICAL));
         
-        JPanel pan = new JPanel();
-        pan.setLayout(new BorderLayout());
+        //Adds the composition area.
         this.add(compArea, BorderLayout.CENTER);
+    }
+    
+    /**
+     * Adds a well sized separator to a tool bar.
+     * @param toolBar Tool bar needing a separator.
+     */
+    private void addSeparatortTo(JToolBar toolBar){
+        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
+        sep.setMaximumSize(new Dimension(8, 32));
+        toolBar.add(sep);
     }
     
     public CompositionArea getCompositionArea(){return compArea;}
     
+    /**
+     * Creates and adds to the toolBarSpin a spinner and its label.
+     * The spinner and its label are setted with the given function argument.
+     * The function return the spinner reference to permite to listen to their modification.
+     * @param label Name of the spinner.
+     * @param value Actual value of the spinner.
+     * @param minValue Minimum value of the spinner.
+     * @param maxValue Maximum value of the spinner.
+     * @return The reference to the created spinner.
+     */
     private JSpinner createSpinner(String label, int value, int minValue, int maxValue){
-        toolBar.add(new JLabel(label));
+        toolBarSpin.add(new JLabel(label));
         JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
         spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
-        spin.setPreferredSize(new Dimension(32, 32));
+        spin.setMaximumSize(new Dimension(64, 32));
+        spin.setMinimumSize(new Dimension(32, 32));
+        spin.setPreferredSize(new Dimension(64, 32));
         spin.setEnabled(false);
-        toolBar.add(spin);
+        toolBarSpin.add(spin);
+        toolBarSpin.addSeparator();
         return spin;
     }
     
