@@ -514,20 +514,28 @@ public class UIController{
     
     public void showProperties(){
         if(selectedGE.size()>0){
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this);
+            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, true);
             dp.setVisible(true);
         }
     }
     
+    /**
+     * Open a dialog window with all the ducument properties.
+     */
     public void showDocProperties(){
-        for(GraphicalElement ge : zIndexStack){
+        Document doc=null;
+        for(GraphicalElement ge : zIndexStack)
             if(ge instanceof Document){
-                for(GraphicalElement graph : selectedGE)
-                    unselectGE(graph);
-                selectGE(ge);
-                DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this);
-                dp.setVisible(true);
+                doc=(Document)ge;
+                break;
             }
+        
+        if(doc!=null){
+            for(GraphicalElement graph : selectedGE)
+                unselectGE(graph);
+            selectGE(doc);
+            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, false);
+            dp.setVisible(true);
         }
     }
     

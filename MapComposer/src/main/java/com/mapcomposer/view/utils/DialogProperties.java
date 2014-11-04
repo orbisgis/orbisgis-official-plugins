@@ -23,51 +23,64 @@ import net.miginfocom.swing.MigLayout;
  */
 public class DialogProperties extends JFrame{
     
-    /** JPanel containing the body ofthe shutter */
+    /** JPanel containing the body ofthe shutter. */
     private final JPanel body;
     
-    /** Validation button*/
+    /** Validation button. */
     private final JButton validate;
     
-    /** Cancel button*/
+    /** Cancel button. */
     private final JButton cancel;
     
-    /** JPanel of the configuration elements */
+    /** JPanel of the configuration elements. */
     private JPanel pan;
     
-    /** List of ConfPanel displayed */
+    /** List of ConfPanel displayed. */
     private List<ConfPanel> listPanels;
     
+    /** UIController. */
     private UIController uic;
     
-    /**main constructor
-     * @param list List of ConfigurationAttributes to display.*/
-    public DialogProperties(List<ConfigurationAttribute> list, UIController uic){
+    /** Main constructor.
+     * @param list List of ConfigurationAttributes to display.
+     * @param uic UIController.
+     * @param enableCB Enable or not the ability to lock ConfigurationAttributs
+     */
+    public DialogProperties(List<ConfigurationAttribute> list, UIController uic, boolean enableLock){
         body = new JPanel(new MigLayout("wrap 2"));
         this.uic=uic;
-        //Positionning the shutter
         this.setLayout(new BorderLayout());
         this.add(body, BorderLayout.CENTER);
         
         listPanels = new ArrayList<>();
-        validate = new JButton("Validate");
-        validate.addActionListener(EventHandler.create(ActionListener.class, this, "validation"));
-        cancel = new JButton("Cancel");
-        cancel.addActionListener(EventHandler.create(ActionListener.class, this, "clearAndHide"));
+        
+        //Adds to a panel the COnfigurationAttribute
         pan = new JPanel();
         pan.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
             JPanel panel = CAManager.getInstance().getRenderer(ca).render(ca);
-            ConfPanel cp = new ConfPanel(panel, ca);
+            ConfPanel cp = new ConfPanel(panel, ca, enableLock);
             listPanels.add(cp);
             pan.add(cp, "wrap");
         }
         body.add(pan, "wrap");
+        
+        
+        //Adds the ok and cancel buttons
+        validate = new JButton("Validate");
+        validate.addActionListener(EventHandler.create(ActionListener.class, this, "validation"));
+        cancel = new JButton("Cancel");
+        cancel.addActionListener(EventHandler.create(ActionListener.class, this, "clearAndHide"));
+        
         body.add(validate);
         body.add(cancel);
+        
         this.pack();
     }
     
+    /**
+     * Action executed when the ok button is clicked.
+     */
     public void validation() {
         List<ConfigurationAttribute> listca = new ArrayList<>();
         for(ConfPanel cp : listPanels){
@@ -77,7 +90,9 @@ public class DialogProperties extends JFrame{
         clearAndHide();
     }
 
-    /** This method clears the dialog and hides it. */
+    /** 
+     * Clears the dialog and hides it.
+     */
     public void clearAndHide() {
         pan = new JPanel();
         listPanels = new ArrayList<>();
@@ -91,17 +106,18 @@ public class DialogProperties extends JFrame{
      */
     private class ConfPanel extends JPanel implements ItemListener{
         private final JPanel pan;
-        private final JCheckBox box;
         private final ConfigurationAttribute ca;
-        public ConfPanel(JPanel pan, ConfigurationAttribute ca){
+        public ConfPanel(JPanel pan, ConfigurationAttribute ca, boolean enableLock){
             super();
             this.pan=pan;
             this.ca = ca;
             this.setLayout(new FlowLayout(FlowLayout.LEFT));
-            box = new JCheckBox();
-            box.addItemListener(this);
-            box.setSelected(ca.isLocked());
-            this.add(box);
+            if(enableLock){
+                JCheckBox box = new JCheckBox();
+                box.addItemListener(this);
+                box.setSelected(ca.isLocked());
+                this.add(box);
+            }
             this.add(pan);
             if(ca.isLocked()){
                 pan.setEnabled(false);
