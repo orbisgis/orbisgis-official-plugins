@@ -31,7 +31,7 @@ public class ColorChooser extends JFrame implements MouseListener{
         button.setSize(40, 20);
         panel.add(button);
         frame.add(panel);
-        frame.setSize(400, 200);
+        frame.pack();
     }
 
     @Override public void mouseClicked(MouseEvent me) {
