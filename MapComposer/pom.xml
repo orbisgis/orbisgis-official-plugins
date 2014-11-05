@@ -1,14 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
     <modelVersion>4.0.0</modelVersion>
-    <groupId>com</groupId>
-    <artifactId>MapComposer</artifactId>
-    <name>MapComposer</name>
-    <version>1.0-SNAPSHOT</version>
+    <groupId>org.orbisgis</groupId>
+    <artifactId>map-composer</artifactId>
+    <name>Map Composer</name>
+    <version>1.0.0</version>
     <packaging>bundle</packaging>
-    <description>
-        OrbisGIS plugin for the composition of cartographic documents.
-    </description>
+    <description>OrbisGIS plugin for the composition of cartographic documents.</description>
     <parent>
        <groupId>org.orbisgis</groupId>
        <artifactId>orbisgis-nexus</artifactId>
@@ -23,8 +21,8 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Private-Package>com.mapcomposer.*</Private-Package>
-                        <Bundle-Activator>com.mapcomposer.Activator</Bundle-Activator>
+                        <Private-Package>org.orbisgis.mapcomposer.*</Private-Package>
+                        <Bundle-Activator>org.orbisgis.mapcomposer.Activator</Bundle-Activator>
                         <Bundle-Category>orbisgis</Bundle-Category>
                     </instructions>
                 </configuration>
