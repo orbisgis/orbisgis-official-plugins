@@ -26,11 +26,11 @@ import javax.swing.JPanel;
 import javax.swing.JSeparator;
 import javax.swing.JSpinner;
 import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
 import org.orbisgis.view.components.actions.ActionCommands;
-import org.orbisgis.view.icons.OrbisGISIcon;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
 import static org.orbisgis.viewapi.main.frames.ext.MainFrameAction.MENU_TOOLS;
@@ -98,7 +98,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.compArea = new CompositionArea();
         //Sets the default size to the window
         this.setSize(1024, 768);
-        this.setIconImage(OrbisGISIcon.getIconImage("mini_orbisgis"));
         
         //Creates the panel containing the two tool bars.
         JPanel top = new JPanel();
@@ -113,35 +112,35 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.setAccelerators(rootPane);
         actions.registerContainer(toolBar);
         
-        actions.addAction(createAction(NEW_COMPOSER, "", "new_composer.png", this, "newComposer"));
-        actions.addAction(createAction(CONFIGURATION, "", "configuration.png", uic, "showDocProperties"));
-        actions.addAction(createAction(SAVE, "", "save.png", uic, "save"));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", "export_composer.png", this, "exportComposer"));
+        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
+        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuation dialog", "configuration.png", uic, "showDocProperties", null));
+        actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uic, "save", null));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(ADD_MAP, "", "add_map.png", this, "addMap"));
-        actions.addAction(createAction(ADD_TEXT, "", "add_text.png", this, "addText"));
-        actions.addAction(createAction(ADD_LEGEND, "", "add_legend.png", this, "addLegend"));
-        actions.addAction(createAction(ADD_ORIENTATION, "", "compass.png", this, "addOrientation"));
-        actions.addAction(createAction(ADD_SCALE, "", "add_scale.png", this, "addScale"));
-        actions.addAction(createAction(ADD_PICTURE, "", "add_picture.png", this, "addPicture"));
+        actions.addAction(createAction(ADD_MAP, "", "Add a map element", "add_map.png", this, "addMap", null));
+        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element",  "add_text.png", this, "addText", null));
+        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element", "add_legend.png", this, "addLegend", null));
+        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element", "compass.png", this, "addOrientation", null));
+        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element", "add_scale.png", this, "addScale", null));
+        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element", "add_picture.png", this, "addPicture", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", "draw_circle.png", this, "drawCircle"));
-        actions.addAction(createAction(DRAW_POLYGON, "", "draw_polygon.png", this, "drawPolygon"));
+        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element", "draw_circle.png", this, "drawCircle", null));
+        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element", "draw_polygon.png", this, "drawPolygon", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(MOVE_BACK, "", "move_back.png", this, "moveBack"));
-        actions.addAction(createAction(MOVE_DOWN, "", "move_down.png", this, "moveDown"));
-        actions.addAction(createAction(MOVE_ON, "", "move_on.png", this, "moveOn"));
-        actions.addAction(createAction(MOVE_FRONT, "", "move_front.png", this, "moveFront"));
+        actions.addAction(createAction(MOVE_BACK, "", "Move to the back", "move_back.png", this, "moveBack", null));
+        actions.addAction(createAction(MOVE_DOWN, "", "Move down", "move_down.png", this, "moveDown", null));
+        actions.addAction(createAction(MOVE_ON, "", "Move on", "move_on.png", this, "moveOn", null));
+        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front", "move_front.png", this, "moveFront", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", "align_to_left.png", this, "alignToLeft"));
-        actions.addAction(createAction(ALIGN_TO_CENTER, "", "align_to_center.png", this, "alignToCenter"));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "align_to_right.png", this, "alignToRight"));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "align_to_bottom.png", this, "alignToBottom"));
-        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "align_to_middle.png", this, "alignToMiddle"));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", "align_to_top.png", this, "alignToTop"));
+        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left", "align_to_left.png", this, "alignToLeft", null));
+        actions.addAction(createAction(ALIGN_TO_CENTER, "", "Align to the center", "align_to_center.png", this, "alignToCenter", null));
+        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right", "align_to_right.png", this, "alignToRight", null));
+        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom", "align_to_bottom.png", this, "alignToBottom", null));
+        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle.png", this, "alignToMiddle", null));
+        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top", "align_to_top.png", this, "alignToTop", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(PROPERTIE, "", "properties.png", uic, "showProperties"));
-        actions.addAction(createAction(DELETE, "", "delete.png", uic, "remove"));
+        actions.addAction(createAction(PROPERTIE, "", "Show selected elements properties", "properties.png", uic, "showProperties", null));
+        actions.addAction(createAction(DELETE, "", "Delete selected elements", "delete.png", uic, "remove", null));
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
         
         //Sets the spinners tool bar.
@@ -205,12 +204,14 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinR.isEnabled()) uic.changeProperty(GraphicalElement.Property.ROTATION, (Integer)spinR.getModel().getValue());
     }
     
-    private DefaultAction createAction(String actionID, String actionLabel, String actionIconName, Object target, String ActionFunctionName){
+    private DefaultAction createAction(String actionID, String actionLabel, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke){
         return new DefaultAction(
                             actionID,
                             actionLabel,
+                            actionToolTip,
                             new ImageIcon(MainWindow.class.getResource(actionIconName)),
-                            EventHandler.create(ActionListener.class, target, ActionFunctionName)
+                            EventHandler.create(ActionListener.class, target, ActionFunctionName),
+                            keyStroke
                         );
     }
     
