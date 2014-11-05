@@ -1,0 +1,40 @@
+package org.orbisgis.mapcomposer.view.configurationattribute;
+
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
+import java.awt.Component;
+import java.awt.FlowLayout;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+
+/**
+ * Renderer associated to the Text ConfigurationAttribute.
+ */
+public class TextRenderer implements CARenderer{
+
+    @Override
+    public JPanel render(ConfigurationAttribute ca) {
+        JPanel pan = new JPanel();
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        
+        StringCA text = (StringCA)ca;
+        
+        pan.add(new JLabel(text.getName()));
+        JTextArea area = new JTextArea(text.getValue());
+        pan.add(area);
+        
+        return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        StringCA text = (StringCA)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JTextArea){
+                text.setValue(((JTextArea)c).getText());
+            }
+        }
+    }
+    
+}

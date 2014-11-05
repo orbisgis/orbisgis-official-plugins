@@ -1,12 +1,12 @@
-<binding xmlns:ns1="http://mapcomposer.com/model/graphicalelement/utils" name="binding" package="com.mapcomposer.model.graphicalelement.utils">
-  <namespace uri="http://mapcomposer.com/model/graphicalelement/utils" default="elements"/>
-  <mapping abstract="true" type-name="ns1:saveHandler" class="com.mapcomposer.model.graphicalelement.utils.SaveHandler">
+<binding xmlns:ns1="http://orbisgis.org/mapcomposer/model/graphicalelement/utils" name="binding" package="org.orbisgis.mapcomposer.model.graphicalelement.utils">
+  <namespace uri="http://orbisgis.org/mapcomposer/model/graphicalelement/utils" default="elements"/>
+  <mapping abstract="true" type-name="ns1:saveHandler" class="org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler">
     <collection field="listMI" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE" name="mapImage">
-        <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
-          <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE" name="mapImage">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
+          <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
             <structure field="x" usage="optional" name="x">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -16,7 +16,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="y" usage="optional" name="y">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -26,7 +26,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="rotation" usage="optional" name="rotation">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -36,7 +36,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="height" usage="optional" name="height">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -46,7 +46,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="width" usage="optional" name="width">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -58,7 +58,7 @@
             <value style="attribute" name="z" field="z"/>
           </structure>
           <structure field="owsc" usage="optional" name="owsc">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -69,7 +69,7 @@
           </structure>
         </structure>
         <structure field="integer" usage="optional" name="integer">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -81,11 +81,11 @@
       </structure>
     </collection>
     <collection field="listO" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleOrientationGE" name="orientation">
-        <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
-          <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleOrientationGE" name="orientation">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
+          <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
             <structure field="x" usage="optional" name="x">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -95,7 +95,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="y" usage="optional" name="y">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -105,7 +105,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="rotation" usage="optional" name="rotation">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -115,7 +115,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="height" usage="optional" name="height">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -125,7 +125,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="width" usage="optional" name="width">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -137,7 +137,7 @@
             <value style="attribute" name="z" field="z"/>
           </structure>
           <structure field="owsc" usage="optional" name="owsc">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -148,7 +148,7 @@
           </structure>
         </structure>
         <structure field="icon" usage="optional" name="icon">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -157,11 +157,11 @@
       </structure>
     </collection>
     <collection field="listS" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleScaleGE" name="scale">
-        <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
-          <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleScaleGE" name="scale">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
+          <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
             <structure field="x" usage="optional" name="x">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -171,7 +171,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="y" usage="optional" name="y">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -181,7 +181,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="rotation" usage="optional" name="rotation">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -191,7 +191,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="height" usage="optional" name="height">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -201,7 +201,7 @@
               <value style="attribute" name="limits" field="limits"/>
             </structure>
             <structure field="width" usage="optional" name="width">
-              <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+              <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                 <value style="element" name="name" field="name" usage="optional"/>
                 <value style="attribute" name="lock" field="lock"/>
               </structure>
@@ -213,7 +213,7 @@
             <value style="attribute" name="z" field="z"/>
           </structure>
           <structure field="owsc" usage="optional" name="owsc">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -224,17 +224,17 @@
           </structure>
         </structure>
         <structure field="milka" usage="optional" name="milka">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
           <value style="attribute" name="index" field="index"/>
           <collection field="list" usage="optional" create-type="java.util.ArrayList">
-            <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE" name="simpleMapImageGE">
-              <structure type="com.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
-                <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+            <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE" name="simpleMapImageGE">
+              <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleCartoGE">
+                <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
                   <structure field="x" usage="optional" name="x">
-                    <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                    <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                       <value style="element" name="name" field="name" usage="optional"/>
                       <value style="attribute" name="lock" field="lock"/>
                     </structure>
@@ -244,7 +244,7 @@
                     <value style="attribute" name="limits" field="limits"/>
                   </structure>
                   <structure field="y" usage="optional" name="y">
-                    <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                    <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                       <value style="element" name="name" field="name" usage="optional"/>
                       <value style="attribute" name="lock" field="lock"/>
                     </structure>
@@ -254,7 +254,7 @@
                     <value style="attribute" name="limits" field="limits"/>
                   </structure>
                   <structure field="rotation" usage="optional" name="rotation">
-                    <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                    <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                       <value style="element" name="name" field="name" usage="optional"/>
                       <value style="attribute" name="lock" field="lock"/>
                     </structure>
@@ -264,7 +264,7 @@
                     <value style="attribute" name="limits" field="limits"/>
                   </structure>
                   <structure field="height" usage="optional" name="height">
-                    <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                    <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                       <value style="element" name="name" field="name" usage="optional"/>
                       <value style="attribute" name="lock" field="lock"/>
                     </structure>
@@ -274,7 +274,7 @@
                     <value style="attribute" name="limits" field="limits"/>
                   </structure>
                   <structure field="width" usage="optional" name="width">
-                    <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                    <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                       <value style="element" name="name" field="name" usage="optional"/>
                       <value style="attribute" name="lock" field="lock"/>
                     </structure>
@@ -286,7 +286,7 @@
                   <value style="attribute" name="z" field="z"/>
                 </structure>
                 <structure field="owsc" usage="optional" name="owsc">
-                  <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+                  <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
                     <value style="element" name="name" field="name" usage="optional"/>
                     <value style="attribute" name="lock" field="lock"/>
                   </structure>
@@ -297,7 +297,7 @@
                 </structure>
               </structure>
               <structure field="integer" usage="optional" name="integer">
-                <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+                <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
                   <value style="element" name="name" field="name" usage="optional"/>
                   <value style="attribute" name="lock" field="lock"/>
                 </structure>
@@ -312,10 +312,10 @@
       </structure>
     </collection>
     <collection field="listI" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE" name="image">
-        <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE" name="image">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
           <structure field="x" usage="optional" name="x">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -325,7 +325,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="y" usage="optional" name="y">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -335,7 +335,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="rotation" usage="optional" name="rotation">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -345,7 +345,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="height" usage="optional" name="height">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -355,7 +355,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="width" usage="optional" name="width">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -367,7 +367,7 @@
           <value style="attribute" name="z" field="z"/>
         </structure>
         <structure field="path" usage="optional" name="path">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -376,10 +376,10 @@
       </structure>
     </collection>
     <collection field="listT" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.text.SimpleTextGE" name="textElement">
-        <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.text.SimpleTextGE" name="textElement">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
           <structure field="x" usage="optional" name="x">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -389,7 +389,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="y" usage="optional" name="y">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -399,7 +399,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="rotation" usage="optional" name="rotation">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -409,7 +409,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="height" usage="optional" name="height">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -419,7 +419,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="width" usage="optional" name="width">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -431,7 +431,7 @@
           <value style="attribute" name="z" field="z"/>
         </structure>
         <structure field="font" usage="optional" name="font">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -441,7 +441,7 @@
           </collection>
         </structure>
         <structure field="colorText" usage="optional" name="colorText">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -450,7 +450,7 @@
           </collection>
         </structure>
         <structure field="colorBack" usage="optional" name="colorBack">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -459,7 +459,7 @@
           </collection>
         </structure>
         <structure field="alignment" usage="optional" name="alignment">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -469,7 +469,7 @@
           </collection>
         </structure>
         <structure field="style" usage="optional" name="style">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -479,7 +479,7 @@
           </collection>
         </structure>
         <structure field="fontSize" usage="optional" name="fontSize">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -489,14 +489,14 @@
           <value style="attribute" name="limits" field="limits"/>
         </structure>
         <structure field="text" usage="optional" name="text">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
           <value style="element" name="value" field="value" usage="optional"/>
         </structure>
         <structure field="alpha" usage="optional" name="alpha">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -508,10 +508,10 @@
       </structure>
     </collection>
     <collection field="listD" usage="optional" create-type="java.util.ArrayList">
-      <structure type="com.mapcomposer.model.graphicalelement.element.SimpleDocumentGE" name="document">
-        <structure type="com.mapcomposer.model.graphicalelement.element.SimpleGE">
+      <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleDocumentGE" name="document">
+        <structure type="org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE">
           <structure field="x" usage="optional" name="x">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -521,7 +521,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="y" usage="optional" name="y">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -531,7 +531,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="rotation" usage="optional" name="rotation">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -541,7 +541,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="height" usage="optional" name="height">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -551,7 +551,7 @@
             <value style="attribute" name="limits" field="limits"/>
           </structure>
           <structure field="width" usage="optional" name="width">
-            <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+            <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
               <value style="element" name="name" field="name" usage="optional"/>
               <value style="attribute" name="lock" field="lock"/>
             </structure>
@@ -563,7 +563,7 @@
           <value style="attribute" name="z" field="z"/>
         </structure>
         <structure field="orientation" usage="optional" name="orientation">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -573,7 +573,7 @@
           </collection>
         </structure>
         <structure field="format" usage="optional" name="format">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseListCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -583,7 +583,7 @@
           </collection>
         </structure>
         <structure field="name" usage="optional" name="name">
-          <structure type="com.mapcomposer.model.configurationattribute.attribute.BaseCA">
+          <structure type="org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA">
             <value style="element" name="name" field="name" usage="optional"/>
             <value style="attribute" name="lock" field="lock"/>
           </structure>
@@ -592,7 +592,7 @@
       </structure>
     </collection>
   </mapping>
-  <mapping class="com.mapcomposer.model.graphicalelement.utils.SaveHandler" name="saveHandler">
+  <mapping class="org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler" name="saveHandler">
     <structure map-as="ns1:saveHandler"/>
   </mapping>
 </binding>

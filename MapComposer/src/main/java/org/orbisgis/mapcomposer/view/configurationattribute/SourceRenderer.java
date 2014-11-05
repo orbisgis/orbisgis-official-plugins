@@ -1,0 +1,45 @@
+package org.orbisgis.mapcomposer.view.configurationattribute;
+
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
+import java.awt.FlowLayout;
+import javax.swing.JButton;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextField;
+import org.orbisgis.mapcomposer.view.utils.MouseListenerBrowse;
+import java.awt.Component;
+
+/**
+ * Renderer associated to the Source ConfigurationAttribute.
+ */
+public class SourceRenderer implements CARenderer{
+
+    @Override
+    public JPanel render(ConfigurationAttribute ca) {
+        JPanel pan = new JPanel();
+        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        
+        final SourceCA source = (SourceCA)ca;
+        
+        pan.add(new JLabel(source.getName()));
+        JTextField jtf = new JTextField(source.getValue());
+        pan.add(jtf);
+        JButton button = new JButton("Browse");
+        button.addMouseListener(new MouseListenerBrowse(jtf));
+        
+        pan.add(button);
+        return pan;
+    }
+
+    @Override
+    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+        SourceCA source = (SourceCA)attribute;
+        for(Component c : panel.getComponents()){
+            if(c instanceof JTextField){
+                source.setValue(((JTextField)c).getText());
+            }
+        }
+    }
+    
+}
