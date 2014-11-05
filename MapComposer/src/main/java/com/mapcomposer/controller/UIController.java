@@ -580,7 +580,11 @@ public class UIController{
         }
     }
     
+    /**
+     * Export to document into png file.
+     */
     public void export(){
+        //Creates and sets the file chooser
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
         fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
@@ -595,8 +599,9 @@ public class UIController{
 
             @Override public String getDescription() {return "PNG Files (.png)";}
         });
-        //If the save is validated, do the marshall
+        //If the save is validated, do the export
         if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
+            //Sets the path of the new file
             String path;
             if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
                 path=fc.getSelectedFile().getAbsolutePath();
@@ -604,7 +609,15 @@ public class UIController{
                 path=fc.getSelectedFile().getAbsolutePath()+".png";
 
             try{
+                //Remove the border, do the export, readd them
+                for(GraphicalElement ge : zIndexStack){
+                    map.get(ge).enableBorders(false);
+                }
                 ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+                
+                for(GraphicalElement ge : zIndexStack){
+                    map.get(ge).enableBorders(true);
+                }
             } catch (IOException ex) {
                 Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
             }
