@@ -243,36 +243,16 @@ public class UIController{
     
     
     public void validateSelectedGE(){
-        for(GraphicalElement ge : selectedGE){
-            if(ge instanceof GERefresh){
-                ((GERefresh)ge).refresh();
-            }
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
-            if(ge instanceof SimpleDocumentGE)
-                mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-        }
-        //Unlock all the ConfigurationAttribute
-        for(GraphicalElement ge : selectedGE){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
-            }
-        }
-        refreshSpin();
+        for(GraphicalElement ge : selectedGE)
+            validateGE(ge);
     }
     
     public void validateGE(GraphicalElement ge){
-        if(ge instanceof GERefresh){
+        if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        }
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         if(ge instanceof SimpleDocumentGE)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-
-        //Unlock all the ConfigurationAttribute
-        for(ConfigurationAttribute ca : ge.getAllAttributes()){
-            ca.setLock(false);
-        }
-        mainWindow.getCompositionArea().refresh();
     }
 
     /**
@@ -281,35 +261,27 @@ public class UIController{
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
-        boolean document = false;
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
             //Takes each ConfigurationAttribute from the GraphicalElement
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            for(ConfigurationAttribute ca : ge.getAllAttributes())
                 //Takes each CA from the list of CA to validate
-                for(ConfigurationAttribute confShutterCA : listCA){
+                for(ConfigurationAttribute confShutterCA : listCA)
                     //If the two CA are the same property and are unlocked, set the new CA value
                     if(ca.isSameName(confShutterCA)){
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
-                            if(ca instanceof RefreshCA){
+                            if(ca instanceof RefreshCA)
                                 ((RefreshCA)ca).refresh(this);
-                            }
                         }
                         break;
                     }
-                }
-            }
-            if(ge instanceof GERefresh){
+            if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
-            }
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
-            if(ge instanceof Document){
-                document=true;
+            if(ge instanceof Document)
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
-            }
         }
-        mainWindow.getCompositionArea().refresh();
         unselectAllGE();
     }
     
@@ -430,6 +402,7 @@ public class UIController{
         selectedGE = new ArrayList<>();
         zindexChange(TO_FRONT);
         validateGE(ge);
+        mainWindow.getCompositionArea().refresh();
     }
     
     public void setAlign( Align a) {
@@ -560,6 +533,7 @@ public class UIController{
                     break;
             }
             validateGE(ge);
+        mainWindow.getCompositionArea().refresh();
         }
     }
     
