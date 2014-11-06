@@ -176,6 +176,7 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
+        map.get(ge).select();
         refreshSpin();
     }
     
@@ -208,10 +209,8 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
-        for(ConfigurationAttribute ca : ge.getAllAttributes()){
-            ca.setLock(false);
-        }
         selectedGE.remove(ge);
+        map.get(ge).unselect();
         refreshSpin();
     }
     
@@ -220,18 +219,11 @@ public class UIController{
      * Reset the selectedGE list and unselect all the CompositionJPanel in the compositionArea.
      */
     public void unselectAllGE(){
-        List<GraphicalElement> temp = Arrays.asList(selectedGE.toArray());
-        //Unlock all the ConfigurationAttributes
-        for(GraphicalElement ge : temp){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
-            }
-        }
-        refreshSpin();
         //Unselect all the GraphicalElements
         for(GraphicalElement ge : selectedGE)
             map.get(ge).unselect();
         selectedGE= new ArrayList<>();
+        refreshSpin();
     }
     
     /**

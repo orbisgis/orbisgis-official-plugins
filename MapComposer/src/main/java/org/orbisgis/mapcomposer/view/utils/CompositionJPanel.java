@@ -92,15 +92,10 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
 
     @Override
     public void mouseClicked(MouseEvent me) {
-        this.selected=!selected;
-        setBorders();
-        if(selected){
-            uic.selectGE(ge);
-        }
-        else{
+        if(selected)
             uic.unselectGE(ge);
-        }
-        setBorders();
+        else
+            uic.selectGE(ge);
     }
 
     @Override
@@ -286,13 +281,11 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         }
     }
     
-    /**
-     * Unselect the CompositionJPanel (remove the orange borders).
-     */
-    public void unselect(){
-        this.selected=false;
-        setBorders();
-    }
+    /** Unselect the CompositionJPanel (remove the orange borders). */
+    public void unselect(){ this.selected=false; setBorders(); }
+    
+    /** Select the CompositionJPanel. */
+    public void select(){ this.selected=true; setBorders(); }
     
     /**
      * Enable or disable the grey and orange borders of the displayed elements.
