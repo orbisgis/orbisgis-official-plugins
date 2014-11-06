@@ -44,9 +44,9 @@ public class SimpleTextGE extends SimpleGE{
         this.colorBack = CAFactory.createColorCA("Background color");
         this.alignment = CAFactory.createSourceListCA("Alignment");
         this.style = CAFactory.createSourceListCA("Style");
-        this.fontSize = CAFactory.createIntegerCA("Font size", 1, 99999);
+        this.fontSize = CAFactory.createIntegerCA("Font size", 1, Integer.MAX_VALUE, 12);
         this.text = CAFactory.createStringCA("Text");
-        this.alpha = CAFactory.createIntegerCA("Alpha", 0, 255);
+        this.alpha = CAFactory.createIntegerCA("Alpha", 0, 255, 0);
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
