@@ -1,6 +1,5 @@
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.awt.Dimension;
 import java.awt.Graphics;
@@ -11,6 +10,7 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
+import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 
 /**
  * Base renderer for GraphicalElement.
@@ -22,8 +22,7 @@ public abstract class GERenderer {
      * @param ge GraphicalElement to render.
      * @return JPanel of the GraphicalElement.
      */
-    public JPanel render(final GraphicalElement ge){
-        JPanel panel = UIController.getPanel(ge);
+    public JPanel render(final GraphicalElement ge, CompositionJPanel panel){
         //Calculate the required size of the panel to contain the full rotated rectangle image.
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());

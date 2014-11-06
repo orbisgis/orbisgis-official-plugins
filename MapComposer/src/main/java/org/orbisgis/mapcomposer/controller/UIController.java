@@ -68,15 +68,6 @@ public class UIController{
     }
     
     /**
-     * Returns the CompositionPanel corresponding to a GraphicalElement registered in map .
-     * @param ge GraphicalElement.
-     * @return The CompositionPanel corresponding to the GraphicalElement, null if it isn't registered.
-     */
-    public static CompositionJPanel getPanel(GraphicalElement ge){
-        return map.get(ge);
-    }
-    
-    /**
      * Change the Z-index of the displayed GraphicalElement.
      * @param z Change of the Z-index.
      */
@@ -264,7 +255,7 @@ public class UIController{
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             if(ge instanceof SimpleDocumentGE)
                 mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         }
@@ -281,7 +272,7 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         if(ge instanceof SimpleDocumentGE)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
 
@@ -320,7 +311,7 @@ public class UIController{
             if(ge instanceof GERefresh){
                 ((GERefresh)ge).refresh();
             }
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             if(ge instanceof Document){
                 document=true;
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
@@ -375,8 +366,8 @@ public class UIController{
             
             //Registers the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
-            mainWindow.getCompositionArea().addGE(getPanel(ge));
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            mainWindow.getCompositionArea().addGE(map.get(ge));
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             zIndexStack.push(ge);
             
             //Refreshes the GE.
@@ -438,11 +429,11 @@ public class UIController{
     
     private void addLoadedGE(GraphicalElement ge) {
         map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
-        mainWindow.getCompositionArea().addGE(getPanel(ge));
+        mainWindow.getCompositionArea().addGE(map.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         zindexChange(TO_FRONT);
