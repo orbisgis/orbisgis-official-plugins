@@ -3,14 +3,14 @@
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.mapcomposer.view.ui.CompositionArea;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
-import java.awt.Rectangle;
+import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.beans.EventHandler;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static java.lang.Thread.sleep;
@@ -22,75 +22,81 @@ import javax.swing.JPanel;
 /**
  * This panel extends from JPanel define the action to do when the user click on it.
  */
-public class CompositionJPanel extends JPanel implements MouseListener, MouseMotionListener{
+public class CompositionJPanel extends JPanel{
     
-    /**Panel contained by the CompositionJPanel.*/
-    private JPanel panel;
-    /**GraphicalElement displayed*/
+    /**Panel contained by the CompositionJPanel. */
+    private JPanel panel = new JPanel();
+    
+    /**GraphicalElement displayed. */
     private final GraphicalElement ge;
-    /**Select state of the panel*/
-    private boolean selected;
-    /**X initial position when user want to move the panel.*/
-    private int startX;
-    /**Y initial position when user want to move the panel.*/
-    private int startY;
-    /**Type of move the user want to do.*/
+    
+    /**Select state of the panel. */
+    private boolean selected=false;
+    
+    /**X initial position when user want to move the panel. */
+    private int startX=0;
+    
+    /**Y initial position when user want to move the panel. */
+    private int startY=0;
+    
+    /**Type of move the user want to do. */
     private enum MoveMod{TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, CENTER, NONE;}
     
-    private MoveMod moveMod;
-            
+    /**Id of the move that the user is doing. */
+    private MoveMod moveMod=MoveMod.NONE;
+    
+    /** Reference to the UIController. */
     private final UIController uic;
     
-    private final CompositionArea compArea;
+    /** Size of the margin of the border for resizing. */
+    private static final int margin = 5;
     
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
+     * @param uic UIController of the application.
      */
-    public CompositionJPanel(GraphicalElement ge, UIController uic, CompositionArea compArea){
+    public CompositionJPanel(GraphicalElement ge, UIController uic){
         super(new BorderLayout());
         this.uic=uic;
-        this.compArea=compArea;
-        moveMod = MoveMod.NONE;
         this.ge=ge;
-        panel=new JPanel();
-        selected = false;
         this.add(panel, BorderLayout.CENTER);
-        startX=0;
-        startY=0;
-        //Disable listeners if it's a Document panel.
+        //Disable mouse listeners if it's a Document panel.
         if(ge instanceof Document)
             this.setEnabled(false);
         else{
-            this.addMouseListener(this);
-            this.addMouseMotionListener(this);
+            this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", "", "mouseClicked"));
+            this.addMouseListener(EventHandler.create(MouseListener.class, this, "mousePressed", "", "mousePressed"));
+            this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseReleased", "getLocationOnScreen", "mouseReleased"));
+            this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "getLocationOnScreen", "mouseDragged"));
+            this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseMoved", "getPoint", "mouseMoved"));
         }
     }
     
     /**
      * Sets the panel contained by the object.
-     * @param panel New panel.
+     * @param panel The new panel.
      */
     public void setPanel(JPanel panel){
         this.panel = panel;
+        this.panel.revalidate();
         setBorders();
-        compArea.refresh();
     }
 
     /**
      * Draw border if the CompositionJPanel is selected.
      */
     private void setBorders() {
-        if(selected){
+        if(selected)
            panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
-        }
-        else{
+        else
            panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
-        }
-        compArea.refresh();
     }
 
-    @Override
+    /**
+     * Select or unselect the panel on click.
+     * @param me Mouse Event.
+     */
     public void mouseClicked(MouseEvent me) {
         if(selected)
             uic.unselectGE(ge);
@@ -98,7 +104,10 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
             uic.selectGE(ge);
     }
 
-    @Override
+    /**
+     * Set the moveMod according to the panel border clicked.
+     * @param me Mouse Event.
+     */
     public void mousePressed(MouseEvent me) {
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
@@ -107,163 +116,117 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
         startX = me.getLocationOnScreen().x;
         startY = me.getLocationOnScreen().y;
         
-        if((me.getY()>=0 && me.getY()<=10) && (me.getX()>=0 && me.getX()<=10)){
+        if(me.getY()<=margin && me.getX()<=margin)
             moveMod=MoveMod.TOP_LEFT;
-            this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
-        }
-        else if((me.getX()>=0 && me.getX()<=10) && (me.getY()>=newHeight-10 && me.getY()<=newHeight)){
+        else if(me.getX()<=margin && me.getY()>=newHeight-margin)
             moveMod=MoveMod.BOTTOM_LEFT;
-            this.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
-        }
-        else if((me.getY()>=newHeight-10 && me.getY()<=newHeight) &&
-                (me.getX()>=newWidth-10 && me.getX()<=newWidth)){
+        else if(me.getY()>=newHeight-margin && me.getX()>=newWidth-margin)
             moveMod=MoveMod.BOTTOM_RIGHT;
-            this.setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
-        }
-        else if((me.getX()>=newWidth-10 && me.getX()<=newWidth) && (me.getY()>=0 && me.getY()<=10)){
+        else if(me.getX()>=newWidth-margin && me.getY()<=margin)
             moveMod=MoveMod.TOP_RIGHT;
-            this.setCursor(new Cursor(Cursor.NE_RESIZE_CURSOR));
-        }
-        else if(me.getY()>=0 && me.getY()<=10){
+        else if(me.getY()<=margin)
             moveMod=MoveMod.TOP;
-            this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
-        }
-        else if(me.getX()>=0 && me.getX()<=10){
+        else if(me.getX()<=margin)
             moveMod=MoveMod.LEFT;
-            this.setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
-        }
-        else if(me.getY()>=newHeight-10 && me.getY()<=newHeight){
+        else if(me.getY()>=newHeight-margin)
             moveMod=MoveMod.BOTTOM;
-            this.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-        }
-        else if(me.getX()>=newWidth-10 && me.getX()<=newWidth){
+        else if(me.getX()>=newWidth-margin)
             moveMod=MoveMod.RIGHT;
-            this.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-        }
-        else{
-            this.setCursor(new Cursor(Cursor.MOVE_CURSOR));
+        else
             moveMod=MoveMod.CENTER;
-        }
     }
 
-    @Override
-    public void mouseReleased(MouseEvent me) {
+    /**
+     * Sets the new dimension and position of the ge when the mouse is released.
+     * @param p Location on screen of the mouse when it's released.
+     */
+    public void mouseReleased(Point p) {
         switch(moveMod){
             case TOP:
-                ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
-                ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
+                ge.setY(ge.getY()-(startY-p.y));
                 break;
             case TOP_LEFT:
-                ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
-                ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
-                ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
-                ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
+                ge.setY(ge.getY()-(startY-p.y));
+                ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
+                ge.setX(ge.getX()-(startX-p.x));
                 break;
             case LEFT:
-                ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
-                ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
-                panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
+                ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
+                ge.setX(ge.getX()-(startX-p.x));
                 break;
             case BOTTOM_LEFT:
-                ge.setWidth(Math.abs(startX-me.getLocationOnScreen().x+ge.getWidth()));
-                ge.setX(ge.getX()-(startX-me.getLocationOnScreen().x));
-                ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
+                ge.setX(ge.getX()-(startX-p.x));
+                ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
                 break;
             case BOTTOM:
-                ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
                 break;
             case BOTTOM_RIGHT:
-                ge.setHeight(Math.abs(-(startY-me.getLocationOnScreen().y)+ge.getHeight()));
-                ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
-                panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
+                ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
                 break;
             case RIGHT:
-                ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
                 break;
             case TOP_RIGHT :
-                ge.setWidth(Math.abs(-(startX-me.getLocationOnScreen().x)+ge.getWidth()));
-                ge.setHeight(Math.abs(startY-me.getLocationOnScreen().y+ge.getHeight()));
-                ge.setY(ge.getY()-(startY-me.getLocationOnScreen().y));
-                panel.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
+                ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
+                ge.setY(ge.getY()-(startY-p.y));
                 break;
             case CENTER:
-                ge.setX(ge.getX()-startX+me.getLocationOnScreen().x);
-                ge.setY(ge.getY()-startY+me.getLocationOnScreen().y);
+                ge.setX(ge.getX()-startX+p.x);
+                ge.setY(ge.getY()-startY+p.y);
                 this.panel.setLocation(ge.getX(), ge.getY());
                 break;
         }
+        panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
         uic.validateGE(ge);
-        if(selected){
-            uic.unselectGE(ge);
-            uic.selectGE(ge);
-        }
-        else{
-            uic.selectGE(ge);
-            uic.unselectGE(ge);
-        }
-        setBorders();
-        moveMod=MoveMod.NONE;
         
-        this.setCursor(new Cursor(Cursor.DEFAULT_CURSOR));
-        this.revalidate();
-        this.repaint();
+        this.moveMod=MoveMod.NONE;
     }
 
-    @Override
-    public void mouseEntered(MouseEvent me) {}
-
-    @Override
-    public void mouseExited(MouseEvent me) {}
-
-    @Override
-    public void mouseDragged(MouseEvent me) {
-        if(moveMod==MoveMod.CENTER){
-            panel.setLocation(ge.getX()-(startX-me.getLocationOnScreen().x), ge.getY()-(startY-me.getLocationOnScreen().y));
-        }
+    /**
+     * Refresh the panel position when it's dragged.
+     * @param p Location of the mouse inside the panel.
+     */
+    public void mouseDragged(Point p) {
+        if(moveMod==MoveMod.CENTER)
+            panel.setLocation(ge.getX()-(startX-p.x), ge.getY()-(startY-p.y));
     }
 
-    @Override
-    public void mouseMoved(MouseEvent me) {
-        int x = me.getX();
-        int y = me.getY();
+    /**
+     * Changes the mouse cursor appearence according to the border hovered.
+     * @param p Point of the mouse.
+     */
+    public void mouseMoved(Point p) {
+        int x = p.x;
+        int y = p.y;
         //Need to recalculate the GE width and height beacause of the rotation
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
         
-        if((y>=0 && y<=10) && (x>=0 && x<=10)){
+        if(y<=margin && x<=margin)
             this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
-        }
-        else if((x>=0 && x<=10) && (y>=newHeight-5 && y<=newHeight)){
+        else if(x<=margin && y>=newHeight-margin)
             this.setCursor(new Cursor(Cursor.SW_RESIZE_CURSOR));
-        }
-        else if((y>=newHeight-10 && y<=newHeight) &&
-                (x>=newWidth-10 && x<=newWidth)){
+        else if(y>=newHeight-margin && x>=newWidth-margin)
             this.setCursor(new Cursor(Cursor.SE_RESIZE_CURSOR));
-        }
-        else if((x>=newWidth-10 && x<=newWidth) && (y>=0 && y<=10)){
+        else if(x>=newWidth-margin &&  y<=margin)
             this.setCursor(new Cursor(Cursor.NE_RESIZE_CURSOR));
-        }
-        else if(x>=0 && y<=10){
+        else if(y<=margin)
             this.setCursor(new Cursor(Cursor.N_RESIZE_CURSOR));
-        }
-        else if(x>=0 && x<=10){
+        else if(x<=margin)
             this.setCursor(new Cursor(Cursor.W_RESIZE_CURSOR));
-        }
-        else if(y>=newHeight-5 && y<=newHeight){
+        else if(y>=newHeight-margin)
             this.setCursor(new Cursor(Cursor.S_RESIZE_CURSOR));
-        }
-        else if(x>=newWidth-5 && x<=newWidth){
+        else if(x>=newWidth-margin)
             this.setCursor(new Cursor(Cursor.E_RESIZE_CURSOR));
-        }
-        else{
+        else
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
-        }
     }
     
     /**
@@ -271,9 +234,9 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
      */
     public void hightlight(){
         try {
-            Rectangle r = new Rectangle(this.getLocation(), this.getSize());
             panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
             this.paintImmediately(this.getVisibleRect());
+            this.wait(1000);
             sleep(1000);
             setBorders();
         } catch (InterruptedException ex) {
@@ -294,9 +257,7 @@ public class CompositionJPanel extends JPanel implements MouseListener, MouseMot
     public void enableBorders(boolean enable){
         if(enable)
             this.setBorders();
-        else{
+        else
             panel.setBorder(null);
-            compArea.refresh();
-        }
     }
 }

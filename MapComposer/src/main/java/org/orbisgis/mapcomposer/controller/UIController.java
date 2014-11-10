@@ -31,7 +31,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import org.jibx.runtime.JiBXException;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -253,6 +252,7 @@ public class UIController{
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         if(ge instanceof SimpleDocumentGE)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        refreshSpin();
     }
 
     /**
@@ -329,7 +329,7 @@ public class UIController{
             GraphicalElement ge = aClass.newInstance();
             
             //Registers the GE and its CompositionJPanel.
-            map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+            map.put(ge, new CompositionJPanel(ge, this));
             mainWindow.getCompositionArea().addGE(map.get(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             zIndexStack.push(ge);
@@ -392,7 +392,7 @@ public class UIController{
     }
     
     private void addLoadedGE(GraphicalElement ge) {
-        map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
+        map.put(ge, new CompositionJPanel(ge, this));
         mainWindow.getCompositionArea().addGE(map.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
