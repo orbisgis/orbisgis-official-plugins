@@ -12,20 +12,21 @@ import javax.swing.JScrollPane;
  * Area for the map document composition.
  */
 public class CompositionArea extends JPanel{
-    /**JscrollPane of the CompositionArea*/
-    private JScrollPane pane;
-    /**Main JPanel of the CompositionArea*/
-    private final JPanel panel;
     
-    private Dimension dim;
+    /**JscrollPane of the CompositionArea. */
+    private final JScrollPane pane;
+    
+    /**Main JPanel of the CompositionArea. */
+    private final JPanel panel = new JPanel(null);
+    
+    /**Dimension of the document into the CompositionArea. */
+    private Dimension dim = new Dimension(50, 50);
     
     /**
-     * Private constructor.
+     * Main constructor.
      */
     public CompositionArea(){
         super(new BorderLayout());
-        dim=new Dimension(50, 50);
-        panel = new JPanel(null);
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
@@ -47,8 +48,6 @@ public class CompositionArea extends JPanel{
     public void removeGE(CompositionJPanel panel){
         if(this.panel.isAncestorOf(panel))
             this.panel.remove(panel);
-        this.panel.repaint();
-        this.panel.revalidate();
         refresh();
     }
     
@@ -78,15 +77,21 @@ public class CompositionArea extends JPanel{
      */
     public void removeAllGE() {
         panel.removeAll();
-        this.repaint();
-        this.revalidate();
+        refresh();
     }
     
+    /**
+     * Refreshes the CompositionArea.
+     */
     public void refresh(){
         panel.revalidate();
         panel.repaint();
     }
     
+    /**
+     * Returns the buffered image corresponding to the CompositionArea.
+     * @return The buffered image corresponding to the CompositionArea.
+     */
     public BufferedImage getDocBufferedImage(){
         BufferedImage bi = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = bi.createGraphics();

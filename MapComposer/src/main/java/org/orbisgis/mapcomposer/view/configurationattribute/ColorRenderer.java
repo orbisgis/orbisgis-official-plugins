@@ -5,6 +5,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.view.utils.ColorChooser;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
@@ -23,10 +25,12 @@ public class ColorRenderer implements CARenderer{
         
         pan.add(new JLabel(color.getName()));
         JLabel label = new JLabel("Text demo");
+        label.setName("label");
         label.setForeground(color.getValue());
         pan.add(label);
-        JButton button = new JButton("Color Chooser");
-        button.addMouseListener(new ColorChooser(label));
+        JButton button = new JButton();
+        button.add(label);
+        button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
         
         pan.add(button);
         return pan;
@@ -36,13 +40,15 @@ public class ColorRenderer implements CARenderer{
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
         ColorCA color = (ColorCA)attribute;
         for(Component c : panel.getComponents()){
-            if(c instanceof JLabel){
-                JLabel label = (JLabel)c;
-                if(label.getText().equals("Text demo")){
-                    color.setValue(label.getForeground());
-                }
+            if(c instanceof JButton){
+                color.setValue(c.getBackground());
             }
         }
+    }
+    
+    public void open(JButton button){
+        ColorChooser cc = new ColorChooser(button);
+        cc.setVisible(true);
     }
     
 }

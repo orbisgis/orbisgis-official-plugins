@@ -31,9 +31,9 @@ public abstract class SimpleGE implements GraphicalElement{
         //ConfigurationAttribute instantiation
         x=CAFactory.createIntegerCA("x");
         y=CAFactory.createIntegerCA("y");
-        rotation=CAFactory.createIntegerCA("Rotation", -360, 360);
-        height=CAFactory.createIntegerCA("Height");
-        width=CAFactory.createIntegerCA("Width");
+        rotation=CAFactory.createIntegerCA("Rotation", -360, 360, 0);
+        height=CAFactory.createIntegerCA("Height", Integer.MIN_VALUE, Integer.MAX_VALUE, 50);
+        width=CAFactory.createIntegerCA("Width", Integer.MIN_VALUE, Integer.MAX_VALUE, 50);
         this.setWidth(50);
         this.setHeight(50);
     }

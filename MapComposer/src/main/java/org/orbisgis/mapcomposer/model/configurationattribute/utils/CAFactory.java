@@ -45,18 +45,27 @@ public class CAFactory {
         return ica;
     }
     
-    public static IntegerCA createIntegerCA(String name, int minimum, int maximum){
+    /**
+     * Create an integer ConfigurationAttribute. 
+     * @param name Name of the CA.
+     * @param minimum Minimum of the CA value.
+     * @param maximum Maximum of the CA value.
+     * @param value Value of the CA.
+     * @return The created CA.
+     */
+    public static IntegerCA createIntegerCA(String name, int minimum, int maximum, int value){
         IntegerCA ica = new IntegerCA();
         ica.setLock(false);
         ica.setName(name);
-        if(minimum<maximum){
+        //Tests if the minimum<value<maximum
+        if(minimum<maximum && minimum<value && value<maximum){
             ica.setLimits(true);
             ica.setMin(minimum);
             ica.setMax(maximum);
-            ica.setValue(minimum);
-            if(minimum<0 && 0<maximum)
-                ica.setValue(0);
+           ica.setValue(value);
         }
+        else
+            ica.setValue(0);
         return ica;
     }
     
@@ -80,7 +89,7 @@ public class CAFactory {
         SourceCA source = new SourceCA();
         source.setLock(false);
         source.setName(name);
-        source.setValue("no_value");
+        source.setValue("/path/to/source");
         return source;
     }
     
@@ -96,7 +105,7 @@ public class CAFactory {
         StringCA string = new StringCA();
         string.setLock(false);
         string.setName(name);
-        string.setValue("no_value");
+        string.setValue("Some text");
         return string;
     }
 }

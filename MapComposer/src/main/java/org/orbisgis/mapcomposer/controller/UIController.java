@@ -31,7 +31,6 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
 import org.jibx.runtime.JiBXException;
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -65,15 +64,6 @@ public class UIController{
     
     public MainWindow getMainWindow(){
         return mainWindow;
-    }
-    
-    /**
-     * Returns the CompositionPanel corresponding to a GraphicalElement registered in map .
-     * @param ge GraphicalElement.
-     * @return The CompositionPanel corresponding to the GraphicalElement, null if it isn't registered.
-     */
-    public static CompositionJPanel getPanel(GraphicalElement ge){
-        return map.get(ge);
     }
     
     /**
@@ -185,6 +175,7 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
+        map.get(ge).select();
         refreshSpin();
     }
     
@@ -217,10 +208,8 @@ public class UIController{
      * @param ge GraphicalElement to select.
      */
     public void unselectGE(GraphicalElement ge){
-        for(ConfigurationAttribute ca : ge.getAllAttributes()){
-            ca.setLock(false);
-        }
         selectedGE.remove(ge);
+        map.get(ge).unselect();
         refreshSpin();
     }
     
@@ -229,18 +218,11 @@ public class UIController{
      * Reset the selectedGE list and unselect all the CompositionJPanel in the compositionArea.
      */
     public void unselectAllGE(){
-        List<GraphicalElement> temp = Arrays.asList(selectedGE.toArray());
-        //Unlock all the ConfigurationAttributes
-        for(GraphicalElement ge : temp){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
-            }
-        }
-        refreshSpin();
         //Unselect all the GraphicalElements
         for(GraphicalElement ge : selectedGE)
             map.get(ge).unselect();
         selectedGE= new ArrayList<>();
+        refreshSpin();
     }
     
     /**
@@ -260,36 +242,17 @@ public class UIController{
     
     
     public void validateSelectedGE(){
-        for(GraphicalElement ge : selectedGE){
-            if(ge instanceof GERefresh){
-                ((GERefresh)ge).refresh();
-            }
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-            if(ge instanceof SimpleDocumentGE)
-                mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-        }
-        //Unlock all the ConfigurationAttribute
-        for(GraphicalElement ge : selectedGE){
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                ca.setLock(false);
-            }
-        }
-        refreshSpin();
+        for(GraphicalElement ge : selectedGE)
+            validateGE(ge);
     }
     
     public void validateGE(GraphicalElement ge){
-        if(ge instanceof GERefresh){
+        if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         if(ge instanceof SimpleDocumentGE)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-
-        //Unlock all the ConfigurationAttribute
-        for(ConfigurationAttribute ca : ge.getAllAttributes()){
-            ca.setLock(false);
-        }
-        mainWindow.getCompositionArea().refresh();
+        refreshSpin();
     }
 
     /**
@@ -298,35 +261,27 @@ public class UIController{
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
-        boolean document = false;
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
             //Takes each ConfigurationAttribute from the GraphicalElement
-            for(ConfigurationAttribute ca : ge.getAllAttributes()){
+            for(ConfigurationAttribute ca : ge.getAllAttributes())
                 //Takes each CA from the list of CA to validate
-                for(ConfigurationAttribute confShutterCA : listCA){
+                for(ConfigurationAttribute confShutterCA : listCA)
                     //If the two CA are the same property and are unlocked, set the new CA value
                     if(ca.isSameName(confShutterCA)){
                         if(!confShutterCA.isLocked()){
                             ca.setValue(confShutterCA.getValue());
-                            if(ca instanceof RefreshCA){
+                            if(ca instanceof RefreshCA)
                                 ((RefreshCA)ca).refresh(this);
-                            }
                         }
                         break;
                     }
-                }
-            }
-            if(ge instanceof GERefresh){
+            if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
-            }
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
-            if(ge instanceof Document){
-                document=true;
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+            if(ge instanceof Document)
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
-            }
         }
-        mainWindow.getCompositionArea().refresh();
         unselectAllGE();
     }
     
@@ -374,9 +329,9 @@ public class UIController{
             GraphicalElement ge = aClass.newInstance();
             
             //Registers the GE and its CompositionJPanel.
-            map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
-            mainWindow.getCompositionArea().addGE(getPanel(ge));
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+            map.put(ge, new CompositionJPanel(ge, this));
+            mainWindow.getCompositionArea().addGE(map.get(ge));
+            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             zIndexStack.push(ge);
             
             //Refreshes the GE.
@@ -437,16 +392,17 @@ public class UIController{
     }
     
     private void addLoadedGE(GraphicalElement ge) {
-        map.put(ge, new CompositionJPanel(ge, this, mainWindow.getCompositionArea()));
-        mainWindow.getCompositionArea().addGE(getPanel(ge));
+        map.put(ge, new CompositionJPanel(ge, this));
+        mainWindow.getCompositionArea().addGE(map.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge));
+        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         zindexChange(TO_FRONT);
         validateGE(ge);
+        mainWindow.getCompositionArea().refresh();
     }
     
     public void setAlign( Align a) {
@@ -577,6 +533,7 @@ public class UIController{
                     break;
             }
             validateGE(ge);
+        mainWindow.getCompositionArea().refresh();
         }
     }
     
