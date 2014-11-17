@@ -85,6 +85,7 @@ public class CompositionArea extends JPanel{
      */
     public void refresh(){
         panel.revalidate();
+        panel.repaint();
     }
     
     /**

@@ -89,7 +89,7 @@ public class CAFactory {
         SourceCA source = new SourceCA();
         source.setLock(false);
         source.setName(name);
-        source.setValue("no_value");
+        source.setValue("/path/to/source");
         return source;
     }
     
@@ -105,7 +105,7 @@ public class CAFactory {
         StringCA string = new StringCA();
         string.setLock(false);
         string.setName(name);
-        string.setValue("no_value");
+        string.setValue("Some text");
         return string;
     }
 }
