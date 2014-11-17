@@ -3,6 +3,7 @@
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.slf4j.LoggerFactory;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Cursor;
@@ -13,9 +14,6 @@ import java.awt.event.MouseMotionListener;
 import java.beans.EventHandler;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static java.lang.Thread.sleep;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.BorderFactory;
 import javax.swing.JPanel;
 
@@ -236,11 +234,10 @@ public class CompositionJPanel extends JPanel{
         try {
             panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
             this.paintImmediately(this.getVisibleRect());
-            this.wait(1000);
-            sleep(1000);
+            Thread.sleep(1000);
             setBorders();
         } catch (InterruptedException ex) {
-            Logger.getLogger(CompositionJPanel.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(CompositionJPanel.class).error(ex.getMessage());
         }
     }
     
