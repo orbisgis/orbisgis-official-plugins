@@ -4,6 +4,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -37,18 +38,6 @@ public abstract class SimpleGE implements GraphicalElement{
         this.setWidth(50);
         this.setHeight(50);
     }
-    /**
-     * Copy constructor.
-     * @param sge SimpleGE to copy.
-     */
-    public SimpleGE(SimpleGE sge){
-        //ConfigurationAttribute instantiation
-        x=sge.x;
-        y=sge.y;
-        rotation=sge.rotation;
-        height=sge.height;
-        width=sge.width;
-    }
     
 
     @Override public void setX(int x)   {this.x.setValue(x);}
@@ -64,4 +53,29 @@ public abstract class SimpleGE implements GraphicalElement{
     @Override public int getRotation()  {return this.rotation.getValue();}
     @Override public int getHeight()    {return this.height.getValue();}
     @Override public int getWidth()     {return this.width.getValue();}
+
+    @Override
+    public void setAttribute(ConfigurationAttribute ca) {
+        if(ca.getName().equals(x.getName()))
+            x=(IntegerCA)ca;
+        if(ca.getName().equals(y.getName()))
+            y=(IntegerCA)ca;
+        if(ca.getName().equals(rotation.getName()))
+            rotation=(IntegerCA)ca;
+        if(ca.getName().equals(height.getName()))
+            height=(IntegerCA)ca;
+        if(ca.getName().equals(width.getName()))
+            width=(IntegerCA)ca;
+    }
+
+    @Override
+    public List<ConfigurationAttribute> getSavableAttributes() {
+        List<ConfigurationAttribute> list = new ArrayList<>();
+        list.add(x);
+        list.add(y);
+        list.add(width);
+        list.add(height);
+        list.add(rotation);
+        return list;
+    }
 }

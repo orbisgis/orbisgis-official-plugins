@@ -1,10 +1,9 @@
 package org.orbisgis.mapcomposer.view.configurationattribute;
 
-import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
+
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.util.ArrayList;
@@ -26,8 +25,8 @@ public class LinkToMapImageRenderer implements CARenderer{
         
         pan.add(new JLabel(milka.getName()));
         ArrayList<String> names = new ArrayList<>();
-        for(SimpleMapImageGE mi : milka.getValue())
-            names.add(mi.getOwsMapContext().getTitle());
+        for(String mi : milka.getValue())
+            names.add(mi);
         final JComboBox list = new JComboBox(names.toArray());
         pan.add(list);
         return pan;
@@ -40,19 +39,9 @@ public class LinkToMapImageRenderer implements CARenderer{
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 int i=1;
-                for(SimpleMapImageGE ge : milka.getValue()){
-                    System.out.println(ge);
-                    if(ge.getOwsMapContext().getTitle().equals(((JComboBox)c).getSelectedItem()))
-                        milka.select(((MapImage)ge));
-                    /*if(ge instanceof MapImage){
-                        System.out.println("mapImage");
-                        if(i==((JComboBox)c).getItemCount()){
-                            milka.select(((MapImage)ge));
-                            System.out.println("setted");
-                            break;
-                        }
-                        i++;
-                    }*/
+                for(String ge : milka.getValue()){
+                    if(ge.equals(((JComboBox)c).getSelectedItem()))
+                        milka.select(ge);
                 }
             }
         }

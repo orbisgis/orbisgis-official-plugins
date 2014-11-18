@@ -1,94 +1,145 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.utils;
 
-import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleOrientationGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleScaleGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.text.SimpleTextGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
+
+import java.io.*;
+import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
-import java.util.Stack;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import java.util.Map;
+
+import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
+import org.xml.sax.Attributes;
+import org.xml.sax.SAXException;
+import org.xml.sax.helpers.DefaultHandler;
+
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
-import org.jibx.runtime.BindingDirectory;
-import org.jibx.runtime.IBindingFactory;
-import org.jibx.runtime.IMarshallingContext;
-import org.jibx.runtime.IUnmarshallingContext;
-import org.jibx.runtime.JiBXException;
+import javax.swing.text.html.HTMLDocument;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Class containig all the graphicalElement to save.
+ * Class containing all the graphicalElement to save.
  */
-public class SaveHandler {
-    private List<MapImage> listMI;
-    private List<Orientation> listO;
-    private List<Scale> listS;
-    private List<Image> listI;
-    private List<TextElement> listT;
-    private List<Document> listD;
-    private final List<GraphicalElement> list;
-    
-    public SaveHandler(){
-        listMI=new ArrayList<>();
-        listO=new ArrayList<>();
-        listS=new ArrayList<>();
-        listI=new ArrayList<>();
-        listT=new ArrayList<>();
-        listD=new ArrayList<>();
-        list=new ArrayList<>();
+public class SaveHandler extends DefaultHandler {
+
+    /**String[] compVersions={"1.0.1"};**/
+
+    private List<GraphicalElement> listGE;
+    private List<Class<? extends GraphicalElement>> listClassGE;
+    private List<Class<? extends ConfigurationAttribute>> listClassCA;
+
+    private boolean inGE = false;
+    private boolean inCA = false;
+    private boolean inField = false;
+
+    private GraphicalElement ge;
+    private ConfigurationAttribute ca;
+    private StringBuffer sb = null;
+
+    @Override
+    public void startDocument() throws SAXException {
+        listGE = new ArrayList<>();
+        listClassGE = GEManager.getInstance().getRegisteredGEClasses();
+        listClassCA = CAManager.getInstance().getRegisteredGEClasses();
     }
-    
-    public List<GraphicalElement> getList(){
-        return list;
+
+    @Override
+    public void startElement(String uri, String localName, String qName, Attributes attributes) throws SAXException {
+        if (inGE) {
+            if (inCA) {
+                inField = true;
+                sb = new StringBuffer();
+            } else {
+                for (Class<? extends ConfigurationAttribute> c : listClassCA) {
+                    if (c.getName().equals(qName)) {
+                        try {
+                            ca = c.newInstance();
+                            inCA = true;
+                        } catch (InstantiationException | IllegalAccessException e) {
+                            throw new SAXException(e);
+                        }
+                    }
+                }
+            }
+        } else {
+            for (Class<? extends GraphicalElement> c : listClassGE) {
+                if (c.getName().equals(qName)) {
+                    try {
+                        ge = c.newInstance();
+                        inGE = true;
+                    } catch (InstantiationException | IllegalAccessException e) {
+                        throw new SAXException(e);
+                    }
+                }
+            }
+        }
+
+        /** part of the code to check if the version of the save is actually compatible with the savehandler version.
+        boolean flag=false;
+        if(qName.equals("synchronized"))
+            for(int i=0; i<compVersions.length; i++)
+                if(attributes.getValue("version").equals(compVersions[i]))
+                    flag=true;
+        if(!flag)
+            **/
     }
-    
-    public void save(final Stack<GraphicalElement> stack) throws JiBXException, FileNotFoundException{
-        //Resets the elements list
-        listMI=new ArrayList<>();
-        listO=new ArrayList<>();
-        listS=new ArrayList<>();
-        listI=new ArrayList<>();
-        listT=new ArrayList<>();
-        listD=new ArrayList<>();
-        list.removeAll(list);
-        
-        Stack<GraphicalElement> temp = new Stack<>();
-        for (GraphicalElement ge : stack) {
-            temp.push(ge);
+
+    @Override
+    public void endElement(String uri, String localName, String qName) throws SAXException {
+        if (inField) {
+            ca.setField(qName, sb.toString().replace("\n", "").replace("\t", ""));
+            sb = null;
+            inField = false;
+        } else if (inCA) {
+            ge.setAttribute(ca);
+            inCA = false;
+        } else if (inGE) {
+            listGE.add(ge);
+            inGE = false;
         }
-        int i=0;
-        //Saves the z-index of the GE
-        while(!temp.empty()){
-            temp.peek().setZ(i);
-            if(temp.peek() instanceof SimpleMapImageGE)
-                listMI.add((MapImage)temp.peek());
-            if(temp.peek() instanceof Orientation)
-                listO.add((Orientation)temp.peek());
-            if(temp.peek() instanceof Scale)
-                listS.add((Scale)temp.peek());
-            if(temp.peek() instanceof Image)
-                listI.add((Image)temp.peek());
-            if(temp.peek() instanceof TextElement)
-                listT.add((TextElement)temp.peek());
-            if(temp.peek() instanceof Document)
-                listD.add((Document)temp.peek());
-            i++;
-            temp.pop();
+    }
+
+    @Override
+    public void characters(char[] ch, int start, int length) throws SAXException {
+        if (sb != null) sb.append(new String(ch, start, length));
+    }
+
+    public List<GraphicalElement> load() throws IOException, ParserConfigurationException, SAXException {
+        //Open the file chooser window
+        JFileChooser fc = new JFileChooser();
+        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
+        fc.setApproveButtonText("Open");
+        fc.setDialogTitle("Open document project");
+        fc.setDialogType(JFileChooser.OPEN_DIALOG);
+        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
+        fc.setFileFilter(new FileFilter() {
+
+            @Override
+            public boolean accept(File file) {
+                if (file.isDirectory()) return true;
+                return file.getAbsolutePath().toLowerCase().contains(".xml");
+            }
+
+            @Override
+            public String getDescription() {
+                return "XML Files (.xml)";
+            }
+        });
+        //If the save is validated, do the marshall
+        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
+            String path = fc.getSelectedFile().getAbsolutePath();
+            SAXParserFactory.newInstance().newSAXParser().parse(new File(path), this);
         }
+        return listGE;
+    }
+
+    public void save(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
         //Open the file chooser window
         JFileChooser fc = new JFileChooser();
         fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
@@ -106,93 +157,30 @@ public class SaveHandler {
             @Override public String getDescription() {return "XML Files (.xml)";}
         });
         //If the save is validated, do the marshall
-        if(fc.showOpenDialog(new JFrame())==JFileChooser.APPROVE_OPTION){
-            String path;
-            if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
-                path=fc.getSelectedFile().getAbsolutePath();
-            else 
-                path=fc.getSelectedFile().getAbsolutePath()+".xml";
-
-            IBindingFactory bfact = BindingDirectory.getFactory(SaveHandler.class);
-            IMarshallingContext mctx = bfact.createMarshallingContext();
-            mctx.marshalDocument(this, "UTF-8", null, new FileOutputStream(path));
-        }
-    }
-    
-    public void load() throws JiBXException, FileNotFoundException{
-        //Resets the elements list
-        listMI=new ArrayList<>();
-        listO=new ArrayList<>();
-        listS=new ArrayList<>();
-        listI=new ArrayList<>();
-        listT=new ArrayList<>();
-        listD=new ArrayList<>();
-        list.removeAll(list);
-        //Open the file chooser window
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
-        fc.setApproveButtonText("Open");
-        fc.setDialogTitle("Open document project");
-        fc.setDialogType(JFileChooser.OPEN_DIALOG);
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new FileFilter() {
-
-            @Override public boolean accept(File file) {
-                if(file.isDirectory()) return true;
-                return file.getAbsolutePath().toLowerCase().contains(".xml");
-            }
-
-            @Override public String getDescription() {return "XML Files (.xml)";}
-        });
-        //If the save is validated, do the marshall
-        if(fc.showOpenDialog(new JFrame())==JFileChooser.APPROVE_OPTION){
+        if(fc.showOpenDialog(new JFrame())==JFileChooser.APPROVE_OPTION) {
             String path = fc.getSelectedFile().getAbsolutePath();
-            IBindingFactory bfact = BindingDirectory.getFactory(SaveHandler.class);
-            IUnmarshallingContext uctx = bfact.createUnmarshallingContext();
-            FileInputStream in = new FileInputStream(path);
-            SaveHandler sh = (SaveHandler)uctx.unmarshalDocument(in, "UTF8");
-
-            //Do the loading
-            int size=0;
-            if(sh.listI!=null)
-                size+= sh.listI.size();
-            if(sh.listMI!=null)
-                size+= sh.listMI.size();
-            if(sh.listO!=null)
-                size+= sh.listO.size();
-            if(sh.listS!=null)
-                size+= sh.listS.size();
-            if(sh.listT!=null)
-                size+= sh.listT.size();
-            if(sh.listD!=null)
-                size+= sh.listD.size();
-
-            for(int i=size-1; i>=0; i--){
-                if(sh.listMI!=null)
-                    for(SimpleMapImageGE ge : sh.listMI)
-                        if(ge.getZ()==i)
-                            list.add(new MapImage(ge));
-                if(sh.listS!=null)
-                    for(SimpleScaleGE ge : sh.listS)
-                        if(ge.getZ()==i)
-                            list.add(new Scale(ge));
-                if(sh.listO!=null)
-                    for(SimpleOrientationGE ge : sh.listO)
-                        if(ge.getZ()==i)
-                            list.add(new Orientation(ge));
-                if(sh.listT!=null)
-                    for(SimpleTextGE ge : sh.listT)
-                        if(ge.getZ()==i)
-                            list.add(new TextElement(ge));
-                if(sh.listD!=null)
-                    for(SimpleDocumentGE ge : sh.listD)
-                        if(ge.getZ()==i)
-                            list.add(new Document(ge));
-                if(sh.listI!=null)
-                    for(SimpleIllustrationGE ge : sh.listI)
-                        if(ge.getZ()==i)
-                            list.add(new Image(ge));
+            if(!path.contains(".xml")) path+=".xml";
+            FileWriter fw = new FileWriter(path);
+            /**fw.write("<synchronized version=\""+this.getClass().getPackage().getImplementationVersion()+"\"/>");**/
+            fw.write("<synchronized>\n");
+            for (GraphicalElement ge : list) {
+                fw.write("\t<" + ge.getClass().getName() + ">\n");
+                for(ConfigurationAttribute ca : ge.getSavableAttributes()){
+                    fw.write("\t\t<"+ca.getClass().getName()+">\n");
+                    Iterator<Map.Entry<String, Object>> it =  ca.getSavableField().entrySet().iterator();
+                    while(it.hasNext()){
+                        Map.Entry<String, Object> entry = it.next();
+                        fw.write("\t\t\t<" + entry.getKey() + ">\n");
+                        fw.write("\t\t\t\t"+entry.getValue().toString()+"\n");
+                        fw.write("\t\t\t</" + entry.getKey() + ">\n");
+                    }
+                    fw.write("\t\t</"+ca.getClass().getName()+">\n");
+                }
+                fw.write("\t</"+ ge.getClass().getName()+">\n");
             }
+            fw.write("</synchronized>");
+            fw.close();
         }
     }
+
 }

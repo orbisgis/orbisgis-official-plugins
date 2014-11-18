@@ -1,8 +1,9 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
+
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
@@ -11,6 +12,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContex
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.configurationattribute.CARenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.ChoiceRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.ColorRenderer;
@@ -20,6 +22,7 @@ import org.orbisgis.mapcomposer.view.configurationattribute.NumericRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.OwsContextRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.SourceRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.TextRenderer;
+import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 
 /**
 * The class manages the link between the ConfigurationAttribute (CA) and their Renderer.
@@ -82,5 +85,19 @@ public class CAManager {
     */
     public CARenderer getRenderer(ConfigurationAttribute ca){
         return map.get(ca.getClass());
+    }
+
+
+
+    /**
+     * Return the list of all the previously registered GraphicalElement classes.
+     * @return List of the GE.
+     */
+    public List<Class<? extends ConfigurationAttribute>> getRegisteredGEClasses(){
+        List<Class<? extends ConfigurationAttribute>> list = new ArrayList<>();
+        Iterator<Map.Entry<Class<? extends ConfigurationAttribute>, CARenderer>> it = map.entrySet().iterator();
+        while(it.hasNext())
+            list.add(it.next().getKey());
+        return list;
     }
 }

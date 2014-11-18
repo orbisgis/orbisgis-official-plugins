@@ -3,6 +3,9 @@ package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * Implementation of the common function of ConfigurationAttributes.
  */
@@ -26,5 +29,18 @@ public abstract class BaseListCA<T> implements ListCA<T>{
     @Override public boolean isSameName(ConfigurationAttribute ca){
         return this.name.equals(ca.getName());
     }
-    
+
+    public void setField(String name, String value) {
+        if(name.equals("name"))
+            name=value;
+        if(name.equals("lock"))
+            lock = Boolean.parseBoolean(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map<String, Object> map = new HashMap<>();
+        map.put("name", name);
+        map.put("lock", lock);
+        return map;
+    }
 }

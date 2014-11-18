@@ -2,6 +2,7 @@ package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import java.awt.Color;
+import java.util.Map;
 
 /**
  * Color ConfigurationAttribute.
@@ -10,10 +11,6 @@ public class ColorCA extends BaseCA<Color> {
     /** Property itself.
      * As color can't be handle by jibx, the color is represented by the Red, Green, blue, Alpha value. */
     private int[] rgba;
-    
-    public ColorCA(){
-        rgba=new int[4];
-    }
 
     @Override public void setValue(Color value) {
         this.rgba[0]=value.getRed();
@@ -27,5 +24,24 @@ public class ColorCA extends BaseCA<Color> {
     @Override public boolean isSameValue(ConfigurationAttribute ca) {
         return ca.getValue().equals(this.getValue());
     }
-    
+
+
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("rgba")) {
+            String[] s = value.split(",");
+            for(int i=0; i<4; i++)
+                rgba[i]=Integer.parseInt(s[i]);
+        }
+    }
+
+    @Override
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("rgba", rgba[0]+","+rgba[1]+","+rgba[2]+","+rgba[3]);
+        return ret;
+    }
+
 }

@@ -1,27 +1,27 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+
 import java.util.List;
+import java.util.Map;
 
 /**
  * The attribute contain the link to a MapImage
  */
-public class MapImageListCA extends BaseListCA<SimpleMapImageGE> implements RefreshCA{
+public class MapImageListCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
     private int index;
     /** Property itself */
-    private List<SimpleMapImageGE> list;
-    
-    public MapImageListCA(){
-        index=-1;
-    }
+    private List<String> list;
+    private MapImage mi;
         
-    @Override public void setValue(List<SimpleMapImageGE> value) {this.list=value;}
-    @Override public List<SimpleMapImageGE> getValue() {return list;}
+    @Override public void setValue(List<String> value) {this.list=value;}
+    @Override public List<String> getValue() {return list;}
 
     @Override public boolean isSameValue(ConfigurationAttribute ca) {
         if(ca instanceof ListCA){
@@ -32,16 +32,16 @@ public class MapImageListCA extends BaseListCA<SimpleMapImageGE> implements Refr
         return false;
     }
 
-    @Override public void       add(SimpleMapImageGE value)       {list.add(value);}
-    @Override public boolean    remove(SimpleMapImageGE value)    {return this.list.remove(value);}
+    @Override public void       add(String value)       {list.add(value);}
+    @Override public boolean    remove(String value)    {return this.list.remove(value);}
     
-    @Override public SimpleMapImageGE     getSelected(){
+    @Override public String getSelected(){
         if(index>=0 && index<list.size())
             return list.get(index);
         else
             return null;
     }
-    @Override public void       select(SimpleMapImageGE choice)   {index=list.indexOf(choice);}
+    @Override public void       select(String choice)   {index=list.indexOf(choice);}
 
     /**
      * Verify if the files path still right.
@@ -49,19 +49,50 @@ public class MapImageListCA extends BaseListCA<SimpleMapImageGE> implements Refr
      */
     @Override
     public void refresh(UIController uic) {
-        for(SimpleMapImageGE mi : this.getValue()){
-            if(!uic.getGEMap().containsKey(mi)){
-                this.remove(((SimpleMapImageGE)mi));
-            }
+        for(String mi : this.getValue()){
+            boolean flag=false;
+            for(GraphicalElement ge : uic.getGEMap().keySet())
+                if(ge instanceof MapImage)
+                    if(ge.toString().equals(mi)) {
+                        flag = true;
+                        this.mi=(MapImage)ge;
+                    }
+            if(!flag)
+                this.remove(mi);
         }
         
         for(Object ge : uic.getGEMap().keySet().toArray()){
             if(ge instanceof MapImage){
-                if(!this.getValue().contains((SimpleMapImageGE)ge)){
-                    this.add(((MapImage)ge));
+                if(!this.getValue().contains(ge.toString())){
+                    this.add(ge.toString());
                 }
             }
         }
         
+    }
+
+    public MapImage getMapImage(){
+        return mi;
+    }
+
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("list"))
+            list= Arrays.asList(value.split(","));
+        if(name.equals("index"))
+            index=Integer.parseInt(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("index", index);
+        String s="";
+        for(String str : list)
+            s+=str+",";
+        if(list.size()>0)s=s.substring(0, s.length()-1);
+        ret.put("list", s);
+        return ret;
     }
 }

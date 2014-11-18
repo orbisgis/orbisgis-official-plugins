@@ -1,5 +1,9 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.interfaces;
 
+import org.xml.sax.Attributes;
+
+import java.util.Map;
+
 /**
  * A ConfigurationAttribute (CA) represent a single property of a GraphicalElement (GE).
  * Creating a class to represent a complex attribute (such as a path to an OWS-Context) permit to simplify its use and to make lighter the GE class.
@@ -54,8 +58,20 @@ public interface ConfigurationAttribute<T> {
     
     /**
      * Compare if two ConfigurationAttributes represents the same attribute (same name and value).
-     * @param ca ConbfigurationAttribute to compare with
+     * @param ca ConfigurationAttribute to compare with
      * @return True if the attribute represented is the same, false otherwise.
      */
     public boolean isSameValue(ConfigurationAttribute ca);
+
+    /**
+     * Sets the field which name is name with the given value.
+     * @param name Name of the field.
+     * @param value Value of the field.
+     */
+    public void setField(String name, String value);
+
+    /**
+     * Return all the CA field.
+     */
+    public Map<String, Object> getSavableField();
 }

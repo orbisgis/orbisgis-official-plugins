@@ -33,7 +33,6 @@ import javax.swing.event.ChangeListener;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
-import static org.orbisgis.viewapi.main.frames.ext.MainFrameAction.MENU_TOOLS;
 
 /**
  * Main window of the map composer. during the developement, the map composer will be a separeted window.
@@ -46,6 +45,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
     public static final String CONFIGURATION = "CONFIGURATION";
     public static final String SAVE = "SAVE";
+    public static final String LOAD = "LOAD";
     public static final String EXPORT_COMPOSER = "EXPORT_COMPOSER";
     public static final String ADD_MAP = "ADD_MAP";
     public static final String ADD_TEXT = "ADD_TEXT";
@@ -65,7 +65,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String ALIGN_TO_BOTTOM = "ALIGN_TO_BOTTOM";
     public static final String ALIGN_TO_MIDDLE = "ALIGN_TO_MIDDLE";
     public static final String ALIGN_TO_TOP = "ALIGN_TO_TOP";
-    public static final String PROPERTIE = "PROPERTIE";
+    public static final String PROPERTIES = "PROPERTIES";
     public static final String DELETE = "DELETE";
     
     /** ActionCommands for the buttons. */
@@ -115,6 +115,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuation dialog", "configuration.png", uic, "showDocProperties", null));
         actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uic, "save", null));
+        actions.addAction(createAction(LOAD, "", "Load the document", "properties.png", uic, "load", null));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));
         addSeparatortTo(toolBar);
         actions.addAction(createAction(ADD_MAP, "", "Add a map element", "add_map.png", this, "addMap", null));
@@ -139,7 +140,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle.png", this, "alignToMiddle", null));
         actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top", "align_to_top.png", this, "alignToTop", null));
         addSeparatortTo(toolBar);
-        actions.addAction(createAction(PROPERTIE, "", "Show selected elements properties", "properties.png", uic, "showProperties", null));
+        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties", "properties.png", uic, "showProperties", null));
         actions.addAction(createAction(DELETE, "", "Delete selected elements", "delete.png", uic, "remove", null));
         toolBar.add(new JSeparator(SwingConstants.VERTICAL));
         

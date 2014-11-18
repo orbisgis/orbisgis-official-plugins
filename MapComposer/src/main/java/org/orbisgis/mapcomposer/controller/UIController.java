@@ -4,7 +4,6 @@ import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
@@ -30,7 +29,10 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
-import org.jibx.runtime.JiBXException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
  * This class manager the interaction between the user, the UI and the data model.
@@ -159,7 +161,6 @@ public class UIController{
     
     /**
      * Move the GraphicalElement to the front or back and set its index.
-     * @param deltaZ Variation of the Z-index of the GE.
      * @param ge GraphicalElement to move.
      * @param temp Temporary stack.
      */
@@ -250,7 +251,7 @@ public class UIController{
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
         map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
-        if(ge instanceof SimpleDocumentGE)
+        if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
     }
@@ -350,7 +351,7 @@ public class UIController{
             //Show the configuration dialog
             showProperties();
         } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
     
@@ -370,27 +371,37 @@ public class UIController{
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
     }
-    
+
+    /**
+     * Run save function of the SaveHandler.
+     */
     public void save(){
         try {
-            listGE.save(zIndexStack);
-        } catch (JiBXException | FileNotFoundException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            listGE.save(zIndexStack.subList(0, zIndexStack.size()));
+        } catch (NoSuchMethodException|IOException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
-    
+
+    /**
+     * Run load function from the SaveHandler and draw loaded GE.
+     */
     public void load(){
         try {
             removeAllGE();
-            listGE.load();
-            for(GraphicalElement ge : listGE.getList()){
+            List<GraphicalElement> list = listGE.load();
+            for(GraphicalElement ge : list){
                 addLoadedGE(ge);
             }
-        } catch (JiBXException | FileNotFoundException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException|SAXException|IOException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
-    
+
+    /**
+     * Add to the project the given GE (that is just loaded)..
+     * @param ge GE to add to the project.
+     */
     private void addLoadedGE(GraphicalElement ge) {
         map.put(ge, new CompositionJPanel(ge, this));
         mainWindow.getCompositionArea().addGE(map.get(ge));

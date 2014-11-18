@@ -8,7 +8,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContex
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.SimpleMapImageGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;
@@ -73,7 +73,7 @@ public class CAFactory {
         MapImageListCA milka = new MapImageListCA();
         milka.setLock(false);
         milka.setName(name);
-        milka.setValue(new ArrayList<SimpleMapImageGE>());
+        milka.setValue(new ArrayList<String>());
         return milka;
     }
     

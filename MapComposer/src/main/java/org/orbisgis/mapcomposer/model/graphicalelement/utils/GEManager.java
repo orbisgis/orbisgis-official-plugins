@@ -1,7 +1,7 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.utils;
 
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
+
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
@@ -67,5 +67,17 @@ public class GEManager {
      */
     public void addGE(Class<? extends GraphicalElement> geClass, GERenderer renderer){
         mapRenderer.put(geClass, renderer);
+    }
+
+    /**
+     * Return the list of all the previously registered GraphicalElement classes.
+     * @return List of the GE.
+     */
+    public List<Class<? extends GraphicalElement>> getRegisteredGEClasses(){
+        List<Class<? extends GraphicalElement>> list = new ArrayList<>();
+        Iterator<Map.Entry<Class<? extends GraphicalElement>, GERenderer>> it = mapRenderer.entrySet().iterator();
+        while(it.hasNext())
+            list.add(it.next().getKey());
+        return list;
     }
 }

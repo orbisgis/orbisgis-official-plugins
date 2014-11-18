@@ -2,15 +2,14 @@ package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 
+import java.util.Map;
+
 /**
  * Text attribute representing a simple text.
  */
-public final class StringCA extends BaseCA<String>{
+public class StringCA extends BaseCA<String>{
     /** Property itself */
     private String value;
-    
-    public StringCA(){
-    }
     
     @Override public void setValue(String value) {this.value=value;}
 
@@ -18,5 +17,18 @@ public final class StringCA extends BaseCA<String>{
 
     @Override public boolean isSameValue(ConfigurationAttribute ca) {
         return ca.getValue().equals(value);
+    }
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("value"))
+            this.value=value;
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("value", value);
+        return ret;
     }
 }

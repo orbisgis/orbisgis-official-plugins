@@ -1,5 +1,6 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
@@ -11,46 +12,25 @@ import java.io.FileNotFoundException;
 import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JOptionPane;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 import org.orbisgis.progress.NullProgressMonitor;
+import org.slf4j.LoggerFactory;
 
 /**
  * ConfigurationAttribute representing a specified OwsMapContext given by OrbisGIS.
  */
-public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
+public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
     private int index;
     /** Property itself */
     private List<String> list;
-    private final OwsMapContext omc;
-    
-    /**
-     * Main constructor.
-     */
-    public OwsContextCA() {
-        super();
-        list = new ArrayList<>();
-        loadListFiles();
-        if(list.isEmpty())
-            this.add("/");
-        else
-            this.select(list.get(0));
-        omc=new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
-        
-        //Refresh of the file list
-        loadListFiles();
-        //Refresh of the selected file
-        try {
-            reloadSelectedOMC();
-        } catch (FileNotFoundException ex) {
-            //Show an alert message ?
-        }
-    }
-    
+    private OwsMapContext omc = new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
+
     public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
@@ -61,7 +41,7 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         try {
             reloadSelectedOMC();
         } catch (FileNotFoundException ex) {
-            //Show an alert message ?
+            LoggerFactory.getLogger(OwsContextCA.class).error(ex.getMessage());
         }
     }
     
@@ -78,7 +58,7 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
                 omc.read(new FileInputStream(new File(getSelected())));
                 omc.open(new NullProgressMonitor());
             } catch (LayerException ex) {
-                Logger.getLogger(OwsContextCA.class.getName()).log(Level.SEVERE, null, ex);
+                LoggerFactory.getLogger(OwsContextCA.class).error(ex.getMessage());
             }
         }
     }
@@ -103,6 +83,10 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
                 list.add(file.getAbsolutePath());
         }
         select(s);
+        if(index==-1 || list.size()==0){
+            list.add("/");
+            select("/");
+        }
     }
 
     @Override
@@ -135,5 +119,25 @@ public final class OwsContextCA extends BaseListCA<String> implements RefreshCA{
             return getSelected().equals(((ListCA)ca).getSelected());
         }
         return false;
+    }
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("list"))
+            list= Arrays.asList(value.split(","));
+        if(name.equals("index"))
+            index=Integer.parseInt(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("index", index);
+        String s="";
+        for(String str : list)
+            s+=str+",";
+        if(list.size()>0)s=s.substring(0, s.length()-1);
+        ret.put("list", s);
+        return ret;
     }
 }

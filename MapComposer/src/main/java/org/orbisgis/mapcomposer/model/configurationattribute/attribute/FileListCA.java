@@ -1,5 +1,6 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
@@ -7,20 +8,16 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshC
 import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * This class represent a list of different files path.
  */
-public final class FileListCA extends BaseListCA<File> implements RefreshCA{
+public class FileListCA extends BaseListCA<File> implements RefreshCA{
     /** Index of the value selected.*/
     private int index;
     /** Property itself */
     private List<String> list;
-    
-    public FileListCA(){
-        index=-1;
-        list=new ArrayList<>();
-    }
 
     @Override public void setValue(List<File> value) {
         list=new ArrayList<>();
@@ -66,5 +63,25 @@ public final class FileListCA extends BaseListCA<File> implements RefreshCA{
         for(File f : listT){
             this.remove(f);
         }
+    }
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("list"))
+            list= Arrays.asList(value.split(","));
+        if(name.equals("index"))
+            index=Integer.parseInt(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("index", index);
+        String s="";
+        for(String str : list)
+            s+=str+",";
+        if(list.size()>0)s=s.substring(0, s.length()-1);
+        ret.put("list", s);
+        return ret;
     }
 }

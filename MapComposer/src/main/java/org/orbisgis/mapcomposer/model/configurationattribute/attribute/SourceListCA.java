@@ -1,11 +1,13 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
+import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * String List ConfigurationAttribute.
@@ -16,10 +18,6 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     private int index;
     /** Property itself */
     private List<String> list;
-    
-    public SourceListCA(){
-        index=-1;
-    }
 
     @Override public void setValue(List<String> value) {this.list=value;}
     @Override public List<String> getValue() {return list;}
@@ -45,5 +43,25 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
         for(String s : list)
             if(!temp.contains(s)) temp.add(s);
         list=temp;
+    }
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("list"))
+            list= Arrays.asList(value.split(","));
+        if(name.equals("index"))
+            index=Integer.parseInt(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("index", index);
+        String s="";
+        for(String str : list)
+            s+=str+",";
+        if(list.size()>0)s=s.substring(0, s.length()-1);
+        ret.put("list", s);
+        return ret;
     }
 }

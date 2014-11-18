@@ -2,10 +2,12 @@ package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 
+import java.util.Map;
+
 /**
  * IntegerCA attribute.
  */
-public final class IntegerCA extends BaseCA<Integer> {
+public class IntegerCA extends BaseCA<Integer> {
     /** Property itself */
     private Integer value;
     /** Minimum value */
@@ -14,13 +16,6 @@ public final class IntegerCA extends BaseCA<Integer> {
     private int max;
     /** Boolean to enable or not the max and min value */
     private boolean limits;
-    
-    /**
-     * Main constructor.
-     */
-    public IntegerCA() {
-        super();
-    }
     
     @Override public void setValue(Integer value) {this.value=value;}
 
@@ -70,5 +65,27 @@ public final class IntegerCA extends BaseCA<Integer> {
      */
     public void setLimits(boolean limits){
         this.limits=limits;
+    }
+
+    @Override
+    public void setField(String name, String value) {
+        super.setField(name, value);
+        if(name.equals("value"))
+            this.value=Integer.parseInt(value);
+        if(name.equals("min"))
+            min = Integer.parseInt(value);
+        if(name.equals("max"))
+            max = Integer.parseInt(value);
+        if(name.equals("limits"))
+            limits = Boolean.parseBoolean(value);
+    }
+
+    public Map<String, Object> getSavableField() {
+        Map ret = super.getSavableField();
+        ret.put("value", value);
+        ret.put("min", min);
+        ret.put("max", max);
+        ret.put("limits", limits);
+        return ret;
     }
 }

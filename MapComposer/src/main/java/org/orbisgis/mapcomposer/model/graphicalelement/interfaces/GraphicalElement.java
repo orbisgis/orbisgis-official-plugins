@@ -1,6 +1,8 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.xml.sax.Attributes;
+
 import java.util.List;
 
 /**
@@ -90,4 +92,17 @@ public interface GraphicalElement {
     public List<ConfigurationAttribute> getAllAttributes();
     
     public enum Property{X, Y, WIDTH, HEIGHT, ROTATION;}
+
+    /**
+     * Sets the ConfigurationAttribute contained in the GE corresponding to the given CA.
+     * @param ca CA to register.
+     */
+    public void setAttribute(ConfigurationAttribute ca);
+
+    /**
+     * Returns all the savable attributes of the GE.
+     */
+    public List<ConfigurationAttribute> getSavableAttributes();
+
+
 }

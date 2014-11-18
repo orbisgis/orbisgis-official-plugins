@@ -1,5 +1,6 @@
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import java.awt.Toolkit;

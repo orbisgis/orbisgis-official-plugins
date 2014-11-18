@@ -1,5 +1,7 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
@@ -21,15 +23,6 @@ public class SimpleCartoGE extends SimpleGE implements CartographicElement{
         super();
         this.owsc = CAFactory.createOwsContextCA("OWS-Context path");
     }
-    
-    /**
-     * Copy constructor.
-     * @param scge SimpleCartoGE to copy.
-     */
-    public SimpleCartoGE(SimpleCartoGE scge){
-        super(scge);
-        this.owsc = scge.owsc;
-    }
 
     @Override public OwsMapContext getOwsMapContext()   {return owsc.getOwsMapContext();}
     @Override public String getOwsPath()                {return owsc.getSelected();}
@@ -40,5 +33,19 @@ public class SimpleCartoGE extends SimpleGE implements CartographicElement{
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(owsc);
         return list;
+    }
+
+    @Override
+    public List<ConfigurationAttribute> getSavableAttributes() {
+        List<ConfigurationAttribute> list = super.getSavableAttributes();
+        list.add(owsc);
+        return list;
+    }
+
+    @Override
+    public void setAttribute(ConfigurationAttribute ca) {
+        super.setAttribute(ca);
+        if(ca.getName().equals(owsc.getName()))
+            owsc=(OwsContextCA)ca;
     }
 }
