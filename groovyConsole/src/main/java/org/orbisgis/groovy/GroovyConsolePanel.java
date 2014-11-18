@@ -476,6 +476,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
         @Override
         public void run(ProgressMonitor progressMonitor) {
+            variables.put("pm", progressMonitor);
             GroovyExecutor groovyExecutor = new GroovyExecutor(script, properties, variables, loggers, executeAction);
             progressMonitor.addPropertyChangeListener(ProgressMonitor.PROP_CANCEL,
                     EventHandler.create(PropertyChangeListener.class, groovyExecutor, "stop"));
