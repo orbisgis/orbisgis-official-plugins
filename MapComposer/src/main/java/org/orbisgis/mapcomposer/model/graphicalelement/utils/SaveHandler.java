@@ -3,23 +3,20 @@ package org.orbisgis.mapcomposer.model.graphicalelement.utils;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-
-import java.io.*;
-import java.lang.reflect.Field;
-import java.lang.reflect.Modifier;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-
 import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
-
-import javax.swing.*;
+import javax.swing.JFileChooser;
+import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
-import javax.swing.text.html.HTMLDocument;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -28,7 +25,7 @@ import javax.xml.parsers.SAXParserFactory;
  */
 public class SaveHandler extends DefaultHandler {
 
-    /**String[] compVersions={"1.0.1"};**/
+    String[] compVersions={"1.0.2"};
 
     private List<GraphicalElement> listGE;
     private List<Class<? extends GraphicalElement>> listClassGE;
@@ -79,15 +76,9 @@ public class SaveHandler extends DefaultHandler {
                 }
             }
         }
-
-        /** part of the code to check if the version of the save is actually compatible with the savehandler version.
-        boolean flag=false;
-        if(qName.equals("synchronized"))
-            for(int i=0; i<compVersions.length; i++)
-                if(attributes.getValue("version").equals(compVersions[i]))
-                    flag=true;
-        if(!flag)
-            **/
+        if(qName.equals("version")){
+            sb = new StringBuffer();
+        }
     }
 
     @Override
@@ -102,6 +93,20 @@ public class SaveHandler extends DefaultHandler {
         } else if (inGE) {
             listGE.add(ge);
             inGE = false;
+        }
+
+        // Check if the version of the save is actually compatible with the mapcomposer version.
+        if(qName.equals("version")) {
+            boolean flag=false;
+            for (int i = 0; i < compVersions.length; i++)
+                if (sb.toString().equals(compVersions[i]))
+                    flag = true;
+            if (!flag) {
+                String message = "File version " + sb.toString() + " isn't compatible with the MapComposer version. Should be ";
+                for (String s : compVersions)
+                    message += s + ";";
+                throw new SAXException(message);
+            }
         }
     }
 
@@ -161,8 +166,7 @@ public class SaveHandler extends DefaultHandler {
             String path = fc.getSelectedFile().getAbsolutePath();
             if(!path.contains(".xml")) path+=".xml";
             FileWriter fw = new FileWriter(path);
-            /**fw.write("<synchronized version=\""+this.getClass().getPackage().getImplementationVersion()+"\"/>");**/
-            fw.write("<synchronized>\n");
+            fw.write("<synchronized>\n\t<version>1.0.2</version>\n");
             for (GraphicalElement ge : list) {
                 fw.write("\t<" + ge.getClass().getName() + ">\n");
                 for(ConfigurationAttribute ca : ge.getSavableAttributes()){
@@ -182,5 +186,6 @@ public class SaveHandler extends DefaultHandler {
             fw.close();
         }
     }
+
 
 }

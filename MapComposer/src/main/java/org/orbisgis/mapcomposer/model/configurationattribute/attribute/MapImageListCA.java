@@ -7,6 +7,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshC
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 
@@ -15,10 +16,10 @@ import java.util.Map;
  */
 public class MapImageListCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index;
+    private int index = 0;
     /** Property itself */
-    private List<String> list;
-    private MapImage mi;
+    private List<String> list = new ArrayList<>();
+    private MapImage mi = null;
         
     @Override public void setValue(List<String> value) {this.list=value;}
     @Override public List<String> getValue() {return list;}

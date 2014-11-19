@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index;
+    private int index = 0;
     /** Property itself */
-    private List<String> list;
+    private List<String> list = new ArrayList<>();
 
     @Override public void setValue(List<String> value) {this.list=value;}
     @Override public List<String> getValue() {return list;}

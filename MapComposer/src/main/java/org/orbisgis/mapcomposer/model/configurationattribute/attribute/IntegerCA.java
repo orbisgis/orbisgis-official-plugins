@@ -9,13 +9,13 @@ import java.util.Map;
  */
 public class IntegerCA extends BaseCA<Integer> {
     /** Property itself */
-    private Integer value;
+    private Integer value = 0;
     /** Minimum value */
-    private int min;
+    private int min = Integer.MIN_VALUE;
     /** Maximum value */
-    private int max;
+    private int max = Integer.MAX_VALUE;
     /** Boolean to enable or not the max and min value */
-    private boolean limits;
+    private boolean limits = false;
     
     @Override public void setValue(Integer value) {this.value=value;}
 

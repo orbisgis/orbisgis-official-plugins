@@ -9,7 +9,7 @@ import java.util.Map;
  */
 public class SourceCA extends BaseCA<String>{
     /** Property itself */
-    private String value;
+    private String value = "";
     
     @Override public void setValue(String value) {this.value=value;}
 

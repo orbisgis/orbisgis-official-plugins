@@ -26,9 +26,9 @@ import org.slf4j.LoggerFactory;
  */
 public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index;
+    private int index = 0;
     /** Property itself */
-    private List<String> list;
+    private List<String> list = new ArrayList<>();
     private OwsMapContext omc = new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
 
     public OwsMapContext getOwsMapContext(){return omc;}

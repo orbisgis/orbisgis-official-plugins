@@ -12,9 +12,9 @@ import java.util.Objects;
  */
 public abstract class BaseCA<T> implements ConfigurationAttribute<T>{
     /** Name of the property */
-    private String name;
+    private String name = "";
     /** Lock. If the property is locked, it can't be changed. */
-    private boolean lock;
+    private boolean lock = false;
     
     public BaseCA(){
         name="no_name";

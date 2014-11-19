@@ -9,8 +9,8 @@ import java.util.Map;
  */
 public class ColorCA extends BaseCA<Color> {
     /** Property itself.
-     * As color can't be handle by jibx, the color is represented by the Red, Green, blue, Alpha value. */
-    private int[] rgba;
+     * The color is represented by the Red, Green, blue, Alpha value. */
+    private int[] rgba = new int[4];
 
     @Override public void setValue(Color value) {
         this.rgba[0]=value.getRed();

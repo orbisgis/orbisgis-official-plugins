@@ -25,10 +25,8 @@ public class ColorRenderer implements CARenderer{
         
         pan.add(new JLabel(color.getName()));
         JLabel label = new JLabel("Text demo");
-        label.setName("label");
-        label.setForeground(color.getValue());
-        pan.add(label);
         JButton button = new JButton();
+        button.setBackground(color.getValue());
         button.add(label);
         button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
         

@@ -11,9 +11,9 @@ import java.util.Map;
  */
 public abstract class BaseListCA<T> implements ListCA<T>{
     /** Name of the property */
-    private String name;
+    private String name = "";
     /** Lock. If the property is locked, it can't be changed. */
-    private boolean lock;
+    private boolean lock = false;
 
     public BaseListCA(){
         name="no_name";

@@ -15,9 +15,9 @@ import java.util.Map;
  */
 public class FileListCA extends BaseListCA<File> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index;
+    private int index = 0;
     /** Property itself */
-    private List<String> list;
+    private List<String> list = new ArrayList<>();
 
     @Override public void setValue(List<File> value) {
         list=new ArrayList<>();
