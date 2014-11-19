@@ -29,7 +29,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     private int index = 0;
     /** Property itself */
     private List<String> list = new ArrayList<>();
-    private OwsMapContext omc = new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
+    private OwsMapContext omc = null;
 
     public OwsMapContext getOwsMapContext(){return omc;}
 
@@ -38,6 +38,8 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         //Refresh of the file list
         loadListFiles();
         //Refresh of the selected file
+        if(omc==null)
+            omc = new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
         try {
             reloadSelectedOMC();
         } catch (FileNotFoundException ex) {
