@@ -8,7 +8,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContex
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import java.awt.Color;
 import java.io.File;
 import java.util.ArrayList;

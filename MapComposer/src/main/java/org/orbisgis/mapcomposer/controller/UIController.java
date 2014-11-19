@@ -9,6 +9,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
+import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler;
 import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
@@ -324,33 +325,29 @@ public class UIController{
      * @param aClass Class of the new GraphicalElement.
      */
     public void addGE(Class<? extends GraphicalElement> aClass) {
-        try {
-            //Creates the GraphicalElement.
-            GraphicalElement ge = aClass.newInstance();
-            
+        //Creates the GraphicalElement.
+        GraphicalElement ge = GEFactory.createGE(aClass);
+        if(ge!=null) {
             //Registers the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge, this));
             mainWindow.getCompositionArea().addGE(map.get(ge));
             map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
             zIndexStack.push(ge);
-            
+
             //Refreshes the GE.
-            if(ge instanceof GERefresh){
-                ((GERefresh)ge).refresh();
-            }
-            
+            if (ge instanceof GERefresh)
+                ((GERefresh) ge).refresh();
+
             //Selects only the GE
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
-            
+
             //Bring it to the front an validate its default properties.
             zindexChange(TO_FRONT);
             validateGE(ge);
-            
+
             //Show the configuration dialog
             showProperties();
-        } catch (InstantiationException | IllegalAccessException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
     

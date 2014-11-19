@@ -1,6 +1,7 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.io.File;
@@ -67,12 +68,8 @@ public class SaveHandler extends DefaultHandler {
         } else {
             for (Class<? extends GraphicalElement> c : listClassGE) {
                 if (c.getName().equals(qName)) {
-                    try {
-                        ge = c.newInstance();
-                        inGE = true;
-                    } catch (InstantiationException | IllegalAccessException e) {
-                        throw new SAXException(e);
-                    }
+                    ge = GEFactory.createGE(c);
+                    inGE = true;
                 }
             }
         }

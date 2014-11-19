@@ -32,7 +32,7 @@ public abstract class BaseListCA<T> implements ListCA<T>{
 
     public void setField(String name, String value) {
         if(name.equals("name"))
-            name=value;
+            this.name=value;
         if(name.equals("lock"))
             lock = Boolean.parseBoolean(value);
     }
