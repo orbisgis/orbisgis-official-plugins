@@ -17,7 +17,6 @@ import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -373,23 +372,23 @@ public class UIController{
     }
 
     /**
-     * Run save function of the SaveHandler.
+     * Run saveProject function of the SaveHandler.
      */
     public void save(){
         try {
-            listGE.save(zIndexStack.subList(0, zIndexStack.size()));
+            listGE.saveProject(zIndexStack.subList(0, zIndexStack.size()));
         } catch (NoSuchMethodException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
 
     /**
-     * Run load function from the SaveHandler and draw loaded GE.
+     * Run loadProject function from the SaveHandler and draw loaded GE.
      */
     public void load(){
         try {
             removeAllGE();
-            List<GraphicalElement> list = listGE.load();
+            List<GraphicalElement> list = listGE.loadProject();
             for(GraphicalElement ge : list){
                 addLoadedGE(ge);
             }
@@ -567,7 +566,7 @@ public class UIController{
 
             @Override public String getDescription() {return "PNG Files (.png)";}
         });
-        //If the save is validated, do the export
+        //If the saveProject is validated, do the export
         if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
             //Sets the path of the new file
             String path;

@@ -25,7 +25,7 @@ public interface GraphicalElement {
     
     /**
      * Sets the z position.
-     * Only used on save and load to keep the z position.
+     * Only used on saveProject and loadProject to keep the z position.
      * @param z The z position.
      */
     public void setZ(int z);
@@ -62,7 +62,7 @@ public interface GraphicalElement {
     
     /**
      * Returns the z position.
-     * Only used on save and load to keep the z position.
+     * Only used on saveProject and loadProject to keep the z position.
      * @return The z position.
      */
     public int getZ();

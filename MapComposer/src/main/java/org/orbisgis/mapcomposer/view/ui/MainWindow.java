@@ -113,7 +113,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.registerContainer(toolBar);
         
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
-        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuation dialog", "configuration.png", uic, "showDocProperties", null));
+        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog", "configuration.png", uic, "showDocProperties", null));
         actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uic, "save", null));
         actions.addAction(createAction(LOAD, "", "Load the document", "properties.png", uic, "load", null));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));

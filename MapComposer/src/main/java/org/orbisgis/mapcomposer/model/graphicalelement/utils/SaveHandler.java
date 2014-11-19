@@ -21,7 +21,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
 /**
- * Class containing all the graphicalElement to save.
+ * Class containing all the graphicalElement to saveProject.
  */
 public class SaveHandler extends DefaultHandler {
 
@@ -95,7 +95,7 @@ public class SaveHandler extends DefaultHandler {
             inGE = false;
         }
 
-        // Check if the version of the save is actually compatible with the mapcomposer version.
+        // Check if the version of the saveProject is actually compatible with the mapcomposer version.
         if(qName.equals("version")) {
             boolean flag=false;
             for (int i = 0; i < compVersions.length; i++)
@@ -115,77 +115,62 @@ public class SaveHandler extends DefaultHandler {
         if (sb != null) sb.append(new String(ch, start, length));
     }
 
-    public List<GraphicalElement> load() throws IOException, ParserConfigurationException, SAXException {
-        //Open the file chooser window
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
-        fc.setApproveButtonText("Open");
-        fc.setDialogTitle("Open document project");
-        fc.setDialogType(JFileChooser.OPEN_DIALOG);
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new FileFilter() {
-
-            @Override
-            public boolean accept(File file) {
-                if (file.isDirectory()) return true;
-                return file.getAbsolutePath().toLowerCase().contains(".xml");
-            }
-
-            @Override
-            public String getDescription() {
-                return "XML Files (.xml)";
-            }
-        });
-        //If the save is validated, do the marshall
-        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION) {
-            String path = fc.getSelectedFile().getAbsolutePath();
-            SAXParserFactory.newInstance().newSAXParser().parse(new File(path), this);
-        }
+    public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
+        File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder());
+        JFileChooser fc = createFileChooser(f, "Load document project");
+        //If the saveProject is validated, do the marshall
+        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION)
+            return load(fc.getSelectedFile().getAbsolutePath());
         return listGE;
     }
 
-    public void save(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
-        //Open the file chooser window
+    public List<GraphicalElement> load(String path) throws ParserConfigurationException, SAXException, IOException {
+        SAXParserFactory.newInstance().newSAXParser().parse(new File(path), this);
+        return listGE;
+    }
+
+    public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
+        File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder());
+        JFileChooser fc = createFileChooser(f, "Save document project");
+        //If the saveProject is validated, do the marshall
+        if(fc.showSaveDialog(new JFrame())==JFileChooser.APPROVE_OPTION)
+            save(list, fc.getSelectedFile().getAbsolutePath());
+    }
+
+    public void save(List<GraphicalElement> list, String path) throws IOException {if(!path.contains(".xml")) path+=".xml";
+        FileWriter fw = new FileWriter(path);
+        fw.write("<synchronized>\n\t<version>1.0.2</version>\n");
+        for (GraphicalElement ge : list) {
+            fw.write("\t<" + ge.getClass().getName() + ">\n");
+            for(ConfigurationAttribute ca : ge.getSavableAttributes()){
+                fw.write("\t\t<"+ca.getClass().getName()+">\n");
+                Iterator<Map.Entry<String, Object>> it =  ca.getSavableField().entrySet().iterator();
+                while(it.hasNext()){
+                    Map.Entry<String, Object> entry = it.next();
+                    fw.write("\t\t\t<" + entry.getKey() + ">\n");
+                    fw.write("\t\t\t\t"+entry.getValue().toString()+"\n");
+                    fw.write("\t\t\t</" + entry.getKey() + ">\n");
+                }
+                fw.write("\t\t</"+ca.getClass().getName()+">\n");
+            }
+            fw.write("\t</"+ ge.getClass().getName()+">\n");
+        }
+        fw.write("</synchronized>");
+        fw.close();
+    }
+
+    private JFileChooser createFileChooser(File currentDirectory, String title){
         JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
-        fc.setApproveButtonText("Save");
-        fc.setDialogTitle("Save document project");
-        fc.setDialogType(JFileChooser.SAVE_DIALOG);
+        fc.setCurrentDirectory(currentDirectory);
+        fc.setDialogTitle(title);
         fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
         fc.setFileFilter(new FileFilter() {
-
             @Override public boolean accept(File file) {
                 if(file.isDirectory()) return true;
                 return file.getAbsolutePath().toLowerCase().contains(".xml");
             }
-
             @Override public String getDescription() {return "XML Files (.xml)";}
         });
-        //If the save is validated, do the marshall
-        if(fc.showOpenDialog(new JFrame())==JFileChooser.APPROVE_OPTION) {
-            String path = fc.getSelectedFile().getAbsolutePath();
-            if(!path.contains(".xml")) path+=".xml";
-            FileWriter fw = new FileWriter(path);
-            fw.write("<synchronized>\n\t<version>1.0.2</version>\n");
-            for (GraphicalElement ge : list) {
-                fw.write("\t<" + ge.getClass().getName() + ">\n");
-                for(ConfigurationAttribute ca : ge.getSavableAttributes()){
-                    fw.write("\t\t<"+ca.getClass().getName()+">\n");
-                    Iterator<Map.Entry<String, Object>> it =  ca.getSavableField().entrySet().iterator();
-                    while(it.hasNext()){
-                        Map.Entry<String, Object> entry = it.next();
-                        fw.write("\t\t\t<" + entry.getKey() + ">\n");
-                        fw.write("\t\t\t\t"+entry.getValue().toString()+"\n");
-                        fw.write("\t\t\t</" + entry.getKey() + ">\n");
-                    }
-                    fw.write("\t\t</"+ca.getClass().getName()+">\n");
-                }
-                fw.write("\t</"+ ge.getClass().getName()+">\n");
-            }
-            fw.write("</synchronized>");
-            fw.close();
-        }
+        return fc;
     }
-
-
 }
