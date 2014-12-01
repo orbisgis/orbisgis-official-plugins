@@ -115,11 +115,11 @@ public class DialogProperties extends JFrame{
             if(enableLock){
                 JCheckBox box = new JCheckBox();
                 box.addItemListener(this);
-                box.setSelected(ca.isLocked());
+                box.setSelected(ca.getReadOnly());
                 this.add(box);
             }
             this.add(pan);
-            if(ca.isLocked()){
+            if(ca.getReadOnly()){
                 pan.setEnabled(false);
                 for(Component c : pan.getComponents())
                     c.setEnabled(false);
@@ -137,7 +137,7 @@ public class DialogProperties extends JFrame{
             pan.setEnabled(!b);
             for(Component c : pan.getComponents())
                 c.setEnabled(!b);
-            ca.setLock(b);
+            ca.setReadOnly(b);
             this.repaint();
             this.revalidate();
         }

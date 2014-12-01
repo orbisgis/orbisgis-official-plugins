@@ -7,7 +7,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.awt.Color;
 import java.awt.Font;
@@ -39,14 +38,14 @@ public class TextElement extends SimpleGE{
      */
     public TextElement(){
         //ConfigurationAttribute instantiation
-        this.font =CAFactory.createSourceListCA("Font");
-        this.colorText = CAFactory.createColorCA("Text color");
-        this.colorBack = CAFactory.createColorCA("Background color");
-        this.alignment = CAFactory.createSourceListCA("Alignment");
-        this.style = CAFactory.createSourceListCA("Style");
-        this.fontSize = CAFactory.createIntegerCA("Font size", 1, Integer.MAX_VALUE, 12);
-        this.text = CAFactory.createStringCA("Text");
-        this.alpha = CAFactory.createIntegerCA("Alpha", 0, 255, 0);
+        this.font = new SourceListCA("Font", false);
+        this.colorText = new ColorCA("Text color", false, Color.BLACK);
+        this.colorBack = new ColorCA("Background color", false, Color.WHITE);
+        this.alignment = new SourceListCA("Alignment", false);
+        this.style = new SourceListCA("Style", false);
+        this.fontSize = new IntegerCA("Font size", false, 1, true, Integer.MAX_VALUE, 12);
+        this.text = new StringCA("Text", true, "Some text");
+        this.alpha = new IntegerCA("Alpha", false, 0, true, 255, 0);
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);

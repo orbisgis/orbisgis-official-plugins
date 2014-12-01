@@ -28,19 +28,19 @@ public class SaveHandlerTest {
         try {
             sh.save(listGE, "target/test.xml");
         } catch (IOException e) {
-            Assert.fail("Fail to save listGE. Exception get : \n"+e.getMessage());
+            Assert.fail("\nFail to save listGE. Exception get : \n"+e.getMessage());
         }
 
         try {
             list=sh.load("target/test.xml");
         } catch (IOException|ParserConfigurationException|SAXException e) {
-            Assert.fail("Fail to load listGE. Exception get : \n"+e.getMessage());
+            Assert.fail("\nFail to load listGE. Exception get : \n"+e.toString());
         }
 
         for(GraphicalElement ge : listGE)
             for(GraphicalElement g : list)
                 if(!ge.equals(g))
-                    Assert.assertNotSame("Saved and loaded GraphicalElement are differents : saved = "+ge.toString()+", loaded = "+g.toString(), ge, g);
+                    Assert.assertNotSame("\nSaved and loaded GraphicalElement are differents : saved = "+ge.toString()+", loaded = "+g.toString(), ge, g);
 
     }
 }

@@ -5,24 +5,83 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import java.util.Map;
 
 /**
- * IntegerCA attribute.
+ * This class represent an integer which can have limits to ensure that its value won't be too high or too low.
+ * It extends the BaseCA abstract class.
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseCA
  */
 public class IntegerCA extends BaseCA<Integer> {
-    /** Property itself */
-    private Integer value = 0;
-    /** Minimum value */
-    private int min = Integer.MIN_VALUE;
-    /** Maximum value */
-    private int max = Integer.MAX_VALUE;
-    /** Boolean to enable or not the max and min value */
-    private boolean limits = false;
+
+    /** Property itself. */
+    private Integer value;
+
+    /** Minimum value. */
+    private int min;
+
+    /** Maximum value. */
+    private int max;
+
+    /** Boolean to enable or not the max and min value. */
+    private boolean limits;
+
+    /**
+     * Empty constructor used in the SaveHandler, on loading a project save.
+     */
+    public IntegerCA(){
+        super("void", false);
+        value=0;
+        min=Integer.MIN_VALUE;
+        max=Integer.MAX_VALUE;
+    }
+
+    /**
+     * Constructor with limits values.
+     * The limits will apply only if the limits boolean is to true anf if min<=value<=max.
+     * @param name Name of the ConfigurationAttribute
+     * @param readOnly Boolean to enable or not the modification of the CA
+     * @param value Value of the integer represented
+     * @param limits Enable or not the limits of the integer value
+     * @param min Minimum value of the integer
+     * @param max Maximum value of the integer
+     */
+    public IntegerCA(String name, boolean readOnly, int value, boolean limits, int min, int max){
+        super(name, readOnly);
+        this.limits=limits;
+        this.value = value;
+        //verify if min<=value<=max
+        if(min <= value && value <= max){
+            this.min = min;
+            this.max = max;
+        }
+        else{
+            this.min = Integer.MIN_VALUE;
+            this.max = Integer.MAX_VALUE;
+            this.limits=false;
+        }
+    }
+
+    /**
+     * This constructor disable the limits for the integer value.
+     * @param name Name of the ConfigurationAttribute
+     * @param readOnly Boolean to enable or not the modification of the CA
+     * @param value Value of the integer represented
+     */
+    public IntegerCA(String name, boolean readOnly, int value){
+        super(name, readOnly);
+        this.limits=false;
+        this.min = Integer.MIN_VALUE;
+        this.value = value;
+        this.max = Integer.MAX_VALUE;
+    }
     
-    @Override public void setValue(Integer value) {this.value=value;}
+    @Override public void setValue(Integer value) {
+        if(min<=value && value<=max || !limits)
+            this.value=value;
+    }
 
     @Override public Integer getValue() {return value;}
 
-    @Override public boolean isSameValue(ConfigurationAttribute ca) {
-        return ca.getValue().equals(value);
+    @Override public boolean isSameValue(ConfigurationAttribute configurationAttribute) {
+        return configurationAttribute.getValue().equals(value);
     }
     
     /**
@@ -52,7 +111,7 @@ public class IntegerCA extends BaseCA<Integer> {
     }
     
     /**
-     * Returns the limits boolean.
+     * Returns the limits boolean. True if the integer value has limits, false otherwise.
      * @return The limits boolean.
      */
     public boolean getLimits(){
@@ -72,16 +131,17 @@ public class IntegerCA extends BaseCA<Integer> {
         super.setField(name, value);
         if(name.equals("value"))
             this.value=Integer.parseInt(value);
-        if(name.equals("min"))
-            min = Integer.parseInt(value);
-        if(name.equals("max"))
-            max = Integer.parseInt(value);
-        if(name.equals("limits"))
-            limits = Boolean.parseBoolean(value);
+        else if(name.equals("min"))
+            this.min = Integer.parseInt(value);
+        else if(name.equals("max"))
+            this.max = Integer.parseInt(value);
+        else if(name.equals("limits"))
+            this.limits = Boolean.parseBoolean(value);
     }
 
-    public Map<String, Object> getSavableField() {
-        Map ret = super.getSavableField();
+    @Override
+    public Map<String, Object> getAllFields() {
+        Map ret = super.getAllFields();
         ret.put("value", value);
         ret.put("min", min);
         ret.put("max", max);

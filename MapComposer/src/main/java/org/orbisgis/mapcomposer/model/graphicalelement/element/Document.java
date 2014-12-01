@@ -1,13 +1,11 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element;
 
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
+
 import java.awt.Dimension;
 import java.util.ArrayList;
 import java.util.List;
@@ -28,9 +26,9 @@ public class Document extends SimpleGE implements GERefresh, AlwaysOnBack {
      */
     public Document(){
         //ConfigurationAttribute instantiation
-        orientation=CAFactory.createSourceListCA("Orientation");
-        format=CAFactory.createSourceListCA("Format");
-        name=CAFactory.createStringCA("Name");
+        orientation= new SourceListCA("Orientation", false);
+        format= new SourceListCA("Format", false);
+        name= new StringCA("Name", false, "Document title");
         //Sets the orientation CA
         orientation.add("Landscape");
         orientation.add("Portrait");

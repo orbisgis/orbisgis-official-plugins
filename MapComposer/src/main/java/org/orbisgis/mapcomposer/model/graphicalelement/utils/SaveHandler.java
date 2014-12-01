@@ -1,12 +1,12 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
@@ -141,7 +141,7 @@ public class SaveHandler extends DefaultHandler {
             fw.write("\t<" + ge.getClass().getName() + ">\n");
             for(ConfigurationAttribute ca : ge.getSavableAttributes()){
                 fw.write("\t\t<"+ca.getClass().getName()+">\n");
-                Iterator<Map.Entry<String, Object>> it =  ca.getSavableField().entrySet().iterator();
+                Iterator<Map.Entry<String, Object>> it =  ca.getAllFields().entrySet().iterator();
                 while(it.hasNext()){
                     Map.Entry<String, Object> entry = it.next();
                     fw.write("\t\t\t<" + entry.getKey() + ">\n");

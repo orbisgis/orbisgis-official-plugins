@@ -1,12 +1,7 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
-import org.orbisgis.mapcomposer.controller.UIController;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.util.List;
 
@@ -23,7 +18,7 @@ public class Scale extends SimpleCartoGE{
      */
     public Scale() {
         super();
-        milka = CAFactory.createMapImageListCA("Link to MapImage");
+        milka = new MapImageListCA("Link to MapImage", false);
     }
     
     @Override
@@ -45,7 +40,7 @@ public class Scale extends SimpleCartoGE{
      */
     public double getMapScale(){
         if(milka.getSelected()!=null)
-            return milka.getMapImage().getMapTransform().getScaleDenominator();
+            return milka.getSelected().getMapTransform().getScaleDenominator();
         return 1;
     }
 

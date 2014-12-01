@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.illustration;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
@@ -11,7 +10,7 @@ import java.util.List;
 /**
  * Root class for illustration GraphicalElements.
  */
-public class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
+public abstract class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     
     /** Path to the data source of the element.*/;
     private SourceCA path;
@@ -19,7 +18,7 @@ public class SimpleIllustrationGE extends SimpleGE implements IllustrationElemen
     /**Main constructor.*/
     public SimpleIllustrationGE(){
         super();
-        path = CAFactory.createSourceCA("Path");
+        path = new SourceCA("Path", false);
     }
     
     /**

@@ -270,7 +270,7 @@ public class UIController{
                 for(ConfigurationAttribute confShutterCA : listCA)
                     //If the two CA are the same property and are unlocked, set the new CA value
                     if(ca.isSameName(confShutterCA)){
-                        if(!confShutterCA.isLocked()){
+                        if(!confShutterCA.getReadOnly()){
                             ca.setValue(confShutterCA.getValue());
                             if(ca instanceof RefreshCA)
                                 ((RefreshCA)ca).refresh(this);
@@ -304,7 +304,7 @@ public class UIController{
                     
                     if(caList.isSameName(caGE)){
                         flag=true;
-                        caList.setLock(!caList.isSameValue(caGE));
+                        caList.setReadOnly(!caList.isSameValue(caGE));
                     }
                 }
             }

@@ -9,28 +9,55 @@ import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.swing.JOptionPane;
+
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 import org.orbisgis.progress.NullProgressMonitor;
 import org.slf4j.LoggerFactory;
 
 /**
- * ConfigurationAttribute representing a specified OwsMapContext given by OrbisGIS.
+ * This class represent a list of path to OwsMapContext files created by the user in OrbisGIS.
+ * The OwsMapContexts are saved in the workspace. The class use the OrbisGIS functions (thanks to the LinkToOrbisGIS class) to get and load them.
+ * It contains all the information of the map and permit to get the map rendering, the scale value ...
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA
  */
 public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index = 0;
-    /** Property itself */
-    private List<String> list = new ArrayList<>();
-    private OwsMapContext omc = null;
+    private int index;
 
+    /** Property itself */
+    private List<String> list;
+
+    /** OwsMapContext corresponding to the path selected in the list.*/
+    private OwsMapContext omc;
+
+    /**
+     * Empty constructor used in the SaveHandler, on loading a project save.
+     */
+    public OwsContextCA(){
+        super("void", false);
+        this.list  = new ArrayList<>();
+    }
+
+    /**
+     * Default constructor for the OwsContextCA.
+     * @param name Name of the ConfigurationAttribute
+     * @param readOnly Boolean to enable or not the modification of the CA
+     */
+    public OwsContextCA(String name, boolean readOnly){
+        super(name, readOnly);
+        list = new ArrayList<>();
+        index = 0;
+        omc = null;
+    }
+
+    /**
+     * Return the OwsMapContext contained represented by the selected path in the list.
+     * @return The OwsMapContext selected
+     */
     public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
@@ -66,29 +93,20 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     }
     
     /**
-     * Set list field with all the files with the oxs extension
+     * Go to the workspace and add to the list all the .ows files.
      */
     private void loadListFiles(){
         File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()+"/maps/");
-        //Definition of the FilenameFilter
-        FilenameFilter filter = new FilenameFilter() {
-            @Override
-            public boolean accept(File file, String string) {
-                String name = string.toLowerCase();
-                return name.contains(".ows");
-            }
-        };
+        //save the selected path
         String s = getSelected();
         list=new ArrayList<>();
-        for(File file : f.listFiles(filter)){
+        //add all the files in the maps folder of the workspace
+        for(File file : f.listFiles()){
             if(file.getAbsolutePath().toLowerCase().contains(".ows"))
                 list.add(file.getAbsolutePath());
         }
+        //try to reselect the path saved
         select(s);
-        if(index==-1 || list.size()==0){
-            list.add("/");
-            select("/");
-        }
     }
 
     @Override
@@ -114,11 +132,11 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     @Override
     public List<String> getValue() {return list;}
 
-    @Override public boolean isSameValue(ConfigurationAttribute ca) {
-        if(ca instanceof ListCA){
+    @Override public boolean isSameValue(ConfigurationAttribute configurationAttribute) {
+        if(configurationAttribute instanceof ListCA){
             if(getSelected()==null)
                 return false;
-            return getSelected().equals(((ListCA)ca).getSelected());
+            return getSelected().equals(((ListCA) configurationAttribute).getSelected());
         }
         return false;
     }
@@ -132,8 +150,9 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
             index=Integer.parseInt(value);
     }
 
-    public Map<String, Object> getSavableField() {
-        Map ret = super.getSavableField();
+    @Override
+    public Map<String, Object> getAllFields() {
+        Map ret = super.getAllFields();
         ret.put("index", index);
         String s="";
         for(String str : list)

@@ -3,7 +3,6 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -30,11 +29,11 @@ public abstract class SimpleGE implements GraphicalElement{
      */
     public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x=CAFactory.createIntegerCA("x");
-        y=CAFactory.createIntegerCA("y");
-        rotation=CAFactory.createIntegerCA("Rotation", -360, 360, 0);
-        height=CAFactory.createIntegerCA("Height", Integer.MIN_VALUE, Integer.MAX_VALUE, 50);
-        width=CAFactory.createIntegerCA("Width", Integer.MIN_VALUE, Integer.MAX_VALUE, 50);
+        x= new IntegerCA("x", false, 0);
+        y= new IntegerCA("y", false, 0);
+        rotation= new IntegerCA("Rotation", false, 0, true, -360, 360);
+        height= new IntegerCA("Height", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        width= new IntegerCA("Width", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
         this.setWidth(50);
         this.setHeight(50);
     }

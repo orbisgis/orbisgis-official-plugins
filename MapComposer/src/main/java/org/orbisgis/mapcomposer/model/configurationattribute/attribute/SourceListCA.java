@@ -10,23 +10,44 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * String List ConfigurationAttribute.
- * StringListCA implements ListCA and contain String fields.
+ * This class represent a list of source and extends the BaseListCA abstract class.
+ * A source can be a list of path to files or a list of values (like up, down, left, right).
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.BaseListCA
  */
 public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     /** Index of the value selected.*/
-    private int index = 0;
+    private int index;
+
     /** Property itself */
-    private List<String> list = new ArrayList<>();
+    private List<String> list;
+
+    /**
+     * Empty constructor used in the SaveHandler, on loading a project save.
+     */
+    public SourceListCA(){
+        super("void", false);
+        this.list  = new ArrayList<>();
+    }
+
+    /**
+     * Default constructor for the SourceListCA.
+     * @param name Name of the ConfigurationAttribute
+     * @param readOnly Boolean to enable or not the modification of the CA
+     */
+    public SourceListCA(String name, boolean readOnly){
+        super(name, readOnly);
+        index = 0;
+        list = new ArrayList<>();
+    }
 
     @Override public void setValue(List<String> value) {this.list=value;}
     @Override public List<String> getValue() {return list;}
 
-    @Override public boolean isSameValue(ConfigurationAttribute ca) {
-        if(ca instanceof ListCA){
+    @Override public boolean isSameValue(ConfigurationAttribute configurationAttribute) {
+        if(configurationAttribute instanceof ListCA){
             if(getSelected()==null)
                 return false;
-            return getSelected().equals(((ListCA)ca).getSelected());
+            return getSelected().equals(((ListCA) configurationAttribute).getSelected());
         }
         return false;
     }
@@ -54,8 +75,9 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
             index=Integer.parseInt(value);
     }
 
-    public Map<String, Object> getSavableField() {
-        Map ret = super.getSavableField();
+    @Override
+    public Map<String, Object> getAllFields() {
+        Map ret = super.getAllFields();
         ret.put("index", index);
         String s="";
         for(String str : list)

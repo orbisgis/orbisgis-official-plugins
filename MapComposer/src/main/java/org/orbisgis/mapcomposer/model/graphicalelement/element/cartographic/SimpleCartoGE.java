@@ -5,7 +5,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import java.util.ArrayList;
 import java.util.List;
@@ -14,14 +13,14 @@ import org.orbisgis.coremap.layerModel.OwsMapContext;
 /**
  * Simple implementation of the CartographicElement.
  */
-public class SimpleCartoGE extends SimpleGE implements CartographicElement{
+public abstract class SimpleCartoGE extends SimpleGE implements CartographicElement{
     /** OWS-Context source.*/
     private OwsContextCA owsc;
     
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
-        this.owsc = CAFactory.createOwsContextCA("OWS-Context path");
+        this.owsc = new OwsContextCA("OWS-Context path", false);
     }
 
     @Override public OwsMapContext getOwsMapContext()   {return owsc.getOwsMapContext();}

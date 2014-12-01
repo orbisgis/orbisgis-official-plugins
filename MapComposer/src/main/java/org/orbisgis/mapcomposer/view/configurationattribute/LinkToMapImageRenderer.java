@@ -25,8 +25,8 @@ public class LinkToMapImageRenderer implements CARenderer{
         
         pan.add(new JLabel(milka.getName()));
         ArrayList<String> names = new ArrayList<>();
-        for(String mi : milka.getValue())
-            names.add(mi);
+        for(MapImage mi : milka.getValue())
+            names.add(mi.toString());
         final JComboBox list = new JComboBox(names.toArray());
         pan.add(list);
         return pan;
@@ -39,7 +39,7 @@ public class LinkToMapImageRenderer implements CARenderer{
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 int i=1;
-                for(String ge : milka.getValue()){
+                for(MapImage ge : milka.getValue()){
                     if(ge.equals(((JComboBox)c).getSelectedItem()))
                         milka.select(ge);
                 }

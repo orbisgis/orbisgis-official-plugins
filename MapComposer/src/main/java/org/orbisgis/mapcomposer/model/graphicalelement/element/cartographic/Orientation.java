@@ -3,11 +3,8 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 import java.util.ArrayList;
 import java.util.List;
 
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 
 /**
  * SimpleOrientationGE of the map (direction of the north in the map).
@@ -20,7 +17,7 @@ public class Orientation extends SimpleCartoGE{
     /**Main constructor*/
     public Orientation(){
         super();
-        icon = CAFactory.createSourceCA("Path");
+        icon = new SourceCA("Path", false);
     }
 
     /**
