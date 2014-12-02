@@ -2,6 +2,7 @@ package org.orbisgis.mapcomposer.model.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
+import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.io.File;
@@ -12,7 +13,6 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 
-import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
@@ -54,12 +54,15 @@ public class SaveAndLoadHandler extends DefaultHandler {
     /** StringBuffer used to register everything inside Configuration xml tags **/
     private StringBuffer sb = null;
 
+    public SaveAndLoadHandler(GEManager geManager, CAManager caManager){
+        // Gets the list of GraphicalElement and Configuration Attributes class
+        listClassGE = geManager.getRegisteredGEClasses();
+        listClassCA = caManager.getRegisteredGEClasses();
+    }
+
     @Override
     public void startDocument() throws SAXException {
         listGE = new ArrayList<>();
-        // Gets the list of GraphicalElement and Configuration Attributes class
-        listClassGE = GEManager.getInstance().getRegisteredGEClasses();
-        listClassCA = CAManager.getInstance().getRegisteredGEClasses();
     }
 
     @Override

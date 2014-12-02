@@ -4,7 +4,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import javax.swing.JPanel;
 
 /**
- * This interface defines the render function associated with a ConfigurationATtribute (CA).
+ * This interface defines the getRenderer function associated with a ConfigurationATtribute (CA).
  * The rendering will be used to display the CAs of a GraphicalElement in the ConfigurationShutter.
  * The link between the CA and its Renderer will be done by the CAManager.
  */

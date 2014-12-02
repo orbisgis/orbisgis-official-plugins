@@ -58,7 +58,7 @@ public class DialogProperties extends JFrame{
         pan = new JPanel();
         pan.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
-            JPanel panel = CAManager.getInstance().getRenderer(ca).render(ca);
+            JPanel panel = uic.getCAManager().getRenderer(ca).render(ca);
             ConfPanel cp = new ConfPanel(panel, ca, enableLock);
             listPanels.add(cp);
             pan.add(cp, "wrap");
@@ -127,7 +127,7 @@ public class DialogProperties extends JFrame{
         }
         
         public ConfigurationAttribute getCA(){
-            CAManager.getInstance().getRenderer(ca).extractValue(pan, ca);
+            uic.getCAManager().getRenderer(ca).extractValue(pan, ca);
             return ca;
         }
 

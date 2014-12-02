@@ -2,6 +2,7 @@ package org.orbisgis.mapcomposer.model.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
@@ -9,7 +10,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scal
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
+import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -21,7 +22,7 @@ public class SaveAndLoadHandlerTest {
 
     @Test
     public final void testSaveNLoad(){
-        SaveAndLoadHandler sh = new SaveAndLoadHandler();
+        SaveAndLoadHandler sh = new SaveAndLoadHandler(new GEManager(), new CAManager());
         List<GraphicalElement> listGE = new ArrayList<GraphicalElement>();
         listGE.add(new Document());
         listGE.add(new Image());

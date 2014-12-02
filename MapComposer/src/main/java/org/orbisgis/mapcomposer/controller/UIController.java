@@ -3,6 +3,7 @@ package org.orbisgis.mapcomposer.controller;
 import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
@@ -37,6 +38,12 @@ import org.xml.sax.SAXException;
  * This class manager the interaction between the user, the UI and the data model.
  */
 public class UIController{
+
+    /** CAManager */
+    private CAManager caManager;
+
+    /** GEManager */
+    private GEManager geManager;
     
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private static LinkedHashMap<GraphicalElement, CompositionJPanel> map;
@@ -56,16 +63,22 @@ public class UIController{
      */
     public UIController(){
         //Initialize the different attributes
+        caManager = new CAManager();
+        geManager = new GEManager();
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
-        listGE = new SaveAndLoadHandler();
+        listGE = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
     }
     
-    public MainWindow getMainWindow(){
-        return mainWindow;
-    }
+    public MainWindow getMainWindow() { return mainWindow; }
+
+    /**
+     * Returns the CAManager.
+     * @return The CAManager
+     */
+    public CAManager getCAManager() { return caManager; }
     
     /**
      * Change the Z-index of the displayed GraphicalElement.
@@ -249,7 +262,7 @@ public class UIController{
     public void validateGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+        map.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge, map.get(ge)));
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -278,7 +291,7 @@ public class UIController{
                     }
             if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+            map.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge, map.get(ge)));
             if(ge instanceof Document)
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
         }
@@ -335,7 +348,7 @@ public class UIController{
             //Registers the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge, this));
             mainWindow.getCompositionArea().addGE(map.get(ge));
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+            map.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge, map.get(ge)));
             zIndexStack.push(ge);
 
             //Refreshes the GE.
@@ -408,7 +421,7 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+        map.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge, map.get(ge)));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         zindexChange(TO_FRONT);

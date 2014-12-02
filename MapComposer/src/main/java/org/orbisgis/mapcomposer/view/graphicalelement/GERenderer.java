@@ -14,7 +14,7 @@ import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 
 /**
  * Base renderer for GraphicalElement.
- * Every extention of the renderer sould call super.render(ge) to get the panel where the element is displayed.
+ * Every extention of the renderer sould call super.getRenderer(ge) to get the panel where the element is displayed.
  */
 public abstract class GERenderer {
     /**

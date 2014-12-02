@@ -29,16 +29,21 @@ import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 * When a CA need to be displayed, the Renderer will be get via this class.
 * So to be used, both should be registered in the CAManager.
 */
+
+/**
+ * This class contain all the ConfigurationAttribute used in the MapComposer. It also manages the link between the ConfigurationAttributes and their Renderer.
+ * To be used, a ConfigurationAttribute should be register with its renderer into this class to be recognise by the composer.
+ * Each GraphicalElement or ConfigurationAttribute which is not register won't be used.
+ */
 public class CAManager {
-    /** Instance of the manager */
-    private static CAManager INSTANCE;
+
     /** HashMap linking the CA to its Renderer */
     private static Map<Class<? extends ConfigurationAttribute>, CARenderer> map;
     
     /**
-    * Private void constructor.
+    * Main constructor.
     */
-    private CAManager(){
+    public CAManager(){
         map = new HashMap<>();
         //Adding the original CA and their Renderer
         map.put(IntegerCA.class, new NumericRenderer());
@@ -49,17 +54,6 @@ public class CAManager {
         map.put(OwsContextCA.class, new OwsContextRenderer());
         map.put(ColorCA.class, new ColorRenderer());
         map.put(MapImageListCA.class, new LinkToMapImageRenderer());
-    }
-    
-    /**
-    * Static method giving the unique instance of the class.
-    * @return The unique instance of the class.
-    */
-    public static synchronized CAManager getInstance(){
-        if(INSTANCE==null){
-            INSTANCE = new CAManager();
-        }
-        return INSTANCE;
     }
     
     /**
