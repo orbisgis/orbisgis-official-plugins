@@ -86,7 +86,7 @@ public interface ConfigurationAttribute<T> {
      * @param name Name of the field.
      * @param value Value of the field.
      * @see ConfigurationAttribute#getAllFields()
-     * @see org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler#endElement(String, String, String)
+     * @see org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler#endElement(String, String, String)
      */
     public void setField(String name, String value);
 
@@ -97,7 +97,7 @@ public interface ConfigurationAttribute<T> {
      * All the fields return by this method should be set in the method setField(String, String).
      * @return Map containing the field names as key and the field values as value.
      * @see ConfigurationAttribute#setField(String, String)
-     * @see org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler#save(java.util.List, String)
+     * @see org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler#save(java.util.List, String)
      */
     public Map<String, Object> getAllFields();
 }

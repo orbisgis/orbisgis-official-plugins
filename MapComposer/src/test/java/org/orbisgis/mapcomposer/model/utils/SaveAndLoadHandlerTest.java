@@ -1,8 +1,15 @@
-package org.orbisgis.mapcomposer.model.graphicalelement.utils;
+package org.orbisgis.mapcomposer.model.utils;
 
 import org.junit.Assert;
 import org.junit.Test;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.xml.sax.SAXException;
 
 import javax.xml.parsers.ParserConfigurationException;
@@ -10,18 +17,18 @@ import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
-public class SaveHandlerTest {
+public class SaveAndLoadHandlerTest {
 
     @Test
     public final void testSaveNLoad(){
-        SaveHandler sh = new SaveHandler();
+        SaveAndLoadHandler sh = new SaveAndLoadHandler();
         List<GraphicalElement> listGE = new ArrayList<GraphicalElement>();
-        listGE.add(GEFactory.createDocument());
-        listGE.add(GEFactory.createImage());
-        listGE.add(GEFactory.createMapImage());
-        listGE.add(GEFactory.createOrientation());
-        listGE.add(GEFactory.createScale());
-        listGE.add(GEFactory.createTextElement());
+        listGE.add(new Document());
+        listGE.add(new Image());
+        listGE.add(new MapImage());
+        listGE.add(new Orientation());
+        listGE.add(new Scale());
+        listGE.add(new TextElement());
 
         List<GraphicalElement> list=null;
 

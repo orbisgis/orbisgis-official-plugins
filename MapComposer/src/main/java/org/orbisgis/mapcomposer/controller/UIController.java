@@ -9,9 +9,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
-import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
-import org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler;
+import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
@@ -48,7 +47,7 @@ public class UIController{
     /**GraphicalElement stack giving the Z-index information*/
     private static Stack<GraphicalElement> zIndexStack;
     
-    private static SaveHandler listGE;
+    private static SaveAndLoadHandler listGE;
     
     private MainWindow mainWindow;
     
@@ -60,7 +59,7 @@ public class UIController{
         map = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
-        listGE = new SaveHandler();
+        listGE = new SaveAndLoadHandler();
         mainWindow = new MainWindow(this);
     }
     
@@ -326,7 +325,12 @@ public class UIController{
      */
     public void addGE(Class<? extends GraphicalElement> aClass) {
         //Creates the GraphicalElement.
-        GraphicalElement ge = GEFactory.createGE(aClass);
+        GraphicalElement ge = null;
+        try {
+            ge = aClass.newInstance();
+        } catch (InstantiationException|IllegalAccessException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+        }
         if(ge!=null) {
             //Registers the GE and its CompositionJPanel.
             map.put(ge, new CompositionJPanel(ge, this));
