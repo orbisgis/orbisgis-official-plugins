@@ -6,7 +6,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageL
 import java.util.List;
 
 /**
- * SimpleScaleGE of the map. 
+ * This class represent the scale of a map. It extends the SimpleCartoGE interface.
  */
 public class Scale extends SimpleCartoGE{
     

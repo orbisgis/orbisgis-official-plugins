@@ -1,13 +1,14 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.text;
 
-import java.util.ArrayList;
-import java.util.List;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+
+import java.util.ArrayList;
+import java.util.List;
 import java.awt.Color;
 import java.awt.Font;
 import java.awt.GraphicsEnvironment;
@@ -43,7 +44,7 @@ public class TextElement extends SimpleGE{
         this.colorBack = new ColorCA("Background color", false, Color.WHITE);
         this.alignment = new SourceListCA("Alignment", false);
         this.style = new SourceListCA("Style", false);
-        this.fontSize = new IntegerCA("Font size", false, 1, true, Integer.MAX_VALUE, 12);
+        this.fontSize = new IntegerCA("Font size", false, 12, true, Integer.MAX_VALUE, Integer.MIN_VALUE);
         this.text = new StringCA("Text", true, "Some text");
         this.alpha = new IntegerCA("Alpha", false, 0, true, 255, 0);
         //ConfigurationAttribute initialisation
@@ -216,13 +217,17 @@ public class TextElement extends SimpleGE{
      * Enumeration for the text font style.
      */
     public static enum Style{
+
         PLAIN(Font.PLAIN),
         ITALIC(Font.ITALIC),
         BOLD(Font.BOLD);
+
         /**Font style value.*/
         private final int value;
+
         /**Enum constructor*/
         private Style(final int value) {this.value = value;}
+
         /**
          * Returns the font style.
          * @return The font style.

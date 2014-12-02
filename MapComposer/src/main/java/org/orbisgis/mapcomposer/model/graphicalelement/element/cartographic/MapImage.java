@@ -1,26 +1,22 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
-import com.vividsolutions.jts.geom.Envelope;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
-import java.awt.image.BufferedImage;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.progress.NullProgressMonitor;
+
 import org.slf4j.LoggerFactory;
 
+import java.awt.image.BufferedImage;
+
 /**
- * Map image generated from an OWS-Context.
+ * This class represent the graphical representation (the image) of the map.
  */
-
-
 public class MapImage extends SimpleCartoGE implements GERefresh {
-    /** MapTransform*/
+
+    /** MapTransform used to generate the map image.
+     * This class come from OrbisGIS
+     */
     private final MapTransform mapTransform;
     
     /**

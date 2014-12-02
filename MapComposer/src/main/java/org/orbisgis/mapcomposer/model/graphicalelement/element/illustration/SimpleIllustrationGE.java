@@ -1,14 +1,15 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.illustration;
 
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Root class for illustration GraphicalElements.
+ * This class is a simple implementation of the IllustrationElement interface and extends the SimpleGE class.
  */
 public abstract class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     

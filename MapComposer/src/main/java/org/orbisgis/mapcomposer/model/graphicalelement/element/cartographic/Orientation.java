@@ -7,7 +7,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 
 /**
- * SimpleOrientationGE of the map (direction of the north in the map).
+ * This class represent the arrow giving the orientation of the map.
+ * The user can specify the picture to use as icon.
  */
 public class Orientation extends SimpleCartoGE{
     

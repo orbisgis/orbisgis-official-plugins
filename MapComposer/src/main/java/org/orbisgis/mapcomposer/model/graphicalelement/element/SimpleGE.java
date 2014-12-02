@@ -8,8 +8,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Simple GE implementation.
- * It contains all the main ConfigurationAttributes (CA) and the implementations of the interface functions.
+ * Simple implementation of the GraphicalElement interface.
+ * It contains all the basic ConfigurationAttributes (CA) and the implementation of the interface functions.
  */
 public abstract class SimpleGE implements GraphicalElement{
     /** x position of the GE.*/
@@ -18,10 +18,11 @@ public abstract class SimpleGE implements GraphicalElement{
     private IntegerCA y;
     /** Inclination of the GE.*/
     private IntegerCA rotation;
-    /** Heght of the GE.*/
+    /** Height of the GE.*/
     private IntegerCA height;
     /** Width of the GE.*/
     private IntegerCA width;
+    /** Z index of the GE.*/
     private int z;
     
     /**
@@ -34,18 +35,16 @@ public abstract class SimpleGE implements GraphicalElement{
         rotation= new IntegerCA("Rotation", false, 0, true, -360, 360);
         height= new IntegerCA("Height", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
         width= new IntegerCA("Width", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        this.setWidth(50);
-        this.setHeight(50);
     }
     
-
+//Setters
     @Override public void setX(int x)   {this.x.setValue(x);}
     @Override public void setY(int y)   {this.y.setValue(y);}
     @Override public void setZ(int z)   {this.z=z; }
     @Override public void setRotation(int rotation) {this.rotation.setValue(rotation);}
     @Override public void setHeight(int height)     {this.height.setValue(height);}
     @Override public void setWidth(int width)       {this.width.setValue(width);}
-    
+//Getters
     @Override public int getX() {return this.x.getValue();}
     @Override public int getY() {return this.y.getValue();}
     @Override public int getZ() {return z;}

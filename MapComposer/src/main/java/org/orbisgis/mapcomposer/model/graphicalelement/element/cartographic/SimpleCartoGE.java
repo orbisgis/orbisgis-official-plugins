@@ -1,19 +1,19 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.CartographicElement;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
-import java.util.ArrayList;
-import java.util.List;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 
+import java.util.ArrayList;
+import java.util.List;
+
 /**
- * Simple implementation of the CartographicElement.
+ * Simple implementation of the CartographicElement interface.
  */
 public abstract class SimpleCartoGE extends SimpleGE implements CartographicElement{
+
     /** OWS-Context source.*/
     private OwsContextCA owsc;
     
