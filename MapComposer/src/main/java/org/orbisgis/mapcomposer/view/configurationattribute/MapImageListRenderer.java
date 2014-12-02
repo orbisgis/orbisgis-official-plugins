@@ -13,18 +13,29 @@ import javax.swing.JPanel;
 
 /**
  * Renderer associated to the LinkToMap CA
+ * The JPanel returned by the render method look like :
+ *  _________________________________________________________________
+ * |                                  ____________________________   |
+ * | NameOfTheConfigurationAttribute |selected value          | v |  |
+ * |                                 |________________________|___|  |
+ * |_________________________________________________________________|
+ *
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA
  */
-public class LinkToMapImageRenderer implements CARenderer{
+public class MapImageListRenderer implements CARenderer{
 
     @Override
     public JPanel render(ConfigurationAttribute ca) {
+    //Create the panel
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
+
+    //Add to the panel all the swing components
         final MapImageListCA milka = (MapImageListCA)ca;
         
         pan.add(new JLabel(milka.getName()));
         ArrayList<String> names = new ArrayList<>();
+        //Display the MapImageListCA into a JComboBox
         for(MapImage mi : milka.getValue())
             names.add(mi.toString());
         final JComboBox list = new JComboBox(names.toArray());
@@ -36,9 +47,9 @@ public class LinkToMapImageRenderer implements CARenderer{
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
         MapImageListCA milka = (MapImageListCA)attribute;
+        //As the MapImage list is in the JComboBox, find it and extract the value.
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
-                int i=1;
                 for(MapImage ge : milka.getValue()){
                     if(ge.equals(((JComboBox)c).getSelectedItem()))
                         milka.select(ge);
@@ -46,5 +57,4 @@ public class LinkToMapImageRenderer implements CARenderer{
             }
         }
     }
-    
 }

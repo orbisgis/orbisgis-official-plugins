@@ -4,13 +4,14 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import javax.swing.JPanel;
 
 /**
- * This interface defines the getRenderer function associated with a ConfigurationATtribute (CA).
- * The rendering will be used to display the CAs of a GraphicalElement in the ConfigurationShutter.
- * The link between the CA and its Renderer will be done by the CAManager.
+ * This interface defines the render function associated to a ConfigurationAttribute (CA).
+ * The render function return a JPanel containing all swing components (JLabel, JButton, JSpinner ...) necessary to the user to configure the attribute.
+ * Thanks to this method, all the ConfigurationAttributes of a GraphicalElement are display into the configuration window.
+ * The link between a CA and its Renderer will be done by the CAManager.
  */
 public interface CARenderer {
     /**
-     * Render method defines how the attribute should be displayed into the configuration shutter.
+     * The Render method defines how the attribute should be displayed into the configuration window.
      * @param ca Instance of the attribute to render.
      * @return JPanel with the representation of the attribute.
      */
@@ -18,8 +19,10 @@ public interface CARenderer {
     
     /**
      * Extracts the value contained by the JPanel and set the attribute.
-     * @param panel JPanel of the ConfigurationShutter containing the value.
-     * @param attribute ConfigurationAttribute to set.
+     * On validation the configuration, this method receive the panel given by the render(ConfigurationAttribute) method and extract the value set by the user.
+     * The value is saved into the attribute given in argument.
+     * @param panel JPanel of the configuration window containing the value.
+     * @param attribute ConfigurationAttribute to set with the extracted value.
      */
     public void extractValue(JPanel panel, ConfigurationAttribute attribute);
 }

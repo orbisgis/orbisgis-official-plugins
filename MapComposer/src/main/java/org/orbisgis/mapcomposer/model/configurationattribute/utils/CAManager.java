@@ -12,17 +12,15 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContex
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.configurationattribute.CARenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.ChoiceRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.SourceListRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.ColorRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.FileListRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.LinkToMapImageRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.NumericRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.MapImageListRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.IntegerRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.OwsContextRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.SourceRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.TextRenderer;
-import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.StringRenderer;
 
 /**
 * The class manages the link between the ConfigurationAttribute (CA) and their Renderer.
@@ -46,14 +44,14 @@ public class CAManager {
     public CAManager(){
         map = new HashMap<>();
         //Adding the original CA and their Renderer
-        map.put(IntegerCA.class, new NumericRenderer());
-        map.put(SourceListCA.class, new ChoiceRenderer());
+        map.put(IntegerCA.class, new IntegerRenderer());
+        map.put(SourceListCA.class, new SourceListRenderer());
         map.put(FileListCA.class, new FileListRenderer());
         map.put(SourceCA.class, new SourceRenderer());
-        map.put(StringCA.class, new TextRenderer());
+        map.put(StringCA.class, new StringRenderer());
         map.put(OwsContextCA.class, new OwsContextRenderer());
         map.put(ColorCA.class, new ColorRenderer());
-        map.put(MapImageListCA.class, new LinkToMapImageRenderer());
+        map.put(MapImageListCA.class, new MapImageListRenderer());
     }
     
     /**

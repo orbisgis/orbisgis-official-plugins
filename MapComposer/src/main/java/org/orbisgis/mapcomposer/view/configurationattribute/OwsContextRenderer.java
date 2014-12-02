@@ -10,17 +10,28 @@ import javax.swing.JPanel;
 
 /**
  * Renderer associated to the OwsContextCA ConfigurationAttribute.
+ * The JPanel returned by the render method look like :
+ *  _________________________________________________________________
+ * |                                  ____________________________   |
+ * | NameOfTheConfigurationAttribute |selected value          | v |  |
+ * |                                 |________________________|___|  |
+ * |_________________________________________________________________|
+ *
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA
  */
 public class OwsContextRenderer implements CARenderer{
 
     @Override
     public JPanel render(ConfigurationAttribute ca) {
+    //Create the panel
         JPanel pan = new JPanel();
         pan.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
+
+    //Add to the panel all the swing components
         OwsContextCA source = (OwsContextCA)ca;
         pan.add(new JLabel(source.getName()));
-        
+
+        //Display the OwsContextCA into a JComboBox
         JComboBox list = new JComboBox(source.getValue().toArray());
         list.setSelectedItem(ca.getValue());
         pan.add(list);
@@ -30,6 +41,7 @@ public class OwsContextRenderer implements CARenderer{
     @Override
     public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
         OwsContextCA source = (OwsContextCA)attribute;
+        //As the OwsContext list is in the JComboBox, find it and extract the value.
         for(Component c : panel.getComponents()){
             if(c instanceof JComboBox){
                 source.select(((JComboBox)c).getModel().getSelectedItem().toString());
