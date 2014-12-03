@@ -15,10 +15,10 @@ import javax.swing.ImageIcon;
 /**
  * Renderer associated to the Image GraphicalElement.
  */
-public class ImageRenderer extends GERenderer{
+public class ImageRenderer extends SimpleGERenderer {
 
     @Override
-    public BufferedImage getcontentImage(GraphicalElement ge) {
+    public BufferedImage getContentImage(GraphicalElement ge) {
         // Draw in a BufferedImage the image file
         File f = new File(((Image)ge).getPath());
         if(f.exists() && f.isFile()) {
@@ -29,7 +29,7 @@ public class ImageRenderer extends GERenderer{
             }
         }
         else{
-            //Use ImageIcon to convert the file URL into a buffered image
+            //Return the icon of the Image as BufferedImage
             ImageIcon icon = new ImageIcon(MainWindow.class.getResource("add_picture.png"));
             BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
             Graphics g = bi.createGraphics();

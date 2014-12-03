@@ -14,30 +14,23 @@ import java.text.AttributedString;
 /**
  * Renderer associated to the scale GraphicalElement.
  */
-public class TextRenderer extends GERenderer{
+public class TextRenderer extends SimpleGERenderer {
 
     @Override
-    public BufferedImage getcontentImage(GraphicalElement ge){
+    public BufferedImage getContentImage(GraphicalElement ge){
         TextElement te = ((TextElement)ge);
         //Drawing on a BufferedImage the text.
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics2D graph = bi.createGraphics();
-        graph.setBackground(Color.white);
-        graph.setColor(Color.black);
-        Color color = new Color(    te.getColorBack().getRed(), 
-                                    te.getColorBack().getGreen(), 
-                                    te.getColorBack().getBlue(), 
-                                    te.getAlpha()
-                                );
-        graph.setColor(color);
+        graph.setColor(new Color(te.getColorBack().getRed(), te.getColorBack().getGreen(), te.getColorBack().getBlue(), te.getAlpha()));
         graph.fillRect(0, 0, te.getWidth(), te.getHeight());
         graph = bi.createGraphics();
         
         //Draw the string and make it fit to the TextElement bounds
         AttributedString attributedString = new AttributedString(te.getText());
         attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize()));
-        color = te.getColorText();
-        attributedString.addAttribute(TextAttribute.FOREGROUND, color);
+        attributedString.addAttribute(TextAttribute.FOREGROUND, te.getColorText());
+        //Cut the text if it's too wide for the BufferedImage width
         int x = 0;
         int y = 0;
         LineBreakMeasurer measurer = new LineBreakMeasurer(attributedString.getIterator(),graph.getFontRenderContext());
@@ -58,12 +51,7 @@ public class TextRenderer extends GERenderer{
             textLayout.draw(graph, x, y);
             y += textLayout.getDescent() + textLayout.getLeading();
         }
-        
-        
-        
-        
-        
-        //graph.drawString(te.getText(), 0, ge.getHeight()/2);
+
         return bi;
     }
 }

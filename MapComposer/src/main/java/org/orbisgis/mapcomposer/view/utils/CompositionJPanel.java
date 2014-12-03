@@ -77,7 +77,11 @@ public class CompositionJPanel extends JPanel{
      */
     public void setPanel(JPanel panel){
         this.panel = panel;
+        this.removeAll();
+        this.add(this.panel, BorderLayout.CENTER);
         this.panel.revalidate();
+        this.setBounds(panel.getBounds());
+        this.setOpaque(false);
         setBorders();
     }
 
@@ -191,8 +195,8 @@ public class CompositionJPanel extends JPanel{
      * @param p Location of the mouse inside the panel.
      */
     public void mouseDragged(Point p) {
-        if(moveMod==MoveMod.CENTER)
-            panel.setLocation(ge.getX()-(startX-p.x), ge.getY()-(startY-p.y));
+        if (moveMod == MoveMod.CENTER)
+            this.setLocation(ge.getX()-(startX-p.x), ge.getY()-(startY-p.y));
     }
 
     /**

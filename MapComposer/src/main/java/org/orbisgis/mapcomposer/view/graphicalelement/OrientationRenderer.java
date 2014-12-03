@@ -15,10 +15,10 @@ import javax.swing.ImageIcon;
 /**
  * Renderer associated to the Orientation GraphicalElement.
  */
-public class OrientationRenderer extends GERenderer{
+public class OrientationRenderer extends SimpleGERenderer {
 
     @Override
-    public BufferedImage getcontentImage(GraphicalElement ge) {
+    public BufferedImage getContentImage(GraphicalElement ge) {
         // Draw in a BufferedImage the orientation icon.
         File f = new File(((Orientation)ge).getIconPath());
         if(f.exists() && f.isFile()) {
@@ -29,7 +29,7 @@ public class OrientationRenderer extends GERenderer{
             }
         }
         else{
-            //Use ImageIcon to convert the file URL into a buffered image
+            //Return the icon of the Orientation as BufferedImage
             ImageIcon icon = new ImageIcon(MainWindow.class.getResource("compass.png"));
             BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
             Graphics g = bi.createGraphics();
