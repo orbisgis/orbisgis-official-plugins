@@ -2,6 +2,7 @@ package org.orbisgis.mapcomposer.controller;
 
 import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
@@ -284,6 +285,8 @@ public class UIController{
                     if(ca.isSameName(confShutterCA)){
                         if(!confShutterCA.getReadOnly()){
                             ca.setValue(confShutterCA.getValue());
+                            if(ca instanceof ListCA && confShutterCA instanceof ListCA)
+                                ((ListCA) ca).select(((ListCA) confShutterCA).getSelected());
                             if(ca instanceof RefreshCA)
                                 ((RefreshCA)ca).refresh(this);
                         }
