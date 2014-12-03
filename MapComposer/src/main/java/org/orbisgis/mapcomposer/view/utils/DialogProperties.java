@@ -2,7 +2,7 @@ package org.orbisgis.mapcomposer.view.utils;
 
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
+
 import java.awt.BorderLayout;
 import java.awt.Component;
 import java.awt.FlowLayout;
@@ -16,6 +16,7 @@ import javax.swing.JButton;
 import javax.swing.JCheckBox;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
+
 import net.miginfocom.swing.MigLayout;
 
 /**
@@ -44,7 +45,6 @@ public class DialogProperties extends JFrame{
     /** Main constructor.
      * @param list List of ConfigurationAttributes to display.
      * @param uic UIController.
-     * @param enableCB Enable or not the ability to lock ConfigurationAttributs
      */
     public DialogProperties(List<ConfigurationAttribute> list, UIController uic, boolean enableLock){
         body = new JPanel(new MigLayout("wrap 2"));
@@ -101,8 +101,8 @@ public class DialogProperties extends JFrame{
     }
     
     /**
-     * Extenson of the JPanel used to display the ConfigurationAttributes.
-     * It also permite to lock and unlock the fields. 
+     * Extension of the JPanel used to display the ConfigurationAttributes.
+     * It also permit to lock and unlock the fields.
      */
     private class ConfPanel extends JPanel implements ItemListener{
         private final JPanel pan;

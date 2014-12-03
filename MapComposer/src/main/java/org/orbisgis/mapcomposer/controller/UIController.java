@@ -36,7 +36,7 @@ import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
- * This class manager the interaction between the user, the UI and the data model.
+ * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
  */
 public class UIController{
 
@@ -54,7 +54,8 @@ public class UIController{
     
     /**GraphicalElement stack giving the Z-index information*/
     private static Stack<GraphicalElement> zIndexStack;
-    
+
+    /** SaveAndLoadHandler */
     private static SaveAndLoadHandler listGE;
     
     private MainWindow mainWindow;
@@ -192,7 +193,10 @@ public class UIController{
         map.get(ge).select();
         refreshSpin();
     }
-    
+
+    /**
+     * Refresh the JSpinner value with the value from the selected GE.
+     */
     public void refreshSpin(){
         boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
         int x=0, y=0, w=0, h=0, r=0; 
@@ -240,7 +244,7 @@ public class UIController{
     }
     
     /**
-     * Remove all the selected GraphicalElement.
+     * Removes all the selected GraphicalElement.
      */
     public void remove(){
         for(GraphicalElement ge : selectedGE){
@@ -253,13 +257,19 @@ public class UIController{
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
     }
-    
-    
+
+    /**
+     * Validates all the selected GraphicalElements
+     */
     public void validateSelectedGE(){
         for(GraphicalElement ge : selectedGE)
             validateGE(ge);
     }
-    
+
+    /**
+     * Validates the given GraphicalElement
+     * @param ge GraphicalElement to validate
+     */
     public void validateGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
@@ -270,8 +280,8 @@ public class UIController{
     }
 
     /**
-     * Read a List of ConfigurationAttribute to set the GraphicalElement.
-     * This action is done when the button validate of the ConfigurationShutter is clicked. 
+     * Reads a list of ConfigurationAttribute and set the GraphicalElement with it.
+     * This action is done when the button validate of the DialogProperties is clicked.
      * @param listCA List of ConfigurationAttributes to read.
      */
     public void validate(List<ConfigurationAttribute> listCA) {
@@ -370,12 +380,15 @@ public class UIController{
             showProperties();
         }
     }
-    
+
     /**
-     * Breaks the encapsulation and should be removed.
+     * Returns the list of all the GraphicalElements added to the document.
+     * @return The list of GraphicalElements
      */
-    public LinkedHashMap<GraphicalElement, CompositionJPanel> getGEMap(){
-        return map;
+    public List<GraphicalElement> getGEList(){
+        List list = new ArrayList<GraphicalElement>();
+        list.addAll(map.keySet());
+        return list;
     }
 
     /**
@@ -513,7 +526,7 @@ public class UIController{
     }
     
     /**
-     * Open a dialog window with all the ducument properties.
+     * Open a dialog window with all the document properties.
      */
     public void showDocProperties(){
         Document doc=null;
@@ -539,7 +552,13 @@ public class UIController{
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
     }
-    
+
+    /**
+     * Apply a change of a property to the selected GraphicalElements.
+     * It's mainly used when the value of a spinner of the tool bar change of value.
+     * @param prop
+     * @param i
+     */
     public void changeProperty(GraphicalElement.Property prop, int i){
         for(GraphicalElement ge : selectedGE){
             switch(prop){
@@ -593,7 +612,7 @@ public class UIController{
                 path=fc.getSelectedFile().getAbsolutePath()+".png";
 
             try{
-                //Remove the border, do the export, readd them
+                //Removes the border, does the export, then adds them again
                 for(GraphicalElement ge : zIndexStack){
                     map.get(ge).enableBorders(false);
                 }

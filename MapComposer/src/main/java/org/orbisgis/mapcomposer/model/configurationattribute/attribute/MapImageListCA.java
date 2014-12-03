@@ -78,14 +78,14 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
         //If not, it's removed
         for(MapImage mi : list){
             boolean flag=false;
-            for(GraphicalElement ge : uic.getGEMap().keySet())
+            for(GraphicalElement ge : uic.getGEList())
                 if(ge.equals(mi))
                     flag = true;
             if(!flag)
                 this.remove(mi);
         }
         
-        for(Object ge : uic.getGEMap().keySet().toArray()){
+        for(GraphicalElement ge : uic.getGEList()){
             if(ge instanceof MapImage){
                 if(!list.contains(ge)){
                     this.add((MapImage)ge);

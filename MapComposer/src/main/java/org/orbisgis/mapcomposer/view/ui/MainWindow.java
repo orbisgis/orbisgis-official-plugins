@@ -35,8 +35,8 @@ import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
 
 /**
- * Main window of the map composer. during the developement, the map composer will be a separeted window.
- * Once finished, it probably will become a part of OrbisGIS using the dockable interface.
+ * Main window of the map composer. It contain the saverals tool bar and the CompositionArea.
+ * It does the link between the user interactions and the UIController
  */
 public class MainWindow extends JFrame implements MainFrameAction{
     
@@ -166,7 +166,11 @@ public class MainWindow extends JFrame implements MainFrameAction{
         sep.setMaximumSize(new Dimension(8, 32));
         toolBar.add(sep);
     }
-    
+
+    /**
+     * Returns the CompositionArea
+     * @return The CompositionArea
+     */
     public CompositionArea getCompositionArea(){return compArea;}
     
     /**
@@ -191,7 +195,11 @@ public class MainWindow extends JFrame implements MainFrameAction{
         toolBarSpin.addSeparator();
         return spin;
     }
-    
+
+    /**
+     * Apply a change in a JSpinner of the tool bar into the selected GraphicalElements via the UIController
+     * @param o JSpinner which had changed.
+     */
     public void spinChange(Object o){
         if(o.equals(spinX))
             if(spinX.isEnabled()) uic.changeProperty(GraphicalElement.Property.X, (Integer)spinX.getModel().getValue());
@@ -204,7 +212,19 @@ public class MainWindow extends JFrame implements MainFrameAction{
         if(o.equals(spinR))
             if(spinR.isEnabled()) uic.changeProperty(GraphicalElement.Property.ROTATION, (Integer)spinR.getModel().getValue());
     }
-    
+
+    /**
+     * Create a DefaultAction with the given value.
+     * @see org.orbisgis.viewapi.components.actions.DefaultAction
+     * @param actionID Action identifier
+     * @param actionLabel Short label
+     * @param actionToolTip Tool tip text
+     * @param actionIconName Name of the icon file
+     * @param target Target of the action listener
+     * @param ActionFunctionName Function of the target
+     * @param keyStroke Shortcut for the action
+     * @return Configured DefaultAction
+     */
     private DefaultAction createAction(String actionID, String actionLabel, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke){
         return new DefaultAction(
                             actionID,
@@ -215,7 +235,14 @@ public class MainWindow extends JFrame implements MainFrameAction{
                             keyStroke
                         );
     }
-    
+
+    /**
+     * Configure a JSpinner of the tool bar.
+     * It enable or not the spinner and set its value.
+     * @param b Enable the spinner if true, disable otherwise
+     * @param i New value of the spinner
+     * @param prop Property corresponding to the spinner to set
+     */
     public void setSpinner(boolean b, int i, Property prop){
         int val=b ? 0 : i;
         switch(prop){
@@ -241,37 +268,60 @@ public class MainWindow extends JFrame implements MainFrameAction{
                 break;
         }
     }
-    
+
+    /**
+     * Create a new document.
+     */
     public void newComposer(){
         uic.removeAllGE();
         uic.addGE(Document.class);
     }
-    
-    //change to handler
+
+    /**
+     * Export the document.
+     */
     public void exportComposer(){
         uic.export();
     }
-    
+
+    /**
+     * Add a MapImage GraphicalElement to the document.
+     */
     public void addMap(){
         uic.addGE(MapImage.class);
     }
-    
+
+    /**
+     * Add a TextElement GraphicalElement to the document.
+     */
     public void addText(){
         uic.addGE(TextElement.class);
     }
-    
+
+    /**
+     * Add a Legend GraphicalElement to the document.
+     */
     public void addLegend(){
         //Unsupported yet
     }
-    
+
+    /**
+     * Add a Orientation GraphicalElement to the document.
+     */
     public void addOrientation(){
         uic.addGE(Orientation.class);
     }
-    
+
+    /**
+     * Add a Scale GraphicalElement to the document.
+     */
     public void addScale(){
         uic.addGE(Scale.class);
     }
-    
+
+    /**
+     * Add a Image GraphicalElement to the document.
+     */
     public void addPicture(){
         uic.addGE(Image.class);
     }

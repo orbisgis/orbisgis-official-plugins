@@ -10,10 +10,11 @@ import javax.swing.JScrollPane;
 
 /**
  * Area for the map document composition.
+ * All the GraphicalElement will be drawn inside.
  */
 public class CompositionArea extends JPanel{
     
-    /**JscrollPane of the CompositionArea. */
+    /**JScrollPane of the CompositionArea. */
     private final JScrollPane pane;
     
     /**Main JPanel of the CompositionArea. */
@@ -89,7 +90,7 @@ public class CompositionArea extends JPanel{
     }
     
     /**
-     * Returns the buffered image corresponding to the CompositionArea.
+     * Returns the buffered image corresponding to the whole CompositionArea.
      * @return The buffered image corresponding to the CompositionArea.
      */
     public BufferedImage getDocBufferedImage(){
