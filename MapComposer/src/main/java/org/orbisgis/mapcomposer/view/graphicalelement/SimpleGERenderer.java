@@ -35,11 +35,11 @@ public abstract class SimpleGERenderer implements GERenderer {
                 //Redefinition of the painComponent method to rotate panel content.
                 @Override protected void paintComponent(Graphics g) {
                     super.paintComponent(g);
-                    AffineTransform at = new AffineTransform();
-                    at.translate(getWidth() / 2, getHeight() / 2);
-                    at.rotate(Math.toRadians(ge.getRotation()));
-                    at.translate(-bi.getWidth()/2, -bi.getHeight()/2);
-                    ((Graphics2D) g).drawImage(bi, at, null);
+                    AffineTransform affineTransform = new AffineTransform();
+                    affineTransform.translate(getWidth() / 2, getHeight() / 2);
+                    affineTransform.rotate(Math.toRadians(ge.getRotation()));
+                    affineTransform.translate(-bi.getWidth() / 2, -bi.getHeight() / 2);
+                    ((Graphics2D) g).drawImage(bi, affineTransform, null);
                 }
             });
         }

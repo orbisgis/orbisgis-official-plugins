@@ -24,22 +24,22 @@ public class OwsContextRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        OwsContextCA source = (OwsContextCA)ca;
-        pan.add(new JLabel(source.getName()));
+        OwsContextCA owsContextCA = (OwsContextCA)ca;
+        panel.add(new JLabel(owsContextCA.getName()));
 
         //Display the OwsContextCA into a JComboBox
-        JComboBox list = new JComboBox(source.getValue().toArray());
+        JComboBox list = new JComboBox(owsContextCA.getValue().toArray());
         list.setSelectedItem(ca.getValue());
-        pan.add(list);
-        return pan;
+        panel.add(list);
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         OwsContextCA source = (OwsContextCA)attribute;
         //As the OwsContext list is in the JComboBox, find it and extract the value.
         for(Component c : panel.getComponents()){

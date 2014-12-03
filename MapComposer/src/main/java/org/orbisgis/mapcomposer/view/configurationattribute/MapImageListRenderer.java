@@ -27,25 +27,25 @@ public class MapImageListRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
         final MapImageListCA milka = (MapImageListCA)ca;
         
-        pan.add(new JLabel(milka.getName()));
+        panel.add(new JLabel(milka.getName()));
         ArrayList<String> names = new ArrayList<>();
         //Display the MapImageListCA into a JComboBox
         for(MapImage mi : milka.getValue())
             names.add(mi.toString());
-        final JComboBox list = new JComboBox(names.toArray());
-        pan.add(list);
-        return pan;
+        final JComboBox comboBox = new JComboBox(names.toArray());
+        panel.add(comboBox);
+        return panel;
     }
         
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         MapImageListCA milka = (MapImageListCA)attribute;
         //As the MapImage list is in the JComboBox, find it and extract the value.
         for(Component c : panel.getComponents()){

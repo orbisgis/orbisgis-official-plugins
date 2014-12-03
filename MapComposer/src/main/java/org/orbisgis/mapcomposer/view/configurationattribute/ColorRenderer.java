@@ -26,28 +26,26 @@ public class ColorRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        final ColorCA color = (ColorCA)ca;
+        final ColorCA colorCA = (ColorCA)ca;
         //Add the name of the ConfigurationAttribute
-        pan.add(new JLabel(color.getName()));
+        panel.add(new JLabel(colorCA.getName()));
 
-        JLabel label = new JLabel("Text demo");
-        JButton button = new JButton();
+        JButton button = new JButton("Text demo");
         //Display the color in the button background
-        button.setBackground(color.getValue());
-        button.add(label);
+        button.setBackground(colorCA.getValue());
         //On clicking on the button, open a color chooser
         button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
         //Add the JButton
-        pan.add(button);
-        return pan;
+        panel.add(button);
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         ColorCA color = (ColorCA)attribute;
         //As the color is in the JButton background, find it and extract the value.
         for(Component c : panel.getComponents()){

@@ -20,10 +20,10 @@ public class OrientationRenderer extends SimpleGERenderer {
     @Override
     public BufferedImage getContentImage(GraphicalElement ge) {
         // Draw in a BufferedImage the orientation icon.
-        File f = new File(((Orientation)ge).getIconPath());
-        if(f.exists() && f.isFile()) {
+        File file = new File(((Orientation)ge).getIconPath());
+        if(file.exists() && file.isFile()) {
             try {
-                return ImageIO.read(f);
+                return ImageIO.read(file);
             } catch (IOException ex) {
                 Logger.getLogger(ImageRenderer.class.getName()).log(Level.SEVERE, null, ex);
             }

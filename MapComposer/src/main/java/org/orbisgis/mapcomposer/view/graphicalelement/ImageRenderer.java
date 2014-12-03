@@ -20,10 +20,10 @@ public class ImageRenderer extends SimpleGERenderer {
     @Override
     public BufferedImage getContentImage(GraphicalElement ge) {
         // Draw in a BufferedImage the image file
-        File f = new File(((Image)ge).getPath());
-        if(f.exists() && f.isFile()) {
+        File file = new File(((Image)ge).getPath());
+        if(file.exists() && file.isFile()) {
             try {
-                return ImageIO.read(f);
+                return ImageIO.read(file);
             } catch (IOException ex) {
                 Logger.getLogger(ImageRenderer.class.getName()).log(Level.SEVERE, null, ex);
             }

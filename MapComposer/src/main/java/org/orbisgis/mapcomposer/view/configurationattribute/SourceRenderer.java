@@ -27,25 +27,25 @@ public class SourceRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        final SourceCA source = (SourceCA)ca;
+        final SourceCA sourceCA = (SourceCA)ca;
         
-        pan.add(new JLabel(source.getName()));
+        panel.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
-        JTextField jtf = new JTextField(source.getValue());
-        pan.add(jtf);
+        JTextField jtf = new JTextField(sourceCA.getValue());
+        panel.add(jtf);
         JButton button = new JButton("Browse");
         button.addMouseListener(new MouseListenerBrowse(jtf));
         
-        pan.add(button);
-        return pan;
+        panel.add(button);
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         SourceCA source = (SourceCA)attribute;
         //As the source is in the JTextField, find it and extract the value.
         for(Component c : panel.getComponents()){

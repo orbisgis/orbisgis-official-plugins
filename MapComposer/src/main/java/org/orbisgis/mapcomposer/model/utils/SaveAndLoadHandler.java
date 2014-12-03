@@ -41,18 +41,18 @@ public class SaveAndLoadHandler extends DefaultHandler {
     private List<Class<? extends ConfigurationAttribute>> listClassCA;
 
     /** Indicates if the position of the reader is inside a GraphicalElement xml tag **/
-    private boolean inGE = false;
+    private boolean insideGE = false;
     /** Indicates if the position of the reader is inside a ConfigurationAttributes xml tag **/
-    private boolean inCA = false;
+    private boolean insideCA = false;
     /** Indicates if the position of the reader is inside a ConfigurationAttributes field xml tag **/
-    private boolean inField = false;
+    private boolean insideField = false;
 
     /** Instance of the GraphicalElement in creation **/
-    private GraphicalElement ge;
+    private GraphicalElement graphicalElement;
     /** Instance of the ConfigurationAttributes in creation **/
-    private ConfigurationAttribute ca;
+    private ConfigurationAttribute configurationAttribute;
     /** StringBuffer used to register everything inside Configuration xml tags **/
-    private StringBuffer sb = null;
+    private StringBuffer stringBuffer = null;
 
     public SaveAndLoadHandler(GEManager geManager, CAManager caManager){
         // Gets the list of GraphicalElement and Configuration Attributes class
@@ -70,17 +70,17 @@ public class SaveAndLoadHandler extends DefaultHandler {
         //Test if the tag read is the "version" one.
         if (qName.equals("version")) {
             //If the tag is the "version" one, start to register with the StringBuffer
-            sb = new StringBuffer();
+            stringBuffer = new StringBuffer();
         }
         else{
             //Test if the reader is actual inside a GraphicalElement xml tag
-            if (inGE) {
+            if (insideGE) {
                 //Test if the reader is actual inside a ConfigurationAttribute xml tag
-                if (inCA) {
+                if (insideCA) {
                     //If the reader is inside a GraphicalElement tag and inside a ConfigurationAttribute tag, it's just before a field of the ConfigurationAttribute
                     //Indicate that the reader is entering into a field and start to register with the StringBuffer
-                    inField = true;
-                    sb = new StringBuffer();
+                    insideField = true;
+                    stringBuffer = new StringBuffer();
                 }
                 //If not, it means that the reader is just before a ConfigurationAttribute xml tag.
                 else {
@@ -89,8 +89,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
                         if (c.getName().equals(qName)) {
                             //Instantiate the corresponding class and indicate that the reader is inside a ConfigurationAttribute xml tag
                             try {
-                                ca = c.newInstance();
-                                inCA = true;
+                                configurationAttribute = c.newInstance();
+                                insideCA = true;
                             } catch (InstantiationException | IllegalAccessException e) {
                                 throw new SAXException(e);
                             }
@@ -105,8 +105,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
                     if (c.getName().equals(qName)) {
                         //Instantiate the corresponding class and indicate that the reader is inside a GraphicalElement xml tag
                         try {
-                            ge = c.newInstance();
-                            inGE = true;
+                            graphicalElement = c.newInstance();
+                            insideGE = true;
                         } catch (InstantiationException|IllegalAccessException e) {
                             throw new SAXException(e);
                         }
@@ -118,31 +118,31 @@ public class SaveAndLoadHandler extends DefaultHandler {
 
     @Override
     public void endElement(String uri, String localName, String qName) throws SAXException {
-        //If the reader is leaving a field xml tag, sets the ConfigurationAttribute ca with the data from the String buffer, stop if and indicates that the reader left the field tag.
-        if (inField) {
-            ca.setField(qName, sb.toString().replace("\n", "").replace("\t", ""));
-            sb = null;
-            inField = false;
+        //If the reader is leaving a field xml tag, sets the ConfigurationAttribute configurationAttribute with the data from the String buffer, stop if and indicates that the reader left the field tag.
+        if (insideField) {
+            configurationAttribute.setField(qName, stringBuffer.toString().replace("\n", "").replace("\t", ""));
+            stringBuffer = null;
+            insideField = false;
         }
-        //If the reader is leaving a ConfigurationAttribute xml tag, add the fully configured CA to the GraphicalElement ge and indicate that the reader left the ConfigurationAttribute tag
-        else if (inCA) {
-            ge.setAttribute(ca);
-            inCA = false;
+        //If the reader is leaving a ConfigurationAttribute xml tag, add the fully configured CA to the GraphicalElement graphicalElement and indicate that the reader left the ConfigurationAttribute tag
+        else if (insideCA) {
+            graphicalElement.setAttribute(configurationAttribute);
+            insideCA = false;
         }
         //If the reader is leaving a GraphicalElement xml tag, add the fully configured GE to the listGE and indicate that the reader left the GraphicalElement tag
-        else if (inGE) {
-            listGE.add(ge);
-            inGE = false;
+        else if (insideGE) {
+            listGE.add(graphicalElement);
+            insideGE = false;
         }
 
         // Check if the version of the saveProject is actually compatible with the MapComposer version.
         if(qName.equals("version")) {
             boolean flag=false;
             for (int i = 0; i < compVersions.length; i++)
-                if (sb.toString().equals(compVersions[i]))
+                if (stringBuffer.toString().equals(compVersions[i]))
                     flag = true;
             if (!flag) {
-                String message = "File version " + sb.toString() + " isn't compatible with the MapComposer version. Should be ";
+                String message = "File version " + stringBuffer.toString() + " isn't compatible with the MapComposer version. Should be ";
                 for (String s : compVersions)
                     message += s + ";";
                 throw new SAXException(message);
@@ -153,7 +153,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
     @Override
     public void characters(char[] ch, int start, int length) throws SAXException {
         //If the StringBuffer isn't null, append the character read from to source to it
-        if (sb != null) sb.append(new String(ch, start, length));
+        if (stringBuffer != null) stringBuffer.append(new String(ch, start, length));
     }
 
     /**
@@ -239,7 +239,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
         for (GraphicalElement ge : list) {
             //Write the GraphicalElement start xml tag
             fw.write("\t<" + ge.getClass().getName() + ">\n");
-            //Write all the ConfigurationAttribute get from the GraphicalElement ge
+            //Write all the ConfigurationAttribute get from the GraphicalElement graphicalElement
             for(ConfigurationAttribute ca : ge.getSavableAttributes()){
                 //Write the ConfigurationAttribute start xml tag
                 fw.write("\t\t<"+ca.getClass().getName()+">\n");

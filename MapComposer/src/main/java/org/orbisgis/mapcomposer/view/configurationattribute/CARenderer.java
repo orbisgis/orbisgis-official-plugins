@@ -24,5 +24,5 @@ public interface CARenderer {
      * @param panel JPanel of the configuration window containing the value.
      * @param attribute ConfigurationAttribute to set with the extracted value.
      */
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute);
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute);
 }

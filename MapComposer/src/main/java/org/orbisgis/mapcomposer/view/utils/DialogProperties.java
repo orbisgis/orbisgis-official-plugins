@@ -34,7 +34,7 @@ public class DialogProperties extends JFrame{
     private final JButton cancel;
     
     /** JPanel of the configuration elements. */
-    private JPanel pan;
+    private JPanel panel;
     
     /** List of ConfPanel displayed. */
     private List<ConfPanel> listPanels;
@@ -55,15 +55,15 @@ public class DialogProperties extends JFrame{
         listPanels = new ArrayList<>();
         
         //Adds to a panel the COnfigurationAttribute
-        pan = new JPanel();
-        pan.setLayout(new MigLayout("wrap 1"));
+        panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
             JPanel panel = uic.getCAManager().getRenderer(ca).render(ca);
             ConfPanel cp = new ConfPanel(panel, ca, enableLock);
             listPanels.add(cp);
-            pan.add(cp, "wrap");
+            this.panel.add(cp, "wrap");
         }
-        body.add(pan, "wrap");
+        body.add(panel, "wrap");
         
         
         //Adds the ok and cancel buttons
@@ -86,7 +86,7 @@ public class DialogProperties extends JFrame{
         for(ConfPanel cp : listPanels){
             listca.add(cp.getCA());
         }
-        uic.validate(listca);
+        uic.validateCAList(listca);
         clearAndHide();
     }
 
@@ -94,9 +94,9 @@ public class DialogProperties extends JFrame{
      * Clears the dialog and hides it.
      */
     public void clearAndHide() {
-        pan = new JPanel();
+        panel = new JPanel();
         listPanels = new ArrayList<>();
-        this.setContentPane(pan);
+        this.setContentPane(panel);
         setVisible(false);
     }
     
@@ -127,7 +127,7 @@ public class DialogProperties extends JFrame{
         }
         
         public ConfigurationAttribute getCA(){
-            uic.getCAManager().getRenderer(ca).extractValue(pan, ca);
+            uic.getCAManager().getRenderer(ca).extractValueFromPanel(pan, ca);
             return ca;
         }
 

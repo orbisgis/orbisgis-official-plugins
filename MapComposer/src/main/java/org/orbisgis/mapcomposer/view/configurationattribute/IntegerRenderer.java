@@ -26,25 +26,25 @@ public class IntegerRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        IntegerCA num = (IntegerCA)ca;
+        IntegerCA integerCA = (IntegerCA)ca;
         
-        pan.add(new JLabel(num.getName()));
+        panel.add(new JLabel(integerCA.getName()));
         SpinnerModel model;
         //Display the IntegerCA into a JSpinner
-        if(num.getLimits())
-            model =new SpinnerNumberModel((int)num.getValue(), num.getMin(), num.getMax(), 1);
+        if(integerCA.getLimits())
+            model =new SpinnerNumberModel((int)integerCA.getValue(), integerCA.getMin(), integerCA.getMax(), 1);
         else
-            model =new SpinnerNumberModel((int)num.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
-        pan.add(new JSpinner(model));
-        return pan;
+            model =new SpinnerNumberModel((int)integerCA.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
+        panel.add(new JSpinner(model));
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         IntegerCA num = (IntegerCA)attribute;
         //As the integer is in the JSpinner, find it and extract the value.
         for(Component c : panel.getComponents()){

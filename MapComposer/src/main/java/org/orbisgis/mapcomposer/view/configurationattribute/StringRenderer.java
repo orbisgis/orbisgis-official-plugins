@@ -24,22 +24,22 @@ public class StringRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        StringCA text = (StringCA)ca;
+        StringCA stringCA = (StringCA)ca;
         
-        pan.add(new JLabel(text.getName()));
+        panel.add(new JLabel(stringCA.getName()));
         //Display the StringCA into a JTextArea
-        JTextArea area = new JTextArea(text.getValue());
-        pan.add(area);
+        JTextArea area = new JTextArea(stringCA.getValue());
+        panel.add(area);
         
-        return pan;
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         StringCA text = (StringCA)attribute;
         //As the string is in the JTextArea, find it and extract the value.
         for(Component c : panel.getComponents()){

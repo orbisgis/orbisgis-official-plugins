@@ -25,22 +25,22 @@ public class FileListRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        FileListCA filelist = (FileListCA)ca;
+        FileListCA fileListCA = (FileListCA)ca;
         
-        pan.add(new JLabel(filelist.getName()));
+        panel.add(new JLabel(fileListCA.getName()));
         //Display the FileListCA into a JComboBox
-        JComboBox list = new JComboBox(filelist.getValue().toArray(new String[0]));
-        pan.add(list);
+        JComboBox list = new JComboBox(fileListCA.getValue().toArray(new String[0]));
+        panel.add(list);
         
-        return pan;
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         FileListCA filelist = (FileListCA)attribute;
         //As the file list is in the JComboBox, find it and extract the value.
         for(Component c : panel.getComponents()){

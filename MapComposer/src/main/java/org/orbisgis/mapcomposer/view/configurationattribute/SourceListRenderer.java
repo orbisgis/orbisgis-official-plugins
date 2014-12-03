@@ -24,25 +24,25 @@ public class SourceListRenderer implements CARenderer{
     @Override
     public JPanel render(ConfigurationAttribute ca) {
     //Create the panel
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
+        JPanel panel = new JPanel();
+        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
 
     //Add to the panel all the swing components
-        SourceListCA choice = (SourceListCA)ca;
+        SourceListCA sourceListCA = (SourceListCA)ca;
         //Add the name of the ConfigurationAttribute
-        pan.add(new JLabel(choice.getName()));
+        panel.add(new JLabel(sourceListCA.getName()));
 
-        JComboBox jcb = new JComboBox(choice.getValue().toArray(new String[0]));
+        JComboBox jcb = new JComboBox(sourceListCA.getValue().toArray(new String[0]));
         //Display the SourceListCA into a JComboBox
-        jcb.setSelectedItem(choice.getSelected());
+        jcb.setSelectedItem(sourceListCA.getSelected());
         //Add the JComboBox
-        pan.add(jcb);
+        panel.add(jcb);
         
-        return pan;
+        return panel;
     }
 
     @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
+    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
         SourceListCA choice = (SourceListCA)attribute;
         //As value is inside a JComboBox, if find a component which is a JComboBox an set the attribute
         for(Component c : panel.getComponents()){
