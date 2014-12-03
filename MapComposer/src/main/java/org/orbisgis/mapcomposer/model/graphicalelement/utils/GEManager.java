@@ -20,7 +20,7 @@ import java.util.*;
 public class GEManager {
 
     /** HashMap to link the GE to its Renderer.*/
-    private Map<Class<? extends GraphicalElement>, SimpleGERenderer> mapRenderer;
+    private Map<Class<? extends GraphicalElement>, GERenderer> mapRenderer;
     
     /** Main constructor.*/
     public GEManager(){
@@ -39,7 +39,7 @@ public class GEManager {
      * @param ge GE class that needs to be rendered.
      * @return The Renderer of the GE.
      */
-    public SimpleGERenderer getRenderer(Class<? extends GraphicalElement> ge){
+    public GERenderer getRenderer(Class<? extends GraphicalElement> ge){
         return mapRenderer.get(ge);
     }
     
@@ -58,7 +58,7 @@ public class GEManager {
      */
     public List<Class<? extends GraphicalElement>> getRegisteredGEClasses(){
         List<Class<? extends GraphicalElement>> list = new ArrayList<>();
-        Iterator<Map.Entry<Class<? extends GraphicalElement>, SimpleGERenderer>> it = mapRenderer.entrySet().iterator();
+        Iterator<Map.Entry<Class<? extends GraphicalElement>, GERenderer>> it = mapRenderer.entrySet().iterator();
         while(it.hasNext())
             list.add(it.next().getKey());
         return list;
