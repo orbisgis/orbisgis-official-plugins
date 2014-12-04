@@ -273,7 +273,7 @@ public class UIController{
     public void validateGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        elementJPanelMap.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge));
+        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -304,7 +304,7 @@ public class UIController{
                     }
             if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
-            elementJPanelMap.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge));
+            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
             if(ge instanceof Document)
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
         }
@@ -361,7 +361,7 @@ public class UIController{
             //Registers the GE and its CompositionJPanel.
             elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
             mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
-            elementJPanelMap.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge));
+            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
             zIndexStack.push(ge);
 
             //Refreshes the GE.
@@ -437,7 +437,7 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        elementJPanelMap.get(ge).setPanel(geManager.getRenderer(ge.getClass()).render(ge));
+        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
         changeZIndex(TO_FRONT);

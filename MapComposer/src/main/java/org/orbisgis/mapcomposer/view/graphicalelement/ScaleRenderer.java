@@ -25,7 +25,7 @@ public class ScaleRenderer extends SimpleGERenderer {
     }
 
     @Override
-    public BufferedImage getContentImage(GraphicalElement ge) {
+    public BufferedImage createImageFromGE(GraphicalElement ge) {
         
         int resolution=-1;
         
@@ -74,7 +74,7 @@ public class ScaleRenderer extends SimpleGERenderer {
             bi.createGraphics().fillRect(i*resolution, 0, width, ge.getHeight()/2-1);
             bi.createGraphics().drawRect(i*resolution, (ge.getHeight()-1)/2, width-1, ge.getHeight()-ge.getHeight()/2);
         }
-        
-        return bi;
+
+        return applyRotationToBufferedImage(bi, ge);
     }
 }

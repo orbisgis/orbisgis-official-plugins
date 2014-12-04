@@ -18,7 +18,7 @@ import javax.swing.ImageIcon;
 public class ImageRenderer extends SimpleGERenderer {
 
     @Override
-    public BufferedImage getContentImage(GraphicalElement ge) {
+    public BufferedImage createImageFromGE(GraphicalElement ge) {
         // Draw in a BufferedImage the image file
         File file = new File(((Image)ge).getPath());
         if(file.exists() && file.isFile()) {
@@ -35,7 +35,7 @@ public class ImageRenderer extends SimpleGERenderer {
             Graphics g = bi.createGraphics();
             icon.paintIcon(null, g, 0,0);
             g.dispose();
-            return bi;
+            return applyRotationToBufferedImage(bi, ge);
         }
         return null;
     }

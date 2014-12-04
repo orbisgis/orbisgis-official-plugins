@@ -14,7 +14,7 @@ import java.awt.image.BufferedImage;
 public class MapImageRenderer extends SimpleGERenderer {
     
     @Override
-    public BufferedImage getContentImage(GraphicalElement ge) {
+    public BufferedImage createImageFromGE(GraphicalElement ge) {
         // Draw in a BufferedImage the map image
         if(((MapImage)ge).getImage()!=null){
         return ((MapImage)ge).getImage();
@@ -26,7 +26,7 @@ public class MapImageRenderer extends SimpleGERenderer {
             Graphics g = bi.createGraphics();
             icon.paintIcon(null, g, 0,0);
             g.dispose();
-            return bi;
+            return applyRotationToBufferedImage(bi, ge);
         }
     }
     

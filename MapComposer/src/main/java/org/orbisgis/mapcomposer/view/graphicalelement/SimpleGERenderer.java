@@ -4,47 +4,46 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import javax.swing.JComponent;
-import javax.swing.JPanel;
 
 /**
  * Base renderer for GraphicalElement.
- * It create a JPanel, size and move it, rotate it and draw the bufferedImage from the getContentImage() method.
- * Every extension of the SimpleRenderer class should call super.getRenderer(ge) to get the panel where the element is displayed.
+ * This abstract class contain a function applying to the bufferedImage the rotation angle of the GraphicalElement.
+ * In fact, after the rotation, the bounding box of the image will be bigger. So if the original bounding box is kept, the image will be cut.
+ * That's why a new image is created, with the new Bounding box and the original image is drawn inside. After the rotation the image won't be cut.
  */
 public abstract class SimpleGERenderer implements GERenderer {
 
-    @Override
-    public JPanel render(final GraphicalElement ge){
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.add(new JPanel());
-        //Calculate the required size of the panel to contain the full rotated image.
+    protected BufferedImage applyRotationToBufferedImage(BufferedImage bi, GraphicalElement ge){
+        //Calculate the size of the bufferedImage according to the rotation of the ge.
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newWidth = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        //Sets the panel bounds
-        panel.setBounds(ge.getX(), ge.getY(), (int)newHeight, (int)newWidth);
-        
-        //Get back the BufferedImage of the GraphicalElement to display and rotate it
-        final BufferedImage bi = getContentImage(ge);
-        if(bi!=null){
-            panel.add(new JComponent() {
-                //Redefinition of the painComponent method to rotate panel content.
-                @Override protected void paintComponent(Graphics g) {
-                    super.paintComponent(g);
-                    AffineTransform affineTransform = new AffineTransform();
-                    affineTransform.translate(getWidth() / 2, getHeight() / 2);
-                    affineTransform.rotate(Math.toRadians(ge.getRotation()));
-                    affineTransform.translate(-bi.getWidth() / 2, -bi.getHeight() / 2);
-                    ((Graphics2D) g).drawImage(bi, affineTransform, null);
-                }
-            });
-        }
-        //Make the panel transparent
-        panel.setOpaque(false);
-        return panel;
+
+        //Create a new BufferedImage with the new size (size after rotation)
+        BufferedImage bufferedImage = new BufferedImage((int)newWidth, (int)newHeight, bi.getType());
+        Graphics2D graph = bufferedImage.createGraphics();
+
+        //Draw the BufferedImage bi into the bigger BufferedImage
+        graph.drawImage(bi, ((int)newWidth-ge.getWidth())/2, ((int)newHeight-ge.getHeight())/2,
+                (int)newWidth-(((int)newWidth-ge.getWidth() )/ 2), (int)newHeight-(((int)newHeight-ge.getHeight() )/ 2),
+                0, 0,
+                ge.getWidth(), ge.getHeight(), null);
+        graph.dispose();
+        bi = bufferedImage;
+
+        AffineTransform affineTransform;
+        AffineTransformOp affineTransformOp;
+
+        //Create the rotation transform fo the buffered image
+        affineTransform= new AffineTransform();
+        affineTransform.rotate(Math.toRadians(ge.getRotation()), newWidth / 2, newHeight / 2);
+
+        //Apply the transform to the bufferedImage an return it
+        affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+        return affineTransformOp.filter(bi, null);
     }
 }

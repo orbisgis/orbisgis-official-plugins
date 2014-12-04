@@ -4,26 +4,22 @@ import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.Point;
+
+import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import javax.swing.BorderFactory;
-import javax.swing.JPanel;
 
-/**
- * This panel extends from JPanel define the action to do when the user click on it.
- */
+import javax.swing.*;
+
+ /**
+  * This panel extends from JPanel define the action to do when the user click on it.
+  */
 public class CompositionJPanel extends JPanel{
-    
-    /**Panel contained by the CompositionJPanel. */
-    private JPanel panel = new JPanel();
     
     /**GraphicalElement displayed. */
     private final GraphicalElement ge;
@@ -58,7 +54,6 @@ public class CompositionJPanel extends JPanel{
         super(new BorderLayout());
         this.uic=uic;
         this.ge=ge;
-        this.add(panel, BorderLayout.CENTER);
         //Disable mouse listeners if it's a Document panel.
         if(ge instanceof Document)
             this.setEnabled(false);
@@ -73,14 +68,25 @@ public class CompositionJPanel extends JPanel{
     
     /**
      * Sets the panel contained by the object.
-     * @param panel The new panel.
+     * @param bufferedImage The new panel.
      */
-    public void setPanel(JPanel panel){
-        this.panel = panel;
+    public void setPanelContent(final BufferedImage bufferedImage){
         this.removeAll();
-        this.add(this.panel, BorderLayout.CENTER);
-        this.panel.revalidate();
-        this.setBounds(panel.getBounds());
+        //Add the BufferedImage into a JComponent in the COmpositionJPanel
+        this.add(new JComponent() {
+            //Redefinition of the painComponent method to rotate the component content.
+            @Override protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                g.drawImage(bufferedImage, 0, 0, null);
+            }
+        }, BorderLayout.CENTER);
+        this.revalidate();
+        double rad = Math.toRadians(ge.getRotation());
+        double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        //As the buffered image is rotated, change the origin point oof the panel to make the center of the image not moving after the rotation.
+        //Take account of the border width (2 pixels).
+        this.setBounds(ge.getX()+(ge.getHeight()-(int)newHeight)/2, ge.getY()+(ge.getWidth()-(int)newWidth)/2, (int)newWidth+2, (int)newHeight+2);
         this.setOpaque(false);
         setBorders();
     }
@@ -90,9 +96,9 @@ public class CompositionJPanel extends JPanel{
      */
     private void setBorders() {
         if(selected)
-           panel.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+           this.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
         else
-           panel.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+           this.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     }
 
     /**
@@ -181,10 +187,10 @@ public class CompositionJPanel extends JPanel{
             case CENTER:
                 ge.setX(ge.getX()-startX+p.x);
                 ge.setY(ge.getY()-startY+p.y);
-                this.panel.setLocation(ge.getX(), ge.getY());
+                this.setLocation(ge.getX(), ge.getY());
                 break;
         }
-        panel.setBounds(ge.getX(), ge.getY(),  ge.getWidth(), ge.getHeight());
+        this.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
         uic.validateGE(ge);
         
         this.moveMod=MoveMod.NONE;
@@ -236,7 +242,7 @@ public class CompositionJPanel extends JPanel{
      */
     public void hightlight(){
         try {
-            panel.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
+            this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
             this.paintImmediately(this.getVisibleRect());
             Thread.sleep(1000);
             setBorders();
@@ -259,6 +265,6 @@ public class CompositionJPanel extends JPanel{
         if(enable)
             this.setBorders();
         else
-            panel.setBorder(null);
+            this.setBorder(null);
     }
 }

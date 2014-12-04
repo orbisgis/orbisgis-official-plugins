@@ -17,7 +17,7 @@ import java.text.AttributedString;
 public class TextRenderer extends SimpleGERenderer {
 
     @Override
-    public BufferedImage getContentImage(GraphicalElement ge){
+    public BufferedImage createImageFromGE(GraphicalElement ge){
         TextElement te = ((TextElement)ge);
         //Drawing on a BufferedImage the text.
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -52,6 +52,6 @@ public class TextRenderer extends SimpleGERenderer {
             y += textLayout.getDescent() + textLayout.getLeading();
         }
 
-        return bi;
+        return applyRotationToBufferedImage(bi, ge);
     }
 }
