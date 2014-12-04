@@ -20,8 +20,8 @@ public abstract class SimpleGERenderer implements GERenderer {
     protected BufferedImage applyRotationToBufferedImage(BufferedImage bi, GraphicalElement ge){
         //Calculate the size of the bufferedImage according to the rotation of the ge.
         double rad = Math.toRadians(ge.getRotation());
-        double newHeight = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-        double newWidth = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
         //Create a new BufferedImage with the new size (size after rotation)
         BufferedImage bufferedImage = new BufferedImage((int)newWidth, (int)newHeight, bi.getType());
