@@ -4,15 +4,17 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.beans.EventHandler;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.SpinnerModel;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 
 /**
  * Renderer associated to the IntegerCA ConfigurationAttribute.
- * The JPanel returned by the render method look like :
+ * The JPanel returned by the createJComponentFromCA method look like :
  *  ________________________________________________________________
  *                                   ____________________________
  * NameOfTheConfigurationAttribute  |integer value           | ^ |
@@ -24,7 +26,7 @@ import javax.swing.SpinnerNumberModel;
 public class IntegerRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
+    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
     //Create the panel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -39,19 +41,9 @@ public class IntegerRenderer implements CARenderer{
             model =new SpinnerNumberModel((int)integerCA.getValue(), integerCA.getMin(), integerCA.getMax(), 1);
         else
             model =new SpinnerNumberModel((int)integerCA.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
-        panel.add(new JSpinner(model));
+        JSpinner spinner = new JSpinner(model);
+        spinner.addChangeListener(EventHandler.create(ChangeListener.class, integerCA, "setValue", "source.value"));
+        panel.add(spinner);
         return panel;
     }
-
-    @Override
-    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
-        IntegerCA num = (IntegerCA)attribute;
-        //As the integer is in the JSpinner, find it and extract the value.
-        for(Component c : panel.getComponents()){
-            if(c instanceof JSpinner){
-                num.setValue(((Integer)((JSpinner)c).getValue()));
-            }
-        }
-    }
-    
 }

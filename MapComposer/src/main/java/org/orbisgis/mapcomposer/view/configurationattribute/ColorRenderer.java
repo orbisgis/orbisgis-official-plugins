@@ -7,11 +7,12 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
 import javax.swing.*;
 
 /**
  * Renderer associated to the ColorCA ConfigurationAttribute.
- * The JPanel returned by the render method look like :
+ * The JPanel returned by the createJComponentFromCA method look like :
  *  _______________________________________________
  * |                                  _________    |
  * | NameOfTheConfigurationAttribute |Button   |   |
@@ -24,7 +25,7 @@ import javax.swing.*;
 public class ColorRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
+    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
     //Create the panel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -39,20 +40,10 @@ public class ColorRenderer implements CARenderer{
         button.setBackground(colorCA.getValue());
         //On clicking on the button, open a color chooser
         button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
+        button.addPropertyChangeListener(EventHandler.create(PropertyChangeListener.class, colorCA, "setValue", "source.background"));
         //Add the JButton
         panel.add(button);
         return panel;
-    }
-
-    @Override
-    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
-        ColorCA color = (ColorCA)attribute;
-        //As the color is in the JButton background, find it and extract the value.
-        for(Component c : panel.getComponents()){
-            if(c instanceof JButton){
-                color.setValue(c.getBackground());
-            }
-        }
     }
 
     /**

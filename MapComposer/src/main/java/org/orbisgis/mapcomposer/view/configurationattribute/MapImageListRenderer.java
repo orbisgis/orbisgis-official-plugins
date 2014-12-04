@@ -6,6 +6,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapI
 
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
 import java.util.ArrayList;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
@@ -13,7 +15,7 @@ import javax.swing.JPanel;
 
 /**
  * Renderer associated to the LinkToMap CA
- * The JPanel returned by the render method look like :
+ * The JPanel returned by the createJComponentFromCA method look like :
  *  _________________________________________________________________
  * |                                  ____________________________   |
  * | NameOfTheConfigurationAttribute |selected value          | v |  |
@@ -25,7 +27,7 @@ import javax.swing.JPanel;
 public class MapImageListRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
+    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
     //Create the panel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -38,23 +40,10 @@ public class MapImageListRenderer implements CARenderer{
         //Display the MapImageListCA into a JComboBox
         for(MapImage mi : milka.getValue())
             names.add(mi.toString());
-        final JComboBox comboBox = new JComboBox(names.toArray());
-        panel.add(comboBox);
+        JComboBox jcb = new JComboBox(names.toArray());
+        jcb.addActionListener(EventHandler.create(ActionListener.class, milka, "select", "source.selectedItem"));
+        jcb.setSelectedItem(ca.getValue());
+        panel.add(jcb);
         return panel;
-    }
-        
-
-    @Override
-    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
-        MapImageListCA milka = (MapImageListCA)attribute;
-        //As the MapImage list is in the JComboBox, find it and extract the value.
-        for(Component c : panel.getComponents()){
-            if(c instanceof JComboBox){
-                for(MapImage ge : milka.getValue()){
-                    if(ge.equals(((JComboBox)c).getSelectedItem()))
-                        milka.select(ge);
-                }
-            }
-        }
     }
 }

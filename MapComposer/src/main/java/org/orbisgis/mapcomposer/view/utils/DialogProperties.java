@@ -24,7 +24,7 @@ import net.miginfocom.swing.MigLayout;
  */
 public class DialogProperties extends JFrame{
     
-    /** JPanel containing the body ofthe shutter. */
+    /** JPanel containing the body of the dialog. */
     private final JPanel body;
     
     /** Validation button. */
@@ -35,9 +35,8 @@ public class DialogProperties extends JFrame{
     
     /** JPanel of the configuration elements. */
     private JPanel panel;
-    
-    /** List of ConfPanel displayed. */
-    private List<ConfPanel> listPanels;
+
+    private List<ConfigurationAttribute> caList;
     
     /** UIController. */
     private UIController uic;
@@ -48,19 +47,17 @@ public class DialogProperties extends JFrame{
      */
     public DialogProperties(List<ConfigurationAttribute> list, UIController uic, boolean enableLock){
         body = new JPanel(new MigLayout("wrap 2"));
+        this.caList = list;
         this.uic=uic;
         this.setLayout(new BorderLayout());
         this.add(body, BorderLayout.CENTER);
-        
-        listPanels = new ArrayList<>();
         
         //Adds to a panel the COnfigurationAttribute
         panel = new JPanel();
         panel.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
-            JPanel panel = uic.getCAManager().getRenderer(ca).render(ca);
+            JPanel panel = uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca);
             ConfPanel cp = new ConfPanel(panel, ca, enableLock);
-            listPanels.add(cp);
             this.panel.add(cp, "wrap");
         }
         body.add(panel, "wrap");
@@ -82,11 +79,7 @@ public class DialogProperties extends JFrame{
      * Action executed when the ok button is clicked.
      */
     public void validation() {
-        List<ConfigurationAttribute> listca = new ArrayList<>();
-        for(ConfPanel cp : listPanels){
-            listca.add(cp.getCA());
-        }
-        uic.validateCAList(listca);
+        uic.validateCAList(caList);
         clearAndHide();
     }
 
@@ -95,7 +88,6 @@ public class DialogProperties extends JFrame{
      */
     public void clearAndHide() {
         panel = new JPanel();
-        listPanels = new ArrayList<>();
         this.setContentPane(panel);
         setVisible(false);
     }
@@ -126,10 +118,10 @@ public class DialogProperties extends JFrame{
             }
         }
         
-        public ConfigurationAttribute getCA(){
+        /*public ConfigurationAttribute getCA(){
             uic.getCAManager().getRenderer(ca).extractValueFromPanel(pan, ca);
             return ca;
-        }
+        }*/
 
         @Override
         public void itemStateChanged(ItemEvent ie) {

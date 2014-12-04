@@ -4,13 +4,18 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
+import java.beans.EventHandler;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.JTextArea;
+import javax.swing.event.DocumentEvent;
+import javax.swing.event.DocumentListener;
+import javax.swing.text.BadLocationException;
+import javax.swing.text.Document;
 
 /**
  * Renderer associated to the Text ConfigurationAttribute.
- * The JPanel returned by the render method look like :
+ * The JPanel returned by the createJComponentFromCA method look like :
  *  _________________________________________________________________
  * |                                  ____________________________   |
  * | NameOfTheConfigurationAttribute |Some text                   |  |
@@ -22,7 +27,7 @@ import javax.swing.JTextArea;
 public class StringRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
+    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
     //Create the panel
         JPanel panel = new JPanel();
         panel.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -33,20 +38,23 @@ public class StringRenderer implements CARenderer{
         panel.add(new JLabel(stringCA.getName()));
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
+        //"Save" the CA inside the JTextField
+        area.getDocument().putProperty("StringCA", stringCA);
+        area.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
         panel.add(area);
         
         return panel;
     }
 
-    @Override
-    public void extractValueFromPanel(JPanel panel, ConfigurationAttribute attribute) {
-        StringCA text = (StringCA)attribute;
-        //As the string is in the JTextArea, find it and extract the value.
-        for(Component c : panel.getComponents()){
-            if(c instanceof JTextArea){
-                text.setValue(((JTextArea)c).getText());
-            }
+    /**
+     * Save the text contained by the Document in the ConfigurationAttribute set as property.
+     * @param document
+     */
+    public void saveDocumentText(Document document){
+        try {
+            ((StringCA)document.getProperty("StringCA")).setValue(document.getText(0, document.getLength()));
+        } catch (BadLocationException e) {
+            e.printStackTrace();
         }
     }
-    
 }
