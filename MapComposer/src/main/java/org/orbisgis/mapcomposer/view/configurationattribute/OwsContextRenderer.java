@@ -6,9 +6,7 @@ import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * Renderer associated to the OwsContextCA ConfigurationAttribute.
@@ -24,20 +22,20 @@ import javax.swing.JPanel;
 public class OwsContextRenderer implements CARenderer{
 
     @Override
-    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    //Add to the panel all the swing components
+    //Add to the component all the swing components
         OwsContextCA owsContextCA = (OwsContextCA)ca;
-        panel.add(new JLabel(owsContextCA.getName()));
+        component.add(new JLabel(owsContextCA.getName()));
 
         //Display the OwsContextCA into a JComboBox
         JComboBox jcb = new JComboBox(owsContextCA.getValue().toArray());
         jcb.addActionListener(EventHandler.create(ActionListener.class, owsContextCA, "select", "source.selectedItem"));
         jcb.setSelectedItem(ca.getValue());
-        panel.add(jcb);
-        return panel;
+        component.add(jcb);
+        return component;
     }
 }

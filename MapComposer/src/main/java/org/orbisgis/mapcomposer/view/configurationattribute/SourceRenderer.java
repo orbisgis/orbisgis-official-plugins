@@ -4,10 +4,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import java.awt.FlowLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextField;
+import javax.swing.*;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
@@ -31,26 +28,26 @@ import java.beans.EventHandler;
 public class SourceRenderer implements CARenderer{
 
     @Override
-    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    //Add to the panel all the swing components
+    //Add to the component all the swing components
         final SourceCA sourceCA = (SourceCA)ca;
         
-        panel.add(new JLabel(sourceCA.getName()));
+        component.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
         JTextField jtf = new JTextField(sourceCA.getValue());
         //"Save" the CA inside the JTextField
         jtf.getDocument().putProperty("SourceCA", sourceCA);
         jtf.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
-        panel.add(jtf);
+        component.add(jtf);
         JButton button = new JButton("Browse");
         button.addMouseListener(new MouseListenerBrowse(jtf));
         
-        panel.add(button);
-        return panel;
+        component.add(button);
+        return component;
     }
 
     /**
@@ -59,7 +56,7 @@ public class SourceRenderer implements CARenderer{
      */
     public void saveDocumentText(Document document){
         try {
-            ((StringCA)document.getProperty("StringCA")).setValue(document.getText(0, document.getLength()));
+            ((SourceCA)document.getProperty("SourceCA")).setValue(document.getText(0, document.getLength()));
         } catch (BadLocationException e) {
             e.printStackTrace();
         }

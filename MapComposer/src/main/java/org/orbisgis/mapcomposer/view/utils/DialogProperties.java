@@ -10,12 +10,8 @@ import java.awt.event.ActionListener;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.beans.EventHandler;
-import java.util.ArrayList;
 import java.util.List;
-import javax.swing.JButton;
-import javax.swing.JCheckBox;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 import net.miginfocom.swing.MigLayout;
 
@@ -56,8 +52,7 @@ public class DialogProperties extends JFrame{
         panel = new JPanel();
         panel.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
-            JPanel panel = uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca);
-            ConfPanel cp = new ConfPanel(panel, ca, enableLock);
+            ConfPanel cp = new ConfPanel(uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca), ca, enableLock);
             this.panel.add(cp, "wrap");
         }
         body.add(panel, "wrap");
@@ -97,11 +92,11 @@ public class DialogProperties extends JFrame{
      * It also permit to lock and unlock the fields.
      */
     private class ConfPanel extends JPanel implements ItemListener{
-        private final JPanel pan;
+        private final JComponent component;
         private final ConfigurationAttribute ca;
-        public ConfPanel(JPanel pan, ConfigurationAttribute ca, boolean enableLock){
+        public ConfPanel(JComponent component, ConfigurationAttribute ca, boolean enableLock){
             super();
-            this.pan=pan;
+            this.component =component;
             this.ca = ca;
             this.setLayout(new FlowLayout(FlowLayout.LEFT));
             if(enableLock){
@@ -110,24 +105,19 @@ public class DialogProperties extends JFrame{
                 box.setSelected(ca.getReadOnly());
                 this.add(box);
             }
-            this.add(pan);
+            this.add(component);
             if(ca.getReadOnly()){
-                pan.setEnabled(false);
-                for(Component c : pan.getComponents())
+                component.setEnabled(false);
+                for(Component c : component.getComponents())
                     c.setEnabled(false);
             }
         }
-        
-        /*public ConfigurationAttribute getCA(){
-            uic.getCAManager().getRenderer(ca).extractValueFromPanel(pan, ca);
-            return ca;
-        }*/
 
         @Override
         public void itemStateChanged(ItemEvent ie) {
             boolean b = ((JCheckBox)ie.getSource()).isSelected();
-            pan.setEnabled(!b);
-            for(Component c : pan.getComponents())
+            component.setEnabled(!b);
+            for(Component c : component.getComponents())
                 c.setEnabled(!b);
             ca.setReadOnly(b);
             this.repaint();

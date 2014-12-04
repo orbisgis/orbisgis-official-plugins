@@ -12,7 +12,7 @@ import javax.swing.*;
 
 /**
  * Renderer associated to the ColorCA ConfigurationAttribute.
- * The JPanel returned by the createJComponentFromCA method look like :
+ * The JComponent returned by the createJComponentFromCA method look like :
  *  _______________________________________________
  * |                                  _________    |
  * | NameOfTheConfigurationAttribute |Button   |   |
@@ -25,15 +25,15 @@ import javax.swing.*;
 public class ColorRenderer implements CARenderer{
 
     @Override
-    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    //Add to the panel all the swing components
+    //Add to the component all the swing components
         final ColorCA colorCA = (ColorCA)ca;
         //Add the name of the ConfigurationAttribute
-        panel.add(new JLabel(colorCA.getName()));
+        component.add(new JLabel(colorCA.getName()));
 
         JButton button = new JButton("Text demo");
         //Display the color in the button background
@@ -42,8 +42,8 @@ public class ColorRenderer implements CARenderer{
         button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
         button.addPropertyChangeListener(EventHandler.create(PropertyChangeListener.class, colorCA, "setValue", "source.background"));
         //Add the JButton
-        panel.add(button);
-        return panel;
+        component.add(button);
+        return component;
     }
 
     /**

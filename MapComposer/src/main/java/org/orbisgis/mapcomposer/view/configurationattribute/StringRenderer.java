@@ -5,9 +5,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import java.beans.EventHandler;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JTextArea;
+import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -27,23 +25,23 @@ import javax.swing.text.Document;
 public class StringRenderer implements CARenderer{
 
     @Override
-    public JPanel createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the panel
-        JPanel panel = new JPanel();
-        panel.setLayout(new FlowLayout(FlowLayout.LEFT));
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    //Add to the panel all the swing components
+    //Add to the component all the swing components
         StringCA stringCA = (StringCA)ca;
         
-        panel.add(new JLabel(stringCA.getName()));
+        component.add(new JLabel(stringCA.getName()));
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
         //"Save" the CA inside the JTextField
         area.getDocument().putProperty("StringCA", stringCA);
         area.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
-        panel.add(area);
+        component.add(area);
         
-        return panel;
+        return component;
     }
 
     /**
