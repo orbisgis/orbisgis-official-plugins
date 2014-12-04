@@ -3,7 +3,6 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.view.utils.ColorChooser;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;

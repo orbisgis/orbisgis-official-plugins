@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -33,7 +32,7 @@ public class FileListRenderer implements CARenderer{
         
         component.add(new JLabel(fileListCA.getName()));
         //Display the FileListCA into a JComboBox
-        JComboBox jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
+        JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
         jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
         jcb.setSelectedItem(ca.getValue());
         component.add(jcb);

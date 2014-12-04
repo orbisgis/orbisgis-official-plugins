@@ -1,6 +1,5 @@
 package org.orbisgis.mapcomposer.view.configurationattribute;
 
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import java.awt.FlowLayout;
@@ -10,7 +9,6 @@ import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
 import org.orbisgis.mapcomposer.view.utils.MouseListenerBrowse;
-import java.awt.Component;
 import java.beans.EventHandler;
 
 /**

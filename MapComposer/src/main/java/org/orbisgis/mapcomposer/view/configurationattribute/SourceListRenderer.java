@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -32,7 +31,7 @@ public class SourceListRenderer implements CARenderer{
         //Add the name of the ConfigurationAttribute
         component.add(new JLabel(sourceListCA.getName()));
 
-        JComboBox jcb = new JComboBox(sourceListCA.getValue().toArray(new String[0]));
+        JComboBox<String> jcb = new JComboBox(sourceListCA.getValue().toArray(new String[0]));
         jcb.addActionListener(EventHandler.create(ActionListener.class, sourceListCA, "select", "source.selectedItem"));
         //Display the SourceListCA into a JComboBox
         jcb.setSelectedItem(sourceListCA.getSelected());

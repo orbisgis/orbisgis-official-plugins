@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.beans.EventHandler;
 import javax.swing.*;

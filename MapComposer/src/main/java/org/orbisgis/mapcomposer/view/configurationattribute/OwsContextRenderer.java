@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -32,7 +31,7 @@ public class OwsContextRenderer implements CARenderer{
         component.add(new JLabel(owsContextCA.getName()));
 
         //Display the OwsContextCA into a JComboBox
-        JComboBox jcb = new JComboBox(owsContextCA.getValue().toArray());
+        JComboBox<String> jcb = new JComboBox(owsContextCA.getValue().toArray());
         jcb.addActionListener(EventHandler.create(ActionListener.class, owsContextCA, "select", "source.selectedItem"));
         jcb.setSelectedItem(ca.getValue());
         component.add(jcb);

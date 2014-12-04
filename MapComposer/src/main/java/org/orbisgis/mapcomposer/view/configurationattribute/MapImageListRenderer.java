@@ -4,7 +4,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -38,7 +37,7 @@ public class MapImageListRenderer implements CARenderer{
         //Display the MapImageListCA into a JComboBox
         for(MapImage mi : milka.getValue())
             names.add(mi.toString());
-        JComboBox jcb = new JComboBox(names.toArray());
+        JComboBox<String> jcb = new JComboBox(names.toArray());
         jcb.addActionListener(EventHandler.create(ActionListener.class, milka, "select", "source.selectedItem"));
         jcb.setSelectedItem(ca.getValue());
         component.add(jcb);
