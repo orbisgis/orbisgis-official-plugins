@@ -9,23 +9,14 @@ import java.awt.image.BufferedImage;
  * Renderer associated to the scale GraphicalElement.
  */
 public class ScaleRenderer extends SimpleGERenderer {
-    
-    /**Dot per inch screen resolution. */
-    private final double dpi;
     /**Dot per millimeter screen resolution. */
-    private final double dpmm;
-    
-    /**
-     * Main constructor
-     */
-    public ScaleRenderer(){
-        //gets the screen dpi
-        this.dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-        this.dpmm = (((double)dpi)/25.4);
-    }
+    private double dpmm;
 
     @Override
     public BufferedImage createImageFromGE(GraphicalElement ge) {
+
+        int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        this.dpmm = (((double)dpi)/25.4);
         
         int resolution=-1;
         
