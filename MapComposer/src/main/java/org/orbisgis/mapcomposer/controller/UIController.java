@@ -2,23 +2,23 @@ package org.orbisgis.mapcomposer.controller;
 
 import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleDocumentGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
-import org.orbisgis.mapcomposer.model.graphicalelement.utils.SaveHandler;
+import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.LinkedHashMap;
@@ -30,23 +30,33 @@ import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
-import org.jibx.runtime.JiBXException;
+import javax.xml.parsers.ParserConfigurationException;
+
+import org.slf4j.LoggerFactory;
+import org.xml.sax.SAXException;
 
 /**
- * This class manager the interaction between the user, the UI and the data model.
+ * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
  */
 public class UIController{
+
+    /** CAManager */
+    private CAManager caManager;
+
+    /** GEManager */
+    private GEManager geManager;
     
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
-    private static LinkedHashMap<GraphicalElement, CompositionJPanel> map;
+    private static LinkedHashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
     
     /**Selected GraphicalElement */
     private List<GraphicalElement> selectedGE;
     
     /**GraphicalElement stack giving the Z-index information*/
     private static Stack<GraphicalElement> zIndexStack;
-    
-    private static SaveHandler listGE;
+
+    /** SaveAndLoadHandler */
+    private static SaveAndLoadHandler saveNLoadHandler;
     
     private MainWindow mainWindow;
     
@@ -55,22 +65,28 @@ public class UIController{
      */
     public UIController(){
         //Initialize the different attributes
-        map = new LinkedHashMap<>();
+        caManager = new CAManager();
+        geManager = new GEManager();
+        elementJPanelMap = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
-        listGE = new SaveHandler();
+        saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
     }
     
-    public MainWindow getMainWindow(){
-        return mainWindow;
-    }
+    public MainWindow getMainWindow() { return mainWindow; }
+
+    /**
+     * Returns the CAManager.
+     * @return The CAManager
+     */
+    public CAManager getCAManager() { return caManager; }
     
     /**
      * Change the Z-index of the displayed GraphicalElement.
      * @param z Change of the Z-index.
      */
-    public void zindexChange(ZIndex z){
+    public void changeZIndex(ZIndex z){
         Stack<GraphicalElement> temp = new Stack<>();
         Stack<GraphicalElement> tempBack = new Stack<>();
         Stack<GraphicalElement> tempFront = new Stack<>();
@@ -99,19 +115,19 @@ public class UIController{
                 switch (z){
                     case TO_BACK:
                         temp.push(ge);
-                        toBackFront(ge, temp);
+                        moveToBackFront(ge, temp);
                         break;
                     case TO_FRONT:
-                        toBackFront(ge, temp);
+                        moveToBackFront(ge, temp);
                         temp.push(ge);
                         break;
                     case FRONT:
                         if(zIndexStack.indexOf(ge)>0)
-                            backFront(1, ge, temp);
+                            moveBackFront(1, ge, temp);
                         break;
                     case BACK:
                         if(zIndexStack.indexOf(ge)<zIndexStack.size()-1)
-                            backFront(-1, ge, temp);
+                            moveBackFront(-1, ge, temp);
                         break;
                 }
             }
@@ -125,8 +141,8 @@ public class UIController{
         while(!tempBack.empty())
             zIndexStack.push(tempBack.pop());
         //Set the z-index of the GE from their stack position
-        for(GraphicalElement g : zIndexStack){
-            mainWindow.getCompositionArea().setZIndex(map.get(g), zIndexStack.indexOf(g));
+        for(GraphicalElement ge : zIndexStack){
+            mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         }
         validateSelectedGE();
     }
@@ -135,9 +151,9 @@ public class UIController{
      * Move the GraphicalElement one step to the front or back and set its index.
      * @param deltaZ Variation of the Z-index of the GE.
      * @param ge GraphicalElement to move.
-     * @param temp Temporary stack.
+     * @param geStack Temporary stack.
      */
-    private void backFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> temp){
+    private void moveBackFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> geStack){
         //Get the target index in the temporary stack (reverse order of the class stack)
         int target = zIndexStack.size()-(zIndexStack.indexOf(ge)-deltaZ);
         zIndexStack.remove(ge);
@@ -147,26 +163,25 @@ public class UIController{
         while(!zIndexStack.empty()){
             //Push the GE at the write index.
             if(i==target)
-                temp.push(ge);
+                geStack.push(ge);
             else
-                temp.push(zIndexStack.pop());
+                geStack.push(zIndexStack.pop());
             i++;
         }
         //If the GE has the higher index, it isn't already pushed.
-        if(!temp.contains(ge))
-            temp.push(ge);
+        if(!geStack.contains(ge))
+            geStack.push(ge);
     }   
     
     /**
      * Move the GraphicalElement to the front or back and set its index.
-     * @param deltaZ Variation of the Z-index of the GE.
      * @param ge GraphicalElement to move.
-     * @param temp Temporary stack.
+     * @param geStack Temporary stack.
      */
-    private void toBackFront(GraphicalElement ge, Stack<GraphicalElement> temp){
+    private void moveToBackFront(GraphicalElement ge, Stack<GraphicalElement> geStack){
         zIndexStack.remove(ge);
         while(!zIndexStack.empty())
-            temp.push(zIndexStack.pop());
+            geStack.push(zIndexStack.pop());
     }
     
     /**
@@ -175,10 +190,13 @@ public class UIController{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
-        map.get(ge).select();
+        elementJPanelMap.get(ge).select();
         refreshSpin();
     }
-    
+
+    /**
+     * Refresh the JSpinner value with the value from the selected GE.
+     */
     public void refreshSpin(){
         boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
         int x=0, y=0, w=0, h=0, r=0; 
@@ -209,7 +227,7 @@ public class UIController{
      */
     public void unselectGE(GraphicalElement ge){
         selectedGE.remove(ge);
-        map.get(ge).unselect();
+        elementJPanelMap.get(ge).unselect();
         refreshSpin();
     }
     
@@ -220,65 +238,73 @@ public class UIController{
     public void unselectAllGE(){
         //Unselect all the GraphicalElements
         for(GraphicalElement ge : selectedGE)
-            map.get(ge).unselect();
+            elementJPanelMap.get(ge).unselect();
         selectedGE= new ArrayList<>();
         refreshSpin();
     }
     
     /**
-     * Remove all the selected GraphicalElement.
+     * Removes all the selected GraphicalElement.
      */
-    public void remove(){
+    public void removeSelectedGE(){
         for(GraphicalElement ge : selectedGE){
-            mainWindow.getCompositionArea().removeGE(map.get(ge));
-            map.remove(ge);
+            mainWindow.getCompositionArea().removeGE(elementJPanelMap.get(ge));
+            elementJPanelMap.remove(ge);
             zIndexStack.remove(ge);
         }
         for(GraphicalElement ge : zIndexStack)
-            mainWindow.getCompositionArea().setZIndex(map.get(ge), zIndexStack.indexOf(ge));
+            mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
     }
-    
-    
+
+    /**
+     * Validates all the selected GraphicalElements
+     */
     public void validateSelectedGE(){
         for(GraphicalElement ge : selectedGE)
             validateGE(ge);
     }
-    
+
+    /**
+     * Validates the given GraphicalElement
+     * @param ge GraphicalElement to validate
+     */
     public void validateGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
-        if(ge instanceof SimpleDocumentGE)
+        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
+        if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
     }
 
     /**
-     * Read a List of ConfigurationAttribute to set the GraphicalElement.
-     * This action is done when the button validate of the ConfigurationShutter is clicked. 
-     * @param listCA List of ConfigurationAttributes to read.
+     * Reads a list of ConfigurationAttribute and set the GraphicalElement with it.
+     * This action is done when the button validate of the DialogProperties is clicked.
+     * @param caList List of ConfigurationAttributes to read.
      */
-    public void validate(List<ConfigurationAttribute> listCA) {
+    public void validateCAList(List<ConfigurationAttribute> caList) {
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
             //Takes each ConfigurationAttribute from the GraphicalElement
-            for(ConfigurationAttribute ca : ge.getAllAttributes())
+            for(ConfigurationAttribute geCA : ge.getAllAttributes())
                 //Takes each CA from the list of CA to validate
-                for(ConfigurationAttribute confShutterCA : listCA)
+                for(ConfigurationAttribute dialogPropertiesCA : caList)
                     //If the two CA are the same property and are unlocked, set the new CA value
-                    if(ca.isSameName(confShutterCA)){
-                        if(!confShutterCA.isLocked()){
-                            ca.setValue(confShutterCA.getValue());
-                            if(ca instanceof RefreshCA)
-                                ((RefreshCA)ca).refresh(this);
+                    if(geCA.isSameName(dialogPropertiesCA)){
+                        if(!dialogPropertiesCA.getReadOnly()){
+                            geCA.setValue(dialogPropertiesCA.getValue());
+                            if(geCA instanceof ListCA && dialogPropertiesCA instanceof ListCA)
+                                ((ListCA) geCA).select(((ListCA) dialogPropertiesCA).getSelected());
+                            if(geCA instanceof RefreshCA)
+                                ((RefreshCA)geCA).refresh(this);
                         }
                         break;
                     }
             if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
             if(ge instanceof Document)
                 mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
         }
@@ -291,7 +317,7 @@ public class UIController{
      */
     private List<ConfigurationAttribute> getCommonAttributes(){
         List<ConfigurationAttribute> list = selectedGE.get(0).getAllAttributes();
-        List<ConfigurationAttribute> listRemove = new ArrayList<>();
+        List<ConfigurationAttribute> listToRemove = new ArrayList<>();
         //Compare each the CA of the list to those of the GE from selectedGE
         boolean flag=false;
         for(ConfigurationAttribute caList : list){
@@ -303,16 +329,16 @@ public class UIController{
                     
                     if(caList.isSameName(caGE)){
                         flag=true;
-                        caList.setLock(!caList.isSameValue(caGE));
+                        caList.setReadOnly(!caList.isSameValue(caGE));
                     }
                 }
             }
             //If the CA isn't in common, it's added to a list to be removed after
             if(!flag){
-                listRemove.add(caList);
+                listToRemove.add(caList);
             }
         }
-        for(ConfigurationAttribute ca : listRemove){
+        for(ConfigurationAttribute ca : listToRemove){
             list.remove(ca);
         }
         
@@ -324,41 +350,45 @@ public class UIController{
      * @param aClass Class of the new GraphicalElement.
      */
     public void addGE(Class<? extends GraphicalElement> aClass) {
+        //Creates the GraphicalElement.
+        GraphicalElement ge = null;
         try {
-            //Creates the GraphicalElement.
-            GraphicalElement ge = aClass.newInstance();
-            
+            ge = aClass.newInstance();
+        } catch (InstantiationException|IllegalAccessException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+        }
+        if(ge!=null) {
             //Registers the GE and its CompositionJPanel.
-            map.put(ge, new CompositionJPanel(ge, this));
-            mainWindow.getCompositionArea().addGE(map.get(ge));
-            map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+            elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
+            mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
+            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
             zIndexStack.push(ge);
-            
+
             //Refreshes the GE.
-            if(ge instanceof GERefresh){
-                ((GERefresh)ge).refresh();
-            }
-            
+            if (ge instanceof GERefresh)
+                ((GERefresh) ge).refresh();
+
             //Selects only the GE
             selectedGE = new ArrayList<>();
             selectedGE.add(ge);
-            
+
             //Bring it to the front an validate its default properties.
-            zindexChange(TO_FRONT);
+            changeZIndex(TO_FRONT);
             validateGE(ge);
-            
+
             //Show the configuration dialog
-            showProperties();
-        } catch (InstantiationException | IllegalAccessException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            showSelectedGEProperties();
         }
     }
-    
+
     /**
-     * Breaks the encapsulation and should be removed.
+     * Returns the list of all the GraphicalElements added to the document.
+     * @return The list of GraphicalElements
      */
-    public LinkedHashMap<GraphicalElement, CompositionJPanel> getGEMap(){
-        return map;
+    public List<GraphicalElement> getGEList(){
+        List list = new ArrayList<GraphicalElement>();
+        list.addAll(elementJPanelMap.keySet());
+        return list;
     }
 
     /**
@@ -366,52 +396,62 @@ public class UIController{
      */
     public void removeAllGE() {
         mainWindow.getCompositionArea().removeAllGE();
-        map = new LinkedHashMap<>();
+        elementJPanelMap = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
     }
-    
-    public void save(){
+
+    /**
+     * Run saveProject function of the SaveHandler.
+     */
+    public void saveDocument(){
         try {
-            listGE.save(zIndexStack);
-        } catch (JiBXException | FileNotFoundException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+            saveNLoadHandler.saveProject(zIndexStack.subList(0, zIndexStack.size()));
+        } catch (NoSuchMethodException|IOException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
-    
-    public void load(){
+
+    /**
+     * Run loadProject function from the SaveHandler and draw loaded GE.
+     */
+    public void loadDocument(){
         try {
             removeAllGE();
-            listGE.load();
-            for(GraphicalElement ge : listGE.getList()){
+            List<GraphicalElement> list = saveNLoadHandler.loadProject();
+            for(GraphicalElement ge : list){
                 addLoadedGE(ge);
             }
-        } catch (JiBXException | FileNotFoundException ex) {
-            Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+        } catch (ParserConfigurationException|SAXException|IOException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
     }
-    
+
+    /**
+     * Add to the project the given GE (that is just loaded)..
+     * @param ge GE to add to the project.
+     */
     private void addLoadedGE(GraphicalElement ge) {
-        map.put(ge, new CompositionJPanel(ge, this));
-        mainWindow.getCompositionArea().addGE(map.get(ge));
+        elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
+        mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        map.get(ge).setPanel(GEManager.getInstance().render(ge.getClass()).render(ge, map.get(ge)));
+        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
         zIndexStack.push(ge);
         selectedGE = new ArrayList<>();
-        zindexChange(TO_FRONT);
+        changeZIndex(TO_FRONT);
         validateGE(ge);
         mainWindow.getCompositionArea().refresh();
     }
     
-    public void setAlign( Align a) {
+    public void setAlign( Align alignment) {
         if(selectedGE.size()>0){
             int xMin;
             int xMax;
             int yMin;
             int yMax;
-            switch(a){
+            switch(alignment){
                 case LEFT:
                     xMin=selectedGE.get(0).getX();
                     for (GraphicalElement ge : selectedGE){
@@ -477,7 +517,7 @@ public class UIController{
         }
     }
     
-    public void showProperties(){
+    public void showSelectedGEProperties(){
         if(selectedGE.size()>0){
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
@@ -486,7 +526,7 @@ public class UIController{
     }
     
     /**
-     * Open a dialog window with all the ducument properties.
+     * Open a dialog window with all the document properties.
      */
     public void showDocProperties(){
         Document doc=null;
@@ -512,7 +552,13 @@ public class UIController{
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
     }
-    
+
+    /**
+     * Apply a change of a property to the selected GraphicalElements.
+     * It's mainly used when the value of a spinner of the tool bar change of value.
+     * @param prop
+     * @param i
+     */
     public void changeProperty(GraphicalElement.Property prop, int i){
         for(GraphicalElement ge : selectedGE){
             switch(prop){
@@ -532,9 +578,9 @@ public class UIController{
                     ge.setRotation(i);
                     break;
             }
-            validateGE(ge);
-        mainWindow.getCompositionArea().refresh();
         }
+        validateSelectedGE();
+        mainWindow.getCompositionArea().refresh();
     }
     
     /**
@@ -556,7 +602,8 @@ public class UIController{
 
             @Override public String getDescription() {return "PNG Files (.png)";}
         });
-        //If the save is validated, do the export
+
+        //If the saveProject is validated, do the export
         if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
             //Sets the path of the new file
             String path;
@@ -565,15 +612,16 @@ public class UIController{
             else 
                 path=fc.getSelectedFile().getAbsolutePath()+".png";
 
+
             try{
-                //Remove the border, do the export, readd them
+                //Removes the border, does the export, then adds them again
                 for(GraphicalElement ge : zIndexStack){
-                    map.get(ge).enableBorders(false);
+                    elementJPanelMap.get(ge).enableBorders(false);
                 }
                 ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
                 
                 for(GraphicalElement ge : zIndexStack){
-                    map.get(ge).enableBorders(true);
+                    elementJPanelMap.get(ge).enableBorders(true);
                 }
             } catch (IOException ex) {
                 Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);

@@ -3,7 +3,9 @@ package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 
 /**
- * Interface for cartographic element based on an OWS-Context.
+ * This interface extends the GraphicalElement interface and represent a cartographic element based on a OwsMapContext file.
+ * It contain the basics filed of a GraphicalElement plus an OwsMapContext (OwsContextCA) which contain all the data from the map created in OrbisGIS.
+ * To simply the use of this interface, the OwsMapContext is set by giving its path.
  */
 public interface CartographicElement extends GraphicalElement{
 

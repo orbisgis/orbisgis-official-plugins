@@ -10,17 +10,18 @@ import javax.swing.JScrollPane;
 
 /**
  * Area for the map document composition.
+ * All the GraphicalElement will be drawn inside.
  */
 public class CompositionArea extends JPanel{
     
-    /**JscrollPane of the CompositionArea. */
-    private final JScrollPane pane;
+    /**JScrollPane of the CompositionArea. */
+    private final JScrollPane scrollPane;
     
     /**Main JPanel of the CompositionArea. */
     private final JPanel panel = new JPanel(null);
     
     /**Dimension of the document into the CompositionArea. */
-    private Dimension dim = new Dimension(50, 50);
+    private Dimension dimension = new Dimension(50, 50);
     
     /**
      * Main constructor.
@@ -29,8 +30,8 @@ public class CompositionArea extends JPanel{
         super(new BorderLayout());
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
-        pane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        this.add(pane, BorderLayout.CENTER);
+        scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        this.add(scrollPane, BorderLayout.CENTER);
     }
     
     /**
@@ -54,11 +55,11 @@ public class CompositionArea extends JPanel{
     /**
      * Sets the dimension of the document in the compositionArea.
      * This method should be called on the document properties definition.
-     * @param dim Dimension of the document.
+     * @param dimension Dimension of the document.
      */
-    public void setDocumentDimension(Dimension dim){
-        this.dim=dim;
-        this.panel.setPreferredSize(dim);
+    public void setDocumentDimension(Dimension dimension){
+        this.dimension =dimension;
+        this.panel.setPreferredSize(this.dimension);
         this.revalidate();
         this.repaint();
     }
@@ -89,11 +90,11 @@ public class CompositionArea extends JPanel{
     }
     
     /**
-     * Returns the buffered image corresponding to the CompositionArea.
+     * Returns the buffered image corresponding to the whole CompositionArea.
      * @return The buffered image corresponding to the CompositionArea.
      */
     public BufferedImage getDocBufferedImage(){
-        BufferedImage bi = new BufferedImage(dim.width, dim.height, BufferedImage.TYPE_INT_ARGB);
+        BufferedImage bi = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = bi.createGraphics();
         panel.paint(g);
         g.dispose();

@@ -2,40 +2,41 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
-import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
 import java.io.File;
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * Renderer associated to the FileListCA ConfigurationAttribute.
+ * The JComponent returned by the createJComponentFromCA method look like :
+ *  ________________________________________________________________
+ * |                                  ____________________________  |
+ * | NameOfTheConfigurationAttribute |selected value          | v | |
+ * |                                 |________________________|___| |
+ * |________________________________________________________________|
+ *
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA
  */
 public class FileListRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
-        FileListCA filelist = (FileListCA)ca;
-        
-        pan.add(new JLabel(filelist.getName()));
-        JComboBox list = new JComboBox(filelist.getValue().toArray(new String[0]));
-        pan.add(list);
-        
-        return pan;
-    }
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
 
-    @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        FileListCA filelist = (FileListCA)attribute;
-        for(Component c : panel.getComponents()){
-            if(c instanceof JComboBox){
-                filelist.select(new File(((JComboBox)c).getModel().getSelectedItem().toString()));
-            }
-        }
+    //Add to the panel all the swing components
+        FileListCA fileListCA = (FileListCA)ca;
+        
+        component.add(new JLabel(fileListCA.getName()));
+        //Display the FileListCA into a JComboBox
+        JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
+        jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
+        jcb.setSelectedItem(ca.getValue());
+        component.add(jcb);
+        
+        return component;
     }
-    
 }

@@ -3,51 +3,54 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.view.utils.ColorChooser;
-import java.awt.Component;
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
+import java.beans.PropertyChangeListener;
+import javax.swing.*;
 
 /**
- * Renderer associated to the Source ConfigurationAttribute.
+ * Renderer associated to the ColorCA ConfigurationAttribute.
+ * The JComponent returned by the createJComponentFromCA method look like :
+ *  _______________________________________________
+ * |                                  _________    |
+ * | NameOfTheConfigurationAttribute |Button   |   |
+ * |                                 |_________|   |
+ * |_______________________________________________|
+ *
+ * The color is chosen by clicking on a button. It opens a ColorChooser and the color is saved in the background of the button
+ * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA
  */
 public class ColorRenderer implements CARenderer{
 
     @Override
-    public JPanel render(ConfigurationAttribute ca) {
-        JPanel pan = new JPanel();
-        pan.setLayout(new FlowLayout(FlowLayout.LEFT));
-        
-        final ColorCA color = (ColorCA)ca;
-        
-        pan.add(new JLabel(color.getName()));
-        JLabel label = new JLabel("Text demo");
-        label.setName("label");
-        label.setForeground(color.getValue());
-        pan.add(label);
-        JButton button = new JButton();
-        button.add(label);
+    public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
+    //Create the component
+        JComponent component = new JPanel();
+        component.setLayout(new FlowLayout(FlowLayout.LEFT));
+
+    //Add to the component all the swing components
+        final ColorCA colorCA = (ColorCA)ca;
+        //Add the name of the ConfigurationAttribute
+        component.add(new JLabel(colorCA.getName()));
+
+        JButton button = new JButton("Text demo");
+        //Display the color in the button background
+        button.setBackground(colorCA.getValue());
+        //On clicking on the button, open a color chooser
         button.addActionListener(EventHandler.create(ActionListener.class, this, "open", "source"));
-        
-        pan.add(button);
-        return pan;
+        button.addPropertyChangeListener(EventHandler.create(PropertyChangeListener.class, colorCA, "setValue", "source.background"));
+        //Add the JButton
+        component.add(button);
+        return component;
     }
 
-    @Override
-    public void extractValue(JPanel panel, ConfigurationAttribute attribute) {
-        ColorCA color = (ColorCA)attribute;
-        for(Component c : panel.getComponents()){
-            if(c instanceof JButton){
-                color.setValue(c.getBackground());
-            }
-        }
-    }
-    
-    public void open(JButton button){
-        ColorChooser cc = new ColorChooser(button);
+    /**
+     * Open a ColorChooser and show it.
+     * @param component The chosen color will be saved in the background of the component
+     */
+    public void open(JComponent component){
+        ColorChooser cc = new ColorChooser(component);
         cc.setVisible(true);
     }
     

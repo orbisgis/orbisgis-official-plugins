@@ -4,7 +4,7 @@
     <groupId>org.orbisgis</groupId>
     <artifactId>map-composer</artifactId>
     <name>Map Composer</name>
-    <version>1.0.1</version>
+    <version>1.0.2-SNAPSHOT</version>
     <packaging>bundle</packaging>
     <description>OrbisGIS plugin for the composition of cartographic documents.</description>
     <parent>
@@ -26,25 +26,6 @@
                         <Bundle-Category>orbisgis</Bundle-Category>
                     </instructions>
                 </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.jibx</groupId>
-                <artifactId>jibx-maven-plugin</artifactId>
-                <version>1.2.5</version>
-                <configuration>
-                    <schemaBindingDirectory>${basedir}/src/main/jibx</schemaBindingDirectory>
-                    <includeSchemaBindings>
-                        <includeSchemaBindings>binding.xml</includeSchemaBindings>
-                    </includeSchemaBindings>
-                    <verbose>true</verbose>
-                </configuration>
-                <executions>
-                    <execution>
-                        <goals>
-                            <goal>bind</goal>
-                        </goals>
-                    </execution>
-                </executions>
             </plugin>
         </plugins>
     </build>
@@ -73,9 +54,10 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.jibx</groupId>
-            <artifactId>jibx-run</artifactId>
-            <version>1.2.5</version>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <version>4.10</version>
+            <scope>test</scope>
         </dependency>
     </dependencies>
     <properties>

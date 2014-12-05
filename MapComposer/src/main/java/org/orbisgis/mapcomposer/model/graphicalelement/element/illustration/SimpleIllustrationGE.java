@@ -2,16 +2,16 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.illustration;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAFactory;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+
 import java.util.ArrayList;
 import java.util.List;
 
 /**
- * Root class for illustration GraphicalElements.
+ * This class is a simple implementation of the IllustrationElement interface and extends the SimpleGE class.
  */
-public class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
+public abstract class SimpleIllustrationGE extends SimpleGE implements IllustrationElement{
     
     /** Path to the data source of the element.*/;
     private SourceCA path;
@@ -19,13 +19,7 @@ public class SimpleIllustrationGE extends SimpleGE implements IllustrationElemen
     /**Main constructor.*/
     public SimpleIllustrationGE(){
         super();
-        path = CAFactory.createSourceCA("Path");
-    }
-    
-    /**Copy constructor.*/
-    public SimpleIllustrationGE(SimpleIllustrationGE sige){
-        super(sige);
-        path = sige.path;
+        path = new SourceCA("Path", false);
     }
     
     /**
@@ -49,5 +43,19 @@ public class SimpleIllustrationGE extends SimpleGE implements IllustrationElemen
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(path);
         return list;
+    }
+
+    @Override
+    public List<ConfigurationAttribute> getSavableAttributes() {
+        List<ConfigurationAttribute> list = super.getSavableAttributes();
+        list.add(path);
+        return list;
+    }
+
+    @Override
+    public void setAttribute(ConfigurationAttribute ca) {
+        super.setAttribute(ca);
+        if(ca.getName().equals(path.getName()))
+            path=(SourceCA)ca;
     }
 }

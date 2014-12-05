@@ -3,21 +3,17 @@ package org.orbisgis.mapcomposer.view.utils;
 import java.awt.Color;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JColorChooser;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
+import javax.swing.*;
 
 /**
  * Color chooser
  */
 public class ColorChooser extends JFrame{
-    private final JButton label;
+    private final JComponent label;
     private final JButton button;
     final JColorChooser jcc;
     
-    public ColorChooser(JButton label){
+    public ColorChooser(JComponent label){
         this.label = label;
         jcc = new JColorChooser(Color.yellow);
         JPanel panel = new JPanel();

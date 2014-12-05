@@ -1,8 +1,9 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import java.util.HashMap;
-import java.util.Map;
+
+import java.util.*;
+
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
@@ -12,51 +13,45 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.view.configurationattribute.CARenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.ChoiceRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.SourceListRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.ColorRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.FileListRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.LinkToMapImageRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.NumericRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.MapImageListRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.IntegerRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.OwsContextRenderer;
 import org.orbisgis.mapcomposer.view.configurationattribute.SourceRenderer;
-import org.orbisgis.mapcomposer.view.configurationattribute.TextRenderer;
+import org.orbisgis.mapcomposer.view.configurationattribute.StringRenderer;
 
 /**
 * The class manages the link between the ConfigurationAttribute (CA) and their Renderer.
 * When a CA need to be displayed, the Renderer will be get via this class.
 * So to be used, both should be registered in the CAManager.
 */
+
+/**
+ * This class contain all the ConfigurationAttribute used in the MapComposer. It also manages the link between the ConfigurationAttributes and their Renderer.
+ * To be used, a ConfigurationAttribute should be register with its renderer into this class to be recognise by the composer.
+ * Each GraphicalElement or ConfigurationAttribute which is not register won't be used.
+ */
 public class CAManager {
-    /** Instance of the manager */
-    private static CAManager INSTANCE;
+
     /** HashMap linking the CA to its Renderer */
     private static Map<Class<? extends ConfigurationAttribute>, CARenderer> map;
     
     /**
-    * Private void constructor.
+    * Main constructor.
     */
-    private CAManager(){
+    public CAManager(){
         map = new HashMap<>();
         //Adding the original CA and their Renderer
-        map.put(IntegerCA.class, new NumericRenderer());
-        map.put(SourceListCA.class, new ChoiceRenderer());
+        map.put(IntegerCA.class, new IntegerRenderer());
+        map.put(SourceListCA.class, new SourceListRenderer());
         map.put(FileListCA.class, new FileListRenderer());
         map.put(SourceCA.class, new SourceRenderer());
-        map.put(StringCA.class, new TextRenderer());
+        map.put(StringCA.class, new StringRenderer());
         map.put(OwsContextCA.class, new OwsContextRenderer());
         map.put(ColorCA.class, new ColorRenderer());
-        map.put(MapImageListCA.class, new LinkToMapImageRenderer());
-    }
-    
-    /**
-    * Static method giving the unique instance of the class.
-    * @return The unique instance of the class.
-    */
-    public static synchronized CAManager getInstance(){
-        if(INSTANCE==null){
-            INSTANCE = new CAManager();
-        }
-        return INSTANCE;
+        map.put(MapImageListCA.class, new MapImageListRenderer());
     }
     
     /**
@@ -82,5 +77,19 @@ public class CAManager {
     */
     public CARenderer getRenderer(ConfigurationAttribute ca){
         return map.get(ca.getClass());
+    }
+
+
+
+    /**
+     * Return the list of all the previously registered GraphicalElement classes.
+     * @return List of the GE.
+     */
+    public List<Class<? extends ConfigurationAttribute>> getRegisteredGEClasses(){
+        List<Class<? extends ConfigurationAttribute>> list = new ArrayList<>();
+        Iterator<Map.Entry<Class<? extends ConfigurationAttribute>, CARenderer>> it = map.entrySet().iterator();
+        while(it.hasNext())
+            list.add(it.next().getKey());
+        return list;
     }
 }
