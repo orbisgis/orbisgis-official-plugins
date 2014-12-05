@@ -2,7 +2,8 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
-import java.awt.Toolkit;
+
+import java.awt.*;
 import java.awt.image.BufferedImage;
 
 /**
@@ -39,33 +40,36 @@ public class ScaleRenderer extends SimpleGERenderer {
         resolution*=dpmm;
         
         //Draw the BufferedImage
-        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_RGB);
+        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics2D g = bi.createGraphics();
+        g.setBackground(Color.black);
+        g.setColor(Color.black);
         
         boolean updown = false;
         int i=0;
         int width = ge.getWidth();
         while(width>=resolution){
             if(updown){
-            bi.createGraphics().drawRect(i*resolution, 0, resolution, ge.getHeight()/2-1);
-            bi.createGraphics().fillRect(i*resolution, ge.getHeight()/2, resolution, ge.getHeight()-ge.getHeight()/2);
+                g.drawRect(i * resolution, 0, resolution, ge.getHeight()/2-1);
+                g.fillRect(i * resolution, ge.getHeight() / 2, resolution, ge.getHeight() -ge.getHeight()/2);
             }
             else{
-                bi.createGraphics().fillRect(i*resolution, 0, resolution, ge.getHeight()/2-1);
-                bi.createGraphics().drawRect(i*resolution, (ge.getHeight()-1)/2, resolution, ge.getHeight()-ge.getHeight()/2);
+                g.fillRect(i * resolution, 0, resolution, ge.getHeight()/2-1);
+                g.drawRect(i * resolution, (ge.getHeight() - 1) / 2, resolution, ge.getHeight() -ge.getHeight()/2);
             }
             updown=!updown;
             width-=resolution;
             i++;
         }
         if(updown){
-            bi.createGraphics().drawRect(i*resolution, 0, width-1, ge.getHeight()/2-1);
-            bi.createGraphics().fillRect(i*resolution, ge.getHeight()/2, width, ge.getHeight()-ge.getHeight()/2);
+            g.drawRect(i * resolution, 0, width - 1, ge.getHeight()/2-1);
+            g.fillRect(i * resolution, ge.getHeight() / 2, width, ge.getHeight() -ge.getHeight()/2);
         }
         else{
-            bi.createGraphics().fillRect(i*resolution, 0, width, ge.getHeight()/2-1);
-            bi.createGraphics().drawRect(i*resolution, (ge.getHeight()-1)/2, width-1, ge.getHeight()-ge.getHeight()/2);
+            g.fillRect(i * resolution, 0, width, ge.getHeight()/2-1);
+            g.drawRect(i * resolution, (ge.getHeight() - 1) / 2, width - 1, ge.getHeight() -ge.getHeight()/2);
         }
-
+        g.dispose();
         return applyRotationToBufferedImage(bi, ge);
     }
 }

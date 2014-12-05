@@ -22,11 +22,12 @@ public class ImageRenderer extends SimpleGERenderer {
         // Draw in a BufferedImage the image file
         File file = new File(((Image)ge).getPath());
         if(file.exists() && file.isFile()) {
-            try {
-                return ImageIO.read(file);
-            } catch (IOException ex) {
-                Logger.getLogger(ImageRenderer.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            ImageIcon icon = new ImageIcon(((Image)ge).getPath());
+            BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
+            Graphics g = bi.createGraphics();
+            icon.paintIcon(null, g, 0,0);
+            g.dispose();
+            return applyRotationToBufferedImage(bi, ge);
         }
         else{
             //Return the icon of the Image as BufferedImage
@@ -37,6 +38,5 @@ public class ImageRenderer extends SimpleGERenderer {
             g.dispose();
             return applyRotationToBufferedImage(bi, ge);
         }
-        return null;
     }
 }

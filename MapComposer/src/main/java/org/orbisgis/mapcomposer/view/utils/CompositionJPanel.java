@@ -71,22 +71,25 @@ public class CompositionJPanel extends JPanel{
      * @param bufferedImage The new panel.
      */
     public void setPanelContent(final BufferedImage bufferedImage){
+        double rad = Math.toRadians(ge.getRotation());
+        final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        final int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        final int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
         this.removeAll();
         //Add the BufferedImage into a JComponent in the COmpositionJPanel
         this.add(new JComponent() {
             //Redefinition of the painComponent method to rotate the component content.
             @Override protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bufferedImage, 0, 0, null);
+                g.drawImage(bufferedImage, -(maxWidth-(int)newWidth)/2, -(maxHeight-(int)newHeight)/2, null);
             }
         }, BorderLayout.CENTER);
         this.revalidate();
-        double rad = Math.toRadians(ge.getRotation());
-        double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-        double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        //As the buffered image is rotated, change the origin point oof the panel to make the center of the image not moving after the rotation.
+        //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
         //Take account of the border width (2 pixels).
-        this.setBounds(ge.getX()+(ge.getHeight()-(int)newHeight)/2, ge.getY()+(ge.getWidth()-(int)newWidth)/2, (int)newWidth+2, (int)newHeight+2);
+        this.setBounds(ge.getX()+(ge.getWidth()-(int)newWidth)/2, ge.getY()+(ge.getHeight()-(int)newHeight)/2, (int)newWidth+2, (int)newHeight+2);
         this.setOpaque(false);
         setBorders();
     }
