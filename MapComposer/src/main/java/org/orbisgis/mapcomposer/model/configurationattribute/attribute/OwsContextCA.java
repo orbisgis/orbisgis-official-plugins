@@ -134,9 +134,10 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
 
     @Override public boolean isSameValue(ConfigurationAttribute configurationAttribute) {
         if(configurationAttribute instanceof ListCA){
-            if(getSelected()==null)
-                return false;
-            return getSelected().equals(((ListCA) configurationAttribute).getSelected());
+            if(getSelected()!=null)
+                return getSelected().equals(((ListCA) configurationAttribute).getSelected());
+            else
+                return (getSelected()==null && ((ListCA) configurationAttribute).getSelected()==null);
         }
         return false;
     }

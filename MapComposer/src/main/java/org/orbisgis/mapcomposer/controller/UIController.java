@@ -326,7 +326,8 @@ public class UIController{
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
                     //refresh the attributes
                     if(caGE instanceof RefreshCA) ((RefreshCA)caGE).refresh(this);
-                    
+                    if(caList instanceof RefreshCA) ((RefreshCA)caList).refresh(this);
+                    //Compare them and if both represent the same property, lock the ConfigurationAttribute
                     if(caList.isSameName(caGE)){
                         flag=true;
                         caList.setReadOnly(!caList.isSameValue(caGE));
