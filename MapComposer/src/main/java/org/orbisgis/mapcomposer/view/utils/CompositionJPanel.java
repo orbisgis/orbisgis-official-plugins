@@ -190,12 +190,9 @@ public class CompositionJPanel extends JPanel{
             case CENTER:
                 ge.setX(ge.getX()-startX+p.x);
                 ge.setY(ge.getY()-startY+p.y);
-                this.setLocation(ge.getX(), ge.getY());
                 break;
         }
-        this.setBounds(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight());
         uic.validateGE(ge);
-        
         this.moveMod=MoveMod.NONE;
     }
 
@@ -204,8 +201,12 @@ public class CompositionJPanel extends JPanel{
      * @param p Location of the mouse inside the panel.
      */
     public void mouseDragged(Point p) {
-        if (moveMod == MoveMod.CENTER)
-            this.setLocation(ge.getX()-(startX-p.x), ge.getY()-(startY-p.y));
+        if (moveMod == MoveMod.CENTER) {
+            double rad = Math.toRadians(ge.getRotation());
+            final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+            final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+            this.setBounds(ge.getX()+(ge.getWidth()-(int)newWidth)/2+p.x-startX, ge.getY()+(ge.getHeight()-(int)newHeight)/2+p.y-startY, this.getWidth(), this.getHeight());
+        }
     }
 
     /**
@@ -215,7 +216,7 @@ public class CompositionJPanel extends JPanel{
     public void mouseMoved(Point p) {
         int x = p.x;
         int y = p.y;
-        //Need to recalculate the GE width and height beacause of the rotation
+        //Need to recalculate the GE width and height because of the rotation
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
