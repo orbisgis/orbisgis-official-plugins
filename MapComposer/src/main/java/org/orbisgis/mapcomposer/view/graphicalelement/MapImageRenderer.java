@@ -17,7 +17,7 @@ public class MapImageRenderer extends SimpleGERenderer {
     public BufferedImage createImageFromGE(GraphicalElement ge) {
         // Draw in a BufferedImage the map image
         if(((MapImage)ge).getImage()!=null){
-        return ((MapImage)ge).getImage();
+        return applyRotationToBufferedImage(((MapImage)ge).getImage(), ge);
         }
         else{
             //Return the icon of the MapImage as BufferedImage
