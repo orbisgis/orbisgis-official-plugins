@@ -1,5 +1,7 @@
 package org.orbisgis.mapcomposer.controller;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
@@ -454,13 +456,18 @@ public class UIController{
             int yMax;
             switch(alignment){
                 case LEFT:
-                    xMin=selectedGE.get(0).getX();
-                    for (GraphicalElement ge : selectedGE){
-                        if (ge.getX() < xMin)
-                            xMin = ge.getX();
-                    }
+                    //Obtain the minimum x position of all the CompositionJPanel from the CompositionArea
+                    //The x position get take into account the rotation of the GraphicalElement.
+                    xMin=elementJPanelMap.get(selectedGE.get(0)).getX();
+                    for (GraphicalElement ge : selectedGE)
+                        if (elementJPanelMap.get(ge).getX() < xMin)
+                            xMin = elementJPanelMap.get(ge).getX();
+                    //Set all the GraphicalElement x position to the one get before
                     for(GraphicalElement ge : selectedGE){
-                        ge.setX(xMin);
+                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
+                        double rad = Math.toRadians(ge.getRotation());
+                        double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
+                        ge.setX(xMin-(ge.getWidth()-(int)newWidth)/2);
                     }
                     break;
                 case CENTER:
@@ -477,20 +484,36 @@ public class UIController{
                         ge.setX(xMid-ge.getWidth()/2);
                     break;
                 case RIGHT:
-                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    //Obtain the maximum x position of all the CompositionJPanel from the CompositionArea
+                    //The x position get take into account the rotation of the GraphicalElement.
+                    xMax=elementJPanelMap.get(selectedGE.get(0)).getX()+elementJPanelMap.get(selectedGE.get(0)).getWidth();
                     for (GraphicalElement ge : selectedGE)
-                        if (ge.getX()+ge.getWidth() > xMax)
-                            xMax = ge.getX()+ge.getWidth();
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setX(xMax-ge.getWidth());
+                        if (elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth() > xMax)
+                            xMax = elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth();
+                    //Takes into account the border width of the ConfigurationJPanel (2 pixels)
+                    xMax-=2;
+                    //Set all the GraphicalElement x position to the one get before
+                    for(GraphicalElement ge : selectedGE) {
+                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
+                        double rad = Math.toRadians(ge.getRotation());
+                        double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
+                        ge.setX(xMax-ge.getWidth()+(ge.getWidth()-(int)newWidth)/2);
+                    }
                     break;
                 case TOP:
-                    yMin=selectedGE.get(0).getY();
+                    //Obtain the minimum y position of all the CompositionJPanel from the CompositionArea
+                    //The y position get take into account the rotation of the GraphicalElement.
+                    yMin=elementJPanelMap.get(selectedGE.get(0)).getY();
                     for (GraphicalElement ge : selectedGE)
                         if (ge.getY() < yMin)
-                            yMin = ge.getY();
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setY(yMin);
+                            yMin = elementJPanelMap.get(ge).getY();
+                    //Set all the GraphicalElement y position to the one get before
+                    for(GraphicalElement ge : selectedGE) {
+                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
+                        double rad = Math.toRadians(ge.getRotation());
+                        double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
+                        ge.setY(yMin - (ge.getHeight() - (int) newHeight) / 2);
+                    }
                     break;
                 case MIDDLE:
                     yMin=selectedGE.get(0).getY();
@@ -506,12 +529,21 @@ public class UIController{
                         ge.setY(yMid-ge.getHeight()/2);
                     break;
                 case BOTTOM:
-                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    //Obtain the maximum y position of all the CompositionJPanel from the CompositionArea
+                    //The y position get take into account the rotation of the GraphicalElement.
+                    yMax=elementJPanelMap.get(selectedGE.get(0)).getY()+elementJPanelMap.get(selectedGE.get(0)).getHeight();
                     for (GraphicalElement ge : selectedGE)
-                        if (ge.getY()+ge.getHeight() > yMax)
-                            yMax = ge.getY()+ge.getHeight();
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setY(yMax-ge.getHeight());
+                        if (elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight() > yMax)
+                            yMax = elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight();
+                    //Takes into account the border width ConfigurationJPanel (2 pixels)
+                    yMax-=2;
+                    //Set all the GraphicalElement y position to the one get before
+                    for(GraphicalElement ge : selectedGE) {
+                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
+                        double rad = Math.toRadians(ge.getRotation());
+                        double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
+                        ge.setY(yMax - ge.getHeight() + (ge.getHeight()-(int)newHeight)/2);
+                    }
                     break;
             }
             validateSelectedGE();
