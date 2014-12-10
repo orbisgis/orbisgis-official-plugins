@@ -173,6 +173,8 @@ public class CompositionJPanel extends JPanel{
                  break;
              case CTRL:
              case SHIFT:
+                 mouseReleasedSHIFT(p);
+                 break;
              case NONE:
                  mouseReleasedNONE(p);
                  break;
@@ -219,6 +221,127 @@ public class CompositionJPanel extends JPanel{
                  ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
                  ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
                  ge.setY(ge.getY()-(startY-p.y));
+                 break;
+             case CENTER:
+                 ge.setX(ge.getX()-startX+p.x);
+                 ge.setY(ge.getY()-startY+p.y);
+                 break;
+         }
+         uic.validateGE(ge);
+         this.moveDirection = MoveDirection.NONE;
+         this.moveMode=MoveMode.NONE;
+     }
+
+     /**
+      * Move and resize of the GraphicalElement when no key are pressed.
+      * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
+      * @param p Location on screen of the mouse when it's released.
+      */
+     private void mouseReleasedSHIFT(Point p) {
+         float ration = ((float)ge.getHeight())/ge.getWidth();
+         switch(moveDirection){
+             case TOP:
+                 //Set the new height
+                 ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
+                 ge.setY(ge.getY() - (startY - p.y));
+                 //Adapt the width
+                 ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                 ge.setWidth((int) (ge.getHeight() / ration));
+                 break;
+             case TOP_LEFT:
+                 //test if the new width corresponding to the new height is wider the the new width
+                 if(Math.abs(startY - p.y + ge.getHeight())/ration > Math.abs(startX-p.x+ge.getWidth())){
+                     //Set the new height
+                     ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
+                     ge.setY(ge.getY() - (startY - p.y));
+                     //Adapt the width
+                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
+                     ge.setWidth((int) (ge.getHeight() / ration));
+                 }
+                 else{
+                     //Set the new height
+                     ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
+                     ge.setX(ge.getX() - (startX - p.x));
+                     //Adapt the width
+                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()) / 2);
+                     ge.setHeight((int) (ge.getWidth() * ration));
+                 }
+                 break;
+             case LEFT:
+                 //Set the new width
+                 ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
+                 ge.setX(ge.getX() - (startX - p.x));
+                 //Adapt the height
+                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
+                 ge.setHeight((int) (ge.getWidth() * ration));
+                 break;
+             case BOTTOM_LEFT:
+                 //test if the new width corresponding to the new height is wider the the new width
+                 if(Math.abs(-(startY-p.y) + ge.getHeight())/ration > Math.abs(startX-p.x+ge.getWidth())){
+                     //Set the new height
+                     ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                     //Adapt the width
+                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                     ge.setWidth((int) (ge.getHeight() / ration));
+                 }
+                 else{
+                     //Set the new width
+                     ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
+                     ge.setX(ge.getX() - (startX - p.x));
+                     //Adapt the height
+                     ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
+                     ge.setHeight((int) (ge.getWidth() * ration));
+                 }
+                 break;
+             case BOTTOM:
+                 //Set the new height
+                 ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                 //Adapt the width
+                 ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                 ge.setWidth((int) (ge.getHeight() / ration));
+                 break;
+             case BOTTOM_RIGHT:
+                 //test if the new width corresponding to the new height is wider the the new width
+                 if(Math.abs(-(startY-p.y) + ge.getHeight())/ration > Math.abs(-(startX - p.x)+ge.getWidth())){
+                     //Set the new height
+                     ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                     //Adapt the width
+                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                     ge.setWidth((int) (ge.getHeight() / ration));
+                     break;
+                 }
+                 else{
+                     //Set the new width
+                     ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                     //Adapt the height
+                     ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
+                     ge.setHeight((int) (ge.getWidth() * ration));
+                 }
+                 break;
+             case RIGHT:
+                 //Set the new width
+                 ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                 //Adapt the height
+                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
+                 ge.setHeight((int) (ge.getWidth() * ration));
+                 break;
+             case TOP_RIGHT :
+                 //test if the new width corresponding to the new height is wider the the new width
+                 if(Math.abs(startY - p.y + ge.getHeight())/ration > Math.abs(-(startX - p.x)+ge.getWidth())){
+                     //Set the new height
+                     ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
+                     ge.setY(ge.getY() - (startY - p.y));
+                     //Adapt the width
+                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                     ge.setWidth((int) (ge.getHeight() / ration));
+                 }
+                 else{
+                     //Set the new width
+                     ge.setWidth(Math.abs(-(startX - p.x) + ge.getWidth()));
+                     //Adapt the height
+                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()) / 2);
+                     ge.setHeight((int) (ge.getWidth() * ration));
+                 }
                  break;
              case CENTER:
                  ge.setX(ge.getX()-startX+p.x);
