@@ -21,23 +21,25 @@ public class OrientationRenderer extends SimpleGERenderer {
     public BufferedImage createImageFromGE(GraphicalElement ge) {
         // Draw in a BufferedImage the orientation icon.
         File file = new File(((Orientation)ge).getIconPath());
-        if(file.exists() && file.isFile()) {
-            //Return the icon of the Orientation as BufferedImage
-            ImageIcon icon = new ImageIcon(((Orientation)ge).getIconPath());
-            BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
-            Graphics g = bi.createGraphics();
-            icon.paintIcon(null, g, 0,0);
-            g.dispose();
-            return applyRotationToBufferedImage(bi, ge);
-        }
-        else{
-            //Return the icon of the Orientation as BufferedImage
-            ImageIcon icon = new ImageIcon(MainWindow.class.getResource("compass.png"));
-            BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
-            Graphics g = bi.createGraphics();
-            icon.paintIcon(null, g, 0,0);
-            g.dispose();
-            return applyRotationToBufferedImage(bi, ge);
-        }
+        ImageIcon icon;
+        if(file.exists() && file.isFile())
+            icon = new ImageIcon(((Orientation)ge).getIconPath());
+        else
+            icon = new ImageIcon(MainWindow.class.getResource("compass.png"));
+
+        //Get the bufferedImage from the image
+        BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
+        Graphics g = bi.createGraphics();
+        icon.paintIcon(null, g, 0,0);
+        g.dispose();
+
+        //Scale the bufferedImage to the GraphicalElement size
+        java.awt.Image image = bi.getScaledInstance(ge.getWidth(), ge.getHeight(), java.awt.Image.SCALE_FAST);
+        BufferedImage resize = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics graph = resize.createGraphics();
+        graph.drawImage(image, 0, 0, null);
+        graph.dispose();
+
+        return applyRotationToBufferedImage(resize, ge);
     }
 }
