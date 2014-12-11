@@ -289,21 +289,14 @@ public class UIController{
     public void validateCAList(List<ConfigurationAttribute> caList) {
         //Apply the function to all the selected GraphicalElements
         for(GraphicalElement ge : selectedGE){
-            //Takes each ConfigurationAttribute from the GraphicalElement
-            for(ConfigurationAttribute geCA : ge.getAllAttributes())
-                //Takes each CA from the list of CA to validate
-                for(ConfigurationAttribute dialogPropertiesCA : caList)
-                    //If the two CA are the same property and are unlocked, set the new CA value
-                    if(geCA.isSameName(dialogPropertiesCA)){
-                        if(!dialogPropertiesCA.getReadOnly()){
-                            geCA.setValue(dialogPropertiesCA.getValue());
-                            if(geCA instanceof ListCA && dialogPropertiesCA instanceof ListCA)
-                                ((ListCA) geCA).select(((ListCA) dialogPropertiesCA).getSelected());
-                            if(geCA instanceof RefreshCA)
-                                ((RefreshCA)geCA).refresh(this);
-                        }
-                        break;
-                    }
+            //Takes each CA from the list of CA to validate
+            for(ConfigurationAttribute dialogPropertiesCA : caList) {
+                if (!dialogPropertiesCA.getReadOnly()) {
+                    if (dialogPropertiesCA instanceof RefreshCA)
+                        ((RefreshCA) dialogPropertiesCA).refresh(this);
+                    ge.setAttribute(dialogPropertiesCA);
+                }
+            }
             if(ge instanceof GERefresh)
                 ((GERefresh)ge).refresh();
             elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));

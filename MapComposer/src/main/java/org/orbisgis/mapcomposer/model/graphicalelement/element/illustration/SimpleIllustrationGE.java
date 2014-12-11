@@ -15,11 +15,15 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
     
     /** Path to the data source of the element.*/;
     private SourceCA path;
+
+    /** Last source path used by a SimpleIllustrationGE **/
+    private static String lastPathSet = "";
     
     /**Main constructor.*/
     public SimpleIllustrationGE(){
         super();
         path = new SourceCA("Path", false);
+        path.setValue(lastPathSet);
     }
     
     /**
@@ -36,6 +40,7 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
      */
     public void setPath(String absolutePath){
         this.path.setValue(absolutePath);
+        lastPathSet = absolutePath;
     }
 
     @Override
@@ -55,7 +60,9 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
     @Override
     public void setAttribute(ConfigurationAttribute ca) {
         super.setAttribute(ca);
-        if(ca.getName().equals(path.getName()))
-            path=(SourceCA)ca;
+        if(ca.getName().equals(path.getName())) {
+            path = (SourceCA) ca;
+            lastPathSet = ((SourceCA)ca).getValue();
+        }
     }
 }
