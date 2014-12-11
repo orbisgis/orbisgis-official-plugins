@@ -44,9 +44,9 @@ public class TextElement extends SimpleGE{
         this.colorBack = new ColorCA("Background color", false, Color.WHITE);
         this.alignment = new SourceListCA("Alignment", false);
         this.style = new SourceListCA("Style", false);
-        this.fontSize = new IntegerCA("Font size", false, 12, true, Integer.MAX_VALUE, Integer.MIN_VALUE);
+        this.fontSize = new IntegerCA("Font size", false, 12, true, 1, Integer.MAX_VALUE);
         this.text = new StringCA("Text", true, "Some text");
-        this.alpha = new IntegerCA("Alpha", false, 0, true, 255, 0);
+        this.alpha = new IntegerCA("Alpha", false, 0, true, 0, 255);
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);

@@ -3,6 +3,8 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import java.awt.FlowLayout;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.EventHandler;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -38,7 +40,21 @@ public class IntegerRenderer implements CARenderer{
             model =new SpinnerNumberModel((int)integerCA.getValue(), Integer.MIN_VALUE, Integer.MAX_VALUE, 1);
         JSpinner spinner = new JSpinner(model);
         spinner.addChangeListener(EventHandler.create(ChangeListener.class, integerCA, "setValue", "source.value"));
+        spinner.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
         component.add(spinner);
         return component;
+    }
+
+    /**
+     * Action done when the mouse wheel is used in the JComboBox of the rendered IntegerCA.
+     * @param mwe MouseWheelEvent
+     */
+    public void mouseWheel(MouseWheelEvent mwe){
+        JSpinner source = (JSpinner) mwe.getSource();
+        SpinnerNumberModel spinMod = (SpinnerNumberModel)source.getModel();
+        int value = (int)source.getValue()-mwe.getWheelRotation();
+        System.out.println(spinMod.getMaximum()+", "+value+", "+spinMod.getMinimum());
+        if(value<=(int)spinMod.getMaximum() && value>=(int)spinMod.getMinimum())
+            source.setValue(value);
     }
 }
