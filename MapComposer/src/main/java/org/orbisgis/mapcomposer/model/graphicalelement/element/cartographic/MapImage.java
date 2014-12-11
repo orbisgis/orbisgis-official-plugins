@@ -32,7 +32,7 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
         if(getOwsMapContext()!=null && getOwsMapContext().getBoundingBox()!=null)
             try {
                 mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
-                mapTransform.setImage(new BufferedImage((int)this.getOwsMapContext().getBoundingBox().getWidth(), (int)this.getOwsMapContext().getBoundingBox().getHeight(), BufferedImage.TYPE_INT_ARGB));
+                mapTransform.setImage(new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB));
                 if(!this.getOwsMapContext().isOpen())
                     this.getOwsMapContext().open(new NullProgressMonitor());
                 this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
