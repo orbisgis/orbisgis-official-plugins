@@ -32,8 +32,15 @@ public class OwsContextRenderer implements CARenderer{
 
         //Display the OwsContextCA into a JComboBox
         JComboBox<String> jcb = new JComboBox(owsContextCA.getValue().toArray());
+        //Adds an empty ows-context
+        jcb.addItem("< none >");
+        //Try to select the selected value of the OwsContextCA in the JComboBox
+        if(owsContextCA.getSelected()!=null)
+            jcb.setSelectedItem(owsContextCA.getSelected());
+        else
+            jcb.setSelectedIndex(jcb.getItemCount() - 1);
+        //Add an action listener to set the ConfigurationAttribute with the selected value of the JComboBox
         jcb.addActionListener(EventHandler.create(ActionListener.class, owsContextCA, "select", "source.selectedItem"));
-        jcb.setSelectedItem(ca.getValue());
         component.add(jcb);
         return component;
     }

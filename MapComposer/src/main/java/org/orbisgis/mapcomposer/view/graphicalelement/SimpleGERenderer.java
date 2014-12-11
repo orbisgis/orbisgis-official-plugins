@@ -23,13 +23,17 @@ public abstract class SimpleGERenderer implements GERenderer {
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
+        int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
         //Create a new BufferedImage with the new size (size after rotation)
-        BufferedImage bufferedImage = new BufferedImage((int)newWidth, (int)newHeight, bi.getType());
+        BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, bi.getType());
         Graphics2D graph = bufferedImage.createGraphics();
 
         //Draw the BufferedImage bi into the bigger BufferedImage
-        graph.drawImage(bi, ((int)newWidth-ge.getWidth())/2, ((int)newHeight-ge.getHeight())/2,
-                (int)newWidth-(((int)newWidth-ge.getWidth() )/ 2), (int)newHeight-(((int)newHeight-ge.getHeight() )/ 2),
+        graph.drawImage(bi,
+                (maxWidth-ge.getWidth())/2, (maxHeight-ge.getHeight())/2,
+                maxWidth-((maxWidth-ge.getWidth() )/ 2), maxHeight-((maxHeight-ge.getHeight() )/ 2),
                 0, 0,
                 ge.getWidth(), ge.getHeight(), null);
         graph.dispose();
@@ -40,7 +44,7 @@ public abstract class SimpleGERenderer implements GERenderer {
 
         //Create the rotation transform fo the buffered image
         affineTransform= new AffineTransform();
-        affineTransform.rotate(Math.toRadians(ge.getRotation()), newWidth / 2, newHeight / 2);
+        affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
 
         //Apply the transform to the bufferedImage an return it
         affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
