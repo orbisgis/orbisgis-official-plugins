@@ -3,13 +3,10 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
 import javax.swing.ImageIcon;
 
 /**

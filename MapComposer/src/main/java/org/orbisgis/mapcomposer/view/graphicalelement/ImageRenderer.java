@@ -3,6 +3,7 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
 import java.io.File;

@@ -233,7 +233,7 @@ public class CompositionJPanel extends JPanel{
      }
 
      /**
-      * Move and resize of the GraphicalElement when no key are pressed.
+      * Move and resize of the GraphicalElement when the key SHIFT is pressed.
       * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
       * @param p Location on screen of the mouse when it's released.
       */
@@ -355,7 +355,7 @@ public class CompositionJPanel extends JPanel{
 
      /**
       * Move and resize of the GraphicalElement when the key ALTGRAPH is pressed.
-      * Sets the new dimension and position of the ge when the mouse is released.
+      * When the mouse is released, the CompositionJPanel take the new size and the GraphicalElement is adapted to fit into it.
       * @param p Location on screen of the mouse when it's released.
       */
      private void mouseReleasedALTGRAPH(Point p) {
