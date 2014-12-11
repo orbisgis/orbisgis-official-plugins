@@ -53,7 +53,6 @@ public class IntegerRenderer implements CARenderer{
         JSpinner source = (JSpinner) mwe.getSource();
         SpinnerNumberModel spinMod = (SpinnerNumberModel)source.getModel();
         int value = (int)source.getValue()-mwe.getWheelRotation();
-        System.out.println(spinMod.getMaximum()+", "+value+", "+spinMod.getMinimum());
         if(value<=(int)spinMod.getMaximum() && value>=(int)spinMod.getMinimum())
             source.setValue(value);
     }

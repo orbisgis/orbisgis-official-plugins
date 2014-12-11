@@ -4,7 +4,6 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
@@ -22,10 +21,7 @@ import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Stack;
+import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
@@ -49,16 +45,16 @@ public class UIController{
     private GEManager geManager;
     
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
-    private static LinkedHashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
+    private HashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
     
     /**Selected GraphicalElement */
     private List<GraphicalElement> selectedGE;
     
     /**GraphicalElement stack giving the Z-index information*/
-    private static Stack<GraphicalElement> zIndexStack;
+    private Stack<GraphicalElement> zIndexStack;
 
     /** SaveAndLoadHandler */
-    private static SaveAndLoadHandler saveNLoadHandler;
+    private SaveAndLoadHandler saveNLoadHandler;
     
     private MainWindow mainWindow;
     
@@ -542,13 +538,24 @@ public class UIController{
             validateSelectedGE();
         }
     }
-    
+
+    /**
+     * Open a dialog window with all the ConfigurationAttributes common to the selected GraphicalElement.
+     */
     public void showSelectedGEProperties(){
         if(selectedGE.size()>0){
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
             dp.setVisible(true);
         }
+    }
+
+    /**
+     * Open a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
+     */
+    public void showGEProperties(GraphicalElement ge){
+        DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this, false);
+        dp.setVisible(true);
     }
     
     /**
