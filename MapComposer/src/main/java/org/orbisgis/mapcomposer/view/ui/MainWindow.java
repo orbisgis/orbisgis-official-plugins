@@ -294,8 +294,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void newComposer(){
         uiController.removeAllGE();
-        uiController.setNewGEClass(Document.class);
-        uiController.createGE(0, 0, 1, 1);
+        uiController.createNewGE(Document.class);
+        uiController.setNewGE(0, 0, 1, 1);
     }
 
     /**
@@ -309,15 +309,17 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
-        uiController.setNewGEClass(MapImage.class);
+        compositionArea.getOverlay().setRatio(-1);
+        uiController.createNewGE(MapImage.class);
         compositionArea.setOverlayEnable(true);
+
     }
 
     /**
      * Add a TextElement GraphicalElement to the document.
      */
     public void addText(){
-        uiController.setNewGEClass(TextElement.class);
+        uiController.createNewGE(TextElement.class);
         compositionArea.setOverlayEnable(true);
     }
 
@@ -332,7 +334,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a Orientation GraphicalElement to the document.
      */
     public void addOrientation(){
-        uiController.setNewGEClass(Orientation.class);
+        uiController.createNewGE(Orientation.class);
         compositionArea.setOverlayEnable(true);
     }
 
@@ -340,7 +342,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a Scale GraphicalElement to the document.
      */
     public void addScale(){
-        uiController.setNewGEClass(Scale.class);
+        uiController.createNewGE(Scale.class);
         compositionArea.setOverlayEnable(true);
     }
 
@@ -348,7 +350,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a Image GraphicalElement to the document.
      */
     public void addPicture() {
-        uiController.setNewGEClass(Image.class);
+        uiController.createNewGE(Image.class);
         compositionArea.setOverlayEnable(true);
     }
     public void drawCircle(){

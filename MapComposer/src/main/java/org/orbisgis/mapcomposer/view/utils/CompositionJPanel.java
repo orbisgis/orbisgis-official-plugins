@@ -118,7 +118,7 @@ public class CompositionJPanel extends JPanel{
     public void mouseClicked(MouseEvent me) {
         if(me.getClickCount()==2)
             uic.showGEProperties(ge);
-        else if(selected)
+        if(selected)
             uic.unselectGE(ge);
         else
             uic.selectGE(ge);

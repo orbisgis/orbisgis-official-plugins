@@ -20,6 +20,11 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     private UIController uiController;
     private boolean enable;
 
+    /** This value is the ratio between width and height of the new GraphicalElement (width/height).
+     * If it's negative, it means that there is not ratio to respect.
+     */
+    private float ratio;
+
     /**
      * Main constructor.
      * @param uiController
@@ -27,6 +32,15 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     public CompositionAreaOverlay(UIController uiController){
         this.uiController = uiController;
         enable = false;
+        ratio = -1;
+    }
+
+    /**
+     * Set the ratio value to respect on drawing the new GraphicalElement bounding box.
+     * @param ratio
+     */
+    public void setRatio(float ratio) {
+        this.ratio = ratio;
     }
 
     /**
@@ -46,9 +60,24 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                 Graphics2D g2 = (Graphics2D) g.create();
                 float[] dash = {10.0f};
                 g2.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER,10.0f,dash,0.0f));
-                int x = (end.x < start.x) ? end.x : start.x;
-                int y = (end.y < start.y) ? end.y : start.y;
-                g2.drawRect(x, y, Math.abs(end.x - start.x), Math.abs(end.y - start.y));
+                int x, y;
+                float width, height;
+                //If the ratio in negative, there is no need to respect it
+                if(ratio<=0) {
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = Math.abs(end.x - start.x);
+                    height = Math.abs(end.y - start.y);
+                }
+                //if the ratio is positive, the new GE bounding box have to respect it.
+                else{
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
+                    height = width/ratio;
+
+                }
+                g2.drawRect(x, y, (int)width, (int)height);
                 g2.dispose();
             }
         }
@@ -79,15 +108,33 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                 //Get the click location on the screen an save the location in the compositionArea
                 start = new Point(  e.getLocationOnScreen().x - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
                                     e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+                if(!e.isShiftDown())
+                    ratio=-1;
                 l.repaint();
             }
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
-                int x = (end.x < start.x) ? end.x : start.x;
-                int y = (end.y < start.y) ? end.y : start.y;
-                uiController.createGE(x, y, Math.abs(end.x - start.x), Math.abs(end.y - start.y));
+                int x, y;
+                float width, height;
+                //If the ratio in negative, there is no need to respect it
+                if(ratio<=0) {
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = Math.abs(end.x - start.x);
+                    height = Math.abs(end.y - start.y);
+                }
+                //if the ratio is positive, the new GE bounding box have to respect it.
+                else{
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
+                    height = width/ratio;
+
+                }
+                uiController.setNewGE(x, y, (int)width, (int)height);
                 l.repaint();
                 start=null;
                 end=null;
+                ratio=-1;
             }
             e.consume();
         }

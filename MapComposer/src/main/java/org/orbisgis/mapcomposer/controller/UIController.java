@@ -6,6 +6,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
@@ -18,14 +19,14 @@ import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
+import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
@@ -63,8 +64,8 @@ public class UIController{
     
     private MainWindow mainWindow;
 
-    /** Class of the new GraphicalElement to create. */
-    private Class<? extends GraphicalElement> newGEClass;
+    /** Instance of the new GraphicalElement to create. */
+    private GraphicalElement newGE;
     
     /**
      * Main constructor.
@@ -303,7 +304,22 @@ public class UIController{
                     ge.setAttribute(dialogPropertiesCA);
                 }
             }
-            validateGE(ge);
+            //If the GraphicalElement was already added to the document
+            if(elementJPanelMap.containsKey(ge))
+                validateGE(ge);
+            //Set the CompositionAreaOverlay ratio in the case of the GraphicalElement was not already added to the Document
+            else{
+                //Give the ratio to the CompositionAreaOverlay();
+                if(newGE instanceof SimpleIllustrationGE) {
+                    try {
+                        BufferedImage bi = ImageIO.read(new File(((SimpleIllustrationGE) newGE).getPath()));
+                        System.out.println(bi.getWidth() +", "+ bi.getHeight());
+                        mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
         }
         toBeSet = new ArrayList<>();
     }
@@ -404,33 +420,41 @@ public class UIController{
         //Apply the z-index change to only the GraphicalElement ge.
         toBeSet.add(ge);
         changeZIndex(ZIndex.TO_FRONT);
-        toBeSet = new ArrayList<>();
-    }
-
-    public void setNewGEClass(Class<? extends GraphicalElement> newGEClass) {
-        this.newGEClass = newGEClass;
+        toBeSet.remove(ge);
     }
 
     /**
-     * Create and set the new GraphicalElement and then open the properties dialog.
+     * Creates a new GraphicalElement with the class given in parameters.
+     * @param newGEClass
      */
-    public void createGE(int x, int y, int width, int height) {
-        //Creates the GraphicalElement.
-        GraphicalElement ge = null;
+    public void createNewGE(Class<? extends GraphicalElement> newGEClass) {
         try {
-            ge = newGEClass.newInstance();
-            ge.setX(x);
-            ge.setY(y);
-            ge.setWidth(width);
-            ge.setHeight(height);
+            newGE = newGEClass.newInstance();
+            //Refresh the ConfigurationAttributes to initialize them
+            for(ConfigurationAttribute ca : newGE.getAllAttributes())
+                if(ca instanceof RefreshCA)
+                    ((RefreshCA)ca).refresh(this);
+
+            showGEProperties(newGE);
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
-        if(ge!=null){
-            addGE(ge);
-            showGEProperties(ge);
+    }
+
+    /**
+     * Set the new GraphicalElement and then open the properties dialog.
+     */
+    public void setNewGE(int x, int y, int width, int height) {
+        //Sets the newGE
+        if (newGE!=null){
+            newGE.setX(x);
+            newGE.setY(y);
+            newGE.setWidth(width);
+            newGE.setHeight(height);
+            addGE(newGE);
         }
         mainWindow.getCompositionArea().setOverlayEnable(false);
+        newGE=null;
     }
     
     public void setAlign( Align alignment) {

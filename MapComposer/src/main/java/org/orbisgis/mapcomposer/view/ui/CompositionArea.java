@@ -120,4 +120,9 @@ public class CompositionArea extends JPanel{
         g.dispose();
         return bi;
     }
+
+    public CompositionAreaOverlay getOverlay(){
+        return (CompositionAreaOverlay)layerUI;
+    }
+
 }
