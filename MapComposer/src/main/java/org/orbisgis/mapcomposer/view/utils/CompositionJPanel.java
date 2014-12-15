@@ -70,6 +70,8 @@ public class CompositionJPanel extends JPanel{
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "getLocationOnScreen", "mouseDragged"));
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseMoved", "getPoint", "mouseMoved"));
         }
+        this.setToolTipText("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
+                "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>");
     }
     
     /**
@@ -88,7 +90,8 @@ public class CompositionJPanel extends JPanel{
         //Add the BufferedImage into a JComponent in the CompositionJPanel
         this.add(new JComponent() {
             //Redefinition of the painComponent method to rotate the component content.
-            @Override protected void paintComponent(Graphics g) {
+            @Override
+            protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 g.drawImage(bufferedImage, -(maxWidth-(int)newWidth)/2, -(maxHeight-(int)newHeight)/2, null);
             }
@@ -96,7 +99,7 @@ public class CompositionJPanel extends JPanel{
         this.revalidate();
         //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
         //Take account of the border width (2 pixels).
-        this.setBounds(ge.getX()+(ge.getWidth()-(int)newWidth)/2, ge.getY()+(ge.getHeight()-(int)newHeight)/2, (int)newWidth+2, (int)newHeight+2);
+        this.setBounds(ge.getX() + (ge.getWidth()-(int)newWidth)/2, ge.getY()+(ge.getHeight()-(int)newHeight)/2, (int)newWidth+2, (int)newHeight+2);
         this.setOpaque(false);
         setBorders();
     }
