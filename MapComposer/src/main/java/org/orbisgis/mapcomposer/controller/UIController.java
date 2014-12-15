@@ -2,7 +2,6 @@ package org.orbisgis.mapcomposer.controller;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
-import static org.orbisgis.mapcomposer.controller.UIController.ZIndex.TO_FRONT;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -47,8 +46,14 @@ public class UIController{
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private HashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
     
-    /**Selected GraphicalElement */
+    /**This list contain all the GraphicalElement selected by the user*/
     private List<GraphicalElement> selectedGE;
+
+    /**This list contain all the GraphicalElements that will be modified (z-index change, validation of the CA)
+     * It's different from the SelectedGE list to permit to modify elements without loosing the selected GE.
+     * e.g. modify one element by double clicking while keeping GraphicalElements selected.
+     */
+    private List<GraphicalElement> toBeSet;
     
     /**GraphicalElement stack giving the Z-index information*/
     private Stack<GraphicalElement> zIndexStack;
@@ -57,6 +62,9 @@ public class UIController{
     private SaveAndLoadHandler saveNLoadHandler;
     
     private MainWindow mainWindow;
+
+    /** Class of the new GraphicalElement to create. */
+    private Class<? extends GraphicalElement> newGEClass;
     
     /**
      * Main constructor.
@@ -67,6 +75,7 @@ public class UIController{
         geManager = new GEManager();
         elementJPanelMap = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
+        toBeSet = new ArrayList<>();
         zIndexStack = new Stack<>();
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
@@ -108,7 +117,7 @@ public class UIController{
         }
         temp = new Stack<>();
         //Move the others GE
-        for(GraphicalElement ge : selectedGE){
+        for(GraphicalElement ge : toBeSet){
             if(zIndexStack.contains(ge)){
                 switch (z){
                     case TO_BACK:
@@ -265,7 +274,8 @@ public class UIController{
     }
 
     /**
-     * Validates the given GraphicalElement
+     * Validates the given GraphicalElement.
+     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
      * @param ge GraphicalElement to validate
      */
     public void validateGE(GraphicalElement ge){
@@ -284,7 +294,7 @@ public class UIController{
      */
     public void validateCAList(List<ConfigurationAttribute> caList) {
         //Apply the function to all the selected GraphicalElements
-        for(GraphicalElement ge : selectedGE){
+        for(GraphicalElement ge : toBeSet){
             //Takes each CA from the list of CA to validate
             for(ConfigurationAttribute dialogPropertiesCA : caList) {
                 if (!dialogPropertiesCA.getReadOnly()) {
@@ -293,13 +303,9 @@ public class UIController{
                     ge.setAttribute(dialogPropertiesCA);
                 }
             }
-            if(ge instanceof GERefresh)
-                ((GERefresh)ge).refresh();
-            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
-            if(ge instanceof Document)
-                mainWindow.getCompositionArea().setDocumentDimension(((Document)zIndexStack.peek()).getDimension());
+            validateGE(ge);
         }
-        unselectAllGE();
+        toBeSet = new ArrayList<>();
     }
     
     /**
@@ -307,12 +313,12 @@ public class UIController{
      * @return List of common ConfigurationAttributes (common about the names and not values).
      */
     private List<ConfigurationAttribute> getCommonAttributes(){
-        List<ConfigurationAttribute> list = selectedGE.get(0).getAllAttributes();
+        List<ConfigurationAttribute> list = toBeSet.get(0).getAllAttributes();
         List<ConfigurationAttribute> listToRemove = new ArrayList<>();
         //Compare each the CA of the list to those of the GE from selectedGE
         boolean flag=false;
         for(ConfigurationAttribute caList : list){
-            for(GraphicalElement ge : selectedGE){
+            for(GraphicalElement ge : toBeSet){
                 flag=false;
                 for(ConfigurationAttribute caGE : ge.getAllAttributes()){
                     //refresh the attributes
@@ -335,42 +341,6 @@ public class UIController{
         }
         
         return list;
-    }
-
-    /**
-     * Adds a new GraphicalElement to the UIController and its JPanel to the COmpositionArea.
-     * @param aClass Class of the new GraphicalElement.
-     */
-    public void addGE(Class<? extends GraphicalElement> aClass) {
-        //Creates the GraphicalElement.
-        GraphicalElement ge = null;
-        try {
-            ge = aClass.newInstance();
-        } catch (InstantiationException|IllegalAccessException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
-        }
-        if(ge!=null) {
-            //Registers the GE and its CompositionJPanel.
-            elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
-            mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
-            elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
-            zIndexStack.push(ge);
-
-            //Refreshes the GE.
-            if (ge instanceof GERefresh)
-                ((GERefresh) ge).refresh();
-
-            //Selects only the GE
-            selectedGE = new ArrayList<>();
-            selectedGE.add(ge);
-
-            //Bring it to the front an validate its default properties.
-            changeZIndex(TO_FRONT);
-            validateGE(ge);
-
-            //Show the configuration dialog
-            showSelectedGEProperties();
-        }
     }
 
     /**
@@ -412,7 +382,7 @@ public class UIController{
             removeAllGE();
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
             for(GraphicalElement ge : list){
-                addLoadedGE(ge);
+                addGE(ge);
             }
         } catch (ParserConfigurationException|SAXException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
@@ -423,7 +393,7 @@ public class UIController{
      * Add to the project the given GE (that is just loaded)..
      * @param ge GE to add to the project.
      */
-    private void addLoadedGE(GraphicalElement ge) {
+    private void addGE(GraphicalElement ge) {
         elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
         mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
         if(ge instanceof GERefresh){
@@ -431,10 +401,36 @@ public class UIController{
         }
         elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
         zIndexStack.push(ge);
-        selectedGE = new ArrayList<>();
-        changeZIndex(TO_FRONT);
-        validateGE(ge);
-        mainWindow.getCompositionArea().refresh();
+        //Apply the z-index change to only the GraphicalElement ge.
+        toBeSet.add(ge);
+        changeZIndex(ZIndex.TO_FRONT);
+        toBeSet = new ArrayList<>();
+    }
+
+    public void setNewGEClass(Class<? extends GraphicalElement> newGEClass) {
+        this.newGEClass = newGEClass;
+    }
+
+    /**
+     * Create and set the new GraphicalElement and then open the properties dialog.
+     */
+    public void createGE(int x, int y, int width, int height) {
+        //Creates the GraphicalElement.
+        GraphicalElement ge = null;
+        try {
+            ge = newGEClass.newInstance();
+            ge.setX(x);
+            ge.setY(y);
+            ge.setWidth(width);
+            ge.setHeight(height);
+        } catch (InstantiationException | IllegalAccessException ex) {
+            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+        }
+        if(ge!=null){
+            addGE(ge);
+            showGEProperties(ge);
+        }
+        mainWindow.getCompositionArea().setOverlayEnable(false);
     }
     
     public void setAlign( Align alignment) {
@@ -545,6 +541,7 @@ public class UIController{
     public void showSelectedGEProperties(){
         if(selectedGE.size()>0){
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
+            toBeSet.addAll(selectedGE);
             DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
             dp.setVisible(true);
         }
@@ -554,6 +551,7 @@ public class UIController{
      * Open a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
      */
     public void showGEProperties(GraphicalElement ge){
+        toBeSet.add(ge);
         DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this, false);
         dp.setVisible(true);
     }
@@ -572,12 +570,12 @@ public class UIController{
         if(doc!=null){
             for(GraphicalElement graph : selectedGE)
                 unselectGE(graph);
-            selectGE(doc);
+            toBeSet.add(doc);
             DialogProperties dp = new DialogProperties(getCommonAttributes(), this, false);
             dp.setVisible(true);
         }
     }
-    
+
     public enum ZIndex{
         TO_FRONT, FRONT, BACK, TO_BACK;
     }

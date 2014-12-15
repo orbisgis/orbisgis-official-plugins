@@ -97,7 +97,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public MainWindow(UIController uiController){
         super("Map composer");
         this.uiController = uiController;
-        this.compositionArea = new CompositionArea();
+        this.compositionArea = new CompositionArea(uiController);
         //Sets the default size to the window
         this.setSize(1024, 768);
         
@@ -294,7 +294,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void newComposer(){
         uiController.removeAllGE();
-        uiController.addGE(Document.class);
+        uiController.setNewGEClass(Document.class);
+        uiController.createGE(0, 0, 1, 1);
     }
 
     /**
@@ -308,14 +309,16 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
-        uiController.addGE(MapImage.class);
+        uiController.setNewGEClass(MapImage.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
      * Add a TextElement GraphicalElement to the document.
      */
     public void addText(){
-        uiController.addGE(TextElement.class);
+        uiController.setNewGEClass(TextElement.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
@@ -329,21 +332,24 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a Orientation GraphicalElement to the document.
      */
     public void addOrientation(){
-        uiController.addGE(Orientation.class);
+        uiController.setNewGEClass(Orientation.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
      * Add a Scale GraphicalElement to the document.
      */
     public void addScale(){
-        uiController.addGE(Scale.class);
+        uiController.setNewGEClass(Scale.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
      * Add a Image GraphicalElement to the document.
      */
-    public void addPicture(){
-        uiController.addGE(Image.class);
+    public void addPicture() {
+        uiController.setNewGEClass(Image.class);
+        compositionArea.setOverlayEnable(true);
     }
     public void drawCircle(){
         //Unsupported yet
