@@ -313,7 +313,6 @@ public class UIController{
                 if(newGE instanceof SimpleIllustrationGE) {
                     try {
                         BufferedImage bi = ImageIO.read(new File(((SimpleIllustrationGE) newGE).getPath()));
-                        System.out.println(bi.getWidth() +", "+ bi.getHeight());
                         mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
                     } catch (IOException e) {
                         e.printStackTrace();
@@ -436,6 +435,19 @@ public class UIController{
                     ((RefreshCA)ca).refresh(this);
 
             showGEProperties(newGE);
+            //If the image has an already set path value, get the image ratio
+            if(newGE instanceof SimpleIllustrationGE) {
+                File f = new File(((SimpleIllustrationGE) newGE).getPath());
+                if(f.exists()) {
+                    try {
+                        BufferedImage bi = ImageIO.read(f);
+                        mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                    } catch (IOException e) {
+                        e.printStackTrace();
+                    }
+                }
+            }
+
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
