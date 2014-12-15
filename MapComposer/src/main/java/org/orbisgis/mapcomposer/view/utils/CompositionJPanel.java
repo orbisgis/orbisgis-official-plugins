@@ -109,7 +109,7 @@ public class CompositionJPanel extends JPanel{
      */
     private void setBorders() {
         if(selected)
-           this.setBorder(BorderFactory.createLineBorder(Color.ORANGE));
+           this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.ORANGE));
         else
            this.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     }
