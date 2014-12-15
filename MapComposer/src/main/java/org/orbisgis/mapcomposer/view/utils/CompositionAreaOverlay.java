@@ -34,7 +34,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
      * @param enable
      */
     public void setEnable(boolean enable) {
-        System.out.println(enable);
         this.enable = enable;
     }
 
