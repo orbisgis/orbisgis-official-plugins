@@ -118,7 +118,7 @@ public class UIController{
         }
         temp = new Stack<>();
         //Move the others GE
-        for(GraphicalElement ge : toBeSet){
+        for(GraphicalElement ge : selectedGE){
             if(zIndexStack.contains(ge)){
                 switch (z){
                     case TO_BACK:
@@ -417,9 +417,11 @@ public class UIController{
         elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
         zIndexStack.push(ge);
         //Apply the z-index change to only the GraphicalElement ge.
-        toBeSet.add(ge);
+        List temp = selectedGE;
+        selectedGE = new ArrayList<>();
+        selectedGE.add(ge);
         changeZIndex(ZIndex.TO_FRONT);
-        toBeSet.remove(ge);
+        selectedGE = temp;
     }
 
     /**
