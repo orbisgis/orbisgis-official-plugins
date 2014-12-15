@@ -66,7 +66,8 @@ public class DialogProperties extends JFrame{
         
         body.add(validate);
         body.add(cancel);
-        
+
+        this.setAlwaysOnTop(true);
         this.pack();
     }
     
