@@ -121,8 +121,6 @@ public class DialogProperties extends JFrame{
             for(Component c : component.getComponents())
                 c.setEnabled(!b);
             ca.setReadOnly(b);
-            this.repaint();
-            this.revalidate();
         }
     }
 }

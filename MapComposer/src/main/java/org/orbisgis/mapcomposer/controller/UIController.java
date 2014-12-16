@@ -264,6 +264,7 @@ public class UIController{
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
+
     }
 
     /**
@@ -649,7 +650,6 @@ public class UIController{
             }
         }
         validateSelectedGE();
-        mainWindow.getCompositionArea().refresh();
     }
     
     /**

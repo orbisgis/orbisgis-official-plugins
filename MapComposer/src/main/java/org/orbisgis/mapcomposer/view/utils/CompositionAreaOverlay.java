@@ -110,7 +110,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                                     e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
                 if(!e.isShiftDown())
                     ratio=-1;
-                l.repaint();
             }
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
                 int x, y;
@@ -131,7 +130,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
                 }
                 uiController.setNewGE(x, y, (int)width, (int)height);
-                l.repaint();
                 start=null;
                 end=null;
                 ratio=-1;

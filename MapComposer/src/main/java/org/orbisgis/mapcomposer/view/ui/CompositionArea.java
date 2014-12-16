@@ -69,7 +69,6 @@ public class CompositionArea extends JPanel{
     public void removeGE(CompositionJPanel panel){
         if(this.panel.isAncestorOf(panel))
             this.panel.remove(panel);
-        refresh();
     }
     
     /**
@@ -80,8 +79,6 @@ public class CompositionArea extends JPanel{
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.panel.setPreferredSize(this.dimension);
-        this.revalidate();
-        this.repaint();
     }
 
     /**
@@ -98,7 +95,7 @@ public class CompositionArea extends JPanel{
      */
     public void removeAllGE() {
         panel.removeAll();
-        refresh();
+        panel.revalidate();
     }
     
     /**
