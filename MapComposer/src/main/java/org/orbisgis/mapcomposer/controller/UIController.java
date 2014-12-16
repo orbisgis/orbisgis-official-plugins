@@ -117,79 +117,86 @@ public class UIController{
             zIndexStack.remove(ge);
         }
         temp = new Stack<>();
+
         //Move the others GE
-        for(GraphicalElement ge : selectedGE){
-            if(zIndexStack.contains(ge)){
-                switch (z){
-                    case TO_BACK:
-                        temp.push(ge);
-                        moveToBackFront(ge, temp);
-                        break;
-                    case TO_FRONT:
-                        moveToBackFront(ge, temp);
-                        temp.push(ge);
-                        break;
-                    case FRONT:
-                        if(zIndexStack.indexOf(ge)>0)
-                            moveBackFront(1, ge, temp);
-                        break;
-                    case BACK:
-                        if(zIndexStack.indexOf(ge)<zIndexStack.size()-1)
-                            moveBackFront(-1, ge, temp);
-                        break;
+        //In each cases : first sort the GE from the selectedGE list,
+        //Then place each GE at the good index in the stack.
+        switch (z){
+            case TO_FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(0, ge);
                 }
-            }
+                break;
+            case FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) > 0) {
+                        int index = temp.indexOf(ge) - 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) < zIndexStack.size() - 1) {
+                        int index = temp.indexOf(ge) + 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case TO_BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(ge);
+                }
+                break;
         }
+
         //Add to the stack the GE of the front
-        while(!tempFront.empty())
-            zIndexStack.push(tempFront.pop());
-        while(!temp.empty())
-            zIndexStack.push(temp.pop());
+        zIndexStack.addAll(tempFront);
         //Add to the stack the GE of the back
-        while(!tempBack.empty())
-            zIndexStack.push(tempBack.pop());
+        zIndexStack.addAll(tempBack);
         //Set the z-index of the GE from their stack position
         for(GraphicalElement ge : zIndexStack){
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         }
         validateSelectedGE();
-    }
-    
-    /**
-     * Move the GraphicalElement one step to the front or back and set its index.
-     * @param deltaZ Variation of the Z-index of the GE.
-     * @param ge GraphicalElement to move.
-     * @param geStack Temporary stack.
-     */
-    private void moveBackFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> geStack){
-        //Get the target index in the temporary stack (reverse order of the class stack)
-        int target = zIndexStack.size()-(zIndexStack.indexOf(ge)-deltaZ);
-        zIndexStack.remove(ge);
-        int i=1;
-
-        //While the object stack isn't empty, push element in the temporary stack.
-        while(!zIndexStack.empty()){
-            //Push the GE at the write index.
-            if(i==target)
-                geStack.push(ge);
-            else
-                geStack.push(zIndexStack.pop());
-            i++;
-        }
-        //If the GE has the higher index, it isn't already pushed.
-        if(!geStack.contains(ge))
-            geStack.push(ge);
-    }   
-    
-    /**
-     * Move the GraphicalElement to the front or back and set its index.
-     * @param ge GraphicalElement to move.
-     * @param geStack Temporary stack.
-     */
-    private void moveToBackFront(GraphicalElement ge, Stack<GraphicalElement> geStack){
-        zIndexStack.remove(ge);
-        while(!zIndexStack.empty())
-            geStack.push(zIndexStack.pop());
     }
     
     /**
