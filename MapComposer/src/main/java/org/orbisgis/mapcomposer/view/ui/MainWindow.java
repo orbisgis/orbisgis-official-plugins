@@ -41,7 +41,7 @@ import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
  * It does the link between the user interactions and the UIController
  */
 public class MainWindow extends JFrame implements MainFrameAction{
-    
+
     //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
@@ -69,16 +69,16 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String ALIGN_TO_TOP = "ALIGN_TO_TOP";
     public static final String PROPERTIES = "PROPERTIES";
     public static final String DELETE = "DELETE";
-    
+
     /** ActionCommands for the buttons. */
     private final ActionCommands actions = new ActionCommands();
     /** JToolBar for the buttons. It's registered in the action ActionCommands. */
     private final JToolBar IconToolBar = new JToolBar();
-    
+
     /** JToolBar for the spinners.
      * The spinners are used to change the position, the size and the rotation of selected GraphicalElements. */
     private final JToolBar spinnerToolBar = new JToolBar();
-    
+
     /** Spinner for the x position. */
     private JSpinner spinnerX =null;
     /** Spinner for the y position. */
@@ -89,10 +89,10 @@ public class MainWindow extends JFrame implements MainFrameAction{
     private JSpinner spinnerH =null;
     /** Spinner for the rotation. */
     private JSpinner spinnerR =null;
-    
+
     private UIController uiController;
     private CompositionArea compositionArea;
-    
+
     /** Public main constructor. */
     public MainWindow(UIController uiController){
         super("Map composer");
@@ -100,20 +100,20 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.compositionArea = new CompositionArea(uiController);
         //Sets the default size to the window
         this.setSize(1024, 768);
-        
+
         //Creates the panel containing the two tool bars.
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.Y_AXIS));
         toolBarPanel.add(IconToolBar);
         toolBarPanel.add(spinnerToolBar);
         this.add(toolBarPanel, BorderLayout.PAGE_START);
-        
+
         //Sets the button tool bar.
         IconToolBar.setFloatable(false);
         spinnerToolBar.setFloatable(false);
         actions.setAccelerators(rootPane);
         actions.registerContainer(IconToolBar);
-        
+
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog", "configuration.png", uiController, "showDocProperties", null));
         actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uiController, "saveDocument", null));
@@ -145,20 +145,20 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties", "properties.png", uiController, "showSelectedGEProperties", null));
         actions.addAction(createAction(DELETE, "", "Delete selected elements", "delete.png", uiController, "removeSelectedGE", null));
         IconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
-        
+
         //Sets the spinners tool bar.
-        spinnerX = createSpinner(" X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerY = createSpinner(" Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerW = createSpinner(" W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerH = createSpinner(" H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinnerX = createSpinner("X", " X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinnerY = createSpinner("Y", " Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinnerW = createSpinner("WIDTH", " W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        spinnerH = createSpinner("HEIGHT", " H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinnerToolBar.add(new JLabel(new ImageIcon(MainWindow.class.getResource("rotation.png"))));
-        spinnerR = createSpinner("", 0, -360, 360);
+        spinnerR = createSpinner("ROTATION", "", 0, -360, 360);
         spinnerToolBar.add(new JSeparator(SwingConstants.VERTICAL));
-        
+
         //Adds the composition area.
         this.add(compositionArea, BorderLayout.CENTER);
     }
-    
+
     /**
      * Adds a well sized separator to a tool bar.
      * @param toolBar Tool bar needing a separator.
@@ -174,20 +174,22 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * @return The CompositionArea
      */
     public CompositionArea getCompositionArea(){return compositionArea;}
-    
+
     /**
      * Creates and adds to the spinnerToolBar a spinner and its label.
      * The spinner and its label are setted with the given function argument.
      * The function return the spinner reference to permite to listen to their modification.
-     * @param label Name of the spinner.
+     * @param name Name of the spinner.
+     * @param label Text display in the tool bar.
      * @param value Actual value of the spinner.
      * @param minValue Minimum value of the spinner.
      * @param maxValue Maximum value of the spinner.
      * @return The reference to the created spinner.
      */
-    private JSpinner createSpinner(String label, int value, int minValue, int maxValue){
+    private JSpinner createSpinner(String name, String label, int value, int minValue, int maxValue){
         spinnerToolBar.add(new JLabel(label));
         JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
+        spin.setName(name);
         spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
         spin.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
         spin.setMaximumSize(new Dimension(64, 32));
@@ -204,16 +206,28 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * @param o JSpinner which had changed.
      */
     public void spinChange(Object o){
-        if(o.equals(spinnerX))
-            if(spinnerX.isEnabled()) uiController.changeProperty(GraphicalElement.Property.X, (Integer) spinnerX.getModel().getValue());
-        if(o.equals(spinnerY))
-            if(spinnerY.isEnabled()) uiController.changeProperty(GraphicalElement.Property.Y, (Integer) spinnerY.getModel().getValue());
-        if(o.equals(spinnerW))
-            if(spinnerW.isEnabled()) uiController.changeProperty(GraphicalElement.Property.WIDTH, (Integer) spinnerW.getModel().getValue());
-        if(o.equals(spinnerH))
-            if(spinnerH.isEnabled()) uiController.changeProperty(GraphicalElement.Property.HEIGHT, (Integer) spinnerH.getModel().getValue());
-        if(o.equals(spinnerR))
-            if(spinnerR.isEnabled()) uiController.changeProperty(GraphicalElement.Property.ROTATION, (Integer) spinnerR.getModel().getValue());
+        if(o instanceof JSpinner){
+            JSpinner spinner = (JSpinner) o;
+            if(spinner.isEnabled() && spinner.getName() != null) {
+                switch (spinner.getName()) {
+                    case "X":
+                        uiController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue());
+                        break;
+                    case "Y":
+                        uiController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue());
+                        break;
+                    case "WIDTH":
+                        uiController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue());
+                        break;
+                    case "HEIGHT":
+                        uiController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue());
+                        break;
+                    case "ROTATION":
+                        uiController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue());
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -221,16 +235,28 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * @param mwe MouseWheelEvent
      */
     public void mouseWheel(MouseWheelEvent mwe){
-        if(mwe.getSource().equals(spinnerX))
-            if(spinnerX.isEnabled()) uiController.changeProperty(Property.X, (int)spinnerX.getValue()-mwe.getWheelRotation());
-        if(mwe.getSource().equals(spinnerY))
-            if(spinnerY.isEnabled()) uiController.changeProperty(Property.Y, (int)spinnerY.getValue()-mwe.getWheelRotation());
-        if(mwe.getSource().equals(spinnerW))
-            if(spinnerW.isEnabled()) uiController.changeProperty(Property.WIDTH, (int)spinnerW.getValue()-mwe.getWheelRotation());
-        if(mwe.getSource().equals(spinnerH))
-            if(spinnerH.isEnabled()) uiController.changeProperty(Property.HEIGHT, (int)spinnerH.getValue()-mwe.getWheelRotation());
-        if(mwe.getSource().equals(spinnerR))
-            if(spinnerR.isEnabled()) uiController.changeProperty(Property.ROTATION, (int)spinnerR.getValue()-mwe.getWheelRotation());
+        if(mwe.getSource() instanceof JSpinner){
+            JSpinner spinner = (JSpinner) mwe.getSource();
+            if(spinner.isEnabled() && spinner.getName() != null) {
+                switch (spinner.getName()) {
+                    case "X":
+                        uiController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue() - mwe.getWheelRotation());
+                        break;
+                    case "Y":
+                        uiController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue() - mwe.getWheelRotation());
+                        break;
+                    case "WIDTH":
+                        uiController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue() - mwe.getWheelRotation());
+                        break;
+                    case "HEIGHT":
+                        uiController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue() - mwe.getWheelRotation());
+                        break;
+                    case "ROTATION":
+                        uiController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue() - mwe.getWheelRotation());
+                        break;
+                }
+            }
+        }
     }
 
     /**
@@ -282,7 +308,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
                 spinnerW.setEnabled(!b);
                 spinnerW.setValue(val);
                 break;
-            case ROTATION:  
+            case ROTATION:
                 spinnerR.setEnabled(!b);
                 spinnerR.setValue(val);
                 break;
