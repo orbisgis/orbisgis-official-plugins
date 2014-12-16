@@ -33,8 +33,8 @@ public abstract class SimpleGE implements GraphicalElement{
         x= new IntegerCA("x", false, 0);
         y= new IntegerCA("y", false, 0);
         rotation= new IntegerCA("Rotation", false, 0, true, -360, 360);
-        height= new IntegerCA("Height", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        width= new IntegerCA("Width", false, 50, true, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        height= new IntegerCA("Height", false, 50, true, 1, Integer.MAX_VALUE);
+        width= new IntegerCA("Width", false, 50, true, 1, Integer.MAX_VALUE);
     }
     
 //Setters

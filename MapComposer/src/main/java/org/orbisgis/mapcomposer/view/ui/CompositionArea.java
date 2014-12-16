@@ -1,12 +1,14 @@
 package org.orbisgis.mapcomposer.view.ui;
 
+import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
-import javax.swing.JPanel;
-import javax.swing.JScrollPane;
+import javax.swing.*;
+import javax.swing.plaf.LayerUI;
 
 /**
  * Area for the map document composition.
@@ -22,16 +24,34 @@ public class CompositionArea extends JPanel{
     
     /**Dimension of the document into the CompositionArea. */
     private Dimension dimension = new Dimension(50, 50);
+
+    /** LayerUI use (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
+    LayerUI<JComponent> layerUI;
+
+    /** JLayer used to link the LayerUI and the CompositionArea. */
+    JLayer<JComponent> jLayer;
     
     /**
      * Main constructor.
      */
-    public CompositionArea(){
+    public CompositionArea(UIController uiController){
         super(new BorderLayout());
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.add(scrollPane, BorderLayout.CENTER);
+
+        layerUI = new CompositionAreaOverlay(uiController);
+        jLayer = new JLayer<>(panel, layerUI);
+        this.add(jLayer);
+    }
+
+    /**
+     * Enable or disable the CompositionAreaOverlay.
+     * @param bool If true enable the overlay, disable it otherwise
+     */
+    public void setOverlayEnable(boolean bool){
+        ((CompositionAreaOverlay)layerUI).setEnable(bool);
     }
     
     /**
@@ -100,4 +120,9 @@ public class CompositionArea extends JPanel{
         g.dispose();
         return bi;
     }
+
+    public CompositionAreaOverlay getOverlay(){
+        return (CompositionAreaOverlay)layerUI;
+    }
+
 }

@@ -48,7 +48,7 @@ public class DialogProperties extends JFrame{
         this.setLayout(new BorderLayout());
         this.add(body, BorderLayout.CENTER);
         
-        //Adds to a panel the COnfigurationAttribute
+        //Adds to a panel the ConfigurationAttribute
         panel = new JPanel();
         panel.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
@@ -66,7 +66,8 @@ public class DialogProperties extends JFrame{
         
         body.add(validate);
         body.add(cancel);
-        
+
+        this.setAlwaysOnTop(true);
         this.pack();
     }
     

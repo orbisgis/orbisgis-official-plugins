@@ -14,6 +14,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
@@ -95,7 +97,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public MainWindow(UIController uiController){
         super("Map composer");
         this.uiController = uiController;
-        this.compositionArea = new CompositionArea();
+        this.compositionArea = new CompositionArea(uiController);
         //Sets the default size to the window
         this.setSize(1024, 768);
         
@@ -187,6 +189,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         spinnerToolBar.add(new JLabel(label));
         JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
         spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
+        spin.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
         spin.setMaximumSize(new Dimension(64, 32));
         spin.setMinimumSize(new Dimension(32, 32));
         spin.setPreferredSize(new Dimension(64, 32));
@@ -211,6 +214,23 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinnerH.isEnabled()) uiController.changeProperty(GraphicalElement.Property.HEIGHT, (Integer) spinnerH.getModel().getValue());
         if(o.equals(spinnerR))
             if(spinnerR.isEnabled()) uiController.changeProperty(GraphicalElement.Property.ROTATION, (Integer) spinnerR.getModel().getValue());
+    }
+
+    /**
+     * Action done when the mouse wheel is used in a JComboBox of the toolbar.
+     * @param mwe MouseWheelEvent
+     */
+    public void mouseWheel(MouseWheelEvent mwe){
+        if(mwe.getSource().equals(spinnerX))
+            if(spinnerX.isEnabled()) uiController.changeProperty(Property.X, (int)spinnerX.getValue()-mwe.getWheelRotation());
+        if(mwe.getSource().equals(spinnerY))
+            if(spinnerY.isEnabled()) uiController.changeProperty(Property.Y, (int)spinnerY.getValue()-mwe.getWheelRotation());
+        if(mwe.getSource().equals(spinnerW))
+            if(spinnerW.isEnabled()) uiController.changeProperty(Property.WIDTH, (int)spinnerW.getValue()-mwe.getWheelRotation());
+        if(mwe.getSource().equals(spinnerH))
+            if(spinnerH.isEnabled()) uiController.changeProperty(Property.HEIGHT, (int)spinnerH.getValue()-mwe.getWheelRotation());
+        if(mwe.getSource().equals(spinnerR))
+            if(spinnerR.isEnabled()) uiController.changeProperty(Property.ROTATION, (int)spinnerR.getValue()-mwe.getWheelRotation());
     }
 
     /**
@@ -274,7 +294,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void newComposer(){
         uiController.removeAllGE();
-        uiController.addGE(Document.class);
+        uiController.createNewGE(Document.class);
+        uiController.setNewGE(0, 0, 1, 1);
     }
 
     /**
@@ -288,14 +309,18 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
-        uiController.addGE(MapImage.class);
+        compositionArea.getOverlay().setRatio(-1);
+        uiController.createNewGE(MapImage.class);
+        compositionArea.setOverlayEnable(true);
+
     }
 
     /**
      * Add a TextElement GraphicalElement to the document.
      */
     public void addText(){
-        uiController.addGE(TextElement.class);
+        uiController.createNewGE(TextElement.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
@@ -309,21 +334,24 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a Orientation GraphicalElement to the document.
      */
     public void addOrientation(){
-        uiController.addGE(Orientation.class);
+        uiController.createNewGE(Orientation.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
      * Add a Scale GraphicalElement to the document.
      */
     public void addScale(){
-        uiController.addGE(Scale.class);
+        uiController.createNewGE(Scale.class);
+        compositionArea.setOverlayEnable(true);
     }
 
     /**
      * Add a Image GraphicalElement to the document.
      */
-    public void addPicture(){
-        uiController.addGE(Image.class);
+    public void addPicture() {
+        uiController.createNewGE(Image.class);
+        compositionArea.setOverlayEnable(true);
     }
     public void drawCircle(){
         //Unsupported yet
