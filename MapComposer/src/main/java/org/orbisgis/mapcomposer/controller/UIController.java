@@ -17,7 +17,6 @@ import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
-import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -30,6 +29,9 @@ import javax.swing.*;
 import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
+import org.orbisgis.sif.SIFDialog;
+import org.orbisgis.sif.SimplePanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -298,7 +300,7 @@ public class UIController{
 
     /**
      * Reads a list of ConfigurationAttribute and set the GraphicalElement with it.
-     * This action is done when the button validate of the DialogProperties is clicked.
+     * This action is done when the button validate of the properties dialog is clicked.
      * @param caList List of ConfigurationAttributes to read.
      */
     public void validateCAList(List<ConfigurationAttribute> caList) {
@@ -588,8 +590,12 @@ public class UIController{
         if(selectedGE.size()>0){
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             toBeSet.addAll(selectedGE);
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
-            dp.setVisible(true);
+            //Create and show the properties dialog.
+            SIFDialog dialog = new SIFDialog(mainWindow, true);
+            dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+            dialog.setVisible(true);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
         }
     }
 
@@ -598,8 +604,12 @@ public class UIController{
      */
     public void showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
-        DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this, false);
-        dp.setVisible(true);
+        //Create and show the properties dialog.
+        SIFDialog dialog = new SIFDialog(mainWindow, true);
+        dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+        dialog.setVisible(true);
+        dialog.pack();
+        dialog.setAlwaysOnTop(true);
     }
     
     /**
@@ -617,8 +627,12 @@ public class UIController{
             for(GraphicalElement graph : selectedGE)
                 unselectGE(graph);
             toBeSet.add(doc);
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, false);
-            dp.setVisible(true);
+            //Create and show the properties dialog.
+            SIFDialog dialog = new SIFDialog(mainWindow, true);
+            dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+            dialog.setVisible(true);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
         }
     }
 
