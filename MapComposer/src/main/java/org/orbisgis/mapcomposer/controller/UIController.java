@@ -32,6 +32,8 @@ import javax.xml.parsers.ParserConfigurationException;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.SimplePanel;
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.UIPanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -591,8 +593,8 @@ public class UIController{
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             toBeSet.addAll(selectedGE);
             //Create and show the properties dialog.
-            SIFDialog dialog = new SIFDialog(mainWindow, true);
-            dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
             dialog.setVisible(true);
             dialog.pack();
             dialog.setAlwaysOnTop(true);
@@ -605,8 +607,8 @@ public class UIController{
     public void showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        SIFDialog dialog = new SIFDialog(mainWindow, true);
-        dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+        UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+        SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
         dialog.setVisible(true);
         dialog.pack();
         dialog.setAlwaysOnTop(true);
@@ -628,8 +630,8 @@ public class UIController{
                 unselectGE(graph);
             toBeSet.add(doc);
             //Create and show the properties dialog.
-            SIFDialog dialog = new SIFDialog(mainWindow, true);
-            dialog.setComponent(new SimplePanel(dialog, new UIDialogProperties(getCommonAttributes(), this, false)));
+            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
             dialog.setVisible(true);
             dialog.pack();
             dialog.setAlwaysOnTop(true);
