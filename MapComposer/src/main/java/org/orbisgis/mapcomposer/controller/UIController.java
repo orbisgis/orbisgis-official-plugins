@@ -14,7 +14,6 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
-import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Dimension;
@@ -25,15 +24,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
-import org.orbisgis.sif.SimplePanel;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.UIPanel;
+import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -408,9 +405,10 @@ public class UIController{
         try {
             removeAllGE();
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            for(GraphicalElement ge : list){
-                addGE(ge);
-            }
+            //Add all the GE starting from the last one (to get the good z-index)
+            for(int i=list.size()-1; i>=0; i--)
+                addGE(list.get(i));
+            mainWindow.getCompositionArea().refresh();
         } catch (ParserConfigurationException|SAXException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
@@ -452,7 +450,7 @@ public class UIController{
             //If the image has an already set path value, get the image ratio
             if(newGE instanceof SimpleIllustrationGE) {
                 File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                if(f.exists()) {
+                if(f.exists() && f.isFile()) {
                     try {
                         BufferedImage bi = ImageIO.read(f);
                         mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
@@ -680,30 +678,11 @@ public class UIController{
      */
     public void export(){
         //Creates and sets the file chooser
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
-        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
-        fc.setDialogTitle("Export document into PNG");
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new FileFilter() {
-
-            @Override public boolean accept(File file) {
-                if(file.isDirectory()) return true;
-                return file.getAbsolutePath().toLowerCase().contains(".png");
-            }
-
-            @Override public String getDescription() {return "PNG Files (.png)";}
-        });
-
-        //If the saveProject is validated, do the export
-        if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
-            //Sets the path of the new file
-            String path;
-            if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
-                path=fc.getSelectedFile().getAbsolutePath();
-            else 
-                path=fc.getSelectedFile().getAbsolutePath()+".png";
-
+        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
+        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+        saveFilePanel.loadState();
+        if(UIFactory.showDialog(saveFilePanel)){
+            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
 
             try{
                 //Removes the border, does the export, then adds them again
@@ -711,7 +690,7 @@ public class UIController{
                     elementJPanelMap.get(ge).enableBorders(false);
                 }
                 ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
-                
+
                 for(GraphicalElement ge : zIndexStack){
                     elementJPanelMap.get(ge).enableBorders(true);
                 }

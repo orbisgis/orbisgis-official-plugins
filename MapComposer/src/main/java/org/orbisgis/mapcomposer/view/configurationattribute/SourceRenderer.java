@@ -8,7 +8,11 @@ import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
 import javax.swing.text.Document;
 
-import org.orbisgis.mapcomposer.view.utils.MouseListenerBrowse;
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.components.OpenFilePanel;
+
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 
 /**
@@ -37,15 +41,41 @@ public class SourceRenderer implements CARenderer{
         component.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
         JTextField jtf = new JTextField(sourceCA.getValue());
+        jtf.setColumns(40);
         //"Save" the CA inside the JTextField
         jtf.getDocument().putProperty("SourceCA", sourceCA);
+        //add the listener for the text changes in the JTextField
         jtf.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
+        //Load the last path use in a sourceCA
+        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
+        openFilePanel.addFilter(new String[]{"*"}, "All files");
+        openFilePanel.loadState();
+        jtf.setText(openFilePanel.getCurrentDirectory().getAbsolutePath());
+
         component.add(jtf);
+        //Create the button Browse
         JButton button = new JButton("Browse");
-        button.addMouseListener(new MouseListenerBrowse(jtf));
+        //"Save" the sourceCA and the JTextField in the button
+        button.putClientProperty("SourceCA", sourceCA);
+        button.putClientProperty("JTextField", jtf);
+        //Add the listener for the click on the button
+        button.addActionListener(EventHandler.create(ActionListener.class, this, "openLoadPanel", ""));
         
         component.add(button);
         return component;
+    }
+
+    public void openLoadPanel(ActionEvent event){
+        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
+        openFilePanel.addFilter(new String[]{"*"}, "All files");
+        openFilePanel.loadState();
+        if (UIFactory.showDialog(openFilePanel, true, true)) {
+            JButton source = (JButton)event.getSource();
+            SourceCA sourceCA = (SourceCA)source.getClientProperty("SourceCA");
+            sourceCA.setValue(openFilePanel.getSelectedFile().getAbsolutePath());
+            JTextField textField = (JTextField)source.getClientProperty("JTextField");
+            textField.setText(openFilePanel.getSelectedFile().getAbsolutePath());
+        }
     }
 
     /**

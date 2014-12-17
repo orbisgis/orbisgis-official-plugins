@@ -12,11 +12,17 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.components.OpenFilePanel;
+import org.orbisgis.sif.components.SaveFilePanel;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
+import javax.imageio.ImageIO;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.filechooser.FileFilter;
@@ -31,7 +37,7 @@ import javax.xml.parsers.SAXParserFactory;
 public class SaveAndLoadHandler extends DefaultHandler {
 
     /** String array containing all the version of the MapComposer compatible with the class **/
-    String[] compVersions={"1.0.2"};
+    String[] compVersions={"1.0.2", "1.0.3"};
 
     /** List of all the GraphicalElement to save **/
     private List<GraphicalElement> listGE;
@@ -164,12 +170,12 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws SAXException
      */
     public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
-        //Create a JFileChooser
-        File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder());
-        JFileChooser fc = createFileChooser(f, "Load document project");
-        //If the saveProject is validated, do the marshall
-        if (fc.showOpenDialog(new JFrame()) == JFileChooser.APPROVE_OPTION)
-            return load(fc.getSelectedFile().getAbsolutePath());
+        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", "Load document project");
+        loadFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        loadFilePanel.loadState();
+
+        if(UIFactory.showDialog(loadFilePanel))
+            return load(loadFilePanel.getSelectedFile().getAbsolutePath());
         return listGE;
     }
 
@@ -194,12 +200,13 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws NoSuchMethodException
      */
     public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
-        //Create a JFileChooser
-        File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder());
-        JFileChooser fc = createFileChooser(f, "Save document project");
-        //If the saveProject is validated, do the marshall
-        if(fc.showSaveDialog(new JFrame())==JFileChooser.APPROVE_OPTION)
-            save(list, fc.getSelectedFile().getAbsolutePath());
+        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", "Save document project");
+        saveFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        saveFilePanel.loadState();
+
+        if(UIFactory.showDialog(saveFilePanel)){
+            save(list, saveFilePanel.getSelectedFile().getAbsolutePath());
+        }
     }
 
     /**
@@ -234,7 +241,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
     public void save(List<GraphicalElement> list, String path) throws IOException {if(!path.contains(".xml")) path+=".xml";
         FileWriter fw = new FileWriter(path);
         //Write the MapComposer version
-        fw.write("<synchronized>\n\t<version>1.0.2</version>\n");
+        fw.write("<synchronized>\n\t<version>1.0.3</version>\n");
         //Write all the GraphicalElement from the list argument
         for (GraphicalElement ge : list) {
             //Write the GraphicalElement start xml tag
@@ -259,26 +266,5 @@ public class SaveAndLoadHandler extends DefaultHandler {
         }
         fw.write("</synchronized>");
         fw.close();
-    }
-
-    /**
-     * Creates and returns a JFileChooser with the given information
-     * @param currentDirectory Directory shown in the JFileChooser
-     * @param title Title of the JFileChooser
-     * @return The JFileChooser
-     */
-    private JFileChooser createFileChooser(File currentDirectory, String title){
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(currentDirectory);
-        fc.setDialogTitle(title);
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new FileFilter() {
-            @Override public boolean accept(File file) {
-                if(file.isDirectory()) return true;
-                return file.getAbsolutePath().toLowerCase().contains(".xml");
-            }
-            @Override public String getDescription() {return "XML Files (.xml)";}
-        });
-        return fc;
     }
 }
