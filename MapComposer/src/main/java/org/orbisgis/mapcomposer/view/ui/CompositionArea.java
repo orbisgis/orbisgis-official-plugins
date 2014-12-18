@@ -48,10 +48,10 @@ public class CompositionArea extends JPanel{
 
     /**
      * Enable or disable the CompositionAreaOverlay.
-     * @param bool If true enable the overlay, disable it otherwise
+     * @param mode If true enable the overlay, disable it otherwise
      */
-    public void setOverlayEnable(boolean bool){
-        ((CompositionAreaOverlay)layerUI).setEnable(bool);
+    public void setOverlayMode(CompositionAreaOverlay.Mode mode){
+        ((CompositionAreaOverlay)layerUI).setMode(mode);
     }
     
     /**

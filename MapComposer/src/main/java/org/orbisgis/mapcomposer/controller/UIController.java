@@ -15,6 +15,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
@@ -477,7 +478,7 @@ public class UIController{
             newGE.setHeight(height);
             addGE(newGE);
         }
-        mainWindow.getCompositionArea().setOverlayEnable(false);
+        mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
     }
     

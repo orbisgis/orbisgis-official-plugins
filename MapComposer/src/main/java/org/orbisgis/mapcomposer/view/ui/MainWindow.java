@@ -32,6 +32,8 @@ import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.SwingConstants;
 import javax.swing.event.ChangeListener;
+
+import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
@@ -337,7 +339,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void addMap(){
         compositionArea.getOverlay().setRatio(-1);
         uiController.createNewGE(MapImage.class);
-        compositionArea.setOverlayEnable(true);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
 
     }
 
@@ -346,7 +348,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addText(){
         uiController.createNewGE(TextElement.class);
-        compositionArea.setOverlayEnable(true);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
     }
 
     /**
@@ -361,7 +363,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addOrientation(){
         uiController.createNewGE(Orientation.class);
-        compositionArea.setOverlayEnable(true);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
     }
 
     /**
@@ -369,7 +371,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addScale(){
         uiController.createNewGE(Scale.class);
-        compositionArea.setOverlayEnable(true);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
     }
 
     /**
@@ -377,7 +379,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addPicture() {
         uiController.createNewGE(Image.class);
-        compositionArea.setOverlayEnable(true);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
     }
     public void drawCircle(){
         //Unsupported yet
