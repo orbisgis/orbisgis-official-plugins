@@ -30,7 +30,7 @@ public class MapImageRenderer extends SimpleGERenderer {
         }
 
         //Scale the bufferedImage to the GraphicalElement size
-        java.awt.Image image = bi.getScaledInstance(ge.getWidth(), ge.getHeight(), java.awt.Image.SCALE_FAST);
+        java.awt.Image image = bi.getScaledInstance(ge.getWidth(), ge.getHeight(), Image.SCALE_SMOOTH);
         BufferedImage resize = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
         Graphics graph = resize.createGraphics();
         graph.drawImage(image, 0, 0, null);

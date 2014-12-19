@@ -27,6 +27,7 @@ import java.util.logging.Logger;
 import javax.imageio.ImageIO;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.UIFactory;
@@ -292,7 +293,8 @@ public class UIController{
     public void validateGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
+        RenderWorker worker = new RenderWorker(this, elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        worker.execute();
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -425,7 +427,8 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
+        RenderWorker worker = new RenderWorker(this, elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        worker.execute();
         zIndexStack.push(ge);
         //Apply the z-index change to only the GraphicalElement ge.
         List temp = selectedGE;
