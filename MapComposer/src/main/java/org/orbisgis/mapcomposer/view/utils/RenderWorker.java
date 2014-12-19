@@ -16,7 +16,6 @@ public class RenderWorker extends SwingWorker{
     private CompositionJPanel compPanel;
     private GERenderer geRenderer;
     private GraphicalElement ge;
-    private BufferedImage waitBI;
 
     /**
      * Main Constructor
@@ -30,23 +29,25 @@ public class RenderWorker extends SwingWorker{
         this.compPanel = compPanel;
         this.geRenderer = geRenderer;
         this.ge = ge;
-        this.waitBI = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
     }
 
 
     @Override
     protected Object doInBackground() throws Exception {
         //Display the wait layer in the CompositionJPanel
+        compPanel.setEnabled(false);
         compPanel.getWaitLayer().start();
-        compPanel.setPanelContent(geRenderer.createImageFromGE(ge));
-        //Hide the wait layer in the CompositionJPanel
-        compPanel.getWaitLayer().stop();
+        BufferedImage bi = geRenderer.createImageFromGE(ge);
+        if(!isCancelled()) {
+            compPanel.setPanelContent(bi);
+            compPanel.getWaitLayer().stop();
+        }
         return null;
     }
 
     @Override
     protected void done() {
-        uic.getMainWindow().getCompositionArea().refresh();
+        compPanel.setEnabled(true);
     }
 }
 

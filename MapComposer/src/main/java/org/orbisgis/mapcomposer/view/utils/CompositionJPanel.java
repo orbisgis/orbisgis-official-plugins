@@ -20,16 +20,16 @@ import javax.swing.*;
   * This panel extends from JPanel define the action to do when the user click on it.
   */
 public class CompositionJPanel extends JPanel{
-    
+
     /**GraphicalElement displayed. */
     private final GraphicalElement ge;
-    
+
     /**Select state of the panel. */
     private boolean selected=false;
-    
+
     /**X initial position when user want to move the panel. */
     private int startX=0;
-    
+
     /**Y initial position when user want to move the panel. */
     private int startY=0;
 
@@ -44,10 +44,10 @@ public class CompositionJPanel extends JPanel{
 
      /**Id of the move that the user is doing. */
      private MoveMode moveMode = MoveMode.NONE;
-    
+
     /** Reference to the UIController. */
     private final UIController uic;
-    
+
     /** Size of the margin of the border for resizing. */
     private static final int margin = 5;
 
@@ -82,10 +82,8 @@ public class CompositionJPanel extends JPanel{
         waitLayer = new WaitLayerUI();
         JLayer<JPanel> layer = new JLayer<>(panel, waitLayer);
         this.add(layer);
-        /*this.revalidate();
-        this.repaint();*/
     }
-    
+
     /**
      * Sets the panel contained by the object.
      * @param bufferedImage The new panel.
@@ -160,7 +158,7 @@ public class CompositionJPanel extends JPanel{
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        
+
         startX = me.getLocationOnScreen().x;
         startY = me.getLocationOnScreen().y;
 
@@ -207,26 +205,47 @@ public class CompositionJPanel extends JPanel{
         }
     }
 
-     /**
-      * Called when the mouse is released.
-      * It transfer the location of the mouse to the right method according to the mouseMode value;
-      * @param p Location on screen of the mouse when it's released.
-      */
-     public void mouseReleasedHub(Point p){
-         switch(moveMode){
-             case ALTGRAPH:
-                 mouseReleasedALTGRAPH(p);
-                 break;
-             case CTRL:
-             case SHIFT:
-                 mouseReleasedSHIFT(p);
-                 break;
-             case NONE:
-                 mouseReleasedNONE(p);
-                 break;
-         }
-         uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
-     }
+    /**
+    * Called when the mouse is released.
+    * It transfer the location of the mouse to the right method according to the mouseMode value;
+    * @param p Location on screen of the mouse when it's released.
+    */
+    public void mouseReleasedHub(Point p){
+        if(moveDirection==MoveDirection.CENTER) {
+            ge.setX(ge.getX() - startX + p.x);
+            ge.setY(ge.getY() - startY + p.y);
+            this.moveDirection = MoveDirection.NONE;
+            this.moveMode = MoveMode.NONE;
+        }
+        else {
+            switch (moveMode) {
+                case ALTGRAPH:
+                    mouseReleasedALTGRAPH(p);
+                    break;
+                case CTRL:
+                case SHIFT:
+                    mouseReleasedSHIFT(p);
+                    break;
+                case NONE:
+                    mouseReleasedNONE(p);
+                    break;
+            }
+            //Set the new bounds of the compositionJPanel before validating it (and redraw it)
+            double rad = Math.toRadians(ge.getRotation());
+            final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+            final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+            panel.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+            this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+            panel.revalidate();
+
+            uic.validateGE(ge);
+
+            this.moveDirection = MoveDirection.NONE;
+            this.moveMode=MoveMode.NONE;
+        }
+
+    uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+    }
 
      /**
       * Move and resize of the GraphicalElement when no key are pressed.
@@ -269,14 +288,7 @@ public class CompositionJPanel extends JPanel{
                  ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
                  ge.setY(ge.getY()-(startY-p.y));
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
      /**
@@ -384,14 +396,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
      /**
@@ -506,14 +511,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setY((int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1);
                  }
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
     /**
@@ -635,7 +633,7 @@ public class CompositionJPanel extends JPanel{
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        
+
         if(y<=margin && x<=margin)
             this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
         else if(x<=margin && y>=newHeight-margin)
@@ -655,7 +653,7 @@ public class CompositionJPanel extends JPanel{
         else
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
-    
+
     /**
      * Draw red border to the element for one second.
      */
@@ -669,13 +667,13 @@ public class CompositionJPanel extends JPanel{
             LoggerFactory.getLogger(CompositionJPanel.class).error(ex.getMessage());
         }
     }
-    
+
     /** Unselect the CompositionJPanel (remove the orange borders). */
     public void unselect(){ this.selected=false; setBorders(); }
-    
+
     /** Select the CompositionJPanel. */
     public void select(){ this.selected=true; setBorders(); }
-    
+
     /**
      * Enable or disable the grey and orange borders of the displayed elements.
      * @param enable Display the borders if true, hide them otherwise.
