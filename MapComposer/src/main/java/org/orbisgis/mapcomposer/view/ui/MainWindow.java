@@ -312,16 +312,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
                 break;
         }
         if(spinner!=null){
-            if(value == spinner.getValue()){
-                spinner.setModel(new SpinnerNumberModel(value, ((SpinnerNumberModel) spinner.getModel()).getMinimum(), ((SpinnerNumberModel) spinner.getModel()).getMaximum(), 1));
-                spinner.setEnabled(!b);
-                spinner.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
-                spinner.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
-            }
-            else {
-                spinner.setValue(val);
-                spinner.setEnabled(!b);
-            }
+            spinner.setModel(new SpinnerNumberModel(value, ((SpinnerNumberModel) spinner.getModel()).getMinimum(), ((SpinnerNumberModel) spinner.getModel()).getMaximum(), 1));
+            spinner.setEnabled(!b);
         }
     }
 

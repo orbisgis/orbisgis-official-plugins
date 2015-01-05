@@ -1,5 +1,6 @@
  package org.orbisgis.mapcomposer.view.utils;
 
+import org.orbisgis.coremap.renderer.se.graphic.Graphic;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
@@ -9,6 +10,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import static java.lang.Math.cos;
@@ -54,6 +57,10 @@ public class CompositionJPanel extends JPanel{
     private WaitLayerUI waitLayer;
     private JPanel panel;
 
+    private BufferedImage contentImage;
+
+    private static int i = 0;
+
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
@@ -92,6 +99,7 @@ public class CompositionJPanel extends JPanel{
         final int maxWidth = Math.max((int)newWidth, width);
         final int maxHeight = Math.max((int)newHeight, height);
 
+        //Draw the bufferedImage
         panel.removeAll();
         //Add the BufferedImage into a JComponent in the CompositionJPanel
         panel.add(new JComponent() {
@@ -99,25 +107,75 @@ public class CompositionJPanel extends JPanel{
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                g.drawImage(contentImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
         panel.revalidate();
-        modify(x, y, width, height, rotation);
-    }
-
-    public void modify(int x, int y, int width, int height, int rotation){
-        double rad = Math.toRadians(rotation);
-        //Width and Height of the rectangle containing the rotated bufferedImage
-        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
-        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
-        this.revalidate();
-        //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
         //Take account of the border width (2 pixels).
         this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
         this.setOpaque(false);
         panel.setOpaque(false);
         setBorders();
+
+        //Save the unrotated bufferedImage
+        contentImage = bufferedImage;
+
+        //Create the rotation transform fo the buffered image
+        AffineTransform affineTransform= new AffineTransform();
+        affineTransform.rotate(-rad, maxWidth / 2, maxHeight / 2);
+
+        //Apply the transform to the bufferedImage an return it
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BICUBIC);
+        contentImage = affineTransformOp.filter(contentImage, null);
+    }
+
+    public void modify(int x, int y, int width, int height, int rotation){
+        System.out.println(i);
+        final double rad = Math.toRadians(rotation);
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
+        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
+        final int maxWidth = Math.max((int)newWidth, width);
+        final int maxHeight = Math.max((int)newHeight, height);
+        this.revalidate();
+        //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
+        panel.removeAll();
+        //Add the BufferedImage into a JComponent in the CompositionJPanel
+        panel.add(new JComponent() {
+            //Redefinition of the painComponent method to rotate the component content.
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (contentImage != null) {
+                    //Create a new BufferedImage with the new size (size after rotation)
+                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, contentImage.getType());
+                    Graphics2D graph = bufferedImage.createGraphics();
+
+                    //Draw the BufferedImage bi into the bigger BufferedImage
+                    graph.drawImage(contentImage,
+                            (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                            maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
+                            0, 0,
+                            contentImage.getWidth(), contentImage.getHeight(), null);
+                    graph.dispose();
+
+                    //Create the rotation transform fo the buffered image
+                    AffineTransform affineTransform = new AffineTransform();
+                    affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+
+                    //Apply the transform to the bufferedImage an return it
+                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                    g.drawImage(affineTransformOp.filter(bufferedImage, null), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                }
+            }
+        }, BorderLayout.CENTER);
+        panel.revalidate();
+        //Take account of the border width (2 pixels).
+        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+        this.setOpaque(false);
+        panel.setOpaque(false);
+        setBorders();
+        i++;
     }
 
     /**
@@ -250,7 +308,7 @@ public class CompositionJPanel extends JPanel{
             this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
             panel.revalidate();
 
-            uic.validateGE(ge);
+            uic.modifyGE(ge);
 
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;

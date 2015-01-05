@@ -199,7 +199,7 @@ public class UIController{
         for(GraphicalElement ge : zIndexStack){
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         }
-        validateSelectedGE();
+        modifySelectedGE();
     }
     
     /**
@@ -278,19 +278,43 @@ public class UIController{
     }
 
     /**
-     * Validates all the selected GraphicalElements
+     * Modify the position and size of all the selected GraphicalElements
      */
-    public void validateSelectedGE(){
+    public void modifySelectedGE(){
         for(GraphicalElement ge : selectedGE)
-            validateGE(ge);
+            modifyGE(ge);
     }
 
     /**
-     * Validates the given GraphicalElement.
-     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
+     * modify the position and the size of the given GraphicalElement.
+     * It does the refresh of the GE, the resizing of the GE representation in the CompositionArea and refreshes the spinner state.
+     * The GE representation is just moved and scaled, not completely re-renderer.
      * @param ge GraphicalElement to validate
      */
-    public void validateGE(GraphicalElement ge){
+    public void modifyGE(GraphicalElement ge){
+        if(ge instanceof GERefresh)
+            ((GERefresh)ge).refresh();
+        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
+        if(ge instanceof Document)
+            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        refreshSpin();
+    }
+
+    /**
+     * Redraws all the selected GraphicalElements
+     */
+    public void redrawSelectedGE(){
+        for(GraphicalElement ge : selectedGE)
+            redrawGE(ge);
+    }
+
+    /**
+     * Redraws the given GraphicalElement.
+     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
+     * The GE representation is completely re-renderer.
+     * @param ge GraphicalElement to validate
+     */
+    public void redrawGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
         RenderWorker worker = new RenderWorker(this, elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
@@ -318,7 +342,7 @@ public class UIController{
             }
             //If the GraphicalElement was already added to the document
             if(elementJPanelMap.containsKey(ge))
-                validateGE(ge);
+                redrawGE(ge);
             //Set the CompositionAreaOverlay ratio in the case of the GraphicalElement was not already added to the Document
             else{
                 //Give the ratio to the CompositionAreaOverlay();
@@ -583,7 +607,7 @@ public class UIController{
                     }
                     break;
             }
-            validateSelectedGE();
+            modifySelectedGE();
         }
     }
 
@@ -674,7 +698,7 @@ public class UIController{
                     break;
             }
         }
-        validateSelectedGE();
+        modifySelectedGE();
     }
     
     /**
