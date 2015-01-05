@@ -39,7 +39,7 @@ public class RenderWorker extends SwingWorker{
         compPanel.getWaitLayer().start();
         BufferedImage bi = geRenderer.createImageFromGE(ge);
         if(!isCancelled()) {
-            compPanel.setPanelContent(bi);
+            compPanel.redraw(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation(), bi);
             compPanel.getWaitLayer().stop();
         }
         return null;

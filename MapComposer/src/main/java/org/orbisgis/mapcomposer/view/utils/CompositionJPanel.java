@@ -84,17 +84,13 @@ public class CompositionJPanel extends JPanel{
         this.add(layer);
     }
 
-    /**
-     * Sets the panel contained by the object.
-     * @param bufferedImage The new panel.
-     */
-    public void setPanelContent(final BufferedImage bufferedImage){
-        double rad = Math.toRadians(ge.getRotation());
+    public void redraw(int x, int y, int width, int height, int rotation, final BufferedImage bufferedImage){
+        double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
-        final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-        final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        final int maxWidth = Math.max((int)newWidth, ge.getWidth());
-        final int maxHeight = Math.max((int)newHeight, ge.getHeight());
+        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
+        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
+        final int maxWidth = Math.max((int)newWidth, width);
+        final int maxHeight = Math.max((int)newHeight, height);
 
         panel.removeAll();
         //Add the BufferedImage into a JComponent in the CompositionJPanel
@@ -107,10 +103,18 @@ public class CompositionJPanel extends JPanel{
             }
         }, BorderLayout.CENTER);
         panel.revalidate();
+        modify(x, y, width, height, rotation);
+    }
+
+    public void modify(int x, int y, int width, int height, int rotation){
+        double rad = Math.toRadians(rotation);
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
+        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
         this.revalidate();
         //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
         //Take account of the border width (2 pixels).
-        this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
         this.setOpaque(false);
         panel.setOpaque(false);
         setBorders();
@@ -630,7 +634,7 @@ public class CompositionJPanel extends JPanel{
     }
 
     /**
-     * Changes the mouse cursor appearence according to the border hovered.
+     * Changes the mouse cursor appearance according to the border hovered.
      * @param p Point of the mouse.
      */
     public void mouseMoved(Point p) {
