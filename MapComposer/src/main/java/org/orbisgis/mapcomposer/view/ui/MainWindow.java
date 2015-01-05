@@ -293,27 +293,35 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void setSpinner(boolean b, int value, Property prop){
         int val=b ? 0 : value;
+        JSpinner spinner = null;
         switch(prop){
             case X:
-                spinnerX.setEnabled(!b);
-                spinnerX.setValue(val);
+                spinner = spinnerX;
                 break;
             case Y:
-                spinnerY.setEnabled(!b);
-                spinnerY.setValue(val);
+                spinner = spinnerY;
                 break;
             case HEIGHT:
-                spinnerH.setEnabled(!b);
-                spinnerH.setValue(val);
+                spinner = spinnerH;
                 break;
             case WIDTH:
-                spinnerW.setEnabled(!b);
-                spinnerW.setValue(val);
+                spinner = spinnerW;
                 break;
             case ROTATION:
-                spinnerR.setEnabled(!b);
-                spinnerR.setValue(val);
+                spinner = spinnerR;
                 break;
+        }
+        if(spinner!=null){
+            if(value == spinner.getValue()){
+                spinner.setModel(new SpinnerNumberModel(value, ((SpinnerNumberModel) spinner.getModel()).getMinimum(), ((SpinnerNumberModel) spinner.getModel()).getMaximum(), 1));
+                spinner.setEnabled(!b);
+                spinner.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
+                spinner.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
+            }
+            else {
+                spinner.setValue(val);
+                spinner.setEnabled(!b);
+            }
         }
     }
 

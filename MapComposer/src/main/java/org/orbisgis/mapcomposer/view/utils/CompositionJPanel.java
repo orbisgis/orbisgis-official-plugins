@@ -141,6 +141,10 @@ public class CompositionJPanel extends JPanel{
             uic.unselectGE(ge);
         else
             uic.selectGE(ge);
+
+        this.moveDirection = MoveDirection.NONE;
+        this.moveMode=MoveMode.NONE;
+        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
@@ -211,6 +215,10 @@ public class CompositionJPanel extends JPanel{
     * @param p Location on screen of the mouse when it's released.
     */
     public void mouseReleasedHub(Point p){
+        //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
+        if(p.x==startX && p.y==startY)
+            return;
+
         if(moveDirection==MoveDirection.CENTER) {
             ge.setX(ge.getX() - startX + p.x);
             ge.setY(ge.getY() - startY + p.y);
@@ -243,8 +251,7 @@ public class CompositionJPanel extends JPanel{
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;
         }
-
-    uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
     }
 
      /**
