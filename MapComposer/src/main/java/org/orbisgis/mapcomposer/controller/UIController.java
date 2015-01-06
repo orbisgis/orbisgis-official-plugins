@@ -14,10 +14,9 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
-import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
-import org.orbisgis.mapcomposer.view.utils.DialogProperties;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
 import java.io.File;
@@ -26,10 +25,13 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 
+import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
+import org.orbisgis.sif.SIFDialog;
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.UIPanel;
+import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
@@ -117,79 +119,86 @@ public class UIController{
             zIndexStack.remove(ge);
         }
         temp = new Stack<>();
+
         //Move the others GE
-        for(GraphicalElement ge : selectedGE){
-            if(zIndexStack.contains(ge)){
-                switch (z){
-                    case TO_BACK:
-                        temp.push(ge);
-                        moveToBackFront(ge, temp);
-                        break;
-                    case TO_FRONT:
-                        moveToBackFront(ge, temp);
-                        temp.push(ge);
-                        break;
-                    case FRONT:
-                        if(zIndexStack.indexOf(ge)>0)
-                            moveBackFront(1, ge, temp);
-                        break;
-                    case BACK:
-                        if(zIndexStack.indexOf(ge)<zIndexStack.size()-1)
-                            moveBackFront(-1, ge, temp);
-                        break;
+        //In each cases : first sort the GE from the selectedGE list,
+        //Then place each GE at the good index in the stack.
+        switch (z){
+            case TO_FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(0, ge);
                 }
-            }
+                break;
+            case FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) > 0) {
+                        int index = temp.indexOf(ge) - 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) < zIndexStack.size() - 1) {
+                        int index = temp.indexOf(ge) + 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case TO_BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(ge);
+                }
+                break;
         }
+
         //Add to the stack the GE of the front
-        while(!tempFront.empty())
-            zIndexStack.push(tempFront.pop());
-        while(!temp.empty())
-            zIndexStack.push(temp.pop());
+        zIndexStack.addAll(tempFront);
         //Add to the stack the GE of the back
-        while(!tempBack.empty())
-            zIndexStack.push(tempBack.pop());
+        zIndexStack.addAll(tempBack);
         //Set the z-index of the GE from their stack position
         for(GraphicalElement ge : zIndexStack){
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         }
         validateSelectedGE();
-    }
-    
-    /**
-     * Move the GraphicalElement one step to the front or back and set its index.
-     * @param deltaZ Variation of the Z-index of the GE.
-     * @param ge GraphicalElement to move.
-     * @param geStack Temporary stack.
-     */
-    private void moveBackFront(int deltaZ, GraphicalElement ge, Stack<GraphicalElement> geStack){
-        //Get the target index in the temporary stack (reverse order of the class stack)
-        int target = zIndexStack.size()-(zIndexStack.indexOf(ge)-deltaZ);
-        zIndexStack.remove(ge);
-        int i=1;
-
-        //While the object stack isn't empty, push element in the temporary stack.
-        while(!zIndexStack.empty()){
-            //Push the GE at the write index.
-            if(i==target)
-                geStack.push(ge);
-            else
-                geStack.push(zIndexStack.pop());
-            i++;
-        }
-        //If the GE has the higher index, it isn't already pushed.
-        if(!geStack.contains(ge))
-            geStack.push(ge);
-    }   
-    
-    /**
-     * Move the GraphicalElement to the front or back and set its index.
-     * @param ge GraphicalElement to move.
-     * @param geStack Temporary stack.
-     */
-    private void moveToBackFront(GraphicalElement ge, Stack<GraphicalElement> geStack){
-        zIndexStack.remove(ge);
-        while(!zIndexStack.empty())
-            geStack.push(zIndexStack.pop());
     }
     
     /**
@@ -264,6 +273,7 @@ public class UIController{
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
+
     }
 
     /**
@@ -290,7 +300,7 @@ public class UIController{
 
     /**
      * Reads a list of ConfigurationAttribute and set the GraphicalElement with it.
-     * This action is done when the button validate of the DialogProperties is clicked.
+     * This action is done when the button validate of the properties dialog is clicked.
      * @param caList List of ConfigurationAttributes to read.
      */
     public void validateCAList(List<ConfigurationAttribute> caList) {
@@ -396,9 +406,10 @@ public class UIController{
         try {
             removeAllGE();
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            for(GraphicalElement ge : list){
-                addGE(ge);
-            }
+            //Add all the GE starting from the last one (to get the good z-index)
+            for(int i=list.size()-1; i>=0; i--)
+                addGE(list.get(i));
+            mainWindow.getCompositionArea().refresh();
         } catch (ParserConfigurationException|SAXException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
@@ -440,7 +451,7 @@ public class UIController{
             //If the image has an already set path value, get the image ratio
             if(newGE instanceof SimpleIllustrationGE) {
                 File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                if(f.exists()) {
+                if(f.exists() && f.isFile()) {
                     try {
                         BufferedImage bi = ImageIO.read(f);
                         mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
@@ -467,7 +478,7 @@ public class UIController{
             newGE.setHeight(height);
             addGE(newGE);
         }
-        mainWindow.getCompositionArea().setOverlayEnable(false);
+        mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
     }
     
@@ -580,8 +591,12 @@ public class UIController{
         if(selectedGE.size()>0){
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             toBeSet.addAll(selectedGE);
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, selectedGE.size()>1);
-            dp.setVisible(true);
+            //Create and show the properties dialog.
+            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
+            dialog.setVisible(true);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
         }
     }
 
@@ -590,8 +605,12 @@ public class UIController{
      */
     public void showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
-        DialogProperties dp = new DialogProperties(ge.getAllAttributes(), this, false);
-        dp.setVisible(true);
+        //Create and show the properties dialog.
+        UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+        SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
+        dialog.setVisible(true);
+        dialog.pack();
+        dialog.setAlwaysOnTop(true);
     }
     
     /**
@@ -609,8 +628,12 @@ public class UIController{
             for(GraphicalElement graph : selectedGE)
                 unselectGE(graph);
             toBeSet.add(doc);
-            DialogProperties dp = new DialogProperties(getCommonAttributes(), this, false);
-            dp.setVisible(true);
+            //Create and show the properties dialog.
+            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
+            dialog.setVisible(true);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
         }
     }
 
@@ -649,7 +672,6 @@ public class UIController{
             }
         }
         validateSelectedGE();
-        mainWindow.getCompositionArea().refresh();
     }
     
     /**
@@ -657,30 +679,11 @@ public class UIController{
      */
     public void export(){
         //Creates and sets the file chooser
-        JFileChooser fc = new JFileChooser();
-        fc.setCurrentDirectory(new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()));
-        fc.setDialogType(JFileChooser.CUSTOM_DIALOG);
-        fc.setDialogTitle("Export document into PNG");
-        fc.setFileSelectionMode(JFileChooser.FILES_ONLY);
-        fc.setFileFilter(new FileFilter() {
-
-            @Override public boolean accept(File file) {
-                if(file.isDirectory()) return true;
-                return file.getAbsolutePath().toLowerCase().contains(".png");
-            }
-
-            @Override public String getDescription() {return "PNG Files (.png)";}
-        });
-
-        //If the saveProject is validated, do the export
-        if(fc.showDialog(new JFrame(), "Export")==JFileChooser.APPROVE_OPTION){
-            //Sets the path of the new file
-            String path;
-            if(fc.getSelectedFile().exists() && fc.getSelectedFile().isFile())
-                path=fc.getSelectedFile().getAbsolutePath();
-            else 
-                path=fc.getSelectedFile().getAbsolutePath()+".png";
-
+        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
+        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+        saveFilePanel.loadState();
+        if(UIFactory.showDialog(saveFilePanel)){
+            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
 
             try{
                 //Removes the border, does the export, then adds them again
@@ -688,7 +691,7 @@ public class UIController{
                     elementJPanelMap.get(ge).enableBorders(false);
                 }
                 ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
-                
+
                 for(GraphicalElement ge : zIndexStack){
                     elementJPanelMap.get(ge).enableBorders(true);
                 }

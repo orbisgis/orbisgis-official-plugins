@@ -18,7 +18,9 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     /*Point where the mouse is released.*/
     private Point end;
     private UIController uiController;
-    private boolean enable;
+
+    public enum Mode{NEW_GE, RESIZE_GE, NONE}
+    private Mode mode;
 
     /** This value is the ratio between width and height of the new GraphicalElement (width/height).
      * If it's negative, it means that there is not ratio to respect.
@@ -31,8 +33,8 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
      */
     public CompositionAreaOverlay(UIController uiController){
         this.uiController = uiController;
-        enable = false;
         ratio = -1;
+        mode = null;
     }
 
     /**
@@ -44,22 +46,63 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     }
 
     /**
-     * Enable or disable itself.
-     * @param enable
+     * Set the start point of the rectangle drawn
+     * @param start
      */
-    public void setEnable(boolean enable) {
-        this.enable = enable;
+    public void setStart(Point start) {
+        this.start = start;
     }
 
+    /**
+     * Set the end point of the rectangle drawn
+     * @param end
+     */
+    public void setEnd(Point end) {
+        this.end = end;
+    }
+
+    /**
+     * Set the mode of the overlay : NONE if nothing should be drawn, NEW_GE if a new GraphicalElement is drawn by the user, RESIZE_GE if the user is resizing an element.
+     * @param mode
+     */
+    public void setMode(Mode mode) {
+        this.mode = mode;
+    }
 
     @Override
     public void paint (Graphics g, JComponent c) {
         super.paint(g, c);
-        if (enable){
+        if (mode == Mode.NEW_GE){
             if (start != null && end != null) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 float[] dash = {10.0f};
                 g2.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER,10.0f,dash,0.0f));
+                int x, y;
+                float width, height;
+                //If the ratio in negative, there is no need to respect it
+                if(ratio<=0) {
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = Math.abs(end.x - start.x);
+                    height = Math.abs(end.y - start.y);
+                }
+                //if the ratio is positive, the new GE bounding box have to respect it.
+                else{
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
+                    width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
+                    height = width/ratio;
+
+                }
+                g2.drawRect(x, y, (int)width, (int)height);
+                g2.dispose();
+            }
+        }
+        if (mode == Mode.RESIZE_GE){
+            if (start != null && end != null) {
+                Graphics2D g2 = (Graphics2D) g.create();
+                float[] dash = {10.0f};
+                g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
                 int x, y;
                 float width, height;
                 //If the ratio in negative, there is no need to respect it
@@ -86,9 +129,9 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     @Override
     protected void processMouseMotionEvent(MouseEvent e, JLayer<? extends JComponent> l) {
         //If the LayerUI is disable, it doesn't consume the mouse event.
-        if(!enable)
+        if(mode == Mode.NONE)
             super.processMouseMotionEvent(e, l);
-        else {
+        else if(mode == Mode.NEW_GE) {
             if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
                 end = new Point(e.getLocationOnScreen().x - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
                                 e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
@@ -96,21 +139,24 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
             }
             e.consume();
         }
+        else if(mode == Mode.RESIZE_GE){
+            super.processMouseMotionEvent(e, l);
+            l.repaint();
+        }
     }
 
     @Override
     protected void processMouseEvent(MouseEvent e, JLayer<? extends JComponent> l) {
         //If the LayerUI is disable, it doesn't consume the mouse event.
-        if(!enable)
+        if(mode == Mode.NONE)
             super.processMouseEvent(e, l);
-        else {
+        else if(mode == Mode.NEW_GE) {
             if (e.getID() == MouseEvent.MOUSE_PRESSED) {
                 //Get the click location on the screen an save the location in the compositionArea
                 start = new Point(  e.getLocationOnScreen().x - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
                                     e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
                 if(!e.isShiftDown())
                     ratio=-1;
-                l.repaint();
             }
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
                 int x, y;
@@ -131,12 +177,20 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
                 }
                 uiController.setNewGE(x, y, (int)width, (int)height);
-                l.repaint();
                 start=null;
                 end=null;
                 ratio=-1;
             }
             e.consume();
+        }
+        else if(mode == Mode.RESIZE_GE){
+            super.processMouseEvent(e, l);
+            if (e.getID() == MouseEvent.MOUSE_RELEASED) {
+                start = null;
+                end = null;
+                ratio = -1;
+                l.repaint();
+            }
         }
     }
 

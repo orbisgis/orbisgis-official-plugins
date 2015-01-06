@@ -14,15 +14,11 @@ public class Orientation extends SimpleCartoGE{
     
     /** Icon of the orientation*/
     private SourceCA icon;
-
-    /** Last icon path used by a SimpleIllustrationGE **/
-    private static String lastPathSet = "";
     
     /**Main constructor*/
     public Orientation(){
         super();
         icon = new SourceCA("Path", false);
-        icon.setValue(lastPathSet);
     }
 
     /**
@@ -37,7 +33,6 @@ public class Orientation extends SimpleCartoGE{
      */
     public void setIconPath(String path) {
         icon.setValue(path);
-        lastPathSet = path;
     }
 
     @Override
@@ -59,9 +54,7 @@ public class Orientation extends SimpleCartoGE{
     @Override
     public void setAttribute(ConfigurationAttribute ca) {
         super.setAttribute(ca);
-        if(ca.getName().equals(icon.getName())) {
+        if(ca.getName().equals(icon.getName()))
             icon = (SourceCA) ca;
-            lastPathSet = ((SourceCA) ca).getValue();
-        }
     }
 }

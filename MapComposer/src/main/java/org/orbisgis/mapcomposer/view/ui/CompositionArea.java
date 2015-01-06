@@ -48,10 +48,10 @@ public class CompositionArea extends JPanel{
 
     /**
      * Enable or disable the CompositionAreaOverlay.
-     * @param bool If true enable the overlay, disable it otherwise
+     * @param mode If true enable the overlay, disable it otherwise
      */
-    public void setOverlayEnable(boolean bool){
-        ((CompositionAreaOverlay)layerUI).setEnable(bool);
+    public void setOverlayMode(CompositionAreaOverlay.Mode mode){
+        ((CompositionAreaOverlay)layerUI).setMode(mode);
     }
     
     /**
@@ -69,7 +69,6 @@ public class CompositionArea extends JPanel{
     public void removeGE(CompositionJPanel panel){
         if(this.panel.isAncestorOf(panel))
             this.panel.remove(panel);
-        refresh();
     }
     
     /**
@@ -80,8 +79,6 @@ public class CompositionArea extends JPanel{
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.panel.setPreferredSize(this.dimension);
-        this.revalidate();
-        this.repaint();
     }
 
     /**
@@ -98,7 +95,7 @@ public class CompositionArea extends JPanel{
      */
     public void removeAllGE() {
         panel.removeAll();
-        refresh();
+        panel.revalidate();
     }
     
     /**

@@ -145,25 +145,48 @@ public class CompositionJPanel extends JPanel{
         
         startX = me.getLocationOnScreen().x;
         startY = me.getLocationOnScreen().y;
-        
-        if(me.getY()<=margin && me.getX()<=margin)
+
+        Point start = new Point(0, 0);
+
+        if(me.getY()<=margin && me.getX()<=margin) {
             moveDirection = MoveDirection.TOP_LEFT;
-        else if(me.getX()<=margin && me.getY()>=newHeight-margin)
+            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
+        }
+        else if(me.getX()<=margin && me.getY()>=newHeight-margin) {
             moveDirection = MoveDirection.BOTTOM_LEFT;
-        else if(me.getY()>=newHeight-margin && me.getX()>=newWidth-margin)
+            start = new Point(this.getX()+this.getWidth()-1, this.getY());
+        }
+        else if(me.getY()>=newHeight-margin && me.getX()>=newWidth-margin) {
             moveDirection = MoveDirection.BOTTOM_RIGHT;
-        else if(me.getX()>=newWidth-margin && me.getY()<=margin)
+            start = new Point(this.getX(), this.getY());
+        }
+        else if(me.getX()>=newWidth-margin && me.getY()<=margin) {
             moveDirection = MoveDirection.TOP_RIGHT;
-        else if(me.getY()<=margin)
+            start = new Point(this.getX(), this.getY()+this.getHeight()-1);
+        }
+        else if(me.getY()<=margin) {
             moveDirection = MoveDirection.TOP;
-        else if(me.getX()<=margin)
+            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
+        }
+        else if(me.getX()<=margin) {
             moveDirection = MoveDirection.LEFT;
-        else if(me.getY()>=newHeight-margin)
+            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
+        }
+        else if(me.getY()>=newHeight-margin) {
             moveDirection = MoveDirection.BOTTOM;
-        else if(me.getX()>=newWidth-margin)
+            start = new Point(this.getX(), this.getY());
+        }
+        else if(me.getX()>=newWidth-margin) {
             moveDirection = MoveDirection.RIGHT;
+            start = new Point(this.getX(), this.getY());
+        }
         else
             moveDirection = MoveDirection.CENTER;
+
+        if(moveDirection != MoveDirection.CENTER){
+            uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.RESIZE_GE);
+            uic.getMainWindow().getCompositionArea().getOverlay().setStart(start);
+        }
     }
 
      /**
@@ -184,6 +207,7 @@ public class CompositionJPanel extends JPanel{
                  mouseReleasedNONE(p);
                  break;
          }
+         uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
      }
 
      /**
@@ -250,7 +274,7 @@ public class CompositionJPanel extends JPanel{
                  ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
                  ge.setY(ge.getY() - (startY - p.y));
                  //Adapt the width
-                 ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                 ge.setX(ge.getX() - (int) (ge.getHeight() / ration - ge.getWidth()));
                  ge.setWidth((int) (ge.getHeight() / ration));
                  break;
              case TOP_LEFT:
@@ -268,7 +292,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
                      ge.setX(ge.getX() - (startX - p.x));
                      //Adapt the width
-                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()) / 2);
+                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
@@ -277,7 +301,7 @@ public class CompositionJPanel extends JPanel{
                  ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
                  ge.setX(ge.getX() - (startX - p.x));
                  //Adapt the height
-                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
+                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()));
                  ge.setHeight((int) (ge.getWidth() * ration));
                  break;
              case BOTTOM_LEFT:
@@ -286,7 +310,7 @@ public class CompositionJPanel extends JPanel{
                      //Set the new height
                      ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
                      //Adapt the width
-                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
+                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
                      ge.setWidth((int) (ge.getHeight() / ration));
                  }
                  else{
@@ -294,7 +318,6 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
                      ge.setX(ge.getX() - (startX - p.x));
                      //Adapt the height
-                     ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
@@ -302,7 +325,6 @@ public class CompositionJPanel extends JPanel{
                  //Set the new height
                  ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
                  //Adapt the width
-                 ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
                  ge.setWidth((int) (ge.getHeight() / ration));
                  break;
              case BOTTOM_RIGHT:
@@ -311,7 +333,6 @@ public class CompositionJPanel extends JPanel{
                      //Set the new height
                      ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
                      //Adapt the width
-                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
                      ge.setWidth((int) (ge.getHeight() / ration));
                      break;
                  }
@@ -319,7 +340,6 @@ public class CompositionJPanel extends JPanel{
                      //Set the new width
                      ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
                      //Adapt the height
-                     ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
@@ -327,7 +347,6 @@ public class CompositionJPanel extends JPanel{
                  //Set the new width
                  ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
                  //Adapt the height
-                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()) / 2);
                  ge.setHeight((int) (ge.getWidth() * ration));
                  break;
              case TOP_RIGHT :
@@ -337,14 +356,13 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
                      ge.setY(ge.getY() - (startY - p.y));
                      //Adapt the width
-                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()) / 2);
                      ge.setWidth((int) (ge.getHeight() / ration));
                  }
                  else{
                      //Set the new width
                      ge.setWidth(Math.abs(-(startX - p.x) + ge.getWidth()));
                      //Adapt the height
-                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()) / 2);
+                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
@@ -481,15 +499,110 @@ public class CompositionJPanel extends JPanel{
      }
 
     /**
-     * Refresh the panel position when it's dragged.
+     * Refresh the panel position when the mouse is dragged dragged.
      * @param p Location of the mouse inside the panel.
      */
     public void mouseDragged(Point p) {
+        //if the user just want to move the element
         if (moveDirection == MoveDirection.CENTER) {
             double rad = Math.toRadians(ge.getRotation());
             final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
             final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
             this.setBounds(ge.getX()+(ge.getWidth()-(int)newWidth)/2+p.x-startX, ge.getY()+(ge.getHeight()-(int)newHeight)/2+p.y-startY, this.getWidth(), this.getHeight());
+        }
+        //If the user is resizing the element
+        else{
+            //Get the position of the mouse in the COmpositionArea
+            Point end = new Point(p.x - uic.getMainWindow().getCompositionArea().getLocationOnScreen().x, p.y - uic.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+            //If the user want to resize by saving the element width/height ratio
+            if(moveMode==MoveMode.SHIFT){
+                float ratio = (float)this.getHeight()/this.getWidth();
+                int x = end.x, y = end.y;
+                int width, height;
+                switch (moveDirection){
+                    case TOP :
+                        x = (this.getX()+this.getWidth())+(int)((end.y-(this.getY()+this.getHeight()))/ratio);
+                        break;
+                    case RIGHT:
+                        y = (this.getY()+this.getHeight())+(int)((end.x-(this.getX()+this.getWidth()))*ratio);
+                        break;
+                    case BOTTOM:
+                        x = (this.getX()+this.getWidth())+(int)((end.y-(this.getY()+this.getHeight()))/ratio);
+                        break;
+                    case LEFT:
+                        y = (this.getY()+this.getHeight())+(int)((end.x-(this.getX()+this.getWidth()))*ratio);
+                        break;
+                    case BOTTOM_LEFT:
+                        width = Math.abs(end.x-(this.getX()+this.getWidth()));
+                        height = Math.abs(end.y-this.getY());
+                        if(width*ratio>height) {
+                            x = end.x;
+                            y = this.getY()+(int)(width*ratio);
+                        }
+                        else {
+                            x = this.getX()+this.getWidth()-(int)(height/ratio);
+                            y = end.y;
+                        }
+                        break;
+                    case BOTTOM_RIGHT:
+                        width = Math.abs(end.x-this.getX());
+                        height = Math.abs(end.y-this.getY());
+                        if(width*ratio>height) {
+                            x = end.x;
+                            y = this.getY()+(int)(width*ratio);
+                        }
+                        else {
+                            x = this.getX()+(int)(height/ratio);
+                            y = end.y;
+                        }
+                        break;
+                    case TOP_LEFT:
+                        width = Math.abs(end.x-(this.getX()+this.getWidth()));
+                        height = Math.abs(end.y-(this.getY()+this.getHeight()));
+                        if(width*ratio>height) {
+                            x = (this.getX() + this.getWidth()) + (int) ((end.y - (this.getY() + this.getHeight())) / ratio);
+                            x = end.x;
+                            y = this.getY()+this.getHeight()-(int)(width*ratio);
+                        }
+                        else {
+                            y = (this.getY() + this.getHeight()) + (int) ((end.x - (this.getX() + this.getWidth())) * ratio);
+                            x = this.getX() + this.getWidth() - (int) (height / ratio);
+                            y = end.y;
+                        }
+                        break;
+                    case TOP_RIGHT:
+                        width = Math.abs(end.x-this.getX());
+                        height = Math.abs(end.y-(this.getY()+this.getHeight()));
+                        if(width*ratio>height) {
+                            x = end.x;
+                            y = this.getY()+this.getHeight()-(int)(width*ratio);
+                        }
+                        else {
+                            x = this.getX()+(int)(height/ratio);
+                            y = end.y;
+                        }
+                        break;
+                }
+                end = new Point(x, y);
+            }
+            //If the element size ratio is not important
+            else{
+                switch (moveDirection){
+                    case TOP :
+                        end = new Point(this.getX(), end.y);
+                        break;
+                    case RIGHT:
+                        end = new Point(end.x, this.getY()+this.getHeight()-1);
+                        break;
+                    case BOTTOM:
+                        end = new Point(this.getX()+this.getWidth()-1, end.y);
+                        break;
+                    case LEFT:
+                        end = new Point(end.x, this.getY());
+                        break;
+                }
+            }
+            uic.getMainWindow().getCompositionArea().getOverlay().setEnd(end);
         }
     }
 
