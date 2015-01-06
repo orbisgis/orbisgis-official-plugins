@@ -10,7 +10,7 @@ import java.beans.PropertyChangeEvent;
 /**
  * This class extends the LayerUI an is used to show an animated image to indicate that the GraphicalElement rendering is running.
  */
-class WaitLayerUI extends LayerUI<JPanel> implements ActionListener {
+public class WaitLayerUI extends LayerUI<JPanel> implements ActionListener {
     private boolean running;
     private boolean fadingOut;
 

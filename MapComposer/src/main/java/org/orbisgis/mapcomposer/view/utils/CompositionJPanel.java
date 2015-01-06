@@ -59,8 +59,6 @@ public class CompositionJPanel extends JPanel{
 
     private BufferedImage contentImage;
 
-    private static int i = 0;
-
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
@@ -130,7 +128,6 @@ public class CompositionJPanel extends JPanel{
     }
 
     public void modify(int x, int y, int width, int height, int rotation){
-        System.out.println(i);
         final double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
         final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
@@ -175,7 +172,6 @@ public class CompositionJPanel extends JPanel{
         this.setOpaque(false);
         panel.setOpaque(false);
         setBorders();
-        i++;
     }
 
     /**

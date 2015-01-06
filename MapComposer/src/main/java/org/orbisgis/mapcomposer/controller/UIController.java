@@ -19,12 +19,17 @@ import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Dimension;
 import java.awt.image.BufferedImage;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.imageio.ImageIO;
+import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.orbisgis.mapcomposer.view.utils.RenderWorker;
@@ -69,6 +74,9 @@ public class UIController{
 
     /** Instance of the new GraphicalElement to create. */
     private GraphicalElement newGE;
+
+    /** Executor used for the RenderWorkers. */
+    private ExecutorService executorService;
     
     /**
      * Main constructor.
@@ -83,6 +91,7 @@ public class UIController{
         zIndexStack = new Stack<>();
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
+        executorService = Executors.newFixedThreadPool(1);
     }
     
     public MainWindow getMainWindow() { return mainWindow; }
@@ -274,7 +283,6 @@ public class UIController{
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
-
     }
 
     /**
@@ -317,7 +325,8 @@ public class UIController{
     public void redrawGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        RenderWorker worker = new RenderWorker(this, elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        unselectGE(ge);
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
         worker.execute();
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
@@ -451,8 +460,8 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        RenderWorker worker = new RenderWorker(this, elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-        worker.execute();
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        executorService.submit(worker);
         zIndexStack.push(ge);
         //Apply the z-index change to only the GraphicalElement ge.
         List temp = selectedGE;
@@ -702,29 +711,51 @@ public class UIController{
     }
     
     /**
-     * Export to document into png file.
+     * Exports to document into png file.
+     * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
+     * Then exports the CompositionArea.
      */
     public void export(){
-        //Creates and sets the file chooser
-        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
-        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-        saveFilePanel.loadState();
-        if(UIFactory.showDialog(saveFilePanel)){
-            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
+        //Render again all the GE. All the RenderWorkers are saved into a list and the export will be done only when all will be terminated.
+        RenderWorker lastRenderWorker = null;
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+            executorService.submit(rw);
+            lastRenderWorker = rw;
+        }
+        executorService.shutdown();
 
-            try{
-                //Removes the border, does the export, then adds them again
-                for(GraphicalElement ge : zIndexStack){
-                    elementJPanelMap.get(ge).enableBorders(false);
-                }
-                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+        //Add to the last RenderWorker a listener to open a saveFilePanel just after the rendering is done
+        if(lastRenderWorker!=null) {
+            lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                    //Verify if the property state is at DONE
+                    if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
+                        //Creates and sets the file chooser
+                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
+                        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+                        saveFilePanel.loadState();
+                        if(UIFactory.showDialog(saveFilePanel)){
+                            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
 
-                for(GraphicalElement ge : zIndexStack){
-                    elementJPanelMap.get(ge).enableBorders(true);
+                            try{
+                                //Removes the border, does the export, then adds them again
+                                for(GraphicalElement ge : zIndexStack){
+                                    elementJPanelMap.get(ge).enableBorders(false);
+                                }
+                                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+
+                                for(GraphicalElement ge : zIndexStack){
+                                    elementJPanelMap.get(ge).enableBorders(true);
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            });
         }
     }
 }

@@ -12,25 +12,21 @@ import java.awt.image.BufferedImage;
  */
 public class RenderWorker extends SwingWorker{
 
-    private UIController uic;
     private CompositionJPanel compPanel;
     private GERenderer geRenderer;
     private GraphicalElement ge;
 
     /**
      * Main Constructor
-     * @param uic
      * @param compPanel CompositionPanel where the GraphicalElement should be rendered.
      * @param geRenderer Renderer to use to render the GraphicalElement.
      * @param ge GraphicalElement to render
      */
-    public RenderWorker(UIController uic, CompositionJPanel compPanel, GERenderer geRenderer, GraphicalElement ge){
-        this.uic = uic;
+    public RenderWorker(CompositionJPanel compPanel, GERenderer geRenderer, GraphicalElement ge){
         this.compPanel = compPanel;
         this.geRenderer = geRenderer;
         this.ge = ge;
     }
-
 
     @Override
     protected Object doInBackground() throws Exception {
@@ -38,16 +34,10 @@ public class RenderWorker extends SwingWorker{
         compPanel.setEnabled(false);
         compPanel.getWaitLayer().start();
         BufferedImage bi = geRenderer.createImageFromGE(ge);
-        if(!isCancelled()) {
-            compPanel.redraw(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation(), bi);
-            compPanel.getWaitLayer().stop();
-        }
-        return null;
-    }
-
-    @Override
-    protected void done() {
+        compPanel.redraw(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation(), bi);
+        compPanel.getWaitLayer().stop();
         compPanel.setEnabled(true);
+        return null;
     }
 }
 
