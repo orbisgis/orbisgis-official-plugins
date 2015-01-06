@@ -18,7 +18,11 @@ import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
@@ -483,10 +487,10 @@ public class UIController{
     }
 
     /**
-     * Creates a new GraphicalElement with the class given in parameters.
+     * DOes the instantiation of the new GraphicalElement and open the configuration dialog.
      * @param newGEClass
      */
-    public void createNewGE(Class<? extends GraphicalElement> newGEClass) {
+    public void instantiateGE(Class<? extends GraphicalElement> newGEClass) {
         try {
             newGE = newGEClass.newInstance();
             //Refresh the ConfigurationAttributes to initialize them
@@ -494,22 +498,37 @@ public class UIController{
                 if(ca instanceof RefreshCA)
                     ((RefreshCA)ca).refresh(this);
 
-            showGEProperties(newGE);
-            //If the image has an already set path value, get the image ratio
-            if(newGE instanceof SimpleIllustrationGE) {
-                File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                if(f.exists() && f.isFile()) {
-                    try {
-                        BufferedImage bi = ImageIO.read(f);
-                        mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
+            showGEProperties(newGE).addWindowListener(EventHandler.create(WindowListener.class, this, "drawGE", "", "windowClosed"));;
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+        }
+    }
+
+    /**
+     * Allow the user to draw the size of the new GraphicalElement
+     * @param winEvent
+     */
+    public void drawGE(WindowEvent winEvent){
+        if(winEvent.getSource() instanceof SIFDialog) {
+            SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
+            if(sifDialog.isAccepted()) {
+                //If the image has an already set path value, get the image ratio
+                if (newGE instanceof SimpleIllustrationGE) {
+                    File f = new File(((SimpleIllustrationGE) newGE).getPath());
+                    if (f.exists() && f.isFile()) {
+                        try {
+                            BufferedImage bi = ImageIO.read(f);
+                            mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                        } catch (IOException e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
+                mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            }
+            else{
+                newGE=null;
+            }
         }
     }
 
@@ -650,7 +669,7 @@ public class UIController{
     /**
      * Open a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
      */
-    public void showGEProperties(GraphicalElement ge){
+    public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
         UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
@@ -658,6 +677,7 @@ public class UIController{
         dialog.setVisible(true);
         dialog.pack();
         dialog.setAlwaysOnTop(true);
+        return dialog;
     }
     
     /**

@@ -322,8 +322,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void newComposer(){
         uiController.removeAllGE();
-        uiController.createNewGE(Document.class);
+        uiController.instantiateGE(Document.class);
         uiController.setNewGE(0, 0, 1, 1);
+        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
@@ -339,8 +340,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void addMap(){
         if(uiController.isDocumentCreated()) {
             compositionArea.getOverlay().setRatio(-1);
-            uiController.createNewGE(MapImage.class);
-            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            uiController.instantiateGE(MapImage.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
     }
 
@@ -349,8 +350,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addText(){
         if(uiController.isDocumentCreated()) {
-            uiController.createNewGE(TextElement.class);
-            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(TextElement.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
     }
 
@@ -368,8 +370,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addOrientation(){
         if(uiController.isDocumentCreated()) {
-            uiController.createNewGE(Orientation.class);
-            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Orientation.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
     }
 
@@ -378,8 +381,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addScale(){
         if(uiController.isDocumentCreated()) {
-            uiController.createNewGE(Scale.class);
-            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Scale.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
     }
 
@@ -388,8 +392,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void addPicture() {
         if(uiController.isDocumentCreated()) {
-            uiController.createNewGE(Image.class);
-            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Image.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
     }
     public void drawCircle(){
@@ -435,7 +440,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
     @Override
     public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
-        List<Action> actions = new ArrayList<Action>();
+        List<Action> actions = new ArrayList<>();
         actions.add(new DefaultAction(MENU_MAPCOMPOSER,"Map Composer",
                 new ImageIcon(),
                 EventHandler.create(ActionListener.class,this,"showMapComposer")).setParent(MENU_TOOLS));
