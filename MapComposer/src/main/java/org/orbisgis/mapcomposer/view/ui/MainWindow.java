@@ -337,55 +337,70 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
-        compositionArea.getOverlay().setRatio(-1);
-        uiController.createNewGE(MapImage.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.createNewGE(MapImage.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        }
     }
 
     /**
      * Add a TextElement GraphicalElement to the document.
      */
     public void addText(){
-        uiController.createNewGE(TextElement.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            uiController.createNewGE(TextElement.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        }
     }
 
     /**
      * Add a Legend GraphicalElement to the document.
      */
     public void addLegend(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
 
     /**
      * Add a Orientation GraphicalElement to the document.
      */
     public void addOrientation(){
-        uiController.createNewGE(Orientation.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            uiController.createNewGE(Orientation.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        }
     }
 
     /**
      * Add a Scale GraphicalElement to the document.
      */
     public void addScale(){
-        uiController.createNewGE(Scale.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            uiController.createNewGE(Scale.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        }
     }
 
     /**
      * Add a Image GraphicalElement to the document.
      */
     public void addPicture() {
-        uiController.createNewGE(Image.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            uiController.createNewGE(Image.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        }
     }
     public void drawCircle(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
     public void drawPolygon(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
     public void moveBack(){
         uiController.changeZIndex(ZIndex.TO_BACK);

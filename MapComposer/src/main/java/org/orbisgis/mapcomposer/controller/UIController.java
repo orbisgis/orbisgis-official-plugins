@@ -93,6 +93,17 @@ public class UIController{
         mainWindow = new MainWindow(this);
         executorService = Executors.newFixedThreadPool(1);
     }
+
+    /**
+     * Returns true if the CompositionArea already contain a Document GE, false otherwise.
+     * @return true if a document GE exist, false otherwise.
+     */
+    public boolean isDocumentCreated(){
+        for(GraphicalElement ge : elementJPanelMap.keySet())
+            if(ge instanceof Document)
+                return true;
+        return false;
+    }
     
     public MainWindow getMainWindow() { return mainWindow; }
 
