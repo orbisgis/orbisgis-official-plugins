@@ -61,7 +61,7 @@ public class UIDialogProperties implements UIPanel {
      * Extension of the JPanel used to display the ConfigurationAttributes.
      * It also permit to lock and unlock the fields.
      */
-    private class ConfPanel extends JPanel implements ItemListener {
+    private static class ConfPanel extends JPanel implements ItemListener {
         private final JComponent component;
         private final ConfigurationAttribute ca;
         public ConfPanel(JComponent component, ConfigurationAttribute ca, boolean enableLock){
