@@ -672,7 +672,7 @@ public class UIController{
     public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+        UIPanel panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
         dialog.setVisible(true);
         dialog.pack();
