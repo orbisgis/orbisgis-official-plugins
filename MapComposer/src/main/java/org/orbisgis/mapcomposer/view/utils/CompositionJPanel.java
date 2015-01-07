@@ -127,6 +127,14 @@ public class CompositionJPanel extends JPanel{
         contentImage = affineTransformOp.filter(contentImage, null);
     }
 
+     /**
+      * Modify the bounding box of the panel without redrawing the content image.
+      * @param x X position of the GE represented.
+      * @param y Y position of the GE represented.
+      * @param width Width of the GE represented.
+      * @param height Height of the GE represented.
+      * @param rotation Rotation of the GE represented.
+      */
     public void modify(int x, int y, int width, int height, int rotation){
         final double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage

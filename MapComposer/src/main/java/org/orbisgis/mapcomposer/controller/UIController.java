@@ -689,7 +689,8 @@ public class UIController{
     }
 
     /**
-     * Open a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
+     * Open and return a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
+     * @return The configuration dialog.
      */
     public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
@@ -784,6 +785,8 @@ public class UIController{
             lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                    //Reset the executorService
+                    executorService = Executors.newFixedThreadPool(1);
                     //Verify if the property state is at DONE
                     if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                         //Creates and sets the file chooser
