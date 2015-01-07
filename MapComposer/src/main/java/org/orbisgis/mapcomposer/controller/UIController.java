@@ -237,17 +237,24 @@ public class UIController{
     }
 
     /**
-     * Refresh the JSpinner value with the value from the selected GE.
+     * Refreshes the JSpinner value and state (enable or not) with the values from the selected GEs.
+     * The method test each GraphicalElement from the selectedGE list to know if every single GE property (X and Y position, width, height, rotation) is the same for the GEs.
+     * In the case where a property is the same for all the selected GE, the corresponding spinner is set to the common value and enabled.
+     * In the case where a property is different for the selected GE, the corresponding spinner is set to 0 and disabled.
+     * In the case where no GE are selected, all the spinners are set to 0 and disabled.
      */
     public void refreshSpin(){
+        //Set the default state for the spinner (enabled and value to 0).
         boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
-        int x=0, y=0, w=0, h=0, r=0; 
+        int x=0, y=0, w=0, h=0, r=0;
+        //If GEs are selected, test each
         if(!selectedGE.isEmpty()){
             x=selectedGE.get(0).getX();
             y=selectedGE.get(0).getY();
             w=selectedGE.get(0).getWidth();
             h=selectedGE.get(0).getHeight();
             r=selectedGE.get(0).getRotation();
+            //Test each GE
             for(GraphicalElement graph : selectedGE){
                 if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
                 if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
@@ -256,6 +263,15 @@ public class UIController{
                 if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
             }
         }
+        //If no GE are selected, lock all the spinners
+        else {
+            boolX = true;
+            boolY = true;
+            boolW = true;
+            boolH = true;
+            boolR = true;
+        }
+        //Sets the spinners.
         mainWindow.setSpinner(boolX, x, Property.X);
         mainWindow.setSpinner(boolY, y, Property.Y);
         mainWindow.setSpinner(boolW, w, Property.WIDTH);
