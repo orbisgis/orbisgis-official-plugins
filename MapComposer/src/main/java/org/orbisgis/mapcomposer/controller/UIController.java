@@ -543,6 +543,7 @@ public class UIController{
             newGE.setWidth(width);
             newGE.setHeight(height);
             addGE(newGE);
+            redrawGE(newGE);
         }
         mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
