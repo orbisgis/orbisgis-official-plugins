@@ -519,7 +519,7 @@ public class UIController{
                 if(ca instanceof RefreshCA)
                     ((RefreshCA)ca).refresh(this);
 
-            showGEProperties(newGE).addWindowListener(EventHandler.create(WindowListener.class, this, "drawGE", "", "windowClosed"));;
+            showGEProperties(newGE).addWindowListener(EventHandler.create(WindowListener.class, this, "drawGE", "", "windowClosed"));
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
@@ -530,7 +530,7 @@ public class UIController{
      * @param winEvent
      */
     public void drawGE(WindowEvent winEvent){
-        if(winEvent.getSource() instanceof SIFDialog) {
+        if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
                 //If the image has an already set path value, get the image ratio

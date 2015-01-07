@@ -11,26 +11,13 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Imag
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
@@ -325,7 +312,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
         uiController.removeAllGE();
         uiController.instantiateGE(Document.class);
         uiController.setNewGE(0, 0, 1, 1);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
@@ -442,9 +428,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
     @Override
     public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
         List<Action> actions = new ArrayList<>();
-        actions.add(new DefaultAction(MENU_MAPCOMPOSER,"Map Composer",
+        actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
                 new ImageIcon(MainWindow.class.getResource("map_composer.png")),
-                EventHandler.create(ActionListener.class,this,"showMapComposer")).setParent(MENU_TOOLS));
+                EventHandler.create(ActionListener.class, this, "showMapComposer")).setParent(MENU_TOOLS));
         return actions;
     }
     public void showMapComposer(){this.setVisible(true);}
