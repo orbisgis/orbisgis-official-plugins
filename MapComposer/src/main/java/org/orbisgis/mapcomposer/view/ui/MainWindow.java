@@ -102,6 +102,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.compositionArea = new CompositionArea(uiController);
         //Sets the default size to the window
         this.setSize(1024, 768);
+        this.setIconImage(new ImageIcon(MainWindow.class.getResource("map_composer.png")).getImage());
 
         //Creates the panel containing the two tool bars.
         JPanel toolBarPanel = new JPanel();
@@ -119,7 +120,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog", "configuration.png", uiController, "showDocProperties", null));
         actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uiController, "saveDocument", null));
-        actions.addAction(createAction(LOAD, "", "Load the document", "properties.png", uiController, "loadDocument", null));
+        actions.addAction(createAction(LOAD, "", "Load the document", "load.png", uiController, "loadDocument", null));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));
         addSeparatortTo(IconToolBar);
         actions.addAction(createAction(ADD_MAP, "", "Add a map element", "add_map.png", this, "addMap", null));
@@ -442,7 +443,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
         List<Action> actions = new ArrayList<>();
         actions.add(new DefaultAction(MENU_MAPCOMPOSER,"Map Composer",
-                new ImageIcon(),
+                new ImageIcon(MainWindow.class.getResource("map_composer.png")),
                 EventHandler.create(ActionListener.class,this,"showMapComposer")).setParent(MENU_TOOLS));
         return actions;
     }

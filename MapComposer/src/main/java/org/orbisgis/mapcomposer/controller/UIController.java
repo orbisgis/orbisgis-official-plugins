@@ -396,7 +396,7 @@ public class UIController{
                         BufferedImage bi = ImageIO.read(new File(((SimpleIllustrationGE) newGE).getPath()));
                         mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LoggerFactory.getLogger(UIController.class).error(e.getMessage());
                     }
                 }
             }
@@ -541,7 +541,7 @@ public class UIController{
                             BufferedImage bi = ImageIO.read(f);
                             mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
                         } catch (IOException e) {
-                            e.printStackTrace();
+                            LoggerFactory.getLogger(UIController.class).error(e.getMessage());
                         }
                     }
                 }
