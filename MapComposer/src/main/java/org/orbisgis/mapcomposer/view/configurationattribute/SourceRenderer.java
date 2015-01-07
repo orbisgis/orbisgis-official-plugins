@@ -40,17 +40,22 @@ public class SourceRenderer implements CARenderer{
         
         component.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
-        JTextField jtf = new JTextField(sourceCA.getValue());
+        JTextField jtf = new JTextField();
         jtf.setColumns(40);
         //"Save" the CA inside the JTextField
         jtf.getDocument().putProperty("SourceCA", sourceCA);
         //add the listener for the text changes in the JTextField
         jtf.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
-        //Load the last path use in a sourceCA
-        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
-        openFilePanel.addFilter(new String[]{"*"}, "All files");
-        openFilePanel.loadState();
-        jtf.setText(openFilePanel.getCurrentDirectory().getAbsolutePath());
+
+        if(sourceCA.getValue()!="")
+            jtf.setText(sourceCA.getValue());
+        else {
+            //Load the last path use in a sourceCA
+            OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
+            openFilePanel.addFilter(new String[]{"*"}, "All files");
+            openFilePanel.loadState();
+            jtf.setText(openFilePanel.getCurrentDirectory().getAbsolutePath());
+        }
 
         component.add(jtf);
         //Create the button Browse
