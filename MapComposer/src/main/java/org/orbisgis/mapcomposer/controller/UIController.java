@@ -2,6 +2,7 @@ package org.orbisgis.mapcomposer.controller;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -17,10 +18,16 @@ import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
+import org.orbisgis.mapcomposer.view.utils.RenderWorker;
+import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
+import org.orbisgis.sif.SIFDialog;
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.UIPanel;
+import org.orbisgis.sif.components.SaveFilePanel;
+
 import java.awt.Dimension;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
-import java.awt.event.WindowStateListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeEvent;
@@ -32,16 +39,11 @@ import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+
 import javax.imageio.ImageIO;
 import javax.swing.*;
 import javax.xml.parsers.ParserConfigurationException;
 
-import org.orbisgis.mapcomposer.view.utils.RenderWorker;
-import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
-import org.orbisgis.sif.SIFDialog;
-import org.orbisgis.sif.UIFactory;
-import org.orbisgis.sif.UIPanel;
-import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 

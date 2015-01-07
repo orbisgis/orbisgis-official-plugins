@@ -6,7 +6,9 @@ import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
 import javax.swing.*;
 import javax.swing.plaf.LayerUI;
 
@@ -44,6 +46,8 @@ public class CompositionArea extends JPanel{
         layerUI = new CompositionAreaOverlay(uiController);
         jLayer = new JLayer<>(panel, layerUI);
         this.add(jLayer);
+
+        panel.addMouseListener(EventHandler.create(MouseListener.class, uiController, "unselectAllGE", null, "mouseClicked"));
     }
 
     /**
