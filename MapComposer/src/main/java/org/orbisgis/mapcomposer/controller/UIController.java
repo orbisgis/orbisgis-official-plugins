@@ -97,7 +97,10 @@ public class UIController{
         zIndexStack = new Stack<>();
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
+        mainWindow.setLocationRelativeTo(null);
         executorService = Executors.newFixedThreadPool(1);
+
+        UIFactory.setMainFrame(mainWindow);
     }
 
     /**
@@ -696,6 +699,7 @@ public class UIController{
         dialog.setVisible(true);
         dialog.pack();
         dialog.setAlwaysOnTop(true);
+        dialog.setLocationRelativeTo(mainWindow);
         return dialog;
     }
     
