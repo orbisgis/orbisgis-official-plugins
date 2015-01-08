@@ -10,14 +10,16 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import javax.swing.*;
+import javax.swing.event.UndoableEditListener;
 import javax.swing.plaf.LayerUI;
+import javax.swing.undo.UndoableEditSupport;
 
 /**
  * Area for the map document composition.
  * All the GraphicalElement will be drawn inside.
  */
 public class CompositionArea extends JPanel{
-    
+
     /**JScrollPane of the CompositionArea. */
     private final JScrollPane scrollPane;
     
@@ -28,11 +30,10 @@ public class CompositionArea extends JPanel{
     private Dimension dimension = new Dimension(50, 50);
 
     /** LayerUI use (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
-    LayerUI<JComponent> layerUI;
+    private LayerUI<JComponent> layerUI;
 
     /** JLayer used to link the LayerUI and the CompositionArea. */
-    JLayer<JComponent> jLayer;
-    
+    private JLayer<JComponent> jLayer;
     /**
      * Main constructor.
      */
@@ -125,5 +126,4 @@ public class CompositionArea extends JPanel{
     public CompositionAreaOverlay getOverlay(){
         return (CompositionAreaOverlay)layerUI;
     }
-
 }

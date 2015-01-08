@@ -58,6 +58,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String ALIGN_TO_TOP = "ALIGN_TO_TOP";
     public static final String PROPERTIES = "PROPERTIES";
     public static final String DELETE = "DELETE";
+    public static final String UNDO = "UNDO";
+    public static final String REDO = "REDO";
 
     /** ActionCommands for the buttons. */
     private final ActionCommands actions = new ActionCommands();
@@ -134,6 +136,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         addSeparatortTo(IconToolBar);
         actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties", "properties.png", uiController, "showSelectedGEProperties", null));
         actions.addAction(createAction(DELETE, "", "Delete selected elements", "delete.png", uiController, "removeSelectedGE", null));
+        actions.addAction(createAction(UNDO, "", "Undo the last action", "rotation.png", uiController, "undo", null));
+        actions.addAction(createAction(REDO, "", "Redo the last action", "rotation.png", uiController, "redo", null));
         IconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
         //Sets the spinners tool bar.

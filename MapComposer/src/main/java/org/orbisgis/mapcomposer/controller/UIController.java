@@ -26,6 +26,7 @@ import org.orbisgis.sif.UIPanel;
 import org.orbisgis.sif.components.SaveFilePanel;
 
 import java.awt.Dimension;
+import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
@@ -42,6 +43,10 @@ import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
+import javax.swing.event.UndoableEditEvent;
+import javax.swing.event.UndoableEditListener;
+import javax.swing.text.AbstractDocument;
+import javax.swing.undo.*;
 import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.LoggerFactory;
@@ -50,7 +55,7 @@ import org.xml.sax.SAXException;
 /**
  * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
  */
-public class UIController{
+public class UIController implements StateEditable{
 
     /** CAManager */
     private CAManager caManager;
@@ -83,6 +88,8 @@ public class UIController{
 
     /** Executor used for the RenderWorkers. */
     private ExecutorService executorService;
+
+    private UndoManager undoManager;
     
     /**
      * Main constructor.
@@ -99,8 +106,25 @@ public class UIController{
         mainWindow = new MainWindow(this);
         mainWindow.setLocationRelativeTo(null);
         executorService = Executors.newFixedThreadPool(1);
+        undoManager = new UndoManager();
 
         UIFactory.setMainFrame(mainWindow);
+    }
+
+    public void undo(){
+        //undoManager.undo();
+        if(undoManager.canUndo())
+            undoManager.undo();
+        else
+            System.out.println("can't undo");
+    }
+
+    public void redo(){
+        //undoManager.redo();
+        if(undoManager.canRedo())
+            undoManager.redo();
+        else
+            System.out.println("can't redo");
     }
 
     /**
@@ -459,6 +483,13 @@ public class UIController{
         zIndexStack = new Stack<>();
     }
 
+    public void removeGE(GraphicalElement ge) {
+        mainWindow.getCompositionArea().removeGE(elementJPanelMap.get(ge));
+        elementJPanelMap.remove(ge);
+        selectedGE.remove(ge);
+        zIndexStack.remove(ge);
+    }
+
     /**
      * Run saveProject function of the SaveHandler.
      */
@@ -546,6 +577,10 @@ public class UIController{
                     }
                 }
                 mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+
+                List<GraphicalElement> list = new ArrayList<>();
+                list.add(newGE);
+                undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ADD_GE, list, this));
             }
             else{
                 newGE=null;
@@ -728,6 +763,19 @@ public class UIController{
         }
     }
 
+    @Override
+    public void storeState(Hashtable state) {
+        state.put("MW", mainWindow);
+        System.out.println("store "+state.size());
+    }
+
+    @Override
+    public void restoreState(Hashtable state) {
+        System.out.println("restore "+state.size());
+        //mainWindow = (MainWindow) hashtable.get("MW");
+        //mainWindow.getCompositionArea().refresh();
+    }
+
     public enum ZIndex{
         TO_FRONT, FRONT, BACK, TO_BACK;
     }
@@ -813,6 +861,37 @@ public class UIController{
                     }
                 }
             });
+        }
+    }
+
+    public static class UndoableEdit extends AbstractUndoableEdit{
+
+        public enum EditType {ADD_GE};
+
+        private EditType editType;
+        private List<GraphicalElement> listGE;
+        private UIController uic;
+
+        public UndoableEdit(EditType editType, List<GraphicalElement> listGE, UIController uic){
+            this.editType = editType;
+            this.listGE = listGE;
+            this.uic = uic;
+        }
+
+        @Override
+        public void redo() throws CannotRedoException {
+            super.redo();
+            for(GraphicalElement ge : listGE)
+                uic.addGE(ge);
+            uic.getMainWindow().getCompositionArea().refresh();
+        }
+
+        @Override
+        public void undo() throws CannotUndoException {
+            super.undo();
+            for(GraphicalElement ge : listGE)
+                uic.removeGE(ge);
+            uic.getMainWindow().getCompositionArea().refresh();
         }
     }
 }
