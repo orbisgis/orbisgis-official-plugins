@@ -1,3 +1,24 @@
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
+
 package org.orbisgis.mapcomposer.controller;
 
 import static java.lang.Math.cos;
@@ -261,7 +282,7 @@ public class UIController{
             r=selectedGE.get(0).getRotation();
             //Test each GE
             for(GraphicalElement graph : selectedGE){
-                if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
+                if (x != graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
                 if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
                 if(w!=graph.getWidth()){ boolW=true;w=selectedGE.get(0).getWidth();}
                 if(h!=graph.getHeight()){ boolH=true;h=selectedGE.get(0).getHeight();}
@@ -363,7 +384,7 @@ public class UIController{
             ((GERefresh)ge).refresh();
         unselectGE(ge);
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-        worker.execute();
+        executorService.submit(worker);
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -731,7 +752,7 @@ public class UIController{
     public enum ZIndex{
         TO_FRONT, FRONT, BACK, TO_BACK;
     }
-    
+
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
     }
