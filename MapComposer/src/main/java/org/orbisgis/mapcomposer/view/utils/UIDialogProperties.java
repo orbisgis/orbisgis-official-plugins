@@ -31,6 +31,7 @@ import java.awt.*;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.net.URL;
+import java.util.ArrayList;
 import java.util.List;
 
 public class UIDialogProperties implements UIPanel {
@@ -51,9 +52,24 @@ public class UIDialogProperties implements UIPanel {
         panel = new JPanel();
         panel.setLayout(new MigLayout("wrap 1"));
         for(ConfigurationAttribute ca : list){
-            ConfPanel cp = new ConfPanel(uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca), ca, enableLock);
+            JComponent caComponent = new JPanel(new FlowLayout());
+            System.out.println(ca.getName());
+            caComponent.add(new JLabel(ca.getName()));
+            caComponent.add(uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca));
+            ConfPanel cp = new ConfPanel(caComponent, ca, enableLock);
             this.panel.add(cp, "wrap");
         }
+    }
+
+    public UIDialogProperties(UIController uic){
+        this.caList = new ArrayList<>();
+        this.uic = uic;
+        this.panel = new JPanel();
+        panel.setLayout(new MigLayout("wrap 1"));
+    }
+
+    public void addJComponent(JComponent component, ConfigurationAttribute ca, boolean enableLock){
+        panel.add(new ConfPanel(component, ca, enableLock), "span");
     }
 
     @Override

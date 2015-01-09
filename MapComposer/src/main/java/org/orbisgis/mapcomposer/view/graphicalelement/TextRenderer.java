@@ -21,11 +21,19 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
-import java.awt.Color;
-import java.awt.Font;
-import java.awt.Graphics2D;
+import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
+import org.orbisgis.sif.UIPanel;
+
+import javax.swing.*;
+import java.awt.*;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
@@ -74,5 +82,98 @@ public class TextRenderer extends SimpleGERenderer {
         }
 
         return applyRotationToBufferedImage(bi, ge);
+    }
+
+    @Override
+    public UIPanel createConfigurationPanel(GraphicalElement ge, UIController uic) {
+        //Create the UIDialogProperties
+        UIDialogProperties uid = new UIDialogProperties(uic);
+        //Get the GraphicalELement
+        TextElement te = (TextElement)ge;
+
+        //Find the Text ConfigurationAttribute
+        StringCA textCA = null;
+        for(ConfigurationAttribute ca : te.getAllAttributes())
+            if(ca.getValue().equals(te.getText()))
+                textCA = (StringCA)ca;
+        //Set the JPanel of the ca
+        JComponent text = new JPanel();
+        text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
+        JLabel textName = new JLabel(textCA.getName());
+        textName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        text.add(textName);
+        text.add(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA));
+        uid.addJComponent(text, textCA, true);
+
+        //Find the Font ConfigurationAttribute
+        SourceListCA fontCA = null;
+        for(ConfigurationAttribute ca : te.getAllAttributes())
+            if(ca instanceof ListCA)
+                if(((ListCA)ca).getSelected().equals(te.getFont()))
+                    fontCA = (SourceListCA)ca;
+        //Set the JPanel of the ca
+        JComponent font = new JPanel();
+        font.setLayout(new FlowLayout());
+        JLabel fontName = new JLabel(fontCA.getName());
+        fontName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        font.add(fontName);
+        font.add(Box.createHorizontalGlue());
+        font.add(uic.getCAManager().getRenderer(fontCA).createJComponentFromCA(fontCA));
+        uid.addJComponent(font, fontCA, true);
+
+        //Find the Font ConfigurationAttribute
+        IntegerCA fontSizeCA = null;
+        for(ConfigurationAttribute ca : te.getAllAttributes())
+            if(ca.getValue().equals(te.getFontSize()))
+                fontSizeCA = (IntegerCA)ca;
+        //Set the JPanel of the ca
+        JComponent fontSize = new JPanel();
+        fontSize.setLayout(new FlowLayout());
+        JLabel fontSizeName = new JLabel(fontSizeCA.getName());
+        fontSizeName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        fontSize.add(fontSizeName);
+        font.add(Box.createHorizontalGlue());
+        fontSize.add(uic.getCAManager().getRenderer(fontSizeCA).createJComponentFromCA(fontSizeCA));
+        uid.addJComponent(fontSize, fontSizeCA, true);
+
+        //Find the Font ConfigurationAttribute
+        SourceListCA StyleCA = null;
+        for(ConfigurationAttribute ca : te.getAllAttributes())
+            if(ca instanceof ListCA)
+                if (TextElement.Style.BOLD.name() == ((ListCA) ca).getSelected() ||
+                        TextElement.Style.ITALIC.name() == ((ListCA) ca).getSelected() ||
+                        TextElement.Style.PLAIN.name() == ((ListCA) ca).getSelected())
+                    StyleCA = (SourceListCA) ca;
+        //Set the JPanel of the ca
+        JComponent style = new JPanel();
+        style.setLayout(new FlowLayout());
+        JLabel styleName = new JLabel(StyleCA.getName());
+        styleName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        style.add(styleName);
+        style.add(Box.createHorizontalGlue());
+        style.add(uic.getCAManager().getRenderer(StyleCA).createJComponentFromCA(StyleCA));
+        uid.addJComponent(style, StyleCA, true);
+
+
+        //Find the Font ConfigurationAttribute
+        SourceListCA alignmentCA = null;
+        for(ConfigurationAttribute ca : te.getAllAttributes())
+            if(ca instanceof ListCA)
+                if(TextElement.Alignment.CENTER.name() == ((ListCA)ca).getSelected() ||
+                        TextElement.Alignment.LEFT.name() == ((ListCA)ca).getSelected() ||
+                        TextElement.Alignment.RIGHT.name() == ((ListCA)ca).getSelected())
+                        alignmentCA = (SourceListCA)ca;
+        //Set the JPanel of the ca
+        JComponent alignment = new JPanel();
+        alignment.setLayout(new FlowLayout());
+        alignment.setBackground(Color.black);
+        JLabel alignmentName = new JLabel(alignmentCA.getName());
+        alignmentName.setAlignmentX(Component.LEFT_ALIGNMENT);
+        alignment.add(alignmentName);
+        alignment.add(Box.createHorizontalGlue());
+        alignment.add(uic.getCAManager().getRenderer(alignmentCA).createJComponentFromCA(alignmentCA));
+        uid.addJComponent(alignment, alignmentCA, true);
+
+        return uid;
     }
 }

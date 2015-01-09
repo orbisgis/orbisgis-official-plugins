@@ -178,7 +178,7 @@ public class TextElement extends SimpleGE{
      * Sets the alignment of the text
      * @param alignment The new alignment.
      */
-    public void setStyle(Alignment alignment) {this.alignment.select(alignment.name());}
+    public void setAlignment(Alignment alignment) {this.alignment.select(alignment.name());}
     
     
     /**

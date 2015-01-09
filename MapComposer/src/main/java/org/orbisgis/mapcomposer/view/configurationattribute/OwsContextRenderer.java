@@ -49,7 +49,7 @@ public class OwsContextRenderer implements CARenderer{
 
     //Add to the component all the swing components
         OwsContextCA owsContextCA = (OwsContextCA)ca;
-        component.add(new JLabel(owsContextCA.getName()));
+        //component.add(new JLabel(owsContextCA.getName()));
 
         //Display the OwsContextCA into a JComboBox
         JComboBox<String> jcb = new JComboBox(owsContextCA.getValue().toArray());

@@ -23,7 +23,8 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import java.awt.FlowLayout;
+
+import java.awt.*;
 import java.beans.EventHandler;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
@@ -34,9 +35,12 @@ import javax.swing.text.Document;
  * Renderer associated to the Text ConfigurationAttribute.
  * The JPanel returned by the createJComponentFromCA method look like :
  *  _________________________________________________________________
- * |                                  ____________________________   |
- * | NameOfTheConfigurationAttribute |Some text                   |  |
- * |                                 |____________________________|  |
+ * |                                                                 |
+ * | NameOfTheConfigurationAttribute :                               |
+ * |  __________________________________________________             |
+ * | |Some text                                         |            |
+ * | |                                                  |            |
+ * | |__________________________________________________|            |
  * |_________________________________________________________________|
  *
  * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA
@@ -47,14 +51,20 @@ public class StringRenderer implements CARenderer{
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
     //Create the component
         JComponent component = new JPanel();
-        component.setLayout(new FlowLayout(FlowLayout.LEFT));
+        component.setLayout(new BoxLayout(component, BoxLayout.Y_AXIS));
 
     //Add to the component all the swing components
         StringCA stringCA = (StringCA)ca;
-        
-        component.add(new JLabel(stringCA.getName()));
+
+        //JLabel label = new JLabel(stringCA.getName());
+        //label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        //component.add(label);
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        area.setColumns(30);
+        area.setRows(4);
+        area.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         //"Save" the CA inside the JTextField
         area.getDocument().putProperty("StringCA", stringCA);
         area.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));

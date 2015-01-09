@@ -53,7 +53,7 @@ public class MapImageListRenderer implements CARenderer{
     //Add to the component all the swing components
         final MapImageListCA milka = (MapImageListCA)ca;
         
-        component.add(new JLabel(milka.getName()));
+        //component.add(new JLabel(milka.getName()));
         ArrayList<String> names = new ArrayList<>();
         //Display the MapImageListCA into a JComboBox
         for(MapImage mi : milka.getValue())

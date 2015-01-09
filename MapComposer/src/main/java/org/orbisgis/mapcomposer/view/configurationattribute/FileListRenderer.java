@@ -51,7 +51,7 @@ public class FileListRenderer implements CARenderer{
     //Add to the panel all the swing components
         FileListCA fileListCA = (FileListCA)ca;
         
-        component.add(new JLabel(fileListCA.getName()));
+        //component.add(new JLabel(fileListCA.getName()));
         //Display the FileListCA into a JComboBox
         JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
         jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));

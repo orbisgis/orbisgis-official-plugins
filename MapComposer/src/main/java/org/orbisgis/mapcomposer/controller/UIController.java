@@ -698,10 +698,30 @@ public class UIController{
      */
     public void showSelectedGEProperties(){
         if(selectedGE.size()>0){
+            //Test if all the selected GE has the same class or not.
+            boolean hasSameClass = true;
+            for(GraphicalElement ge : selectedGE)
+                if(ge.getClass()!=selectedGE.get(0).getClass())
+                    hasSameClass=false;
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             toBeSet.addAll(selectedGE);
             //Create and show the properties dialog.
-            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            UIPanel panel = null;
+            if(hasSameClass) {
+                //Try to create an equivalent GE with the common attributes
+                try {
+                    GraphicalElement ge = selectedGE.get(0).getClass().newInstance();
+                    List<ConfigurationAttribute> listCA = getCommonAttributes();
+                    for(ConfigurationAttribute ca : listCA) {
+                        ge.setAttribute(ca);
+                    }
+                    panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge, this);
+                } catch (InstantiationException|IllegalAccessException e) {
+                    Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, e);
+                }
+            }
+            else
+                panel = new UIDialogProperties(getCommonAttributes(), this, false);
             SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
             dialog.setVisible(true);
             dialog.pack();
@@ -716,7 +736,9 @@ public class UIController{
     public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        UIPanel panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
+        UIPanel panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge, this);
+        if(panel==null)
+            panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
         dialog.setVisible(true);
         dialog.pack();

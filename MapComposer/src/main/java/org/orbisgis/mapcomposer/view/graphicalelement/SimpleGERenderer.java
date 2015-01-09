@@ -21,7 +21,9 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.sif.UIPanel;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
@@ -70,5 +72,10 @@ public abstract class SimpleGERenderer implements GERenderer {
         //Apply the transform to the bufferedImage an return it
         affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
         return affineTransformOp.filter(bi, null);
+    }
+
+    @Override
+    public UIPanel createConfigurationPanel(GraphicalElement ge, UIController uic) {
+        return null;
     }
 }

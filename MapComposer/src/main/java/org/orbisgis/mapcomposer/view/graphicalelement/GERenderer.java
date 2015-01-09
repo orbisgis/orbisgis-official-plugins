@@ -21,7 +21,10 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.sif.UIPanel;
+
 import java.awt.image.BufferedImage;
 import javax.swing.JPanel;
 
@@ -38,4 +41,12 @@ public interface  GERenderer {
      * @return The buffered image corresponding to the GraphicalElement
      */
     public BufferedImage createImageFromGE(GraphicalElement ge);
+
+    /**
+     * This methods allow to create a custom UIPanel displayed in the configuration dialog.
+     * By default this method must return null to indicate to the application the it should use the default UIPanel.
+     * @param ge GraphicalElement taht configuration is displayed.
+     * @return Null to use the default UIPanel constitution, not null to use a custom one.
+     */
+    public UIPanel createConfigurationPanel(GraphicalElement ge, UIController uic);
 }

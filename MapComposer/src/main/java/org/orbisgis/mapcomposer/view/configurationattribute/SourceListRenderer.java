@@ -50,7 +50,7 @@ public class SourceListRenderer implements CARenderer{
     //Add to the component all the swing components
         SourceListCA sourceListCA = (SourceListCA)ca;
         //Add the name of the ConfigurationAttribute
-        component.add(new JLabel(sourceListCA.getName()));
+        //component.add(new JLabel(sourceListCA.getName()));
 
         JComboBox<String> jcb = new JComboBox(sourceListCA.getValue().toArray(new String[0]));
         jcb.addActionListener(EventHandler.create(ActionListener.class, sourceListCA, "select", "source.selectedItem"));

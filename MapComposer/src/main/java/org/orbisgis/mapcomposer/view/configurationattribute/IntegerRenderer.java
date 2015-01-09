@@ -52,7 +52,7 @@ public class IntegerRenderer implements CARenderer{
     //Add to the panel all the swing components
         IntegerCA integerCA = (IntegerCA)ca;
         
-        component.add(new JLabel(integerCA.getName()));
+        //component.add(new JLabel(integerCA.getName()));
         SpinnerModel model;
         //Display the IntegerCA into a JSpinner
         if(integerCA.getLimits())

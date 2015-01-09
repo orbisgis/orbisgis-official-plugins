@@ -53,7 +53,7 @@ public class ColorRenderer implements CARenderer{
     //Add to the component all the swing components
         final ColorCA colorCA = (ColorCA)ca;
         //Add the name of the ConfigurationAttribute
-        component.add(new JLabel(colorCA.getName()));
+        //component.add(new JLabel(colorCA.getName()));
 
         JButton button = new JButton("Text demo");
         //Display the color in the button background

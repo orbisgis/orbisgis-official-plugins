@@ -59,7 +59,7 @@ public class SourceRenderer implements CARenderer{
     //Add to the component all the swing components
         final SourceCA sourceCA = (SourceCA)ca;
         
-        component.add(new JLabel(sourceCA.getName()));
+        //component.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
         JTextField jtf = new JTextField();
         jtf.setColumns(40);
