@@ -34,14 +34,10 @@ import javax.swing.text.Document;
 /**
  * Renderer associated to the Text ConfigurationAttribute.
  * The JPanel returned by the createJComponentFromCA method look like :
- *  _________________________________________________________________
- * |                                                                 |
- * | NameOfTheConfigurationAttribute :                               |
- * |  __________________________________________________             |
- * | |Some text                                         |            |
- * | |                                                  |            |
- * | |__________________________________________________|            |
- * |_________________________________________________________________|
+ *  __________________________________________________
+ * |Some text                                         |
+ * |                                                  |
+ * |__________________________________________________|
  *
  * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA
  */
@@ -49,16 +45,8 @@ public class StringRenderer implements CARenderer{
 
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the component
-        JComponent component = new JPanel();
-        component.setLayout(new BoxLayout(component, BoxLayout.Y_AXIS));
-
-    //Add to the component all the swing components
         StringCA stringCA = (StringCA)ca;
 
-        //JLabel label = new JLabel(stringCA.getName());
-        //label.setAlignmentX(Component.LEFT_ALIGNMENT);
-        //component.add(label);
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
         area.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -68,9 +56,8 @@ public class StringRenderer implements CARenderer{
         //"Save" the CA inside the JTextField
         area.getDocument().putProperty("StringCA", stringCA);
         area.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
-        component.add(area);
         
-        return component;
+        return area;
     }
 
     /**

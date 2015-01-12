@@ -22,6 +22,7 @@
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
 import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
@@ -39,6 +40,8 @@ import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
 import java.text.AttributedString;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renderer associated to the scale GraphicalElement.
@@ -85,94 +88,139 @@ public class TextRenderer extends SimpleGERenderer {
     }
 
     @Override
-    public UIPanel createConfigurationPanel(GraphicalElement ge, UIController uic) {
-        //Create the UIDialogProperties
-        UIDialogProperties uid = new UIDialogProperties(uic);
-        //Get the GraphicalELement
-        TextElement te = (TextElement)ge;
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
 
+        //Create the UIDialogProperties that will be returned
+        UIDialogProperties uid = new UIDialogProperties(uic);
+        
+        //Add the text configuration elements
         //Find the Text ConfigurationAttribute
         StringCA textCA = null;
-        for(ConfigurationAttribute ca : te.getAllAttributes())
-            if(ca.getValue().equals(te.getText()))
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Text"))
                 textCA = (StringCA)ca;
-        //Set the JPanel of the ca
-        JComponent text = new JPanel();
-        text.setLayout(new BoxLayout(text, BoxLayout.Y_AXIS));
-        JLabel textName = new JLabel(textCA.getName());
-        textName.setAlignmentX(Component.LEFT_ALIGNMENT);
-        text.add(textName);
-        text.add(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA));
-        uid.addJComponent(text, textCA, true);
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> text = new ArrayList<>();
+        JPanel panel = new JPanel();
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        panel.add(new JLabel(textCA.getName()));
+        panel.add(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA));
+        text.add(panel);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(text, textCA, enableLock);
 
         //Find the Font ConfigurationAttribute
         SourceListCA fontCA = null;
-        for(ConfigurationAttribute ca : te.getAllAttributes())
-            if(ca instanceof ListCA)
-                if(((ListCA)ca).getSelected().equals(te.getFont()))
-                    fontCA = (SourceListCA)ca;
-        //Set the JPanel of the ca
-        JComponent font = new JPanel();
-        font.setLayout(new FlowLayout());
-        JLabel fontName = new JLabel(fontCA.getName());
-        fontName.setAlignmentX(Component.LEFT_ALIGNMENT);
-        font.add(fontName);
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Font"))
+                fontCA = (SourceListCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> font = new ArrayList<>();
+        font.add(new JLabel(fontCA.getName()));
         font.add(Box.createHorizontalGlue());
         font.add(uic.getCAManager().getRenderer(fontCA).createJComponentFromCA(fontCA));
-        uid.addJComponent(font, fontCA, true);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(font, fontCA, enableLock);
 
         //Find the Font ConfigurationAttribute
         IntegerCA fontSizeCA = null;
-        for(ConfigurationAttribute ca : te.getAllAttributes())
-            if(ca.getValue().equals(te.getFontSize()))
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Font size"))
                 fontSizeCA = (IntegerCA)ca;
-        //Set the JPanel of the ca
-        JComponent fontSize = new JPanel();
-        fontSize.setLayout(new FlowLayout());
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> fontSize = new ArrayList<>();;
         JLabel fontSizeName = new JLabel(fontSizeCA.getName());
-        fontSizeName.setAlignmentX(Component.LEFT_ALIGNMENT);
         fontSize.add(fontSizeName);
-        font.add(Box.createHorizontalGlue());
-        fontSize.add(uic.getCAManager().getRenderer(fontSizeCA).createJComponentFromCA(fontSizeCA));
-        uid.addJComponent(fontSize, fontSizeCA, true);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        fontSize.add(Box.createHorizontalStrut(100 - fontSizeName.getFontMetrics(fontSizeName.getFont()).stringWidth(fontSizeName.getText())));
+        //Limits the size of the component
+        JSpinner FontSizeSpinner = (JSpinner)uic.getCAManager().getRenderer(fontSizeCA).createJComponentFromCA(fontSizeCA);
+        FontSizeSpinner.setPreferredSize(new Dimension(80, (int) FontSizeSpinner.getPreferredSize().getHeight()));
+        fontSize.add(FontSizeSpinner);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(fontSize, fontSizeCA, enableLock);
 
         //Find the Font ConfigurationAttribute
         SourceListCA StyleCA = null;
-        for(ConfigurationAttribute ca : te.getAllAttributes())
-            if(ca instanceof ListCA)
-                if (TextElement.Style.BOLD.name() == ((ListCA) ca).getSelected() ||
-                        TextElement.Style.ITALIC.name() == ((ListCA) ca).getSelected() ||
-                        TextElement.Style.PLAIN.name() == ((ListCA) ca).getSelected())
-                    StyleCA = (SourceListCA) ca;
-        //Set the JPanel of the ca
-        JComponent style = new JPanel();
-        style.setLayout(new FlowLayout());
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Style"))
+                StyleCA = (SourceListCA) ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> style = new ArrayList<>();
         JLabel styleName = new JLabel(StyleCA.getName());
-        styleName.setAlignmentX(Component.LEFT_ALIGNMENT);
         style.add(styleName);
-        style.add(Box.createHorizontalGlue());
-        style.add(uic.getCAManager().getRenderer(StyleCA).createJComponentFromCA(StyleCA));
-        uid.addJComponent(style, StyleCA, true);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        style.add(Box.createHorizontalStrut(100 - styleName.getFontMetrics(styleName.getFont()).stringWidth(styleName.getText())));
+        JComboBox styleBox = (JComboBox)uic.getCAManager().getRenderer(StyleCA).createJComponentFromCA(StyleCA);
+        //Limits the size of the component
+        styleBox.setPreferredSize(new Dimension(80, (int) styleBox.getPreferredSize().getHeight()));
+        style.add(styleBox);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(style, StyleCA, enableLock);
 
 
         //Find the Font ConfigurationAttribute
         SourceListCA alignmentCA = null;
-        for(ConfigurationAttribute ca : te.getAllAttributes())
-            if(ca instanceof ListCA)
-                if(TextElement.Alignment.CENTER.name() == ((ListCA)ca).getSelected() ||
-                        TextElement.Alignment.LEFT.name() == ((ListCA)ca).getSelected() ||
-                        TextElement.Alignment.RIGHT.name() == ((ListCA)ca).getSelected())
-                        alignmentCA = (SourceListCA)ca;
-        //Set the JPanel of the ca
-        JComponent alignment = new JPanel();
-        alignment.setLayout(new FlowLayout());
-        alignment.setBackground(Color.black);
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Alignment"))
+                alignmentCA = (SourceListCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> alignment = new ArrayList<>();
         JLabel alignmentName = new JLabel(alignmentCA.getName());
-        alignmentName.setAlignmentX(Component.LEFT_ALIGNMENT);
         alignment.add(alignmentName);
-        alignment.add(Box.createHorizontalGlue());
-        alignment.add(uic.getCAManager().getRenderer(alignmentCA).createJComponentFromCA(alignmentCA));
-        uid.addJComponent(alignment, alignmentCA, true);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        alignment.add(Box.createHorizontalStrut(100 - alignmentName.getFontMetrics(alignmentName.getFont()).stringWidth(alignmentName.getText())));
+        JComboBox alignmentBox = (JComboBox)uic.getCAManager().getRenderer(alignmentCA).createJComponentFromCA(alignmentCA);
+        //Limits the size of the component
+        alignmentBox.setPreferredSize(new Dimension(80, (int) alignmentBox.getPreferredSize().getHeight()));
+        alignment.add(alignmentBox);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(alignment, alignmentCA, enableLock);
+
+        //Find the Font ConfigurationAttribute
+        ColorCA textColorCA = null;
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Text color"))
+                textColorCA = (ColorCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> textColor = new ArrayList<>();
+        JLabel textColorName = new JLabel(textColorCA.getName());
+        textColor.add(textColorName);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        textColor.add(Box.createHorizontalStrut(140 - textColorName.getFontMetrics(textColorName.getFont()).stringWidth(textColorName.getText())));
+        textColor.add(uic.getCAManager().getRenderer(textColorCA).createJComponentFromCA(textColorCA));
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(textColor, textColorCA, enableLock);
+
+        //Find the Font ConfigurationAttribute
+        ColorCA backgroundColorCA = null;
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Background color"))
+                backgroundColorCA = (ColorCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> backgroundColor = new ArrayList<>();
+        JLabel backgroundName = new JLabel(backgroundColorCA.getName());
+        backgroundColor.add(backgroundName);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        backgroundColor.add(Box.createHorizontalStrut(140 - backgroundName.getFontMetrics(backgroundName.getFont()).stringWidth(backgroundName.getText())));
+        backgroundColor.add(uic.getCAManager().getRenderer(backgroundColorCA).createJComponentFromCA(backgroundColorCA));
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(backgroundColor, backgroundColorCA, enableLock);
+
+        //Find the Font ConfigurationAttribute
+        IntegerCA alphaCA = null;
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals("Alpha"))
+                alphaCA = (IntegerCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> alpha = new ArrayList<>();
+        alpha.add(new JLabel(alphaCA.getName()));
+        JSpinner alphaSpinner = (JSpinner)uic.getCAManager().getRenderer(alphaCA).createJComponentFromCA(alphaCA);
+        //Limits the size of the component
+        alphaSpinner.setPreferredSize(new Dimension(80, (int) alphaSpinner.getPreferredSize().getHeight()));
+        alpha.add(alphaSpinner);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(alpha, alphaCA, enableLock);
 
         return uid;
     }

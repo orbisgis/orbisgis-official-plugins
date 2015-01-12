@@ -35,6 +35,7 @@ public interface CARenderer {
     /**
      * This method defines how the attribute should be displayed into the configuration window.
      * The ConfigurationAttribute should be displayed into swing component and should permit the user to configure the ConfigurationAttribute.
+     * The component cant be a simple component (like a JComboBox) or a more complex one (A JPanel containing a JTextArea and a JButton).
      * The method need to implement a way to get back the value configured by the user.
      * As example, it can use an ActionListener to se the ConfigurationAttribute with the value when the swing component is modified.
      * @param ca Instance of the attribute to createJComponentFromCA.

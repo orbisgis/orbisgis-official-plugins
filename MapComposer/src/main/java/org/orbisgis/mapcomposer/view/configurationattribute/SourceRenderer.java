@@ -91,6 +91,10 @@ public class SourceRenderer implements CARenderer{
         return component;
     }
 
+    /**
+     * Opens an LoadPanel to permit to the user to select the file to load.
+     * @param event
+     */
     public void openLoadPanel(ActionEvent event){
         OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
         openFilePanel.addFilter(new String[]{"*"}, "All files");

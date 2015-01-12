@@ -21,7 +21,6 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import net.miginfocom.swing.MigLayout;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.sif.UIPanel;
@@ -34,42 +33,73 @@ import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * This class extends the UIPanel class an is used to display a popup windows allowing the user to configure GraphicalElements.
+ * It can be constructed in two ways :
+ * - By giving it the list of ConfigurationAttributes to configure and the class construct itself the displayed UI.
+ * - Adding one by one the different Components and ConfigurationAttributes corresponding to set.
+ */
 public class UIDialogProperties implements UIPanel {
 
-    /** JPanel of the configuration elements. */
+    /** JComponent that will be displayed. */
     private JComponent panel;
 
+    /** List of the ConfigurationAttributes displayed in the panel. */
     private List<ConfigurationAttribute> caList;
 
     /** UIController. */
     private UIController uic;
 
-    public UIDialogProperties(java.util.List<ConfigurationAttribute> list, UIController uic, boolean enableLock) {
-        this.caList = list;
+    /**
+     * Main constructor that build itself the Component to display from the caList of ConfigurationAttribute given
+     * @param caList List of ConfigurationAttributes to set.
+     * @param uic UIController.
+     * @param enableLock If true, checkboxes enabling and disabling the ConfigurationAttributes configuration are displayed. They aren't if false;
+     */
+    public UIDialogProperties(java.util.List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
+        this.caList = caList;
         this.uic=uic;
 
         //Adds to a panel the ConfigurationAttribute
         panel = new JPanel();
-        panel.setLayout(new MigLayout("wrap 1"));
-        for(ConfigurationAttribute ca : list){
-            JComponent caComponent = new JPanel(new FlowLayout());
-            System.out.println(ca.getName());
+        panel.setLayout(new GridBagLayout());
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx=1;
+        for(ConfigurationAttribute ca : caList){
+            List<Component> caComponent = new ArrayList<>();
             caComponent.add(new JLabel(ca.getName()));
             caComponent.add(uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca));
             ConfPanel cp = new ConfPanel(caComponent, ca, enableLock);
-            this.panel.add(cp, "wrap");
+            constraints.gridy=this.panel.getComponentCount();
+            this.panel.add(cp, constraints);
         }
     }
 
+    /**
+     * This constructor must be followed by several calls to the method addComponent(List<>, ConfigurationAttribute, boolean) to constrcut the panel.
+     * @param uic
+     */
     public UIDialogProperties(UIController uic){
         this.caList = new ArrayList<>();
         this.uic = uic;
         this.panel = new JPanel();
-        panel.setLayout(new MigLayout("wrap 1"));
+        panel.setLayout(new GridBagLayout());
     }
 
-    public void addJComponent(JComponent component, ConfigurationAttribute ca, boolean enableLock){
-        panel.add(new ConfPanel(component, ca, enableLock), "span");
+    /**
+     * Add the given ConfigurationAttributes and its representation to the UIDialogProperties.
+     * @param component Component that will be displayed.
+     * @param ca ConfigurationAttribute to configure.
+     * @param enableLock If true, checkboxes enabling and disabling the ConfigurationAttributes configuration are displayed. They aren't if false;
+     */
+    public void addComponent(List<Component> component, ConfigurationAttribute ca, boolean enableLock){
+        caList.add(ca);
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx=1;
+        constraints.gridy=this.panel.getComponentCount();
+        panel.add(new ConfPanel(component, ca, enableLock), constraints);
     }
 
     @Override
@@ -99,11 +129,11 @@ public class UIDialogProperties implements UIPanel {
      * It also permit to lock and unlock the fields.
      */
     private static class ConfPanel extends JPanel implements ItemListener {
-        private final JComponent component;
+        private final List<Component> component;
         private final ConfigurationAttribute ca;
-        public ConfPanel(JComponent component, ConfigurationAttribute ca, boolean enableLock){
+        public ConfPanel(List<Component> component, ConfigurationAttribute ca, boolean enableLock){
             super();
-            this.component =component;
+            this.component = component;
             this.ca = ca;
             this.setLayout(new FlowLayout(FlowLayout.LEFT));
             if(enableLock){
@@ -112,10 +142,12 @@ public class UIDialogProperties implements UIPanel {
                 box.setSelected(ca.getReadOnly());
                 this.add(box);
             }
-            this.add(component);
+            for(Component comp : component){
+                this.add(comp);
+            }
             if(ca.getReadOnly()){
-                component.setEnabled(false);
-                for(Component c : component.getComponents())
+                this.setEnabled(false);
+                for(Component c : component)
                     c.setEnabled(false);
             }
         }
@@ -123,10 +155,22 @@ public class UIDialogProperties implements UIPanel {
         @Override
         public void itemStateChanged(ItemEvent ie) {
             boolean b = ((JCheckBox)ie.getSource()).isSelected();
-            component.setEnabled(!b);
-            for(Component c : component.getComponents())
-                c.setEnabled(!b);
+            this.setEnabled(!b);
+            for(Component c : component)
+                enableAll(!b, c);
             ca.setReadOnly(b);
+        }
+
+        /**
+         * Recursive call to enable or not all th components contained by a JComponent.
+         * @param enable
+         * @param component
+         */
+        private void enableAll(boolean enable, Component component){
+            component.setEnabled(enable);
+            if(component instanceof JComponent)
+            for(Component comp : ((JComponent)component).getComponents())
+                enableAll(enable, comp);
         }
     }
 }

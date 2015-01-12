@@ -709,19 +709,10 @@ public class UIController{
             UIPanel panel = null;
             if(hasSameClass) {
                 //Try to create an equivalent GE with the common attributes
-                try {
-                    GraphicalElement ge = selectedGE.get(0).getClass().newInstance();
-                    List<ConfigurationAttribute> listCA = getCommonAttributes();
-                    for(ConfigurationAttribute ca : listCA) {
-                        ge.setAttribute(ca);
-                    }
-                    panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge, this);
-                } catch (InstantiationException|IllegalAccessException e) {
-                    Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, e);
-                }
+                panel = geManager.getRenderer(selectedGE.get(0).getClass()).createConfigurationPanel(getCommonAttributes(), this, true);
             }
-            else
-                panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            if(panel==null)
+                panel = new UIDialogProperties(getCommonAttributes(), this, true);
             SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
             dialog.setVisible(true);
             dialog.pack();
@@ -736,7 +727,7 @@ public class UIController{
     public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        UIPanel panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge, this);
+        UIPanel panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge.getAllAttributes(), this, false);
         if(panel==null)
             panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
