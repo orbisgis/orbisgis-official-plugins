@@ -2,6 +2,9 @@
 * MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
 * documents based on OrbisGIS results.
 *
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
 * The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
 * team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
 *
@@ -32,6 +35,8 @@ import java.awt.event.MouseEvent;
  * This class is used as an overlay to the CompositionArea to permit to draw the bounding box of a new GraphicalElement.
  * It will be enabled only when the user wants to create a new GraphicalElement. So the user can draw the bounding box of the new GraphicalElement.
  * The size will be transfer to the UIController to create the GE.
+ *
+ * @author Sylvain PALOMINOS
  */
 public class CompositionAreaOverlay extends LayerUI<JComponent>{
     /*Point where the mouse is pressed.*/

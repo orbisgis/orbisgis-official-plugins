@@ -2,6 +2,9 @@
 * MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
 * documents based on OrbisGIS results.
 *
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
 * The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
 * team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
 *
@@ -23,6 +26,8 @@ package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
 
 /**
  * A GraphicalElement implementing this interface will always be over the other GraphicalElements.
+ *
+ * @author Sylvain PALOMINOS
  */
 public interface AlwaysOnFront {
     
