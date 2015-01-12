@@ -1,7 +1,32 @@
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
+
 package org.orbisgis.mapcomposer.controller;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
+
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -17,26 +42,39 @@ import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
-import java.awt.Dimension;
-import java.awt.image.BufferedImage;
-import java.io.File;
-import java.io.IOException;
-import java.util.*;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import javax.imageio.ImageIO;
-import javax.xml.parsers.ParserConfigurationException;
-
+import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.UIPanel;
 import org.orbisgis.sif.components.SaveFilePanel;
+
+import java.awt.Dimension;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
+import java.io.File;
+import java.io.IOException;
+import java.util.*;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+
+import javax.imageio.ImageIO;
+import javax.swing.*;
+import javax.xml.parsers.ParserConfigurationException;
+
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
 
 /**
  * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
+ *
+ * @author Sylvain PALOMINOS
  */
 public class UIController{
 
@@ -68,6 +106,9 @@ public class UIController{
 
     /** Instance of the new GraphicalElement to create. */
     private GraphicalElement newGE;
+
+    /** Executor used for the RenderWorkers. */
+    private ExecutorService executorService;
     
     /**
      * Main constructor.
@@ -82,6 +123,21 @@ public class UIController{
         zIndexStack = new Stack<>();
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
         mainWindow = new MainWindow(this);
+        mainWindow.setLocationRelativeTo(null);
+        executorService = Executors.newFixedThreadPool(1);
+
+        UIFactory.setMainFrame(mainWindow);
+    }
+
+    /**
+     * Returns true if the CompositionArea already contain a Document GE, false otherwise.
+     * @return true if a document GE exist, false otherwise.
+     */
+    public boolean isDocumentCreated(){
+        for(GraphicalElement ge : elementJPanelMap.keySet())
+            if(ge instanceof Document)
+                return true;
+        return false;
     }
     
     public MainWindow getMainWindow() { return mainWindow; }
@@ -198,7 +254,7 @@ public class UIController{
         for(GraphicalElement ge : zIndexStack){
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         }
-        validateSelectedGE();
+        modifySelectedGE();
     }
     
     /**
@@ -212,25 +268,41 @@ public class UIController{
     }
 
     /**
-     * Refresh the JSpinner value with the value from the selected GE.
+     * Refreshes the JSpinner value and state (enable or not) with the values from the selected GEs.
+     * The method test each GraphicalElement from the selectedGE list to know if every single GE property (X and Y position, width, height, rotation) is the same for the GEs.
+     * In the case where a property is the same for all the selected GE, the corresponding spinner is set to the common value and enabled.
+     * In the case where a property is different for the selected GE, the corresponding spinner is set to 0 and disabled.
+     * In the case where no GE are selected, all the spinners are set to 0 and disabled.
      */
     public void refreshSpin(){
+        //Set the default state for the spinner (enabled and value to 0).
         boolean boolX=false, boolY=false, boolW=false, boolH=false, boolR=false;
-        int x=0, y=0, w=0, h=0, r=0; 
+        int x=0, y=0, w=0, h=0, r=0;
+        //If GEs are selected, test each
         if(!selectedGE.isEmpty()){
             x=selectedGE.get(0).getX();
             y=selectedGE.get(0).getY();
             w=selectedGE.get(0).getWidth();
             h=selectedGE.get(0).getHeight();
             r=selectedGE.get(0).getRotation();
+            //Test each GE
             for(GraphicalElement graph : selectedGE){
-                if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
+                if (x != graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
                 if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
                 if(w!=graph.getWidth()){ boolW=true;w=selectedGE.get(0).getWidth();}
                 if(h!=graph.getHeight()){ boolH=true;h=selectedGE.get(0).getHeight();}
                 if(r!=graph.getRotation()){ boolR=true;r=selectedGE.get(0).getRotation();}
             }
         }
+        //If no GE are selected, lock all the spinners
+        else {
+            boolX = true;
+            boolY = true;
+            boolW = true;
+            boolH = true;
+            boolR = true;
+        }
+        //Sets the spinners.
         mainWindow.setSpinner(boolX, x, Property.X);
         mainWindow.setSpinner(boolY, y, Property.Y);
         mainWindow.setSpinner(boolW, w, Property.WIDTH);
@@ -273,26 +345,51 @@ public class UIController{
             mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
-
     }
 
     /**
-     * Validates all the selected GraphicalElements
+     * Modify the position and size of all the selected GraphicalElements
      */
-    public void validateSelectedGE(){
+    public void modifySelectedGE(){
         for(GraphicalElement ge : selectedGE)
-            validateGE(ge);
+            modifyGE(ge);
     }
 
     /**
-     * Validates the given GraphicalElement.
-     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
+     * modify the position and the size of the given GraphicalElement.
+     * It does the refresh of the GE, the resizing of the GE representation in the CompositionArea and refreshes the spinner state.
+     * The GE representation is just moved and scaled, not completely re-renderer.
      * @param ge GraphicalElement to validate
      */
-    public void validateGE(GraphicalElement ge){
+    public void modifyGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
+        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
+        if(ge instanceof Document)
+            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        refreshSpin();
+    }
+
+    /**
+     * Redraws all the selected GraphicalElements
+     */
+    public void redrawSelectedGE(){
+        for(GraphicalElement ge : selectedGE)
+            redrawGE(ge);
+    }
+
+    /**
+     * Redraws the given GraphicalElement.
+     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
+     * The GE representation is completely re-renderer.
+     * @param ge GraphicalElement to validate
+     */
+    public void redrawGE(GraphicalElement ge){
+        if(ge instanceof GERefresh)
+            ((GERefresh)ge).refresh();
+        unselectGE(ge);
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        executorService.submit(worker);
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -316,7 +413,7 @@ public class UIController{
             }
             //If the GraphicalElement was already added to the document
             if(elementJPanelMap.containsKey(ge))
-                validateGE(ge);
+                redrawGE(ge);
             //Set the CompositionAreaOverlay ratio in the case of the GraphicalElement was not already added to the Document
             else{
                 //Give the ratio to the CompositionAreaOverlay();
@@ -325,7 +422,7 @@ public class UIController{
                         BufferedImage bi = ImageIO.read(new File(((SimpleIllustrationGE) newGE).getPath()));
                         mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
                     } catch (IOException e) {
-                        e.printStackTrace();
+                        LoggerFactory.getLogger(UIController.class).error(e.getMessage());
                     }
                 }
             }
@@ -425,7 +522,8 @@ public class UIController{
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        elementJPanelMap.get(ge).setPanelContent(geManager.getRenderer(ge.getClass()).createImageFromGE(ge));
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+        executorService.submit(worker);
         zIndexStack.push(ge);
         //Apply the z-index change to only the GraphicalElement ge.
         List temp = selectedGE;
@@ -436,10 +534,10 @@ public class UIController{
     }
 
     /**
-     * Creates a new GraphicalElement with the class given in parameters.
+     * DOes the instantiation of the new GraphicalElement and open the configuration dialog.
      * @param newGEClass
      */
-    public void createNewGE(Class<? extends GraphicalElement> newGEClass) {
+    public void instantiateGE(Class<? extends GraphicalElement> newGEClass) {
         try {
             newGE = newGEClass.newInstance();
             //Refresh the ConfigurationAttributes to initialize them
@@ -447,22 +545,37 @@ public class UIController{
                 if(ca instanceof RefreshCA)
                     ((RefreshCA)ca).refresh(this);
 
-            showGEProperties(newGE);
-            //If the image has an already set path value, get the image ratio
-            if(newGE instanceof SimpleIllustrationGE) {
-                File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                if(f.exists() && f.isFile()) {
-                    try {
-                        BufferedImage bi = ImageIO.read(f);
-                        mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
-                    } catch (IOException e) {
-                        e.printStackTrace();
-                    }
-                }
-            }
-
+            showGEProperties(newGE).addWindowListener(EventHandler.create(WindowListener.class, this, "drawGE", "", "windowClosed"));
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+        }
+    }
+
+    /**
+     * Allow the user to draw the size of the new GraphicalElement
+     * @param winEvent
+     */
+    public void drawGE(WindowEvent winEvent){
+        if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
+            SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
+            if(sifDialog.isAccepted()) {
+                //If the image has an already set path value, get the image ratio
+                if (newGE instanceof SimpleIllustrationGE) {
+                    File f = new File(((SimpleIllustrationGE) newGE).getPath());
+                    if (f.exists() && f.isFile()) {
+                        try {
+                            BufferedImage bi = ImageIO.read(f);
+                            mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                        } catch (IOException e) {
+                            LoggerFactory.getLogger(UIController.class).error(e.getMessage());
+                        }
+                    }
+                }
+                mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+            }
+            else{
+                newGE=null;
+            }
         }
     }
 
@@ -477,6 +590,7 @@ public class UIController{
             newGE.setWidth(width);
             newGE.setHeight(height);
             addGE(newGE);
+            redrawGE(newGE);
         }
         mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
@@ -580,7 +694,7 @@ public class UIController{
                     }
                     break;
             }
-            validateSelectedGE();
+            modifySelectedGE();
         }
     }
 
@@ -601,16 +715,19 @@ public class UIController{
     }
 
     /**
-     * Open a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
+     * Open and return a dialog window with all the ConfigurationAttributes from the given GraphicalElement.
+     * @return The configuration dialog.
      */
-    public void showGEProperties(GraphicalElement ge){
+    public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+        UIPanel panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
         dialog.setVisible(true);
         dialog.pack();
         dialog.setAlwaysOnTop(true);
+        dialog.setLocationRelativeTo(mainWindow);
+        return dialog;
     }
     
     /**
@@ -640,7 +757,7 @@ public class UIController{
     public enum ZIndex{
         TO_FRONT, FRONT, BACK, TO_BACK;
     }
-    
+
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
     }
@@ -671,33 +788,57 @@ public class UIController{
                     break;
             }
         }
-        validateSelectedGE();
+        modifySelectedGE();
     }
     
     /**
-     * Export to document into png file.
+     * Exports to document into png file.
+     * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
+     * Then exports the CompositionArea.
      */
     public void export(){
-        //Creates and sets the file chooser
-        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
-        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-        saveFilePanel.loadState();
-        if(UIFactory.showDialog(saveFilePanel)){
-            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
+        //Render again all the GE. All the RenderWorkers are saved into a list and the export will be done only when all will be terminated.
+        RenderWorker lastRenderWorker = null;
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
+            executorService.submit(rw);
+            lastRenderWorker = rw;
+        }
+        executorService.shutdown();
 
-            try{
-                //Removes the border, does the export, then adds them again
-                for(GraphicalElement ge : zIndexStack){
-                    elementJPanelMap.get(ge).enableBorders(false);
-                }
-                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+        //Add to the last RenderWorker a listener to open a saveFilePanel just after the rendering is done
+        if(lastRenderWorker!=null) {
+            lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
+                    //Reset the executorService
+                    executorService = Executors.newFixedThreadPool(1);
+                    //Verify if the property state is at DONE
+                    if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
+                        //Creates and sets the file chooser
+                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
+                        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+                        saveFilePanel.loadState();
+                        if(UIFactory.showDialog(saveFilePanel)){
+                            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
 
-                for(GraphicalElement ge : zIndexStack){
-                    elementJPanelMap.get(ge).enableBorders(true);
+                            try{
+                                //Removes the border, does the export, then adds them again
+                                for(GraphicalElement ge : zIndexStack){
+                                    elementJPanelMap.get(ge).enableBorders(false);
+                                }
+                                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+
+                                for(GraphicalElement ge : zIndexStack){
+                                    elementJPanelMap.get(ge).enableBorders(true);
+                                }
+                            } catch (IOException ex) {
+                                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+                            }
+                        }
+                    }
                 }
-            } catch (IOException ex) {
-                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
-            }
+            });
         }
     }
 }

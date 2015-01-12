@@ -1,3 +1,27 @@
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
+
 package org.orbisgis.mapcomposer.view.ui;
 
 import org.orbisgis.mapcomposer.controller.UIController;
@@ -11,26 +35,13 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Imag
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.event.ActionListener;
-import java.awt.event.MouseWheelEvent;
-import java.awt.event.MouseWheelListener;
+
+import java.awt.*;
+import java.awt.event.*;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
-import javax.swing.Action;
-import javax.swing.BoxLayout;
-import javax.swing.ImageIcon;
-import javax.swing.JFrame;
-import javax.swing.JLabel;
-import javax.swing.JPanel;
-import javax.swing.JSeparator;
-import javax.swing.JSpinner;
-import javax.swing.JToolBar;
-import javax.swing.KeyStroke;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.SwingConstants;
+import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
@@ -41,6 +52,8 @@ import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
 /**
  * Main window of the map composer. It contain the saverals tool bar and the CompositionArea.
  * It does the link between the user interactions and the UIController
+ *
+ * @author Sylvain PALOMINOS
  */
 public class MainWindow extends JFrame implements MainFrameAction{
 
@@ -102,6 +115,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.compositionArea = new CompositionArea(uiController);
         //Sets the default size to the window
         this.setSize(1024, 768);
+        this.setIconImage(new ImageIcon(MainWindow.class.getResource("map_composer.png")).getImage());
 
         //Creates the panel containing the two tool bars.
         JPanel toolBarPanel = new JPanel();
@@ -119,7 +133,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog", "configuration.png", uiController, "showDocProperties", null));
         actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uiController, "saveDocument", null));
-        actions.addAction(createAction(LOAD, "", "Load the document", "properties.png", uiController, "loadDocument", null));
+        actions.addAction(createAction(LOAD, "", "Load the document", "load.png", uiController, "loadDocument", null));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));
         addSeparatortTo(IconToolBar);
         actions.addAction(createAction(ADD_MAP, "", "Add a map element", "add_map.png", this, "addMap", null));
@@ -293,27 +307,27 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void setSpinner(boolean b, int value, Property prop){
         int val=b ? 0 : value;
+        JSpinner spinner = null;
         switch(prop){
             case X:
-                spinnerX.setEnabled(!b);
-                spinnerX.setValue(val);
+                spinner = spinnerX;
                 break;
             case Y:
-                spinnerY.setEnabled(!b);
-                spinnerY.setValue(val);
+                spinner = spinnerY;
                 break;
             case HEIGHT:
-                spinnerH.setEnabled(!b);
-                spinnerH.setValue(val);
+                spinner = spinnerH;
                 break;
             case WIDTH:
-                spinnerW.setEnabled(!b);
-                spinnerW.setValue(val);
+                spinner = spinnerW;
                 break;
             case ROTATION:
-                spinnerR.setEnabled(!b);
-                spinnerR.setValue(val);
+                spinner = spinnerR;
                 break;
+        }
+        if(spinner!=null){
+            spinner.setModel(new SpinnerNumberModel(value, ((SpinnerNumberModel) spinner.getModel()).getMinimum(), ((SpinnerNumberModel) spinner.getModel()).getMaximum(), 1));
+            spinner.setEnabled(!b);
         }
     }
 
@@ -322,7 +336,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
      */
     public void newComposer(){
         uiController.removeAllGE();
-        uiController.createNewGE(Document.class);
+        uiController.instantiateGE(Document.class);
         uiController.setNewGE(0, 0, 1, 1);
     }
 
@@ -337,55 +351,74 @@ public class MainWindow extends JFrame implements MainFrameAction{
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
-        compositionArea.getOverlay().setRatio(-1);
-        uiController.createNewGE(MapImage.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(MapImage.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
+        }
     }
 
     /**
      * Add a TextElement GraphicalElement to the document.
      */
     public void addText(){
-        uiController.createNewGE(TextElement.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(TextElement.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
+        }
     }
 
     /**
      * Add a Legend GraphicalElement to the document.
      */
     public void addLegend(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
 
     /**
      * Add a Orientation GraphicalElement to the document.
      */
     public void addOrientation(){
-        uiController.createNewGE(Orientation.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Orientation.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
+        }
     }
 
     /**
      * Add a Scale GraphicalElement to the document.
      */
     public void addScale(){
-        uiController.createNewGE(Scale.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Scale.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
+        }
     }
 
     /**
      * Add a Image GraphicalElement to the document.
      */
     public void addPicture() {
-        uiController.createNewGE(Image.class);
-        compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+        if(uiController.isDocumentCreated()) {
+            compositionArea.getOverlay().setRatio(-1);
+            uiController.instantiateGE(Image.class);
+            compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
+        }
     }
     public void drawCircle(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
     public void drawPolygon(){
-        //Unsupported yet
+        if(uiController.isDocumentCreated()) {
+            //Unsupported yet
+        }
     }
     public void moveBack(){
         uiController.changeZIndex(ZIndex.TO_BACK);
@@ -420,10 +453,10 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
     @Override
     public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
-        List<Action> actions = new ArrayList<Action>();
-        actions.add(new DefaultAction(MENU_MAPCOMPOSER,"Map Composer",
-                new ImageIcon(),
-                EventHandler.create(ActionListener.class,this,"showMapComposer")).setParent(MENU_TOOLS));
+        List<Action> actions = new ArrayList<>();
+        actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
+                new ImageIcon(MainWindow.class.getResource("map_composer.png")),
+                EventHandler.create(ActionListener.class, this, "showMapComposer")).setParent(MENU_TOOLS));
         return actions;
     }
     public void showMapComposer(){this.setVisible(true);}

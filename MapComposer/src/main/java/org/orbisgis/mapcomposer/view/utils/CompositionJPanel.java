@@ -1,5 +1,30 @@
- package org.orbisgis.mapcomposer.view.utils;
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
 
+package org.orbisgis.mapcomposer.view.utils;
+
+import org.orbisgis.coremap.renderer.se.graphic.Graphic;
 import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
@@ -9,6 +34,8 @@ import java.awt.*;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.AffineTransform;
+import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import static java.lang.Math.cos;
@@ -18,18 +45,20 @@ import javax.swing.*;
 
  /**
   * This panel extends from JPanel define the action to do when the user click on it.
+  *
+  * @author Sylvain PALOMINOS
   */
 public class CompositionJPanel extends JPanel{
-    
+
     /**GraphicalElement displayed. */
     private final GraphicalElement ge;
-    
+
     /**Select state of the panel. */
     private boolean selected=false;
-    
+
     /**X initial position when user want to move the panel. */
     private int startX=0;
-    
+
     /**Y initial position when user want to move the panel. */
     private int startY=0;
 
@@ -44,13 +73,18 @@ public class CompositionJPanel extends JPanel{
 
      /**Id of the move that the user is doing. */
      private MoveMode moveMode = MoveMode.NONE;
-    
+
     /** Reference to the UIController. */
     private final UIController uic;
-    
+
     /** Size of the margin of the border for resizing. */
     private static final int margin = 5;
-    
+
+    private WaitLayerUI waitLayer;
+    private JPanel panel;
+
+    private BufferedImage contentImage;
+
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
@@ -58,6 +92,9 @@ public class CompositionJPanel extends JPanel{
      */
     public CompositionJPanel(GraphicalElement ge, UIController uic){
         super(new BorderLayout());
+        this.setSize(ge.getWidth(), ge.getHeight());
+        panel = new JPanel(new BorderLayout());
+        this.add(panel);
         this.uic=uic;
         this.ge=ge;
         //Disable mouse listeners if it's a Document panel.
@@ -72,35 +109,102 @@ public class CompositionJPanel extends JPanel{
         }
         this.setToolTipText("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
                 "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>");
-    }
-    
-    /**
-     * Sets the panel contained by the object.
-     * @param bufferedImage The new panel.
-     */
-    public void setPanelContent(final BufferedImage bufferedImage){
-        double rad = Math.toRadians(ge.getRotation());
-        //Width and Height of the rectangle containing the rotated bufferedImage
-        final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-        final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        final int maxWidth = Math.max((int)newWidth, ge.getWidth());
-        final int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-        this.removeAll();
+        waitLayer = new WaitLayerUI();
+        JLayer<JPanel> layer = new JLayer<>(panel, waitLayer);
+        this.add(layer);
+    }
+
+    public void redraw(int x, int y, int width, int height, int rotation, final BufferedImage bufferedImage){
+        double rad = Math.toRadians(rotation);
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
+        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
+        final int maxWidth = Math.max((int)newWidth, width);
+        final int maxHeight = Math.max((int)newHeight, height);
+
+        //Draw the bufferedImage
+        panel.removeAll();
         //Add the BufferedImage into a JComponent in the CompositionJPanel
-        this.add(new JComponent() {
+        panel.add(new JComponent() {
             //Redefinition of the painComponent method to rotate the component content.
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(bufferedImage, -(maxWidth-(int)newWidth)/2, -(maxHeight-(int)newHeight)/2, null);
+                g.drawImage(contentImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
+        panel.revalidate();
+        //Take account of the border width (2 pixels).
+        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+        this.setOpaque(false);
+        panel.setOpaque(false);
+        setBorders();
+
+        //Save the unrotated bufferedImage
+        contentImage = bufferedImage;
+
+        //Create the rotation transform fo the buffered image
+        AffineTransform affineTransform= new AffineTransform();
+        affineTransform.rotate(-rad, maxWidth / 2, maxHeight / 2);
+
+        //Apply the transform to the bufferedImage an return it
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BICUBIC);
+        contentImage = affineTransformOp.filter(contentImage, null);
+    }
+
+     /**
+      * Modify the bounding box of the panel without redrawing the content image.
+      * @param x X position of the GE represented.
+      * @param y Y position of the GE represented.
+      * @param width Width of the GE represented.
+      * @param height Height of the GE represented.
+      * @param rotation Rotation of the GE represented.
+      */
+    public void modify(int x, int y, int width, int height, int rotation){
+        final double rad = Math.toRadians(rotation);
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
+        final double newHeight = Math.abs(cos(rad)*height)+Math.abs(sin(rad)*width);
+        final int maxWidth = Math.max((int)newWidth, width);
+        final int maxHeight = Math.max((int)newHeight, height);
         this.revalidate();
         //As the buffered image is rotated, change the origin point of the panel to make the center of the image not moving after the rotation.
+        panel.removeAll();
+        //Add the BufferedImage into a JComponent in the CompositionJPanel
+        panel.add(new JComponent() {
+            //Redefinition of the painComponent method to rotate the component content.
+            @Override
+            protected void paintComponent(Graphics g) {
+                super.paintComponent(g);
+                if (contentImage != null) {
+                    //Create a new BufferedImage with the new size (size after rotation)
+                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, contentImage.getType());
+                    Graphics2D graph = bufferedImage.createGraphics();
+
+                    //Draw the BufferedImage bi into the bigger BufferedImage
+                    graph.drawImage(contentImage,
+                            (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                            maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
+                            0, 0,
+                            contentImage.getWidth(), contentImage.getHeight(), null);
+                    graph.dispose();
+
+                    //Create the rotation transform fo the buffered image
+                    AffineTransform affineTransform = new AffineTransform();
+                    affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+
+                    //Apply the transform to the bufferedImage an return it
+                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                    g.drawImage(affineTransformOp.filter(bufferedImage, null), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                }
+            }
+        }, BorderLayout.CENTER);
+        panel.revalidate();
         //Take account of the border width (2 pixels).
-        this.setBounds(ge.getX() + (ge.getWidth()-(int)newWidth)/2, ge.getY()+(ge.getHeight()-(int)newHeight)/2, (int)newWidth+2, (int)newHeight+2);
+        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
         this.setOpaque(false);
+        panel.setOpaque(false);
         setBorders();
     }
 
@@ -114,7 +218,11 @@ public class CompositionJPanel extends JPanel{
            this.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
     }
 
-    /**
+    public WaitLayerUI getWaitLayer() {
+        return waitLayer;
+    }
+
+     /**
      * Select or unselect the panel on click.
      * @param me Mouse Event.
      */
@@ -125,6 +233,10 @@ public class CompositionJPanel extends JPanel{
             uic.unselectGE(ge);
         else
             uic.selectGE(ge);
+
+        this.moveDirection = MoveDirection.NONE;
+        this.moveMode=MoveMode.NONE;
+        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
@@ -142,7 +254,7 @@ public class CompositionJPanel extends JPanel{
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        
+
         startX = me.getLocationOnScreen().x;
         startY = me.getLocationOnScreen().y;
 
@@ -189,26 +301,50 @@ public class CompositionJPanel extends JPanel{
         }
     }
 
-     /**
-      * Called when the mouse is released.
-      * It transfer the location of the mouse to the right method according to the mouseMode value;
-      * @param p Location on screen of the mouse when it's released.
-      */
-     public void mouseReleasedHub(Point p){
-         switch(moveMode){
-             case ALTGRAPH:
-                 mouseReleasedALTGRAPH(p);
-                 break;
-             case CTRL:
-             case SHIFT:
-                 mouseReleasedSHIFT(p);
-                 break;
-             case NONE:
-                 mouseReleasedNONE(p);
-                 break;
-         }
-         uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
-     }
+    /**
+    * Called when the mouse is released.
+    * It transfer the location of the mouse to the right method according to the mouseMode value;
+    * @param p Location on screen of the mouse when it's released.
+    */
+    public void mouseReleasedHub(Point p){
+        //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
+        if(p.x==startX && p.y==startY)
+            return;
+
+        if(moveDirection==MoveDirection.CENTER) {
+            ge.setX(ge.getX() - startX + p.x);
+            ge.setY(ge.getY() - startY + p.y);
+            this.moveDirection = MoveDirection.NONE;
+            this.moveMode = MoveMode.NONE;
+        }
+        else {
+            switch (moveMode) {
+                case ALTGRAPH:
+                    mouseReleasedALTGRAPH(p);
+                    break;
+                case CTRL:
+                case SHIFT:
+                    mouseReleasedSHIFT(p);
+                    break;
+                case NONE:
+                    mouseReleasedNONE(p);
+                    break;
+            }
+            //Set the new bounds of the compositionJPanel before validating it (and redraw it)
+            double rad = Math.toRadians(ge.getRotation());
+            final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+            final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+            panel.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+            this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+            panel.revalidate();
+
+            uic.modifyGE(ge);
+
+            this.moveDirection = MoveDirection.NONE;
+            this.moveMode=MoveMode.NONE;
+        }
+        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+    }
 
      /**
       * Move and resize of the GraphicalElement when no key are pressed.
@@ -251,14 +387,7 @@ public class CompositionJPanel extends JPanel{
                  ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
                  ge.setY(ge.getY()-(startY-p.y));
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
      /**
@@ -366,14 +495,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
      /**
@@ -488,14 +610,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setY((int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1);
                  }
                  break;
-             case CENTER:
-                 ge.setX(ge.getX()-startX+p.x);
-                 ge.setY(ge.getY()-startY+p.y);
-                 break;
          }
-         uic.validateGE(ge);
-         this.moveDirection = MoveDirection.NONE;
-         this.moveMode=MoveMode.NONE;
      }
 
     /**
@@ -607,7 +722,7 @@ public class CompositionJPanel extends JPanel{
     }
 
     /**
-     * Changes the mouse cursor appearence according to the border hovered.
+     * Changes the mouse cursor appearance according to the border hovered.
      * @param p Point of the mouse.
      */
     public void mouseMoved(Point p) {
@@ -617,7 +732,7 @@ public class CompositionJPanel extends JPanel{
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-        
+
         if(y<=margin && x<=margin)
             this.setCursor(new Cursor(Cursor.NW_RESIZE_CURSOR));
         else if(x<=margin && y>=newHeight-margin)
@@ -637,7 +752,7 @@ public class CompositionJPanel extends JPanel{
         else
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
-    
+
     /**
      * Draw red border to the element for one second.
      */
@@ -651,13 +766,13 @@ public class CompositionJPanel extends JPanel{
             LoggerFactory.getLogger(CompositionJPanel.class).error(ex.getMessage());
         }
     }
-    
+
     /** Unselect the CompositionJPanel (remove the orange borders). */
     public void unselect(){ this.selected=false; setBorders(); }
-    
+
     /** Select the CompositionJPanel. */
     public void select(){ this.selected=true; setBorders(); }
-    
+
     /**
      * Enable or disable the grey and orange borders of the displayed elements.
      * @param enable Display the borders if true, hide them otherwise.
