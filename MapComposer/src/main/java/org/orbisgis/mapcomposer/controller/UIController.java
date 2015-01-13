@@ -374,7 +374,11 @@ public class UIController{
      * Redraws all the selected GraphicalElements
      */
     public void redrawSelectedGE(){
+        //Copy of the list to avoid ConcurrentModificationException
+        List<GraphicalElement> list = new ArrayList<>();
         for(GraphicalElement ge : selectedGE)
+            list.add(ge);
+        for(GraphicalElement ge : list)
             redrawGE(ge);
     }
 

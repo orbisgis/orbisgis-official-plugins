@@ -159,6 +159,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         addSeparatortTo(IconToolBar);
         actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties.png", uiController, "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
         actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete.png", uiController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
+        actions.addAction(createAction(DELETE, "", "Redraw selected elements (Ctrl + R)", "refresh.png", uiController, "redrawSelectedGE", KeyStroke.getKeyStroke("control R")));
         IconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
         //Sets the spinners tool bar.
