@@ -38,6 +38,7 @@ import org.orbisgis.sif.components.OpenFilePanel;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
+import java.io.File;
 
 /**
  * Renderer associated to the Source ConfigurationAttribute.
@@ -67,14 +68,14 @@ public class SourceRenderer implements CARenderer{
         //component.add(new JLabel(sourceCA.getName()));
         //Display the SourceCA into a JTextField
         JTextField jtf = new JTextField();
-        jtf.setColumns(40);
+        jtf.setColumns(25);
         //"Save" the CA inside the JTextField
         jtf.getDocument().putProperty("SourceCA", sourceCA);
         //add the listener for the text changes in the JTextField
         jtf.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
 
         if(sourceCA.getValue()!="")
-            jtf.setText(sourceCA.getValue());
+            jtf.setText(new File(sourceCA.getValue()).getName());
         else {
             //Load the last path use in a sourceCA
             OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
@@ -109,7 +110,7 @@ public class SourceRenderer implements CARenderer{
             SourceCA sourceCA = (SourceCA)source.getClientProperty("SourceCA");
             sourceCA.setValue(openFilePanel.getSelectedFile().getAbsolutePath());
             JTextField textField = (JTextField)source.getClientProperty("JTextField");
-            textField.setText(openFilePanel.getSelectedFile().getAbsolutePath());
+            textField.setText(openFilePanel.getSelectedFile().getName());
         }
     }
 
@@ -119,7 +120,10 @@ public class SourceRenderer implements CARenderer{
      */
     public void saveDocumentText(Document document){
         try {
-            ((SourceCA)document.getProperty("SourceCA")).setValue(document.getText(0, document.getLength()));
+            SourceCA sourceCA = (SourceCA)document.getProperty("SourceCA");
+            String name = document.getText(0, document.getLength());
+            if(new File(name).exists())
+                sourceCA.setValue(name);
         } catch (BadLocationException e) {
             e.printStackTrace();
         }
