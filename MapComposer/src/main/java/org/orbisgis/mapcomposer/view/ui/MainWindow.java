@@ -358,6 +358,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(MapImage.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -369,6 +371,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(TextElement.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -378,6 +382,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -389,6 +395,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Orientation.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -400,6 +408,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Scale.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -411,16 +421,22 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Image.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void drawCircle(){
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void drawPolygon(){
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void moveBack(){
         uiController.changeZIndex(ZIndex.TO_BACK);

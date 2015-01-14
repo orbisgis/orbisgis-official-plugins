@@ -576,6 +576,7 @@ public class UIController{
                     }
                 }
                 mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+                mainWindow.getCompositionArea().getOverlay().writeMessage("Now you can draw the GraphicalElement.");
             }
             else{
                 newGE=null;
