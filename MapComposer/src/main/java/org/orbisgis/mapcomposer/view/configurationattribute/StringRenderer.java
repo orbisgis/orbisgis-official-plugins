@@ -26,7 +26,8 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
-import java.awt.FlowLayout;
+
+import java.awt.*;
 import java.beans.EventHandler;
 import javax.swing.*;
 import javax.swing.event.DocumentListener;
@@ -36,11 +37,10 @@ import javax.swing.text.Document;
 /**
  * Renderer associated to the Text ConfigurationAttribute.
  * The JPanel returned by the createJComponentFromCA method look like :
- *  _________________________________________________________________
- * |                                  ____________________________   |
- * | NameOfTheConfigurationAttribute |Some text                   |  |
- * |                                 |____________________________|  |
- * |_________________________________________________________________|
+ *  __________________________________________________
+ * |Some text                                         |
+ * |                                                  |
+ * |__________________________________________________|
  *
  * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA
  *
@@ -50,22 +50,19 @@ public class StringRenderer implements CARenderer{
 
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the component
-        JComponent component = new JPanel();
-        component.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-    //Add to the component all the swing components
         StringCA stringCA = (StringCA)ca;
-        
-        component.add(new JLabel(stringCA.getName()));
+
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        area.setColumns(35);
+        area.setRows(7);
+        area.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         //"Save" the CA inside the JTextField
         area.getDocument().putProperty("StringCA", stringCA);
         area.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "saveDocumentText", "document"));
-        component.add(area);
         
-        return component;
+        return area;
     }
 
     /**

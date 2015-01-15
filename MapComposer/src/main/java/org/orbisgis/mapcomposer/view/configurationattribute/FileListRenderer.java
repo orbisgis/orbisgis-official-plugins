@@ -26,20 +26,22 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
-import java.awt.FlowLayout;
+import org.orbisgis.sif.common.ContainerItem;
+
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.File;
 import javax.swing.*;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renderer associated to the FileListCA ConfigurationAttribute.
  * The JComponent returned by the createJComponentFromCA method look like :
- *  ________________________________________________________________
- * |                                  ____________________________  |
- * | NameOfTheConfigurationAttribute |selected value          | v | |
- * |                                 |________________________|___| |
- * |________________________________________________________________|
+ *  ____________________________
+ * |selected value          | v |
+ * |________________________|___|
  *
  * @see org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA
  *
@@ -49,20 +51,27 @@ public class FileListRenderer implements CARenderer{
 
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
-    //Create the component
-        JComponent component = new JPanel();
-        component.setLayout(new FlowLayout(FlowLayout.LEFT));
-
-    //Add to the panel all the swing components
         FileListCA fileListCA = (FileListCA)ca;
-        
-        component.add(new JLabel(fileListCA.getName()));
+
         //Display the FileListCA into a JComboBox
-        JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
-        jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
+        List<ContainerItem<File>> listContainer = new ArrayList<>();
+        for(File f : fileListCA.getValue()){
+            listContainer.add(new ContainerItem<File>(f, f.getName()));
+        }
+        JComboBox<ContainerItem<File>> jcb = new JComboBox<ContainerItem<File>>(listContainer.toArray(new ContainerItem[0]));
+        jcb.putClientProperty("ca", fileListCA);
         jcb.setSelectedItem(ca.getValue());
-        component.add(jcb);
+        //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
+        jcb.addActionListener(EventHandler.create(ActionListener.class, this, "setCA", ""));
         
-        return component;
+        return jcb;
+    }
+
+    public void setCA(ActionEvent actionEvent){
+        if((actionEvent.getSource() instanceof JComboBox)){
+            FileListCA fileListCA = (FileListCA)((JComboBox) actionEvent.getSource()).getClientProperty("ca");
+            ContainerItem<File> container = (ContainerItem)((JComboBox) actionEvent.getSource()).getSelectedItem();
+            fileListCA.select(container.getKey());
+        }
     }
 }

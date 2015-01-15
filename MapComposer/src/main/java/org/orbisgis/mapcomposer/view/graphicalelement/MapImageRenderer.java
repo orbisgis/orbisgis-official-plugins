@@ -24,13 +24,21 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
+import org.orbisgis.sif.UIPanel;
 
 import javax.swing.*;
 import java.awt.*;
 import java.awt.image.BufferedImage;
+import java.util.*;
+import java.util.List;
 
 /**
  * Renderer associated to the Cartographic GraphicalElement.
@@ -38,20 +46,19 @@ import java.awt.image.BufferedImage;
  * @author Sylvain PALOMINOS
  */
 public class MapImageRenderer extends SimpleGERenderer {
-    
+
     @Override
     public BufferedImage createImageFromGE(GraphicalElement ge) {
         BufferedImage bi;
         // Draw in a BufferedImage the map image
-        if(((MapImage)ge).getImage()!=null){
-            bi = ((MapImage)ge).getImage();
-        }
-        else{
+        if (((MapImage) ge).getImage() != null) {
+            bi = ((MapImage) ge).getImage();
+        } else {
             //Return the icon of the MapImage as BufferedImage
             ImageIcon icon = new ImageIcon(MainWindow.class.getResource("add_map.png"));
-            bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
+            bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics g = bi.createGraphics();
-            icon.paintIcon(null, g, 0,0);
+            icon.paintIcon(null, g, 0, 0);
             g.dispose();
         }
 
@@ -63,5 +70,31 @@ public class MapImageRenderer extends SimpleGERenderer {
         graph.dispose();
 
         return applyRotationToBufferedImage(resize, ge);
+    }
+
+    public UIPanel createConfigurationPanel(java.util.List<ConfigurationAttribute> caList, UIController uic, boolean enableLock){
+        //Create the UIDialogProperties that will be returned
+        UIDialogProperties uid = new UIDialogProperties(uic);
+
+        //Add the text configuration elements
+        //Find the OwsContext ConfigurationAttribute
+        OwsContextCA owscCA = null;
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals(MapImage.sOWSC))
+                owscCA = (OwsContextCA)ca;
+        //Create the list of component composing the ConfigurationAttribute representation.
+        List<Component> owsc = new ArrayList<>();
+        JLabel owscName = new JLabel(owscCA.getName());
+        owsc.add(owscName);
+        //Create a kind of tabulation to align elements from different ConfigurationAttribute
+        owsc.add(Box.createHorizontalStrut(150 - owscName.getFontMetrics(owscName.getFont()).stringWidth(owscName.getText())));
+        JComboBox owscBox = (JComboBox)uic.getCAManager().getRenderer(owscCA).createJComponentFromCA(owscCA);
+        //Limits the size of the component
+        owscBox.setPreferredSize(new Dimension(200, (int) owscBox.getPreferredSize().getHeight()));
+        owsc.add(owscBox);
+        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
+        uid.addComponent(owsc, owscCA, enableLock);
+
+        return uid;
     }
 }

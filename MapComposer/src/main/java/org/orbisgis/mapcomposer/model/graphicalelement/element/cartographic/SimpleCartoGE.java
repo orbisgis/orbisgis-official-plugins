@@ -42,11 +42,13 @@ public abstract class SimpleCartoGE extends SimpleGE implements CartographicElem
 
     /** OWS-Context source.*/
     private OwsContextCA owsc;
+
+    public static final String sOWSC = "OWS-Context path";
     
     /**Main constructor.*/
     public SimpleCartoGE(){
         super();
-        this.owsc = new OwsContextCA("OWS-Context path", false);
+        this.owsc = new OwsContextCA(sOWSC, false);
     }
 
     @Override public OwsMapContext getOwsMapContext()   {return owsc.getOwsMapContext();}
@@ -70,7 +72,7 @@ public abstract class SimpleCartoGE extends SimpleGE implements CartographicElem
     @Override
     public void setAttribute(ConfigurationAttribute ca) {
         super.setAttribute(ca);
-        if(ca.getName().equals(owsc.getName()))
+        if(ca.getName().equals(sOWSC))
             owsc=(OwsContextCA)ca;
     }
 }

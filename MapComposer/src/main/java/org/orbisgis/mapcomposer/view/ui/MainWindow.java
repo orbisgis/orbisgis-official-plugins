@@ -127,39 +127,39 @@ public class MainWindow extends JFrame implements MainFrameAction{
         //Sets the button tool bar.
         IconToolBar.setFloatable(false);
         spinnerToolBar.setFloatable(false);
-        actions.setAccelerators(rootPane);
         actions.registerContainer(IconToolBar);
 
-        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document", "new_composer.png", this, "newComposer", null));
-        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog", "configuration.png", uiController, "showDocProperties", null));
-        actions.addAction(createAction(SAVE, "", "Save the document", "save.png", uiController, "saveDocument", null));
-        actions.addAction(createAction(LOAD, "", "Load the document", "load.png", uiController, "loadDocument", null));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document", "export_composer.png", this, "exportComposer", null));
+        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer.png", this, "newComposer", KeyStroke.getKeyStroke("control N")));
+        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration.png", uiController, "showDocProperties", KeyStroke.getKeyStroke("control D")));
+        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save.png", uiController, "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", "Load the document (Ctrl + L)", "load.png", uiController, "loadDocument", KeyStroke.getKeyStroke("control L")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer.png", this, "exportComposer", KeyStroke.getKeyStroke("control E")));
         addSeparatortTo(IconToolBar);
-        actions.addAction(createAction(ADD_MAP, "", "Add a map element", "add_map.png", this, "addMap", null));
-        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element",  "add_text.png", this, "addText", null));
-        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element", "add_legend.png", this, "addLegend", null));
-        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element", "compass.png", this, "addOrientation", null));
-        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element", "add_scale.png", this, "addScale", null));
-        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element", "add_picture.png", this, "addPicture", null));
+        actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map.png", this, "addMap", KeyStroke.getKeyStroke("alt M")));
+        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element (Alt + T)",  "add_text.png", this, "addText", KeyStroke.getKeyStroke("alt T")));
+        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element (Alt + L)", "add_legend.png", this, "addLegend", KeyStroke.getKeyStroke("alt L")));
+        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element (Alt + O)", "compass.png", this, "addOrientation", KeyStroke.getKeyStroke("alt O")));
+        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element (Alt + S)", "add_scale.png", this, "addScale", KeyStroke.getKeyStroke("alt S")));
+        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element (Alt + I)", "add_picture.png", this, "addPicture", KeyStroke.getKeyStroke("alt I")));
         addSeparatortTo(IconToolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element", "draw_circle.png", this, "drawCircle", null));
-        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element", "draw_polygon.png", this, "drawPolygon", null));
+        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element (Alt + C)", "draw_circle.png", this, "drawCircle", KeyStroke.getKeyStroke("alt C")));
+        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element (Alt + Y)", "draw_polygon.png", this, "drawPolygon", KeyStroke.getKeyStroke("alt Y")));
         addSeparatortTo(IconToolBar);
-        actions.addAction(createAction(MOVE_BACK, "", "Move to the back", "move_back.png", this, "moveBack", null));
-        actions.addAction(createAction(MOVE_DOWN, "", "Move down", "move_down.png", this, "moveDown", null));
-        actions.addAction(createAction(MOVE_ON, "", "Move on", "move_on.png", this, "moveOn", null));
-        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front", "move_front.png", this, "moveFront", null));
+        actions.addAction(createAction(MOVE_BACK, "", "Move to the back (Alt + PageDown)", "move_back.png", this, "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
+        actions.addAction(createAction(MOVE_DOWN, "", "Move down (Alt + Down)", "move_down.png", this, "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
+        actions.addAction(createAction(MOVE_ON, "", "Move on (Alt + Up)", "move_on.png", this, "moveOn", KeyStroke.getKeyStroke("alt UP")));
+        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front (Alt + PageUp)", "move_front.png", this, "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
         addSeparatortTo(IconToolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left", "align_to_left.png", this, "alignToLeft", null));
+        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left (Alt + numpad 4)", "align_to_left.png", this, "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
         actions.addAction(createAction(ALIGN_TO_CENTER, "", "Align to the center", "align_to_center.png", this, "alignToCenter", null));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right", "align_to_right.png", this, "alignToRight", null));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom", "align_to_bottom.png", this, "alignToBottom", null));
+        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right (Alt + numpad 6)", "align_to_right.png", this, "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
+        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom (Alt + numpad 2)", "align_to_bottom.png", this, "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
         actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle.png", this, "alignToMiddle", null));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top", "align_to_top.png", this, "alignToTop", null));
+        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top (Alt + numpad 8)", "align_to_top.png", this, "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
         addSeparatortTo(IconToolBar);
-        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties", "properties.png", uiController, "showSelectedGEProperties", null));
-        actions.addAction(createAction(DELETE, "", "Delete selected elements", "delete.png", uiController, "removeSelectedGE", null));
+        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties.png", uiController, "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
+        actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete.png", uiController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
+        actions.addAction(createAction(DELETE, "", "Redraw selected elements (Ctrl + R)", "refresh.png", uiController, "redrawSelectedGE", KeyStroke.getKeyStroke("control R")));
         IconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
         //Sets the spinners tool bar.
@@ -173,6 +173,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
         //Adds the composition area.
         this.add(compositionArea, BorderLayout.CENTER);
+
+        actions.setAccelerators(rootPane, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
     /**
@@ -337,7 +339,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void newComposer(){
         uiController.removeAllGE();
         uiController.instantiateGE(Document.class);
-        uiController.setNewGE(0, 0, 1, 1);
     }
 
     /**
@@ -356,6 +357,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(MapImage.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -367,6 +370,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(TextElement.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -376,6 +381,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -387,6 +394,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Orientation.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -398,6 +407,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Scale.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
 
     /**
@@ -409,16 +420,22 @@ public class MainWindow extends JFrame implements MainFrameAction{
             uiController.instantiateGE(Image.class);
             compositionArea.setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void drawCircle(){
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void drawPolygon(){
         if(uiController.isDocumentCreated()) {
             //Unsupported yet
         }
+        else
+            this.compositionArea.getOverlay().writeMessage("First create a new document or open an existing project.");
     }
     public void moveBack(){
         uiController.changeZIndex(ZIndex.TO_BACK);

@@ -24,12 +24,16 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.sif.UIPanel;
 
 import java.awt.*;
 import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
+import java.util.List;
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -75,5 +79,10 @@ public abstract class SimpleGERenderer implements GERenderer {
         //Apply the transform to the bufferedImage an return it
         affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
         return affineTransformOp.filter(bi, null);
+    }
+
+    @Override
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
+        return null;
     }
 }
