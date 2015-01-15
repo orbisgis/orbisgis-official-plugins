@@ -102,7 +102,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Text ConfigurationAttribute
         StringCA textCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Text"))
+            if(ca.getName().equals(TextElement.sText))
                 textCA = (StringCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> text = new ArrayList<>();
@@ -117,7 +117,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         SourceListCA fontCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Font"))
+            if(ca.getName().equals(TextElement.sFont))
                 fontCA = (SourceListCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> font = new ArrayList<>();
@@ -130,7 +130,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         IntegerCA fontSizeCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Font size"))
+            if(ca.getName().equals(TextElement.sFontSize))
                 fontSizeCA = (IntegerCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> fontSize = new ArrayList<>();;
@@ -148,7 +148,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         SourceListCA StyleCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Style"))
+            if(ca.getName().equals(TextElement.sStyle))
                 StyleCA = (SourceListCA) ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> style = new ArrayList<>();
@@ -167,7 +167,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         SourceListCA alignmentCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Alignment"))
+            if(ca.getName().equals(TextElement.sAlignment))
                 alignmentCA = (SourceListCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> alignment = new ArrayList<>();
@@ -185,7 +185,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         ColorCA textColorCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Text color"))
+            if(ca.getName().equals(TextElement.sTextColor))
                 textColorCA = (ColorCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> textColor = new ArrayList<>();
@@ -200,7 +200,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         ColorCA backgroundColorCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Background color"))
+            if(ca.getName().equals(TextElement.sBackColor))
                 backgroundColorCA = (ColorCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> backgroundColor = new ArrayList<>();
@@ -215,7 +215,7 @@ public class TextRenderer extends SimpleGERenderer {
         //Find the Font ConfigurationAttribute
         IntegerCA alphaCA = null;
         for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals("Alpha"))
+            if(ca.getName().equals(TextElement.sAlpha))
                 alphaCA = (IntegerCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
         List<Component> alpha = new ArrayList<>();
