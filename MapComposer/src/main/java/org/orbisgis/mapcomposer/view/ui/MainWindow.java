@@ -339,7 +339,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void newComposer(){
         uiController.removeAllGE();
         uiController.instantiateGE(Document.class);
-        uiController.setNewGE(0, 0, 1, 1);
     }
 
     /**

@@ -505,12 +505,15 @@ public class UIController{
      */
     public void loadDocument(){
         try {
-            removeAllGE();
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            //Add all the GE starting from the last one (to get the good z-index)
-            for(int i=list.size()-1; i>=0; i--)
-                addGE(list.get(i));
-            mainWindow.getCompositionArea().refresh();
+            //Test if the file was successfully loaded.
+            if(list != null) {
+                removeAllGE();
+                //Add all the GE starting from the last one (to get the good z-index)
+                for (int i = list.size() - 1; i >= 0; i--)
+                    addGE(list.get(i));
+                mainWindow.getCompositionArea().refresh();
+            }
         } catch (ParserConfigurationException|SAXException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
@@ -563,20 +566,26 @@ public class UIController{
         if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
-                //If the image has an already set path value, get the image ratio
-                if (newGE instanceof SimpleIllustrationGE) {
-                    File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                    if (f.exists() && f.isFile()) {
-                        try {
-                            BufferedImage bi = ImageIO.read(f);
-                            mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(UIController.class).error(e.getMessage());
+                //If the newGE is a Document GE, then draw it immediately
+                if(newGE instanceof Document){
+                    setNewGE(0, 0, 1, 1);
+                }
+                else {
+                    //If the image has an already set path value, get the image ratio
+                    if (newGE instanceof SimpleIllustrationGE) {
+                        File f = new File(((SimpleIllustrationGE) newGE).getPath());
+                        if (f.exists() && f.isFile()) {
+                            try {
+                                BufferedImage bi = ImageIO.read(f);
+                                mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                            } catch (IOException e) {
+                                LoggerFactory.getLogger(UIController.class).error(e.getMessage());
+                            }
                         }
                     }
+                    mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+                    mainWindow.getCompositionArea().getOverlay().writeMessage("Now you can draw the GraphicalElement.");
                 }
-                mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-                mainWindow.getCompositionArea().getOverlay().writeMessage("Now you can draw the GraphicalElement.");
             }
             else{
                 newGE=null;
@@ -824,13 +833,12 @@ public class UIController{
         }
         executorService.shutdown();
 
-        //Add to the last RenderWorker a listener to open a saveFilePanel just after the rendering is done
+        //Add to the lastRenderWorker a listener to open a saveFilePanel just after the rendering is done
+        //If the lastRenderWorker is null it means that there is nothing to export, so skip the exportation
         if(lastRenderWorker!=null) {
             lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                    //Reset the executorService
-                    executorService = Executors.newFixedThreadPool(1);
                     //Verify if the property state is at DONE
                     if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                         //Creates and sets the file chooser
@@ -858,5 +866,7 @@ public class UIController{
                 }
             });
         }
+        //Reset the executorService
+        executorService = Executors.newFixedThreadPool(1);
     }
 }

@@ -49,7 +49,7 @@ public class CompositionArea extends JPanel{
     
     /**Main JPanel of the CompositionArea. */
     private final JPanel panel = new JPanel(null);
-    
+
     /**Dimension of the document into the CompositionArea. */
     private Dimension dimension = new Dimension(50, 50);
 

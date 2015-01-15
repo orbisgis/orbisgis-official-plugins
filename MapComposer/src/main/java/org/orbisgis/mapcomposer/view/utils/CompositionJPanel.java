@@ -344,6 +344,7 @@ public class CompositionJPanel extends JPanel{
             this.moveMode=MoveMode.NONE;
         }
         uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+        uic.refreshSpin();
     }
 
      /**

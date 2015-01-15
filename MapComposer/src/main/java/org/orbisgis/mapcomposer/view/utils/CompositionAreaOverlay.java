@@ -54,17 +54,15 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
     /** Stop the overlay if the message has not change during this time */
     private static final int MESSAGE_TIMEOUT = 3000;
-    /** Size of the arc value for drawinf the round rectangle **/
+    /** Size of the arc value for drawing the round rectangle **/
     private static final int MESSAGE_ARC = 15;
     /** Space between the window border and the message box border **/
     private static final int MESSAGE_MARGIN = 10;
     /** Maximum value of the presence of the message **/
     private static final int MESSAGE_PRESENCE_MAX = 100;
-    /** minimum value of the timer delay to the mesage box velocity **/
-    private static final int MESSAGE_TIME_GROWING = 50;
-    /** Value added or removed from the timer delay to give an impression of decreasing or increasing the move velocity. **/
-    private static final int TIMER_DELAY_DECREASE = 2;
-    /** Alpha value applyed to the message box.**/
+    /** Value of the timer delay to the message box velocity **/
+    private static final int MESSAGE_TIME_GROWING = 5;
+    /** Alpha value applied to the message box.**/
     private static final float MESSAGE_ALPHA = 0.7f;
     /** Border in pixels, on top and bottom of text message */
     private static final int OVERLAY_INNER_BORDER = 2;
@@ -287,7 +285,8 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     public void writeMessage(String message){
         this.message = message;
         this.messagePresence = 0;
-        timer = new Timer(1, EventHandler.create(ActionListener.class, this, "growIn"));
+        timer.stop();
+        timer = new Timer(MESSAGE_TIME_GROWING, EventHandler.create(ActionListener.class, this, "growIn"));
         timer.setRepeats(true);
         timer.start();
         this.firePropertyChange("messageOpacity", null, messagePresence);
@@ -299,9 +298,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     public void growIn(){
         messagePresence++;
         this.firePropertyChange("messageOpacity", null, messagePresence);
-        //Try to decrease the velocity
-        if(timer.getDelay()<= MESSAGE_TIME_GROWING && messagePresence>75)
-            timer.setDelay(timer.getDelay() + TIMER_DELAY_DECREASE);
         //Stop the growing
         if(messagePresence==MESSAGE_PRESENCE_MAX){
             timer.stop();
@@ -327,8 +323,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     public void growOut(){
         messagePresence--;
         this.firePropertyChange("messageOpacity", null, messagePresence);
-        if(timer.getDelay()>=TIMER_DELAY_DECREASE)
-            timer.setDelay(timer.getDelay() - TIMER_DELAY_DECREASE);
         if(messagePresence<=0){
             timer.stop();
             messagePresence = MESSAGE_PRESENCE_MAX;
