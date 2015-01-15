@@ -90,7 +90,7 @@ public class MapImageRenderer extends SimpleGERenderer {
         owsc.add(Box.createHorizontalStrut(150 - owscName.getFontMetrics(owscName.getFont()).stringWidth(owscName.getText())));
         JComboBox owscBox = (JComboBox)uic.getCAManager().getRenderer(owscCA).createJComponentFromCA(owscCA);
         //Limits the size of the component
-        owscBox.setPreferredSize(new Dimension(150, (int) owscBox.getPreferredSize().getHeight()));
+        owscBox.setPreferredSize(new Dimension(200, (int) owscBox.getPreferredSize().getHeight()));
         owsc.add(owscBox);
         //Add the ConfigurationAttribute and its representation to the UIDialogProperties
         uid.addComponent(owsc, owscCA, enableLock);

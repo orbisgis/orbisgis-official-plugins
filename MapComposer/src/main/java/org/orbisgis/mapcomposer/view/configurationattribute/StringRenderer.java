@@ -55,8 +55,8 @@ public class StringRenderer implements CARenderer{
         //Display the StringCA into a JTextArea
         JTextArea area = new JTextArea(stringCA.getValue());
         area.setAlignmentX(Component.LEFT_ALIGNMENT);
-        area.setColumns(30);
-        area.setRows(4);
+        area.setColumns(35);
+        area.setRows(7);
         area.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
         //"Save" the CA inside the JTextField
         area.getDocument().putProperty("StringCA", stringCA);

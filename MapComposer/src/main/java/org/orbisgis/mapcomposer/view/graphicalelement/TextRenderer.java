@@ -109,7 +109,8 @@ public class TextRenderer extends SimpleGERenderer {
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.add(new JLabel(textCA.getName()));
-        panel.add(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA));
+        //Puts the JTextArea inside a JScrollPane
+        panel.add(new JScrollPane(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA)));
         text.add(panel);
         //Add the ConfigurationAttribute and its representation to the UIDialogProperties
         uid.addComponent(text, textCA, enableLock);
