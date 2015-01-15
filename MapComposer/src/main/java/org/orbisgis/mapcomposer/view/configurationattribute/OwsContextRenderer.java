@@ -26,9 +26,12 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
-import java.awt.FlowLayout;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
+import java.io.File;
 import javax.swing.*;
 
 /**
@@ -52,12 +55,29 @@ public class OwsContextRenderer implements CARenderer{
         JComboBox<String> jcb = new JComboBox(owsContextCA.getValue().toArray());
         //Adds an empty ows-context
         jcb.addItem("< none >");
+        //Sets a custom renderer to the JComboBox to display the name of the OWS-Context".
+        jcb.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                if(value == null)
+                    return this;
+                setText(value.toString());
+                //If the value is a String, test if this string is a path and then set the text to the OWS-Context name.
+                if(value instanceof String) {
+                    File file = new File(value.toString());
+                    if(file.exists())
+                        setText(file.getName());
+                }
+                return this;
+            }
+        });
         //Try to select the selected value of the OwsContextCA in the JComboBox
         if(owsContextCA.getSelected()!=null)
             jcb.setSelectedItem(owsContextCA.getSelected());
         else
             jcb.setSelectedIndex(jcb.getItemCount() - 1);
-        //Add an action listener to set the ConfigurationAttribute with the selected value of the JComboBox
+        //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
         jcb.addActionListener(EventHandler.create(ActionListener.class, owsContextCA, "select", "source.selectedItem"));
 
         return jcb;

@@ -26,11 +26,15 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
-import java.awt.FlowLayout;
+
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.File;
 import javax.swing.*;
+import javax.swing.event.ListDataListener;
+import javax.swing.plaf.basic.BasicComboBoxEditor;
+import javax.swing.plaf.basic.BasicComboBoxRenderer;
 
 /**
  * Renderer associated to the FileListCA ConfigurationAttribute.
@@ -51,8 +55,25 @@ public class FileListRenderer implements CARenderer{
 
         //Display the FileListCA into a JComboBox
         JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
-        jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
+        //Sets a custom renderer to the JComboBox to display the name of the file and not their full path.
+        jcb.setRenderer(new DefaultListCellRenderer() {
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                //If the value is null, don't touch the combo box
+                if (value == null)
+                    return this;
+                //If the value is a File, set the text to the file name.
+                if (value instanceof File)
+                    setText(((File) value).getName());
+                else
+                    setText(value.toString());
+                return this;
+            }
+        });
         jcb.setSelectedItem(ca.getValue());
+        //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
+        jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
         
         return jcb;
     }

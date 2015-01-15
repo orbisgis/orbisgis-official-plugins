@@ -28,7 +28,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 
-import java.awt.FlowLayout;
+import java.awt.*;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.util.ArrayList;
@@ -53,11 +53,26 @@ public class MapImageListRenderer implements CARenderer{
 
         ArrayList<String> names = new ArrayList<>();
         //Display the MapImageListCA into a JComboBox
-        for(MapImage mi : milka.getValue())
-            names.add(mi.toString());
-        JComboBox<String> jcb = new JComboBox(names.toArray());
-        jcb.addActionListener(EventHandler.create(ActionListener.class, milka, "select", "source.selectedItem"));
+        JComboBox<MapImage> jcb = new JComboBox(milka.getValue().toArray());
+        //Sets a custom renderer to the JComboBox to display the name of the OWS-Context represented by the selected MapImage.
+        jcb.setRenderer(new DefaultListCellRenderer(){
+            @Override
+            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
+                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
+                //If the value is null, don't touch the combo box
+                if(value == null)
+                    return this;
+                //If the value is a MapImage, set the text to the OWS-Context represented
+                if(value instanceof MapImage)
+                    setText(((MapImage)value).getOwsMapContext().getTitle());
+                else
+                    setText(value.toString());
+                return this;
+            }
+        });
         jcb.setSelectedItem(ca.getValue());
+        //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
+        jcb.addActionListener(EventHandler.create(ActionListener.class, milka, "select", "source.selectedItem"));
 
         return jcb;
     }
