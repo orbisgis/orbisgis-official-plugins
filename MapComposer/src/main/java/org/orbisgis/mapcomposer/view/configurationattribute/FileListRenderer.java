@@ -26,15 +26,15 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.FileListCA;
+import org.orbisgis.sif.common.ContainerItem;
 
-import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.File;
 import javax.swing.*;
-import javax.swing.event.ListDataListener;
-import javax.swing.plaf.basic.BasicComboBoxEditor;
-import javax.swing.plaf.basic.BasicComboBoxRenderer;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Renderer associated to the FileListCA ConfigurationAttribute.
@@ -54,27 +54,24 @@ public class FileListRenderer implements CARenderer{
         FileListCA fileListCA = (FileListCA)ca;
 
         //Display the FileListCA into a JComboBox
-        JComboBox<File> jcb = new JComboBox(fileListCA.getValue().toArray(new String[0]));
-        //Sets a custom renderer to the JComboBox to display the name of the file and not their full path.
-        jcb.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                //If the value is null, don't touch the combo box
-                if (value == null)
-                    return this;
-                //If the value is a File, set the text to the file name.
-                if (value instanceof File)
-                    setText(((File) value).getName());
-                else
-                    setText(value.toString());
-                return this;
-            }
-        });
+        List<ContainerItem<File>> listContainer = new ArrayList<>();
+        for(File f : fileListCA.getValue()){
+            listContainer.add(new ContainerItem<File>(f, f.getName()));
+        }
+        JComboBox<ContainerItem<File>> jcb = new JComboBox<ContainerItem<File>>(listContainer.toArray(new ContainerItem[0]));
+        jcb.putClientProperty("ca", fileListCA);
         jcb.setSelectedItem(ca.getValue());
         //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
-        jcb.addActionListener(EventHandler.create(ActionListener.class, fileListCA, "select", "source.selectedItem"));
+        jcb.addActionListener(EventHandler.create(ActionListener.class, this, "setCA", ""));
         
         return jcb;
+    }
+
+    public void setCA(ActionEvent actionEvent){
+        if((actionEvent.getSource() instanceof JComboBox)){
+            FileListCA fileListCA = (FileListCA)((JComboBox) actionEvent.getSource()).getClientProperty("ca");
+            ContainerItem<File> container = (ContainerItem)((JComboBox) actionEvent.getSource()).getSelectedItem();
+            fileListCA.select(container.getKey());
+        }
     }
 }

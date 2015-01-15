@@ -26,12 +26,13 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import org.orbisgis.sif.common.ContainerItem;
 
-import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.File;
+import java.util.*;
 import javax.swing.*;
 
 /**
@@ -52,34 +53,29 @@ public class OwsContextRenderer implements CARenderer{
         OwsContextCA owsContextCA = (OwsContextCA)ca;
 
         //Display the OwsContextCA into a JComboBox
-        JComboBox<String> jcb = new JComboBox(owsContextCA.getValue().toArray());
-        //Adds an empty ows-context
-        jcb.addItem("< none >");
-        //Sets a custom renderer to the JComboBox to display the name of the OWS-Context".
-        jcb.setRenderer(new DefaultListCellRenderer(){
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                if(value == null)
-                    return this;
-                setText(value.toString());
-                //If the value is a String, test if this string is a path and then set the text to the OWS-Context name.
-                if(value instanceof String) {
-                    File file = new File(value.toString());
-                    if(file.exists())
-                        setText(file.getName());
-                }
-                return this;
-            }
-        });
+        List<ContainerItem<String>> listContainer = new ArrayList<>();
+        for(String string : owsContextCA.getValue()){
+            listContainer.add(new ContainerItem<>(string, (new File(string.toString()).getName())));
+        }
+        JComboBox<ContainerItem<String>> jcb = new JComboBox<ContainerItem<String>>(listContainer.toArray(new ContainerItem[0]));
+        jcb.addItem(new ContainerItem<String>("", "< none >"));
+        jcb.putClientProperty("ca", owsContextCA);
         //Try to select the selected value of the OwsContextCA in the JComboBox
         if(owsContextCA.getSelected()!=null)
-            jcb.setSelectedItem(owsContextCA.getSelected());
+            jcb.setSelectedItem(listContainer.get(owsContextCA.getValue().indexOf(owsContextCA.getSelected())));
         else
             jcb.setSelectedIndex(jcb.getItemCount() - 1);
         //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
-        jcb.addActionListener(EventHandler.create(ActionListener.class, owsContextCA, "select", "source.selectedItem"));
+        jcb.addActionListener(EventHandler.create(ActionListener.class, this, "setCA", ""));
 
         return jcb;
+    }
+
+    public void setCA(ActionEvent actionEvent){
+        if((actionEvent.getSource() instanceof JComboBox)){
+            OwsContextCA owsContextCA = (OwsContextCA)((JComboBox) actionEvent.getSource()).getClientProperty("ca");
+            ContainerItem<String> container = (ContainerItem)((JComboBox) actionEvent.getSource()).getSelectedItem();
+            owsContextCA.select(container.getKey());
+        }
     }
 }

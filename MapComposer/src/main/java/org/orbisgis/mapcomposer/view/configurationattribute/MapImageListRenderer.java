@@ -27,12 +27,15 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import org.orbisgis.sif.common.ContainerItem;
 
 import java.awt.*;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.util.ArrayList;
 import javax.swing.*;
+import java.util.List;
 
 /**
  * Renderer associated to the LinkToMap CA
@@ -51,29 +54,28 @@ public class MapImageListRenderer implements CARenderer{
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
         final MapImageListCA milka = (MapImageListCA)ca;
 
-        ArrayList<String> names = new ArrayList<>();
         //Display the MapImageListCA into a JComboBox
-        JComboBox<MapImage> jcb = new JComboBox(milka.getValue().toArray());
-        //Sets a custom renderer to the JComboBox to display the name of the OWS-Context represented by the selected MapImage.
-        jcb.setRenderer(new DefaultListCellRenderer(){
-            @Override
-            public Component getListCellRendererComponent(JList<?> list, Object value, int index, boolean isSelected, boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-                //If the value is null, don't touch the combo box
-                if(value == null)
-                    return this;
-                //If the value is a MapImage, set the text to the OWS-Context represented
-                if(value instanceof MapImage)
-                    setText(((MapImage)value).getOwsMapContext().getTitle());
-                else
-                    setText(value.toString());
-                return this;
-            }
-        });
-        jcb.setSelectedItem(ca.getValue());
+        List<ContainerItem<MapImage>> listContainer = new ArrayList<>();
+        for(MapImage mapImage : milka.getValue()){
+            listContainer.add(new ContainerItem<>(mapImage, mapImage.getOwsMapContext().getTitle()));
+        }
+        JComboBox<ContainerItem<MapImage>> jcb = new JComboBox<ContainerItem<MapImage>>(listContainer.toArray(new ContainerItem[0]));
+        jcb.putClientProperty("ca", milka);
+        if(milka.getSelected()!=null)
+            jcb.setSelectedItem(listContainer.get(milka.getValue().indexOf(milka.getSelected())));
+        else
+            jcb.setSelectedIndex(0);
         //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
-        jcb.addActionListener(EventHandler.create(ActionListener.class, milka, "select", "source.selectedItem"));
+        jcb.addActionListener(EventHandler.create(ActionListener.class, this, "setCA", ""));
 
         return jcb;
+    }
+
+    public void setCA(ActionEvent actionEvent){
+        if((actionEvent.getSource() instanceof JComboBox)){
+            MapImageListCA milka = (MapImageListCA)((JComboBox) actionEvent.getSource()).getClientProperty("ca");
+            ContainerItem<MapImage> container = (ContainerItem)((JComboBox) actionEvent.getSource()).getSelectedItem();
+            milka.select(container.getKey());
+        }
     }
 }
