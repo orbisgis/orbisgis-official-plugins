@@ -1,3 +1,27 @@
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
+
 package org.orbisgis.mapcomposer.controller;
 
 import static java.lang.Math.cos;
@@ -54,6 +78,8 @@ import org.xml.sax.SAXException;
 
 /**
  * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
+ *
+ * @author Sylvain PALOMINOS
  */
 public class UIController implements StateEditable{
 
@@ -285,7 +311,7 @@ public class UIController implements StateEditable{
             r=selectedGE.get(0).getRotation();
             //Test each GE
             for(GraphicalElement graph : selectedGE){
-                if(x!=graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
+                if (x != graph.getX()){ boolX=true;x=selectedGE.get(0).getX();}
                 if(y!=graph.getY()){ boolY=true;y=selectedGE.get(0).getY();}
                 if(w!=graph.getWidth()){ boolW=true;w=selectedGE.get(0).getWidth();}
                 if(h!=graph.getHeight()){ boolH=true;h=selectedGE.get(0).getHeight();}
@@ -372,7 +398,11 @@ public class UIController implements StateEditable{
      * Redraws all the selected GraphicalElements
      */
     public void redrawSelectedGE(){
+        //Copy of the list to avoid ConcurrentModificationException
+        List<GraphicalElement> list = new ArrayList<>();
         for(GraphicalElement ge : selectedGE)
+            list.add(ge);
+        for(GraphicalElement ge : list)
             redrawGE(ge);
     }
 
@@ -387,7 +417,7 @@ public class UIController implements StateEditable{
             ((GERefresh)ge).refresh();
         unselectGE(ge);
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-        worker.execute();
+        executorService.submit(worker);
         if(ge instanceof Document)
             mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
         refreshSpin();
@@ -506,12 +536,15 @@ public class UIController implements StateEditable{
      */
     public void loadDocument(){
         try {
-            removeAllGE();
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            //Add all the GE starting from the last one (to get the good z-index)
-            for(int i=list.size()-1; i>=0; i--)
-                addGE(list.get(i));
-            mainWindow.getCompositionArea().refresh();
+            //Test if the file was successfully loaded.
+            if(list != null) {
+                removeAllGE();
+                //Add all the GE starting from the last one (to get the good z-index)
+                for (int i = list.size() - 1; i >= 0; i--)
+                    addGE(list.get(i));
+                mainWindow.getCompositionArea().refresh();
+            }
         } catch (ParserConfigurationException|SAXException|IOException ex) {
             LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
         }
@@ -564,17 +597,25 @@ public class UIController implements StateEditable{
         if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
-                //If the image has an already set path value, get the image ratio
-                if (newGE instanceof SimpleIllustrationGE) {
-                    File f = new File(((SimpleIllustrationGE) newGE).getPath());
-                    if (f.exists() && f.isFile()) {
-                        try {
-                            BufferedImage bi = ImageIO.read(f);
-                            mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
-                        } catch (IOException e) {
-                            LoggerFactory.getLogger(UIController.class).error(e.getMessage());
+                //If the newGE is a Document GE, then draw it immediately
+                if(newGE instanceof Document){
+                    setNewGE(0, 0, 1, 1);
+                }
+                else {
+                    //If the image has an already set path value, get the image ratio
+                    if (newGE instanceof SimpleIllustrationGE) {
+                        File f = new File(((SimpleIllustrationGE) newGE).getPath());
+                        if (f.exists() && f.isFile()) {
+                            try {
+                                BufferedImage bi = ImageIO.read(f);
+                                mainWindow.getCompositionArea().getOverlay().setRatio((float) bi.getWidth() / bi.getHeight());
+                            } catch (IOException e) {
+                                LoggerFactory.getLogger(UIController.class).error(e.getMessage());
+                            }
                         }
                     }
+                    mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
+                    mainWindow.getCompositionArea().getOverlay().writeMessage("Now you can draw the GraphicalElement.");
                 }
                 mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
 
@@ -712,10 +753,21 @@ public class UIController implements StateEditable{
      */
     public void showSelectedGEProperties(){
         if(selectedGE.size()>0){
+            //Test if all the selected GE has the same class or not.
+            boolean hasSameClass = true;
+            for(GraphicalElement ge : selectedGE)
+                if(ge.getClass()!=selectedGE.get(0).getClass())
+                    hasSameClass=false;
             //If the only one GraphicalElement is selected, the locking checkboxes are hidden
             toBeSet.addAll(selectedGE);
             //Create and show the properties dialog.
-            UIPanel panel = new UIDialogProperties(getCommonAttributes(), this, false);
+            UIPanel panel = null;
+            if(hasSameClass) {
+                //Try to create an equivalent GE with the common attributes
+                panel = geManager.getRenderer(selectedGE.get(0).getClass()).createConfigurationPanel(getCommonAttributes(), this, true);
+            }
+            if(panel==null)
+                panel = new UIDialogProperties(getCommonAttributes(), this, true);
             SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
             dialog.setVisible(true);
             dialog.pack();
@@ -730,7 +782,9 @@ public class UIController implements StateEditable{
     public SIFDialog showGEProperties(GraphicalElement ge){
         toBeSet.add(ge);
         //Create and show the properties dialog.
-        UIPanel panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
+        UIPanel panel = geManager.getRenderer(ge.getClass()).createConfigurationPanel(ge.getAllAttributes(), this, false);
+        if(panel==null)
+            panel = new UIDialogProperties(ge.getAllAttributes(), this, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainWindow, true);
         dialog.setVisible(true);
         dialog.pack();
@@ -779,7 +833,7 @@ public class UIController implements StateEditable{
     public enum ZIndex{
         TO_FRONT, FRONT, BACK, TO_BACK;
     }
-    
+
     public enum Align{
         LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM;
     }
@@ -828,13 +882,12 @@ public class UIController implements StateEditable{
         }
         executorService.shutdown();
 
-        //Add to the last RenderWorker a listener to open a saveFilePanel just after the rendering is done
+        //Add to the lastRenderWorker a listener to open a saveFilePanel just after the rendering is done
+        //If the lastRenderWorker is null it means that there is nothing to export, so skip the exportation
         if(lastRenderWorker!=null) {
             lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
                 @Override
                 public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                    //Reset the executorService
-                    executorService = Executors.newFixedThreadPool(1);
                     //Verify if the property state is at DONE
                     if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                         //Creates and sets the file chooser
@@ -862,6 +915,8 @@ public class UIController implements StateEditable{
                 }
             });
         }
+        //Reset the executorService
+        executorService = Executors.newFixedThreadPool(1);
     }
 
     public static class UndoableEdit extends AbstractUndoableEdit{

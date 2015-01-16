@@ -1,3 +1,27 @@
+/*
+* MapComposer is an OrbisGIS plugin dedicated to the creation of cartographic
+* documents based on OrbisGIS results.
+*
+* This plugin is developed at French IRSTV institute as part of the MApUCE project,
+* funded by the French Agence Nationale de la Recherche (ANR) under contract ANR-13-VBDU-0004.
+*
+* The MapComposer plugin is distributed under GPL 3 license. It is produced by the "Atelier SIG"
+* team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
+*
+* Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+*
+* This file is part of the MapComposer plugin.
+*
+* The MapComposer plugin is free software: you can redistribute it and/or modify it under the
+* terms of the GNU General Public License as published by the Free Software
+* Foundation, either version 3 of the License, or (at your option) any later
+* version.
+*
+* The MapComposer plugin is distributed in the hope that it will be useful, but WITHOUT ANY
+* WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR
+* A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
+*/
+
 package org.orbisgis.mapcomposer.model.graphicalelement.element.text;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
@@ -15,6 +39,8 @@ import java.awt.GraphicsEnvironment;
 
 /**
  * GraphicalElement displaying a text. Several aspects can be defined such as the text color, the font,the font size ...
+ *
+ * @author Sylvain PALOMINOS
  */
 public class TextElement extends SimpleGE{
     /** Fonts allowed */
@@ -33,20 +59,29 @@ public class TextElement extends SimpleGE{
     private StringCA text;
     /** Alpha (transparency value) */
     private IntegerCA alpha;
+
+    public static final String sText = "Text";
+    public static final String sTextColor = "Text color";
+    public static final String sBackColor = "Background color";
+    public static final String sAlignment = "Alignment";
+    public static final String sStyle = "Style";
+    public static final String sAlpha = "Alpha";
+    public static final String sFont = "Font";
+    public static final String sFontSize = "Font size";
     
     /**
      * Public main constructor.
      */
     public TextElement(){
         //ConfigurationAttribute instantiation
-        this.font = new SourceListCA("Font", false);
-        this.colorText = new ColorCA("Text color", false, Color.BLACK);
-        this.colorBack = new ColorCA("Background color", false, Color.WHITE);
-        this.alignment = new SourceListCA("Alignment", false);
-        this.style = new SourceListCA("Style", false);
-        this.fontSize = new IntegerCA("Font size", false, 12, true, 1, Integer.MAX_VALUE);
-        this.text = new StringCA("Text", false, "Some text");
-        this.alpha = new IntegerCA("Alpha", false, 0, true, 0, 255);
+        this.font = new SourceListCA(sFont, false);
+        this.colorText = new ColorCA(sTextColor, false, Color.BLACK);
+        this.colorBack = new ColorCA(sBackColor, false, Color.WHITE);
+        this.alignment = new SourceListCA(sAlignment, false);
+        this.style = new SourceListCA(sStyle, false);
+        this.fontSize = new IntegerCA(sFontSize, false, 12, true, 1, Integer.MAX_VALUE);
+        this.text = new StringCA(sText, false, "Some text");
+        this.alpha = new IntegerCA(sAlpha, false, 0, true, 0, 255);
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
             this.font.add(s);
@@ -93,21 +128,21 @@ public class TextElement extends SimpleGE{
     @Override
     public void setAttribute(ConfigurationAttribute ca) {
         super.setAttribute(ca);
-        if(ca.getName().equals(font.getName()))
+        if(ca.getName().equals(sFont))
             font=(SourceListCA)ca;
-        if(ca.getName().equals(colorText.getName()))
+        if(ca.getName().equals(sTextColor))
             colorText=(ColorCA)ca;
-        if(ca.getName().equals(colorBack.getName()))
+        if(ca.getName().equals(sBackColor))
             colorBack=(ColorCA)ca;
-        if(ca.getName().equals(alignment.getName()))
+        if(ca.getName().equals(sAlignment))
             alignment=(SourceListCA)ca;
-        if(ca.getName().equals(style.getName()))
+        if(ca.getName().equals(sStyle))
             style=(SourceListCA)ca;
-        if(ca.getName().equals(fontSize.getName()))
+        if(ca.getName().equals(sFontSize))
             fontSize=(IntegerCA)ca;
-        if(ca.getName().equals(text.getName()))
+        if(ca.getName().equals(sText))
             text=(StringCA)ca;
-        if(ca.getName().equals(alpha.getName()))
+        if(ca.getName().equals(sAlpha))
             alpha=(IntegerCA)ca;
     }
 
@@ -157,7 +192,7 @@ public class TextElement extends SimpleGE{
      * Sets the alignment of the text
      * @param alignment The new alignment.
      */
-    public void setStyle(Alignment alignment) {this.alignment.select(alignment.name());}
+    public void setAlignment(Alignment alignment) {this.alignment.select(alignment.name());}
     
     
     /**
