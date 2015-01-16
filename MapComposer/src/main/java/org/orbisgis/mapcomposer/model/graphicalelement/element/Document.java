@@ -27,7 +27,7 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 
 import java.awt.Dimension;
@@ -40,7 +40,7 @@ import java.util.List;
  *
  * @author Sylvain PALOMINOS
  */
-public class Document extends SimpleGE implements GERefresh, AlwaysOnBack {
+public class Document extends SimpleGE implements GERefresh, GEProperties {
 
     /**Document orientation (portrait or landscape)*/
     private SourceListCA orientation;
@@ -50,6 +50,26 @@ public class Document extends SimpleGE implements GERefresh, AlwaysOnBack {
 
     /**Name of the document*/
     private StringCA name;
+
+    @Override
+    public boolean isDocumentNeeded() {
+        return false;
+    }
+
+    @Override
+    public boolean isAlwaysOnTop() {
+        return false;
+    }
+
+    @Override
+    public boolean isAlwaysOnBack() {
+        return true;
+    }
+
+    @Override
+    public boolean isDrawnByUser() {
+        return false;
+    }
 
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
     public enum Orientation{PORTRAIT, LANDSCAPE}

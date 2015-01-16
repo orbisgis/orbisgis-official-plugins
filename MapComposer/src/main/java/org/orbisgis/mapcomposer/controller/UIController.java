@@ -32,10 +32,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshC
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnBack;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.AlwaysOnFront;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
@@ -180,16 +177,16 @@ public class UIController implements StateEditable{
         Stack<GraphicalElement> temp = new Stack<>();
         Stack<GraphicalElement> tempBack = new Stack<>();
         Stack<GraphicalElement> tempFront = new Stack<>();
-        //Get the GE implementing the AlwaysOnBack interface and put them at the back
+        //Get the GE implementing the GEProperties interface and which are always on the back
         for(GraphicalElement ge : zIndexStack){
-            if(ge instanceof AlwaysOnBack){
+            if(ge instanceof GEProperties && ((GEProperties)ge).isAlwaysOnBack()){
                 tempBack.push(ge);
                 temp.add(ge);
             }
         }
-        //Get the GE implementing the AlwaysOnFront interface and put them at the front
+        //Get the GE implementing the GEProperties interface and which are always on the front
         for(GraphicalElement ge : zIndexStack){
-            if(ge instanceof AlwaysOnFront){
+            if(ge instanceof  GEProperties && ((GEProperties)ge).isAlwaysOnTop()){
                 tempFront.push(ge);
                 temp.add(ge);
             }
@@ -572,12 +569,25 @@ public class UIController implements StateEditable{
     }
 
     /**
-     * DOes the instantiation of the new GraphicalElement and open the configuration dialog.
+     * Does the instantiation of the new GraphicalElement and open the configuration dialog.
      * @param newGEClass
      */
-    public void instantiateGE(Class<? extends GraphicalElement> newGEClass) {
+    public void instantiateNewGE(Class<? extends GraphicalElement> newGEClass) {
         try {
+            //Instantiate the GraphicalElement
             newGE = newGEClass.newInstance();
+            //Test if the newGE doesn't implement GEProperties and if there isn't a Document GE
+            if( !(newGE instanceof GEProperties) && !isDocumentCreated()) {
+                this.mainWindow.getCompositionArea().getOverlay().writeMessage("First create a new document or open an existing project.");
+                return;
+            }
+
+            //Test if the newGE implements GEProperties and if it needs a Document GE and if there isn't a Document GE
+            if( newGE instanceof GEProperties && ((GEProperties)newGE).isDocumentNeeded() && !isDocumentCreated()) {
+                this.mainWindow.getCompositionArea().getOverlay().writeMessage("First create a new document or open an existing project.");
+                return;
+            }
+
             //Refresh the ConfigurationAttributes to initialize them
             for(ConfigurationAttribute ca : newGE.getAllAttributes())
                 if(ca instanceof RefreshCA)
@@ -598,8 +608,10 @@ public class UIController implements StateEditable{
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
                 //If the newGE is a Document GE, then draw it immediately
-                if(newGE instanceof Document){
-                    setNewGE(0, 0, 1, 1);
+                if(newGE instanceof GEProperties && !((GEProperties)newGE).isDrawnByUser()){
+                    addGE(newGE);
+                    redrawGE(newGE);
+                    newGE=null;
                 }
                 else {
                     //If the image has an already set path value, get the image ratio
@@ -617,7 +629,6 @@ public class UIController implements StateEditable{
                     mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
                     mainWindow.getCompositionArea().getOverlay().writeMessage("Now you can draw the GraphicalElement.");
                 }
-                mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
 
                 List<GraphicalElement> list = new ArrayList<>();
                 list.add(newGE);
