@@ -133,9 +133,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer.png", this, "newComposer", KeyStroke.getKeyStroke("control N")));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration.png", uiController, "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save.png", uiController, "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", "Load the document (Ctrl + L)", "load.png", uiController, "loadDocument", KeyStroke.getKeyStroke("control L")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer.png", this, "exportComposer", KeyStroke.getKeyStroke("control E")));
+        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save.png", uiController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", "Load the document (Ctrl + L)", "load.png", uiController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control L")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer.png", uiController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
         addSeparatortTo(IconToolBar);
         actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map.png", this, "addMap", KeyStroke.getKeyStroke("alt M")));
         actions.addAction(createAction(ADD_TEXT,  "", "Add a text element (Alt + T)",  "add_text.png", this, "addText", KeyStroke.getKeyStroke("alt T")));
@@ -162,7 +162,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
         actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties.png", uiController, "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
         actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete.png", uiController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
-        actions.addAction(createAction(DELETE, "", "Redraw selected elements (Ctrl + R)", "refresh.png", uiController, "redrawSelectedGE", KeyStroke.getKeyStroke("control R")));
+        actions.addAction(createAction(DELETE, "", "Redraw selected elements (Ctrl + R)", "refresh.png", uiController, "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
         actions.addAction(createAction(UNDO, "", "Undo the last action", "rotation.png", uiController, "undo", null));
         actions.addAction(createAction(REDO, "", "Redo the last action", "rotation.png", uiController, "redo", null));
 
@@ -348,13 +348,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
 
     /**
-     * Export the document.
-     */
-    public void exportComposer(){
-        uiController.export();
-    }
-
-    /**
      * Add a MapImage GraphicalElement to the document.
      */
     public void addMap(){
@@ -424,22 +417,22 @@ public class MainWindow extends JFrame implements MainFrameAction{
         uiController.changeZIndex(ZIndex.TO_FRONT);
     }
     public void alignToLeft(){
-        uiController.setAlign(Align.LEFT);
+        uiController.getCompositionAreaController().setAlign(Align.LEFT);
     }
     public void alignToCenter(){
-        uiController.setAlign(Align.CENTER);
+        uiController.getCompositionAreaController().setAlign(Align.CENTER);
     }
     public void alignToRight(){
-        uiController.setAlign(Align.RIGHT);
+        uiController.getCompositionAreaController().setAlign(Align.RIGHT);
     }
     public void alignToBottom(){
-        uiController.setAlign(Align.BOTTOM);
+        uiController.getCompositionAreaController().setAlign(Align.BOTTOM);
     }
     public void alignToMiddle(){
-        uiController.setAlign(Align.MIDDLE);
+        uiController.getCompositionAreaController().setAlign(Align.MIDDLE);
     }
     public void alignToTop(){
-        uiController.setAlign(Align.TOP);
+        uiController.getCompositionAreaController().setAlign(Align.TOP);
     }
 
     @Override

@@ -24,9 +24,6 @@
 
 package org.orbisgis.mapcomposer.controller;
 
-import static java.lang.Math.cos;
-import static java.lang.Math.sin;
-
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -35,43 +32,25 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Simp
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
-import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
-import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
-import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.UIPanel;
-import org.orbisgis.sif.components.SaveFilePanel;
 
-import java.awt.Dimension;
-import java.awt.event.ActionEvent;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.*;
-import java.util.concurrent.ExecutorService;
-import java.util.concurrent.Executors;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
-import javax.swing.event.UndoableEditEvent;
-import javax.swing.event.UndoableEditListener;
-import javax.swing.text.AbstractDocument;
 import javax.swing.undo.*;
-import javax.xml.parsers.ParserConfigurationException;
 
 import org.slf4j.LoggerFactory;
-import org.xml.sax.SAXException;
 
 /**
  * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
@@ -86,9 +65,6 @@ public class UIController implements StateEditable{
     /** GEManager */
     private GEManager geManager;
     
-    /**Map doing the link between GraphicalElements and their CompositionJPanel*/
-    private HashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
-    
     /**This list contain all the GraphicalElement selected by the user*/
     private List<GraphicalElement> selectedGE;
 
@@ -100,19 +76,16 @@ public class UIController implements StateEditable{
     
     /**GraphicalElement stack giving the Z-index information*/
     private Stack<GraphicalElement> zIndexStack;
-
-    /** SaveAndLoadHandler */
-    private SaveAndLoadHandler saveNLoadHandler;
     
     private MainWindow mainWindow;
 
     /** Instance of the new GraphicalElement to create. */
     private GraphicalElement newGE;
 
-    /** Executor used for the RenderWorkers. */
-    private ExecutorService executorService;
-
     private UndoManager undoManager;
+
+    private CompositionAreaController compositionAreaController;
+    private IOController ioController;
     
     /**
      * Main constructor.
@@ -121,16 +94,14 @@ public class UIController implements StateEditable{
         //Initialize the different attributes
         caManager = new CAManager();
         geManager = new GEManager();
-        elementJPanelMap = new LinkedHashMap<>();
         selectedGE = new ArrayList<>();
         toBeSet = new ArrayList<>();
         zIndexStack = new Stack<>();
-        saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
+        ioController = new IOController(this);
         mainWindow = new MainWindow(this);
         mainWindow.setLocationRelativeTo(null);
-        executorService = Executors.newFixedThreadPool(1);
         undoManager = new UndoManager();
-
+        compositionAreaController = new CompositionAreaController(this, mainWindow.getCompositionArea());
         UIFactory.setMainFrame(mainWindow);
     }
 
@@ -155,7 +126,7 @@ public class UIController implements StateEditable{
      * @return true if a document GE exist, false otherwise.
      */
     public boolean isDocumentCreated(){
-        for(GraphicalElement ge : elementJPanelMap.keySet())
+        for(GraphicalElement ge : zIndexStack)
             if(ge instanceof Document)
                 return true;
         return false;
@@ -272,9 +243,7 @@ public class UIController implements StateEditable{
         //Add to the stack the GE of the back
         zIndexStack.addAll(tempBack);
         //Set the z-index of the GE from their stack position
-        for(GraphicalElement ge : zIndexStack){
-            mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
-        }
+        compositionAreaController.setZIndex(zIndexStack);
         modifySelectedGE();
     }
     
@@ -284,7 +253,7 @@ public class UIController implements StateEditable{
      */
     public void selectGE(GraphicalElement ge){
         selectedGE.add(ge);
-        elementJPanelMap.get(ge).select();
+        compositionAreaController.selectGE(ge);
         refreshSpin();
     }
 
@@ -337,7 +306,7 @@ public class UIController implements StateEditable{
      */
     public void unselectGE(GraphicalElement ge){
         selectedGE.remove(ge);
-        elementJPanelMap.get(ge).unselect();
+        compositionAreaController.unselectGE(ge);
         refreshSpin();
     }
     
@@ -347,8 +316,7 @@ public class UIController implements StateEditable{
      */
     public void unselectAllGE(){
         //Unselect all the GraphicalElements
-        for(GraphicalElement ge : selectedGE)
-            elementJPanelMap.get(ge).unselect();
+        compositionAreaController.unselectAllGE();
         selectedGE= new ArrayList<>();
         refreshSpin();
     }
@@ -358,12 +326,10 @@ public class UIController implements StateEditable{
      */
     public void removeSelectedGE(){
         for(GraphicalElement ge : selectedGE){
-            mainWindow.getCompositionArea().removeGE(elementJPanelMap.get(ge));
-            elementJPanelMap.remove(ge);
+            compositionAreaController.remove(ge);
             zIndexStack.remove(ge);
         }
-        for(GraphicalElement ge : zIndexStack)
-            mainWindow.getCompositionArea().setZIndex(elementJPanelMap.get(ge), zIndexStack.indexOf(ge));
+        compositionAreaController.setZIndex(zIndexStack);
         selectedGE=new ArrayList<>();
         mainWindow.getCompositionArea().refresh();
     }
@@ -385,38 +351,7 @@ public class UIController implements StateEditable{
     public void modifyGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
-        if(ge instanceof Document)
-            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
-        refreshSpin();
-    }
-
-    /**
-     * Redraws all the selected GraphicalElements
-     */
-    public void redrawSelectedGE(){
-        //Copy of the list to avoid ConcurrentModificationException
-        List<GraphicalElement> list = new ArrayList<>();
-        for(GraphicalElement ge : selectedGE)
-            list.add(ge);
-        for(GraphicalElement ge : list)
-            redrawGE(ge);
-    }
-
-    /**
-     * Redraws the given GraphicalElement.
-     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
-     * The GE representation is completely re-renderer.
-     * @param ge GraphicalElement to validate
-     */
-    public void redrawGE(GraphicalElement ge){
-        if(ge instanceof GERefresh)
-            ((GERefresh)ge).refresh();
-        unselectGE(ge);
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-        executorService.submit(worker);
-        if(ge instanceof Document)
-            mainWindow.getCompositionArea().setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+        compositionAreaController.modifyCompositionJPanel(ge);
         refreshSpin();
     }
 
@@ -437,8 +372,8 @@ public class UIController implements StateEditable{
                 }
             }
             //If the GraphicalElement was already added to the document
-            if(elementJPanelMap.containsKey(ge))
-                redrawGE(ge);
+            if(compositionAreaController.isGEDrawn(ge))
+                compositionAreaController.refreshGE(ge);
             //Set the CompositionAreaOverlay ratio in the case of the GraphicalElement was not already added to the Document
             else{
                 //Give the ratio to the CompositionAreaOverlay();
@@ -495,8 +430,8 @@ public class UIController implements StateEditable{
      * @return The list of GraphicalElements
      */
     public List<GraphicalElement> getGEList(){
-        List list = new ArrayList<GraphicalElement>();
-        list.addAll(elementJPanelMap.keySet());
+        List list = new ArrayList<>();
+        list.addAll(zIndexStack);
         return list;
     }
 
@@ -504,61 +439,23 @@ public class UIController implements StateEditable{
      * Remove all the displayed GE from the panel.
      */
     public void removeAllGE() {
-        mainWindow.getCompositionArea().removeAllGE();
-        elementJPanelMap = new LinkedHashMap<>();
+        compositionAreaController.removeAll();
         selectedGE = new ArrayList<>();
         zIndexStack = new Stack<>();
     }
 
     public void removeGE(GraphicalElement ge) {
-        mainWindow.getCompositionArea().removeGE(elementJPanelMap.get(ge));
-        elementJPanelMap.remove(ge);
+        compositionAreaController.remove(ge);
         selectedGE.remove(ge);
         zIndexStack.remove(ge);
-    }
-
-    /**
-     * Run saveProject function of the SaveHandler.
-     */
-    public void saveDocument(){
-        try {
-            saveNLoadHandler.saveProject(zIndexStack.subList(0, zIndexStack.size()));
-        } catch (NoSuchMethodException|IOException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
-        }
-    }
-
-    /**
-     * Run loadProject function from the SaveHandler and draw loaded GE.
-     */
-    public void loadDocument(){
-        try {
-            List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            //Test if the file was successfully loaded.
-            if(list != null) {
-                removeAllGE();
-                //Add all the GE starting from the last one (to get the good z-index)
-                for (int i = list.size() - 1; i >= 0; i--)
-                    addGE(list.get(i));
-                mainWindow.getCompositionArea().refresh();
-            }
-        } catch (ParserConfigurationException|SAXException|IOException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
-        }
     }
 
     /**
      * Add to the project the given GE (that is just loaded)..
      * @param ge GE to add to the project.
      */
-    private void addGE(GraphicalElement ge) {
-        elementJPanelMap.put(ge, new CompositionJPanel(ge, this));
-        mainWindow.getCompositionArea().addGE(elementJPanelMap.get(ge));
-        if(ge instanceof GERefresh){
-            ((GERefresh)ge).refresh();
-        }
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-        executorService.submit(worker);
+    public void addGE(GraphicalElement ge) {
+        compositionAreaController.add(ge);
         zIndexStack.push(ge);
         //Apply the z-index change to only the GraphicalElement ge.
         List temp = selectedGE;
@@ -610,7 +507,7 @@ public class UIController implements StateEditable{
                 //If the newGE is a Document GE, then draw it immediately
                 if(newGE instanceof GEProperties && !((GEProperties)newGE).isDrawnByUser()){
                     addGE(newGE);
-                    redrawGE(newGE);
+                    compositionAreaController.refreshGE(newGE);
                     newGE=null;
                 }
                 else {
@@ -651,113 +548,13 @@ public class UIController implements StateEditable{
             newGE.setWidth(width);
             newGE.setHeight(height);
             addGE(newGE);
-            redrawGE(newGE);
+            compositionAreaController.refreshGE(newGE);
         }
         mainWindow.getCompositionArea().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
     }
     
-    public void setAlign( Align alignment) {
-        if(selectedGE.size()>0){
-            int xMin;
-            int xMax;
-            int yMin;
-            int yMax;
-            switch(alignment){
-                case LEFT:
-                    //Obtain the minimum x position of all the CompositionJPanel from the CompositionArea
-                    //The x position get take into account the rotation of the GraphicalElement.
-                    xMin=elementJPanelMap.get(selectedGE.get(0)).getX();
-                    for (GraphicalElement ge : selectedGE)
-                        if (elementJPanelMap.get(ge).getX() < xMin)
-                            xMin = elementJPanelMap.get(ge).getX();
-                    //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : selectedGE){
-                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(xMin-(ge.getWidth()-(int)newWidth)/2);
-                    }
-                    break;
-                case CENTER:
-                    xMin=selectedGE.get(0).getX();
-                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
-                    for (GraphicalElement ge : selectedGE) {
-                        if (ge.getX() < xMin)
-                            xMin = ge.getX();
-                        if (ge.getX()+ge.getWidth() > xMax)
-                            xMax = ge.getX()+ge.getWidth();
-                    }
-                    int xMid = (xMax+xMin)/2;
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setX(xMid-ge.getWidth()/2);
-                    break;
-                case RIGHT:
-                    //Obtain the maximum x position of all the CompositionJPanel from the CompositionArea
-                    //The x position get take into account the rotation of the GraphicalElement.
-                    xMax=elementJPanelMap.get(selectedGE.get(0)).getX()+elementJPanelMap.get(selectedGE.get(0)).getWidth();
-                    for (GraphicalElement ge : selectedGE)
-                        if (elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth() > xMax)
-                            xMax = elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth();
-                    //Takes into account the border width of the ConfigurationJPanel (2 pixels)
-                    xMax-=2;
-                    //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(xMax-ge.getWidth()+(ge.getWidth()-(int)newWidth)/2);
-                    }
-                    break;
-                case TOP:
-                    //Obtain the minimum y position of all the CompositionJPanel from the CompositionArea
-                    //The y position get take into account the rotation of the GraphicalElement.
-                    yMin=elementJPanelMap.get(selectedGE.get(0)).getY();
-                    for (GraphicalElement ge : selectedGE)
-                        if (ge.getY() < yMin)
-                            yMin = elementJPanelMap.get(ge).getY();
-                    //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
-                        ge.setY(yMin - (ge.getHeight() - (int) newHeight) / 2);
-                    }
-                    break;
-                case MIDDLE:
-                    yMin=selectedGE.get(0).getY();
-                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
-                    for (GraphicalElement ge : selectedGE) {
-                        if (ge.getY() < yMin)
-                            yMin = ge.getY();
-                        if (ge.getY()+ge.getHeight() > yMax)
-                            yMax = ge.getY()+ge.getHeight();
-                    }
-                    int yMid = (yMax+yMin)/2;
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setY(yMid-ge.getHeight()/2);
-                    break;
-                case BOTTOM:
-                    //Obtain the maximum y position of all the CompositionJPanel from the CompositionArea
-                    //The y position get take into account the rotation of the GraphicalElement.
-                    yMax=elementJPanelMap.get(selectedGE.get(0)).getY()+elementJPanelMap.get(selectedGE.get(0)).getHeight();
-                    for (GraphicalElement ge : selectedGE)
-                        if (elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight() > yMax)
-                            yMax = elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight();
-                    //Takes into account the border width ConfigurationJPanel (2 pixels)
-                    yMax-=2;
-                    //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
-                        ge.setY(yMax - ge.getHeight() + (ge.getHeight()-(int)newHeight)/2);
-                    }
-                    break;
-            }
-            modifySelectedGE();
-        }
-    }
+
 
     /**
      * Open a dialog window with all the ConfigurationAttributes common to the selected GraphicalElement.
@@ -877,57 +674,20 @@ public class UIController implements StateEditable{
         }
         modifySelectedGE();
     }
-    
-    /**
-     * Exports to document into png file.
-     * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
-     * Then exports the CompositionArea.
-     */
-    public void export(){
-        //Render again all the GE. All the RenderWorkers are saved into a list and the export will be done only when all will be terminated.
-        RenderWorker lastRenderWorker = null;
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), geManager.getRenderer(ge.getClass()), ge);
-            executorService.submit(rw);
-            lastRenderWorker = rw;
-        }
-        executorService.shutdown();
 
-        //Add to the lastRenderWorker a listener to open a saveFilePanel just after the rendering is done
-        //If the lastRenderWorker is null it means that there is nothing to export, so skip the exportation
-        if(lastRenderWorker!=null) {
-            lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                    //Verify if the property state is at DONE
-                    if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-                        //Creates and sets the file chooser
-                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
-                        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-                        saveFilePanel.loadState();
-                        if(UIFactory.showDialog(saveFilePanel)){
-                            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
+    public GEManager getGEManager(){
+        return geManager;
+    }
 
-                            try{
-                                //Removes the border, does the export, then adds them again
-                                for(GraphicalElement ge : zIndexStack){
-                                    elementJPanelMap.get(ge).enableBorders(false);
-                                }
-                                ImageIO.write(mainWindow.getCompositionArea().getDocBufferedImage(),"png",new File(path));
+    public List<GraphicalElement> getSelectedGE(){
+        return selectedGE;
+    }
 
-                                for(GraphicalElement ge : zIndexStack){
-                                    elementJPanelMap.get(ge).enableBorders(true);
-                                }
-                            } catch (IOException ex) {
-                                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
-                            }
-                        }
-                    }
-                }
-            });
-        }
-        //Reset the executorService
-        executorService = Executors.newFixedThreadPool(1);
+    public CompositionAreaController getCompositionAreaController(){
+        return compositionAreaController;
+    }
+    public IOController getIOController(){
+        return ioController;
     }
 
     public static class UndoableEdit extends AbstractUndoableEdit{
@@ -959,5 +719,9 @@ public class UIController implements StateEditable{
                 uic.removeGE(ge);
             uic.getMainWindow().getCompositionArea().refresh();
         }
+    }
+
+    public void refreshSelectedGE() {
+        compositionAreaController.refreshGE(selectedGE);
     }
 }
