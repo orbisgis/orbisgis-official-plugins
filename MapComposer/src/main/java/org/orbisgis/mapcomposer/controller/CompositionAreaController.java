@@ -25,17 +25,17 @@
 package org.orbisgis.mapcomposer.controller;
 
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.ui.CompositionArea;
+import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 
 import java.awt.*;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
+import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
@@ -44,10 +44,18 @@ import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 /**
+ * This controller is in charge of all the interactions with the CompositionArea
+ *
  * @author Sylvain PALOMINOS
  */
 
 public class CompositionAreaController {
+
+    public enum ZIndex{ TO_FRONT, FRONT, BACK, TO_BACK; }
+    public enum Align{ LEFT, CENTER, RIGHT, TOP, MIDDLE, BOTTOM; }
+
+    /**GraphicalElement stack giving the Z-index information*/
+    private Stack<GraphicalElement> zIndexStack;
 
     /** Executor used for the RenderWorkers. */
     private ExecutorService executorService;
@@ -55,17 +63,217 @@ public class CompositionAreaController {
     /**Map doing the link between GraphicalElements and their CompositionJPanel*/
     private HashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
 
-    UIController uic;
-    
-    CompositionArea compositionArea;
+    /** MainController */
+    private MainController uic;
 
-    public CompositionAreaController(UIController uic, CompositionArea compositionArea){
+    /** CompositionArea */
+    private CompositionArea compositionArea;
+
+    public CompositionAreaController(MainController uic){
         this.uic = uic;
         executorService = Executors.newFixedThreadPool(1);
         elementJPanelMap = new LinkedHashMap<>();
-        this.compositionArea = compositionArea;
+        zIndexStack = new Stack<>();
     }
-    
+
+    /**
+     * Adds a GraphicalElement to the CompositionArea.
+     * @param ge GraphicalElement to add.
+     */
+    public void add(GraphicalElement ge){
+        zIndexStack.push(ge);
+        elementJPanelMap.put(ge, new CompositionJPanel(ge, uic));
+        compositionArea.add(elementJPanelMap.get(ge));
+        if(ge instanceof GERefresh){
+            ((GERefresh)ge).refresh();
+        }
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
+        executorService.submit(worker);
+    }
+
+    /**
+     * Removes from the CompositionArea a GraphicalElement.
+     * @param ge GraphicalElement to remove.
+     */
+    public void remove(GraphicalElement ge){
+        compositionArea.removeGE(elementJPanelMap.get(ge));
+        elementJPanelMap.remove(ge);
+        zIndexStack.remove(ge);
+        compositionArea.refresh();
+    }
+
+    /**
+     * Removes a list of GraphicalElements from the CompositionArea.
+     * @param listGE
+     */
+    public void remove(List<GraphicalElement> listGE){
+        for(GraphicalElement ge : listGE) {
+            remove(ge);
+        }
+        setZIndex(zIndexStack);
+    }
+
+    /**
+     * Removes all the graphicalElement from the CompositionArea.
+     */
+    public void removeAll(){
+        for(GraphicalElement ge : elementJPanelMap.keySet()) {
+            compositionArea.removeGE(elementJPanelMap.get(ge));
+        }
+        elementJPanelMap = new HashMap<>();
+        zIndexStack = new Stack<>();
+    }
+
+    /**
+     * Change the Z-index of the displayed GraphicalElement.
+     * @param z Change of the Z-index.
+     */
+    public void changeZIndex(ZIndex z){
+        List<GraphicalElement> selectedGE = uic.getGEController().getSelectedGE();
+
+        Stack<GraphicalElement> temp = new Stack<>();
+        Stack<GraphicalElement> tempBack = new Stack<>();
+        Stack<GraphicalElement> tempFront = new Stack<>();
+        //Get the GE implementing the GEProperties interface and which are always on the back
+        for(GraphicalElement ge : zIndexStack){
+            if(ge instanceof GEProperties && ((GEProperties)ge).isAlwaysOnBack()){
+                tempBack.push(ge);
+                temp.add(ge);
+            }
+        }
+        //Get the GE implementing the GEProperties interface and which are always on the front
+        for(GraphicalElement ge : zIndexStack){
+            if(ge instanceof  GEProperties && ((GEProperties)ge).isAlwaysOnTop()){
+                tempFront.push(ge);
+                temp.add(ge);
+            }
+        }
+        //Remove the previous detected elements
+        for(GraphicalElement ge : temp){
+            zIndexStack.remove(ge);
+        }
+        temp = new Stack<>();
+
+        //Move the others GE
+        //In each cases : first sort the GE from the selectedGE list,
+        //Then place each GE at the good index in the stack.
+        switch (z){
+            case TO_FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(0, ge);
+                }
+                break;
+            case FRONT:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) > 0) {
+                        int index = temp.indexOf(ge) - 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return -1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return 1;
+                        return 0;
+                    }
+                });
+                temp.addAll(zIndexStack);
+                for(GraphicalElement ge : selectedGE) {
+                    if (zIndexStack.indexOf(ge) < zIndexStack.size() - 1) {
+                        int index = temp.indexOf(ge) + 1;
+                        zIndexStack.remove(ge);
+                        zIndexStack.add(index, ge);
+                    }
+                }
+                break;
+            case TO_BACK:
+                Collections.sort(selectedGE, new Comparator<GraphicalElement>() {
+                    @Override
+                    public int compare(GraphicalElement ge1, GraphicalElement ge2) {
+                        if(zIndexStack.indexOf(ge1)>zIndexStack.indexOf(ge2)) return 1;
+                        if(zIndexStack.indexOf(ge1)<zIndexStack.indexOf(ge2)) return -1;
+                        return 0;
+                    }
+                });
+                for(GraphicalElement ge : selectedGE) {
+                    zIndexStack.remove(ge);
+                    zIndexStack.add(ge);
+                }
+                break;
+        }
+
+        //Add to the stack the GE of the front
+        zIndexStack.addAll(tempFront);
+        //Add to the stack the GE of the back
+        zIndexStack.addAll(tempBack);
+        //Set the z-index of the GE from their stack position
+        setZIndex(zIndexStack);
+        uic.getGEController().modifySelectedGE();
+    }
+
+    /**
+     * Return the BufferedImage of the Document.
+     * @return The BufferedImage of the Document.
+     */
+    public BufferedImage getCompositionAreaBufferedImage(){
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            elementJPanelMap.get(ge).enableBorders(false);
+        }
+        BufferedImage bi = compositionArea.getDocBufferedImage();
+
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            elementJPanelMap.get(ge).enableBorders(true);
+        }
+
+        return bi;
+    }
+
+    /**
+     * Returns true if the given GraphicalElement is already drawn in the CompositionArea, false otherwise.
+     * @param ge GraphicalElement to test.
+     * @return True if drawn in the CompositionArea, false otherwise.
+     */
+    public boolean isGEDrawn(GraphicalElement ge){
+        return elementJPanelMap.containsKey(ge);
+    }
+
+    /**
+     * Modifies the representation of a GraphicalElement without redrawing it.
+     * Moves and resize the CompositionJPanel and stretch the displayed image to the new panel dimension.
+     * @param ge GraphicalElement to modify.
+     */
+    public void modifyCompositionJPanel(GraphicalElement ge){
+        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
+        if(ge instanceof Document)
+            setDocumentDimension((Document) ge);
+    }
+
+    /**
+     * Refreshes and redraws all the GraphicalElements displayed into the CompositionArea.
+     * @return The last RenderWorker that will be executed.
+     */
     public RenderWorker refreshAllGE(){
         RenderWorker lastRenderWorker = null;
         executorService = Executors.newFixedThreadPool(1);
@@ -91,83 +299,34 @@ public class CompositionAreaController {
 
     /**
      * Redraws the given GraphicalElement.
-     * It does the refresh of the GE, the actualization of the GE representation in the CompositionArea and refreshes the spinner state.
+     * It does the refresh of the GE and the actualization of the GE representation in the CompositionArea.
      * The GE representation is completely re-renderer.
      * @param ge GraphicalElement to validate
      */
     public void refreshGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        uic.unselectGE(ge);
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
         executorService.submit(worker);
         if(ge instanceof Document)
             compositionArea.setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
     }
 
-    public void setZIndex(List<GraphicalElement> listGE){
-        for(GraphicalElement ge : listGE){
-            compositionArea.setZIndex(elementJPanelMap.get(ge), listGE.indexOf(ge));
-        }
+    /**
+     * Refreshes and redraws the selected GraphicalElements.
+     */
+    public void refreshSelectedGE() {
+        refreshGE(uic.getGEController().getSelectedGE());
+        uic.unselectAllGE();
     }
 
-    public void remove(GraphicalElement ge){
-        compositionArea.remove(elementJPanelMap.get(ge));
-        elementJPanelMap.remove(ge);
-    }
-
-    public void remove(List<GraphicalElement> listGE){
-        for(GraphicalElement ge : listGE) {
-            remove(ge);
-        }
-    }
-
-    public void removeAll(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()) {
-            compositionArea.remove(elementJPanelMap.get(ge));
-        }
-        elementJPanelMap = new HashMap<>();
-    }
-
-    public void add(GraphicalElement ge){
-        elementJPanelMap.put(ge, new CompositionJPanel(ge, uic));
-        compositionArea.add(elementJPanelMap.get(ge));
-        if(ge instanceof GERefresh){
-            ((GERefresh)ge).refresh();
-        }
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
-        executorService.submit(worker);
-    }
-
-    public void setDocumentDimension(Document document){
-        compositionArea.setDocumentDimension(document.getDimension());
-    }
-    
-    public void selectGE(GraphicalElement ge){
-        elementJPanelMap.get(ge).select();
-    }
-    
-    public void unselectGE(GraphicalElement ge){
-        elementJPanelMap.get(ge).unselect();
-    }
-    
-    public void unselectAllGE(){
-        for(GraphicalElement ge : elementJPanelMap.keySet())
-            elementJPanelMap.get(ge).select();
-    }
-    
-    public void modifyCompositionJPanel(GraphicalElement ge){
-        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
-        if(ge instanceof Document)
-            setDocumentDimension((Document)ge);
-    }
-    
-    public boolean isGEDrawn(GraphicalElement ge){
-        return elementJPanelMap.containsKey(ge);
-    }
-
-    public void setAlign( UIController.Align alignment) {
-        if(uic.getSelectedGE().size()>0){
+    /**
+     * Align all the GraphicalElement contained by the selectedGE list.
+     * @param alignment Alignment to apply.
+     */
+    public void setAlign(Align alignment) {
+        List<GraphicalElement> selectedGE = uic.getGEController().getSelectedGE();
+        if(selectedGE.size()>0){
             int xMin;
             int xMax;
             int yMin;
@@ -176,12 +335,12 @@ public class CompositionAreaController {
                 case LEFT:
                     //Obtain the minimum x position of all the CompositionJPanel from the CompositionArea
                     //The x position get take into account the rotation of the GraphicalElement.
-                    xMin=elementJPanelMap.get(uic.getSelectedGE().get(0)).getX();
-                    for (GraphicalElement ge : uic.getSelectedGE())
+                    xMin=elementJPanelMap.get(selectedGE.get(0)).getX();
+                    for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getX() < xMin)
                             xMin = elementJPanelMap.get(ge).getX();
                     //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : uic.getSelectedGE()){
+                    for(GraphicalElement ge : selectedGE){
                         //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
@@ -189,29 +348,29 @@ public class CompositionAreaController {
                     }
                     break;
                 case CENTER:
-                    xMin=uic.getSelectedGE().get(0).getX();
-                    xMax=uic.getSelectedGE().get(0).getX()+uic.getSelectedGE().get(0).getWidth();
-                    for (GraphicalElement ge : uic.getSelectedGE()) {
+                    xMin=selectedGE.get(0).getX();
+                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                    for (GraphicalElement ge : selectedGE) {
                         if (ge.getX() < xMin)
                             xMin = ge.getX();
                         if (ge.getX()+ge.getWidth() > xMax)
                             xMax = ge.getX()+ge.getWidth();
                     }
                     int xMid = (xMax+xMin)/2;
-                    for(GraphicalElement ge : uic.getSelectedGE())
+                    for(GraphicalElement ge : selectedGE)
                         ge.setX(xMid-ge.getWidth()/2);
                     break;
                 case RIGHT:
                     //Obtain the maximum x position of all the CompositionJPanel from the CompositionArea
                     //The x position get take into account the rotation of the GraphicalElement.
-                    xMax=elementJPanelMap.get(uic.getSelectedGE().get(0)).getX()+elementJPanelMap.get(uic.getSelectedGE().get(0)).getWidth();
-                    for (GraphicalElement ge : uic.getSelectedGE())
+                    xMax=elementJPanelMap.get(selectedGE.get(0)).getX()+elementJPanelMap.get(selectedGE.get(0)).getWidth();
+                    for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth() > xMax)
                             xMax = elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth();
                     //Takes into account the border width of the ConfigurationJPanel (2 pixels)
                     xMax-=2;
                     //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : uic.getSelectedGE()) {
+                    for(GraphicalElement ge : selectedGE) {
                         //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
@@ -221,12 +380,12 @@ public class CompositionAreaController {
                 case TOP:
                     //Obtain the minimum y position of all the CompositionJPanel from the CompositionArea
                     //The y position get take into account the rotation of the GraphicalElement.
-                    yMin=elementJPanelMap.get(uic.getSelectedGE().get(0)).getY();
-                    for (GraphicalElement ge : uic.getSelectedGE())
+                    yMin=elementJPanelMap.get(selectedGE.get(0)).getY();
+                    for (GraphicalElement ge : selectedGE)
                         if (ge.getY() < yMin)
                             yMin = elementJPanelMap.get(ge).getY();
                     //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : uic.getSelectedGE()) {
+                    for(GraphicalElement ge : selectedGE) {
                         //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
@@ -234,29 +393,29 @@ public class CompositionAreaController {
                     }
                     break;
                 case MIDDLE:
-                    yMin=uic.getSelectedGE().get(0).getY();
-                    yMax=uic.getSelectedGE().get(0).getY()+uic.getSelectedGE().get(0).getHeight();
-                    for (GraphicalElement ge : uic.getSelectedGE()) {
+                    yMin=selectedGE.get(0).getY();
+                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                    for (GraphicalElement ge : selectedGE) {
                         if (ge.getY() < yMin)
                             yMin = ge.getY();
                         if (ge.getY()+ge.getHeight() > yMax)
                             yMax = ge.getY()+ge.getHeight();
                     }
                     int yMid = (yMax+yMin)/2;
-                    for(GraphicalElement ge : uic.getSelectedGE())
+                    for(GraphicalElement ge : selectedGE)
                         ge.setY(yMid-ge.getHeight()/2);
                     break;
                 case BOTTOM:
                     //Obtain the maximum y position of all the CompositionJPanel from the CompositionArea
                     //The y position get take into account the rotation of the GraphicalElement.
-                    yMax=elementJPanelMap.get(uic.getSelectedGE().get(0)).getY()+elementJPanelMap.get(uic.getSelectedGE().get(0)).getHeight();
-                    for (GraphicalElement ge : uic.getSelectedGE())
+                    yMax=elementJPanelMap.get(selectedGE.get(0)).getY()+elementJPanelMap.get(selectedGE.get(0)).getHeight();
+                    for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight() > yMax)
                             yMax = elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight();
                     //Takes into account the border width ConfigurationJPanel (2 pixels)
                     yMax-=2;
                     //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : uic.getSelectedGE()) {
+                    for(GraphicalElement ge : selectedGE) {
                         //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
@@ -264,20 +423,82 @@ public class CompositionAreaController {
                     }
                     break;
             }
-            uic.modifySelectedGE();
+            uic.getGEController().modifySelectedGE();
         }
     }
 
-    public BufferedImage getCompositionAreaBufferedImage(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(false);
+    /**
+     * Sets the z index of CompositionJPanels corresponding to the GraphicalElements given in argument.
+     * With the position of the GraphicalElements in the given List, sets their z index inside of the CompositionArea.
+     * @param listGE List of GraphicalElement that the z index was modified.
+     */
+    private void setZIndex(List<GraphicalElement> listGE){
+        for(GraphicalElement ge : listGE){
+            compositionArea.setZIndex(elementJPanelMap.get(ge), listGE.indexOf(ge));
         }
-        BufferedImage bi = compositionArea.getDocBufferedImage();
+    }
 
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(true);
-        }
+    /**
+     * Sets the CompositionArea to control.
+     * @param compositionArea
+     */
+    public void setCompositionArea(CompositionArea compositionArea){
+        this.compositionArea = compositionArea;
+    }
 
-        return bi;
+    /**
+     * Sets the new size of the document representation in the CompositionArea.
+     * @param document Document represented in the CompositionArea.
+     */
+    public void setDocumentDimension(Document document){
+        compositionArea.setDocumentDimension(document.getDimension());
+    }
+
+    /**
+     * Sets the ratio to respect on resizing or creating an element in the CompositionArea.
+     * @param ratio
+     */
+    public void setOverlayRatio(float ratio){
+        compositionArea.getOverlay().setRatio(ratio);
+    }
+
+    /**
+     * Sets the mode (None, New GE, Resize GE) of the CompositionAreaOverlay.
+     * @param mode
+     */
+    public void setOverlayMode(CompositionAreaOverlay.Mode mode){
+        compositionArea.getOverlay().setMode(mode);
+    }
+
+    /**
+     * Sets the message displayed by the CompositionAreaOverlay.
+     * @param message
+     */
+    public void setOverlayMessage(String message){
+        compositionArea.getOverlay().writeMessage(message);
+    }
+
+    /**
+     * Select a GraphicalElement in the CompositionArea (make its borders orange).
+     * @param ge GraphicalElement to select.
+     */
+    public void selectGE(GraphicalElement ge){
+        elementJPanelMap.get(ge).select();
+    }
+
+    /**
+     * Select a GraphicalElement in the CompositionArea (make its borders orange).
+     * @param ge GraphicalElement to unselect.
+     */
+    public void unselectGE(GraphicalElement ge){
+        elementJPanelMap.get(ge).unselect();
+    }
+
+    /**
+     * Unselects all the GraphicalElements.
+     */
+    public void unselectAllGE(){
+        for(GraphicalElement ge : elementJPanelMap.keySet())
+            elementJPanelMap.get(ge).unselect();
     }
 }

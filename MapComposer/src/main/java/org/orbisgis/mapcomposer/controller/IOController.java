@@ -44,7 +44,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 
 /**
- *
+ * This controller manage the save, load and export actions.
  *
  * @author Sylvain PALOMINOS
  */
@@ -54,11 +54,12 @@ public class IOController {
     /** SaveAndLoadHandler */
     private SaveAndLoadHandler saveNLoadHandler;
 
-    private UIController uic;
+    /** MainController to get access to the other controllers*/
+    private MainController mainController;
 
-    public IOController(UIController uic){
-        this.uic = uic;
-        saveNLoadHandler = new SaveAndLoadHandler(uic.getGEManager(), uic.getCAManager());
+    public IOController(MainController mainController){
+        this.mainController = mainController;
+        saveNLoadHandler = new SaveAndLoadHandler(mainController.getGEManager(), mainController.getCAManager());
     }
 
     /**
@@ -66,9 +67,9 @@ public class IOController {
      */
     public void saveDocument(){
         try {
-            saveNLoadHandler.saveProject(uic.getGEList());
+            saveNLoadHandler.saveProject(mainController.getGEList());
         } catch (NoSuchMethodException|IOException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
     }
 
@@ -80,14 +81,13 @@ public class IOController {
             List<GraphicalElement> list = saveNLoadHandler.loadProject();
             //Test if the file was successfully loaded.
             if(list != null) {
-                uic.removeAllGE();
+                mainController.removeAllGE();
                 //Add all the GE starting from the last one (to get the good z-index)
                 for (int i = list.size() - 1; i >= 0; i--)
-                    uic.addGE(list.get(i));
-                uic.getMainWindow().getCompositionArea().refresh();
+                    mainController.addGE(list.get(i));
             }
         } catch (ParserConfigurationException |SAXException |IOException ex) {
-            LoggerFactory.getLogger(UIController.class).error(ex.getMessage());
+            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
     }
 
@@ -98,7 +98,7 @@ public class IOController {
      */
     public void export(){
         //Render again all the GE. All the RenderWorkers are saved into a list and the export will be done only when all will be terminated.
-        RenderWorker lastRenderWorker = uic.getCompositionAreaController().refreshAllGE();
+        RenderWorker lastRenderWorker = mainController.getCompositionAreaController().refreshAllGE();
 
         //Add to the lastRenderWorker a listener to open a saveFilePanel just after the rendering is done
         //If the lastRenderWorker is null it means that there is nothing to export, so skip the exportation
@@ -116,9 +116,9 @@ public class IOController {
                             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
 
                             try{
-                                ImageIO.write(uic.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
+                                ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
                             } catch (IOException ex) {
-                                Logger.getLogger(UIController.class.getName()).log(Level.SEVERE, null, ex);
+                                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
                             }
                         }
                     }

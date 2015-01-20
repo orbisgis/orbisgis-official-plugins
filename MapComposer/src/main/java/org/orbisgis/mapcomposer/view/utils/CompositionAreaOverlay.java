@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 
 import javax.swing.*;
 import javax.swing.plaf.LayerUI;
@@ -47,7 +47,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     private Point start;
     /*Point where the mouse is released.*/
     private Point end;
-    private UIController uiController;
+    private MainController mainController;
 
     public enum Mode{NEW_GE, RESIZE_GE, NONE}
     private Mode mode;
@@ -78,10 +78,10 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
     /**
      * Main constructor.
-     * @param uiController
+     * @param mainController
      */
-    public CompositionAreaOverlay(UIController uiController){
-        this.uiController = uiController;
+    public CompositionAreaOverlay(MainController mainController){
+        this.mainController = mainController;
         ratio = -1;
         mode = null;
         messageFont = new JLabel().getFont().deriveFont(Font.BOLD);
@@ -217,8 +217,8 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
             super.processMouseMotionEvent(e, l);
         else if(mode == Mode.NEW_GE) {
             if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
-                end = new Point(e.getLocationOnScreen().x - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
-                                e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+                end = new Point(e.getLocationOnScreen().x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
+                                e.getLocationOnScreen().y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
                 l.repaint();
             }
             e.consume();
@@ -237,8 +237,8 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
         else if(mode == Mode.NEW_GE) {
             if (e.getID() == MouseEvent.MOUSE_PRESSED) {
                 //Get the click location on the screen an save the location in the compositionArea
-                start = new Point(  e.getLocationOnScreen().x - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
-                                    e.getLocationOnScreen().y - uiController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+                start = new Point(  e.getLocationOnScreen().x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
+                                    e.getLocationOnScreen().y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
                 if(!e.isShiftDown())
                     ratio=-1;
             }
@@ -260,7 +260,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                     height = width/ratio;
 
                 }
-                uiController.setNewGE(x, y, (int)width, (int)height);
+                mainController.getGEController().setNewGE(x, y, (int)width, (int)height);
                 start=null;
                 end=null;
                 ratio=-1;

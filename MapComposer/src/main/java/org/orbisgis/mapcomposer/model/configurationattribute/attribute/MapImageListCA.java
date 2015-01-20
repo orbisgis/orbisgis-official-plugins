@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -99,7 +99,7 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
      * If the MapImages don't exist, they are removed from the list.
      */
     @Override
-    public void refresh(UIController uic) {
+    public void refresh(MainController uic) {
         //For each MapImage in the list, test if it still present in the UIController.
         //If not, it's removed
         for(MapImage mi : list){

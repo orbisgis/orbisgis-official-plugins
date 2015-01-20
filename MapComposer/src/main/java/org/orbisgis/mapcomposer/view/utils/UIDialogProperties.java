@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.sif.UIPanel;
 
@@ -53,7 +53,7 @@ public class UIDialogProperties implements UIPanel {
     private List<ConfigurationAttribute> caList;
 
     /** UIController. */
-    private UIController uic;
+    private MainController uic;
 
     /**
      * Main constructor that build itself the Component to display from the caList of ConfigurationAttribute given
@@ -61,7 +61,7 @@ public class UIDialogProperties implements UIPanel {
      * @param uic UIController.
      * @param enableLock If true, checkboxes enabling and disabling the ConfigurationAttributes configuration are displayed. They aren't if false;
      */
-    public UIDialogProperties(java.util.List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
+    public UIDialogProperties(java.util.List<ConfigurationAttribute> caList, MainController uic, boolean enableLock) {
         this.caList = caList;
         this.uic=uic;
 
@@ -85,7 +85,7 @@ public class UIDialogProperties implements UIPanel {
      * This constructor must be followed by several calls to the method addComponent(List<>, ConfigurationAttribute, boolean) to constrcut the panel.
      * @param uic
      */
-    public UIDialogProperties(UIController uic){
+    public UIDialogProperties(MainController uic){
         this.caList = new ArrayList<>();
         this.uic = uic;
         this.panel = new JPanel();
@@ -119,7 +119,7 @@ public class UIDialogProperties implements UIPanel {
 
     @Override
     public String validateInput() {
-        uic.validateCAList(caList);
+        uic.getGEController().validateCAList(caList);
         return null;
     }
 

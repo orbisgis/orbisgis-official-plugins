@@ -25,7 +25,7 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -87,7 +87,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
-    public void refresh(UIController uic) {
+    public void refresh(MainController uic) {
         //Refresh of the file list
         loadListFiles();
         //Refresh of the selected file

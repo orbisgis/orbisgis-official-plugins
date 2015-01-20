@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
@@ -34,9 +34,7 @@ import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import javax.swing.*;
-import javax.swing.event.UndoableEditListener;
 import javax.swing.plaf.LayerUI;
-import javax.swing.undo.UndoableEditSupport;
 
 /**
  * Area for the map document composition.
@@ -63,18 +61,18 @@ public class CompositionArea extends JPanel{
     /**
      * Main constructor.
      */
-    public CompositionArea(UIController uiController){
+    public CompositionArea(MainController mainController){
         super(new BorderLayout());
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.add(scrollPane, BorderLayout.CENTER);
 
-        layerUI = new CompositionAreaOverlay(uiController);
+        layerUI = new CompositionAreaOverlay(mainController);
         jLayer = new JLayer<>(panel, layerUI);
         this.add(jLayer);
 
-        panel.addMouseListener(EventHandler.create(MouseListener.class, uiController, "unselectAllGE", null, "mouseClicked"));
+        panel.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
     }
 
     /**

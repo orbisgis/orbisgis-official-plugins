@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -105,7 +105,7 @@ public class FileListCA extends BaseListCA<File> implements RefreshCA{
      * If the file doesn't exist, it's path is removed from the list.
      */
     @Override
-    public void refresh(UIController uic) {
+    public void refresh(MainController uic) {
         List<File> listT = new ArrayList<>();
         //Add to a list all the wrong path
         for(File f : this.getValue()){

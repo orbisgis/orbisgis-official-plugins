@@ -24,7 +24,6 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import org.orbisgis.mapcomposer.controller.UIController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 

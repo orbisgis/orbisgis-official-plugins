@@ -24,10 +24,9 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
@@ -72,7 +71,7 @@ public class MapImageRenderer extends SimpleGERenderer {
         return applyRotationToBufferedImage(resize, ge);
     }
 
-    public UIPanel createConfigurationPanel(java.util.List<ConfigurationAttribute> caList, UIController uic, boolean enableLock){
+    public UIPanel createConfigurationPanel(java.util.List<ConfigurationAttribute> caList, MainController uic, boolean enableLock){
         //Create the UIDialogProperties that will be returned
         UIDialogProperties uid = new UIDialogProperties(uic);
 
