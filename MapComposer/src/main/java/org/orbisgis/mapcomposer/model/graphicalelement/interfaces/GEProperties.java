@@ -25,10 +25,33 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
 
 /**
- * A GraphicalElement implementing this interface will always be over the other GraphicalElements.
+ * This interface allow to define custom behavior of the GraphicalElement
  *
  * @author Sylvain PALOMINOS
  */
-public interface AlwaysOnFront {
-    
+public interface GEProperties {
+
+    /**
+     * This method specify if the GraphicalElement needs the previous creation of a Document GE or not.
+     * @return True if it need a Document GE, false otherwise.
+     */
+    public boolean isDocumentNeeded();
+
+    /**
+     * This methods specify if the GraphicalElement should be always drawn over all the others.
+     * @return True if it will always be on the top, false otherwise.
+     */
+    public boolean isAlwaysOnTop();
+
+    /**
+     * This methods specify if the GraphicalElement should be always drawn under all the others.
+     * @return True if it will always be on the back, false otherwise.
+     */
+    public boolean isAlwaysOnBack();
+
+    /**
+     * This method specify if this GraphicalElement should be draw by the user or if its dimension are automatically set.
+     * @return Trus if the user need to draw it, false otherwise.
+     */
+    public boolean isDrawnByUser();
 }

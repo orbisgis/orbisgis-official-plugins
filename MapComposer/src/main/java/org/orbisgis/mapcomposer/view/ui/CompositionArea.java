@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import java.awt.BorderLayout;
@@ -43,7 +43,7 @@ import javax.swing.plaf.LayerUI;
  * @author Sylvain PALOMINOS
  */
 public class CompositionArea extends JPanel{
-    
+
     /**JScrollPane of the CompositionArea. */
     private final JScrollPane scrollPane;
     
@@ -54,26 +54,25 @@ public class CompositionArea extends JPanel{
     private Dimension dimension = new Dimension(50, 50);
 
     /** LayerUI use (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
-    LayerUI<JComponent> layerUI;
+    private LayerUI<JComponent> layerUI;
 
     /** JLayer used to link the LayerUI and the CompositionArea. */
-    JLayer<JComponent> jLayer;
-    
+    private JLayer<JComponent> jLayer;
     /**
      * Main constructor.
      */
-    public CompositionArea(UIController uiController){
+    public CompositionArea(MainController mainController){
         super(new BorderLayout());
         JPanel body = new JPanel(new BorderLayout());
         body.add(panel, BorderLayout.CENTER);
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         this.add(scrollPane, BorderLayout.CENTER);
 
-        layerUI = new CompositionAreaOverlay(uiController);
+        layerUI = new CompositionAreaOverlay(mainController);
         jLayer = new JLayer<>(panel, layerUI);
         this.add(jLayer);
 
-        panel.addMouseListener(EventHandler.create(MouseListener.class, uiController, "unselectAllGE", null, "mouseClicked"));
+        panel.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
     }
 
     /**
@@ -151,5 +150,4 @@ public class CompositionArea extends JPanel{
     public CompositionAreaOverlay getOverlay(){
         return (CompositionAreaOverlay)layerUI;
     }
-
 }

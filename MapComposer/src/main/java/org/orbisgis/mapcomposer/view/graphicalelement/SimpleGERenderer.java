@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.sif.UIPanel;
@@ -82,7 +82,7 @@ public abstract class SimpleGERenderer implements GERenderer {
     }
 
     @Override
-    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, MainController uic, boolean enableLock) {
         return null;
     }
 }

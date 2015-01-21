@@ -25,7 +25,7 @@
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
 import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
@@ -85,7 +85,7 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
     @Override public void       select(String choice)   {index=list.indexOf(choice);}
 
     @Override
-    public void refresh(UIController uic) {
+    public void refresh(MainController uic) {
         List<String> temp = new ArrayList<>();
         for(String s : list)
             if(!temp.contains(s)) temp.add(s);

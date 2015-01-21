@@ -24,8 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import org.orbisgis.coremap.renderer.se.graphic.Graphic;
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
@@ -75,7 +74,7 @@ public class CompositionJPanel extends JPanel{
      private MoveMode moveMode = MoveMode.NONE;
 
     /** Reference to the UIController. */
-    private final UIController uic;
+    private final MainController uic;
 
     /** Size of the margin of the border for resizing. */
     private static final int margin = 5;
@@ -90,7 +89,7 @@ public class CompositionJPanel extends JPanel{
      * @param ge GraphicalElement to display.
      * @param uic UIController of the application.
      */
-    public CompositionJPanel(GraphicalElement ge, UIController uic){
+    public CompositionJPanel(GraphicalElement ge, MainController uic){
         super(new BorderLayout());
         this.setSize(ge.getWidth(), ge.getHeight());
         panel = new JPanel(new BorderLayout());
@@ -228,7 +227,7 @@ public class CompositionJPanel extends JPanel{
      */
     public void mouseClicked(MouseEvent me) {
         if(me.getClickCount()==2)
-            uic.showGEProperties(ge);
+            uic.getUIController().showGEProperties(ge);
         if(selected)
             uic.unselectGE(ge);
         else
@@ -338,13 +337,13 @@ public class CompositionJPanel extends JPanel{
             this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
             panel.revalidate();
 
-            uic.modifyGE(ge);
+            uic.getGEController().modifyGE(ge);
 
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;
         }
         uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
-        uic.refreshSpin();
+        uic.getUIController().refreshSpin();
     }
 
      /**

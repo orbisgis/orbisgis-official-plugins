@@ -24,13 +24,12 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
@@ -98,7 +97,7 @@ public class TextRenderer extends SimpleGERenderer {
     }
 
     @Override
-    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, UIController uic, boolean enableLock) {
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, MainController uic, boolean enableLock) {
 
         //Create the UIDialogProperties that will be returned
         UIDialogProperties uid = new UIDialogProperties(uic);

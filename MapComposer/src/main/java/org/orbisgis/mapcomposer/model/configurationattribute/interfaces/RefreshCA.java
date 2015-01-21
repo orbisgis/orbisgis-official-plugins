@@ -24,7 +24,7 @@
 
 package org.orbisgis.mapcomposer.model.configurationattribute.interfaces;
 
-import org.orbisgis.mapcomposer.controller.UIController;
+import org.orbisgis.mapcomposer.controller.MainController;
 
 /**
  * This interface for the ConfigurationAttribute allows to define a refresh method.
@@ -37,5 +37,5 @@ public interface RefreshCA {
      * Refresh function.
      * @param uic UIController of the application. It permits to have an access to all the information necessary to verify the ConfigurationAttribute value.
      */
-    public void refresh(UIController uic);
+    public void refresh(MainController uic);
 }
