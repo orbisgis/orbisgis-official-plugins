@@ -52,18 +52,18 @@ public class UIDialogProperties implements UIPanel {
     /** List of the ConfigurationAttributes displayed in the panel. */
     private List<ConfigurationAttribute> caList;
 
-    /** UIController. */
-    private MainController uic;
+    /** MainController. */
+    private MainController mainController;
 
     /**
      * Main constructor that build itself the Component to display from the caList of ConfigurationAttribute given
      * @param caList List of ConfigurationAttributes to set.
-     * @param uic UIController.
+     * @param mainController UIController.
      * @param enableLock If true, checkboxes enabling and disabling the ConfigurationAttributes configuration are displayed. They aren't if false;
      */
-    public UIDialogProperties(java.util.List<ConfigurationAttribute> caList, MainController uic, boolean enableLock) {
+    public UIDialogProperties(java.util.List<ConfigurationAttribute> caList, MainController mainController, boolean enableLock) {
         this.caList = caList;
-        this.uic=uic;
+        this.mainController = mainController;
 
         //Adds to a panel the ConfigurationAttribute
         panel = new JPanel();
@@ -74,7 +74,7 @@ public class UIDialogProperties implements UIPanel {
         for(ConfigurationAttribute ca : caList){
             List<Component> caComponent = new ArrayList<>();
             caComponent.add(new JLabel(ca.getName()));
-            caComponent.add(uic.getCAManager().getRenderer(ca).createJComponentFromCA(ca));
+            caComponent.add(mainController.getCAManager().getRenderer(ca).createJComponentFromCA(ca));
             ConfPanel cp = new ConfPanel(caComponent, ca, enableLock);
             constraints.gridy=this.panel.getComponentCount();
             this.panel.add(cp, constraints);
@@ -83,11 +83,11 @@ public class UIDialogProperties implements UIPanel {
 
     /**
      * This constructor must be followed by several calls to the method addComponent(List<>, ConfigurationAttribute, boolean) to constrcut the panel.
-     * @param uic
+     * @param mainController
      */
-    public UIDialogProperties(MainController uic){
+    public UIDialogProperties(MainController mainController){
         this.caList = new ArrayList<>();
-        this.uic = uic;
+        this.mainController = mainController;
         this.panel = new JPanel();
         panel.setLayout(new GridBagLayout());
     }
@@ -119,7 +119,7 @@ public class UIDialogProperties implements UIPanel {
 
     @Override
     public String validateInput() {
-        uic.getGEController().validateCAList(caList);
+        mainController.getGEController().validateCAList(caList);
         return null;
     }
 

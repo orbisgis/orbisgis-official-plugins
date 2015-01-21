@@ -36,11 +36,11 @@ import java.util.*;
 import javax.swing.undo.*;
 
 /**
- * This class manager the interaction between the MainWindows, the CompositionArea and and the data model.
+ * This class manager the interaction between different controllers.
  *
  * @author Sylvain PALOMINOS
  */
-public class MainController implements StateEditable{
+public class MainController{
 
     /** CAManager */
     private CAManager caManager;
@@ -48,18 +48,7 @@ public class MainController implements StateEditable{
     /** GEManager */
     private GEManager geManager;
     
-    /**This list contain all the GraphicalElement selected by the user*/
-    //private List<GraphicalElement> selectedGE;
-
-    /**This list contain all the GraphicalElements that will be modified (z-index change, validation of the CA)
-     * It's different from the SelectedGE list to permit to modify elements without loosing the selected GE.
-     * e.g. modify one element by double clicking while keeping GraphicalElements selected.
-     */
-    //private List<GraphicalElement> toBeSet;
-    
     private MainWindow mainWindow;
-
-    private UndoManager undoManager;
 
     private CompositionAreaController compositionAreaController;
     private IOController ioController;
@@ -80,24 +69,7 @@ public class MainController implements StateEditable{
         mainWindow = new MainWindow(this);
         mainWindow.setLocationRelativeTo(null);
         compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
-        undoManager = new UndoManager();
         UIFactory.setMainFrame(mainWindow);
-    }
-
-    public void undo(){
-        //undoManager.undo();
-        if(undoManager.canUndo())
-            undoManager.undo();
-        else
-            System.out.println("can't undo");
-    }
-
-    public void redo(){
-        //undoManager.redo();
-        if(undoManager.canRedo())
-            undoManager.redo();
-        else
-            System.out.println("can't redo");
     }
 
     /**
@@ -193,19 +165,6 @@ public class MainController implements StateEditable{
         geController.addGE(ge);
     }
 
-    @Override
-    public void storeState(Hashtable state) {
-        state.put("MW", mainWindow);
-        System.out.println("store "+state.size());
-    }
-
-    @Override
-    public void restoreState(Hashtable state) {
-        System.out.println("restore "+state.size());
-        //mainWindow = (MainWindow) hashtable.get("MW");
-        //mainWindow.getCompositionArea().refresh();
-    }
-
     public GEManager getGEManager(){
         return geManager;
     }
@@ -220,36 +179,5 @@ public class MainController implements StateEditable{
     }
     public GEController getGEController(){
         return geController;
-    }
-
-    public static class UndoableEdit extends AbstractUndoableEdit{
-
-        public enum EditType {ADD_GE};
-
-        private EditType editType;
-        private List<GraphicalElement> listGE;
-        private MainController uic;
-
-        public UndoableEdit(EditType editType, List<GraphicalElement> listGE, MainController uic){
-            this.editType = editType;
-            this.listGE = listGE;
-            this.uic = uic;
-        }
-
-        @Override
-        public void redo() throws CannotRedoException {
-            super.redo();
-            for(GraphicalElement ge : listGE)
-                uic.addGE(ge);
-            uic.getMainWindow().getCompositionArea().refresh();
-        }
-
-        @Override
-        public void undo() throws CannotUndoException {
-            super.undo();
-            for(GraphicalElement ge : listGE)
-                uic.removeGE(ge);
-            uic.getMainWindow().getCompositionArea().refresh();
-        }
     }
 }

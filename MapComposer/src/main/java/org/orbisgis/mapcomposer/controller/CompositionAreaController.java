@@ -64,13 +64,13 @@ public class CompositionAreaController {
     private HashMap<GraphicalElement, CompositionJPanel> elementJPanelMap;
 
     /** MainController */
-    private MainController uic;
+    private MainController mainController;
 
     /** CompositionArea */
     private CompositionArea compositionArea;
 
-    public CompositionAreaController(MainController uic){
-        this.uic = uic;
+    public CompositionAreaController(MainController mainController){
+        this.mainController = mainController;
         executorService = Executors.newFixedThreadPool(1);
         elementJPanelMap = new LinkedHashMap<>();
         zIndexStack = new Stack<>();
@@ -82,12 +82,12 @@ public class CompositionAreaController {
      */
     public void add(GraphicalElement ge){
         zIndexStack.push(ge);
-        elementJPanelMap.put(ge, new CompositionJPanel(ge, uic));
+        elementJPanelMap.put(ge, new CompositionJPanel(ge, mainController));
         compositionArea.add(elementJPanelMap.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
         executorService.submit(worker);
     }
 
@@ -129,7 +129,7 @@ public class CompositionAreaController {
      * @param z Change of the Z-index.
      */
     public void changeZIndex(ZIndex z){
-        List<GraphicalElement> selectedGE = uic.getGEController().getSelectedGE();
+        List<GraphicalElement> selectedGE = mainController.getGEController().getSelectedGE();
 
         Stack<GraphicalElement> temp = new Stack<>();
         Stack<GraphicalElement> tempBack = new Stack<>();
@@ -230,7 +230,7 @@ public class CompositionAreaController {
         zIndexStack.addAll(tempBack);
         //Set the z-index of the GE from their stack position
         setZIndex(zIndexStack);
-        uic.getGEController().modifySelectedGE();
+        mainController.getGEController().modifySelectedGE();
     }
 
     /**
@@ -278,7 +278,7 @@ public class CompositionAreaController {
         RenderWorker lastRenderWorker = null;
         executorService = Executors.newFixedThreadPool(1);
         for(GraphicalElement ge : elementJPanelMap.keySet()){
-            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
+            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
             executorService.submit(rw);
             lastRenderWorker = rw;
         }
@@ -306,7 +306,7 @@ public class CompositionAreaController {
     public void refreshGE(GraphicalElement ge){
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), uic.getGEManager().getRenderer(ge.getClass()), ge);
+        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
         executorService.submit(worker);
         if(ge instanceof Document)
             compositionArea.setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
@@ -316,8 +316,8 @@ public class CompositionAreaController {
      * Refreshes and redraws the selected GraphicalElements.
      */
     public void refreshSelectedGE() {
-        refreshGE(uic.getGEController().getSelectedGE());
-        uic.unselectAllGE();
+        refreshGE(mainController.getGEController().getSelectedGE());
+        mainController.unselectAllGE();
     }
 
     /**
@@ -325,7 +325,7 @@ public class CompositionAreaController {
      * @param alignment Alignment to apply.
      */
     public void setAlign(Align alignment) {
-        List<GraphicalElement> selectedGE = uic.getGEController().getSelectedGE();
+        List<GraphicalElement> selectedGE = mainController.getGEController().getSelectedGE();
         if(selectedGE.size()>0){
             int xMin;
             int xMax;
@@ -423,7 +423,7 @@ public class CompositionAreaController {
                     }
                     break;
             }
-            uic.getGEController().modifySelectedGE();
+            mainController.getGEController().modifySelectedGE();
         }
     }
 

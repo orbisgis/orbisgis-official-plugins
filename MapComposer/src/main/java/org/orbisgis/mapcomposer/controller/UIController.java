@@ -45,6 +45,8 @@ import static org.orbisgis.mapcomposer.controller.CompositionAreaController.Alig
 import static org.orbisgis.mapcomposer.controller.CompositionAreaController.ZIndex.*;
 
 /**
+ * This class get all the user interaction with the MainWindow.
+ *
  * @author Sylvain PALOMINOS
  */
 
@@ -157,7 +159,6 @@ public class UIController {
             UIPanel panel = null;
             if(hasSameClass) {
                 //Try to create an equivalent GE with the common attributes
-                System.out.println(toBeSet.size());
                 panel = mainController.getGEManager().getRenderer(selectedGE.get(0).getClass()).createConfigurationPanel(getCommonAttributes(toBeSet), mainController, true);
             }
             if(panel==null)

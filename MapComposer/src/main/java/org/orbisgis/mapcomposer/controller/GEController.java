@@ -45,6 +45,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * This controller manage all the GraphicalElement created in the project.
+ *
  * @author Sylvain PALOMINOS
  */
 
