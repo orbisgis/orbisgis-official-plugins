@@ -24,8 +24,10 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element.illustration;
 
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 
@@ -83,5 +85,13 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
         super.setAttribute(ca);
         if(ca.getName().equals(path.getName()))
             path = (SourceCA) ca;
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        SimpleIllustrationGE copy = (SimpleIllustrationGE) super.deepCopy();
+        copy.path = (SourceCA) this.path.deepCopy();
+
+        return copy;
     }
 }

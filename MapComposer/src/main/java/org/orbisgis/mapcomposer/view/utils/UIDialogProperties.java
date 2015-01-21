@@ -119,7 +119,7 @@ public class UIDialogProperties implements UIPanel {
 
     @Override
     public String validateInput() {
-        mainController.getGEController().validateCAList(caList);
+        mainController.validateCAList(caList);
         return null;
     }
 

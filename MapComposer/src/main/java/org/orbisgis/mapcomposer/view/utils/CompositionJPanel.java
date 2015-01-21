@@ -26,6 +26,7 @@ package org.orbisgis.mapcomposer.view.utils;
 
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
 
@@ -37,9 +38,13 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
+import java.io.File;
+import java.io.IOException;
+
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
+import javax.imageio.ImageIO;
 import javax.swing.*;
 
  /**

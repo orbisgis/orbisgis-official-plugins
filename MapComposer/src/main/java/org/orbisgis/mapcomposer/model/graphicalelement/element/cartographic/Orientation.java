@@ -29,6 +29,7 @@ import java.util.List;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 /**
  * This class represent the arrow giving the orientation of the map.
@@ -82,5 +83,12 @@ public class Orientation extends SimpleCartoGE{
         super.setAttribute(ca);
         if(ca.getName().equals(icon.getName()))
             icon = (SourceCA) ca;
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        Orientation copy = (Orientation)super.deepCopy();
+        copy.icon = (SourceCA) this.icon.deepCopy();
+        return copy;
     }
 }

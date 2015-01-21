@@ -174,4 +174,16 @@ public class IntegerCA extends BaseCA<Integer> {
         ret.put("limits", limits);
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        IntegerCA copy = new IntegerCA();
+        copy.setValue(this.getValue());
+        copy.setReadOnly(this.getReadOnly());
+        copy.setName(this.getName());
+        copy.setLimits(this.getLimits());
+        copy.setMax(this.getMax());
+        copy.setMin(this.getMin());
+        return copy;
+    }
 }

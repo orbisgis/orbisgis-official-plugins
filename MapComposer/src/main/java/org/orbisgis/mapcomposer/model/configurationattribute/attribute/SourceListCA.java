@@ -112,4 +112,18 @@ public class SourceListCA extends BaseListCA<String> implements RefreshCA{
         ret.put("list", s);
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        SourceListCA copy = new SourceListCA();
+        List<String> list = new ArrayList<>();
+        for(String s : getValue())
+        list.add(s);
+        copy.setValue(list);
+        copy.select(this.getSelected());
+        copy.setReadOnly(this.getReadOnly());
+        copy.setName(this.getName());
+
+        return copy;
+    }
 }

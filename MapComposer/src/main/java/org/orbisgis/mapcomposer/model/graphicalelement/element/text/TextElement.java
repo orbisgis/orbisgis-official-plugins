@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -123,6 +124,21 @@ public class TextElement extends SimpleGE{
         list.add(text);
         list.add(alpha);
         return list;
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        TextElement copy = (TextElement)super.deepCopy();
+        copy.alpha = (IntegerCA) this.alpha.deepCopy();
+        copy.text = (StringCA) this.text.deepCopy();
+        copy.colorText = (ColorCA) this.colorText.deepCopy();
+        copy.colorBack = (ColorCA) this.colorBack.deepCopy();
+        copy.fontSize = (IntegerCA) this.fontSize.deepCopy();
+        copy.alignment = (SourceListCA) this.alignment.deepCopy();
+        copy.style = (SourceListCA) this.style.deepCopy();
+        copy.font = (SourceListCA) this.font.deepCopy();
+
+        return copy;
     }
 
     @Override

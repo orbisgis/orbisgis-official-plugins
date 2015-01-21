@@ -78,4 +78,14 @@ public class SourceCA extends BaseCA<String>{
         ret.put("value", value);
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        SourceCA copy = new SourceCA();
+        copy.setValue(this.getValue());
+        copy.setName(this.getName());
+        copy.setReadOnly(this.getReadOnly());
+
+        return copy;
+    }
 }

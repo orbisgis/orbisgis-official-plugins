@@ -26,6 +26,7 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.util.List;
 
@@ -75,5 +76,12 @@ public class Scale extends SimpleCartoGE{
         super.setAttribute(ca);
         if(ca.getName().equals(milka.getName()))
             milka=(MapImageListCA)ca;
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        Scale copy = (Scale) super.deepCopy();
+        copy.milka = (MapImageListCA)milka.deepCopy();
+        return copy;
     }
 }
