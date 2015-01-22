@@ -29,6 +29,7 @@ import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 
 import javax.swing.*;
 import java.awt.image.BufferedImage;
+
 /**
  * This class extends the SwingWorker and is used to do the rendering of a GraphicalElement without freezing the MapComposer.
  *

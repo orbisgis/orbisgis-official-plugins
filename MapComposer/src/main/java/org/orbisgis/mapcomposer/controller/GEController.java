@@ -330,4 +330,8 @@ public class GEController {
     public void setToBeSetList(List<GraphicalElement> list){
         toBeSet = list;
     }
+
+    public List<GraphicalElement> getToBeSet(){
+        return toBeSet;
+    }
 }

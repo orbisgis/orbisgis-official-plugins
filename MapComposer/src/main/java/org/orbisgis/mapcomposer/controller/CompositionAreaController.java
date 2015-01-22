@@ -432,8 +432,11 @@ public class CompositionAreaController {
      * With the position of the GraphicalElements in the given List, sets their z index inside of the CompositionArea.
      * @param listGE List of GraphicalElement that the z index was modified.
      */
-    private void setZIndex(List<GraphicalElement> listGE){
+    public void setZIndex(List<GraphicalElement> listGE){
+        zIndexStack = new Stack<>();
+        zIndexStack.addAll(listGE);
         for(GraphicalElement ge : listGE){
+            ge.setZ(listGE.indexOf(ge));
             compositionArea.setZIndex(elementJPanelMap.get(ge), listGE.indexOf(ge));
         }
     }
