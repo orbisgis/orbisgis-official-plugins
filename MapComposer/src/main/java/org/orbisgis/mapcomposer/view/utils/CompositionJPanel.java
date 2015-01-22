@@ -311,6 +311,7 @@ public class CompositionJPanel extends JPanel{
     * @param p Location on screen of the mouse when it's released.
     */
     public void mouseReleasedHub(Point p){
+        GraphicalElement ge = this.ge.deepCopy();
         //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
         if(p.x==startX && p.y==startY)
             return;
@@ -324,14 +325,14 @@ public class CompositionJPanel extends JPanel{
         else {
             switch (moveMode) {
                 case ALTGRAPH:
-                    mouseReleasedALTGRAPH(p);
+                    mouseReleasedALTGRAPH(p, ge);
                     break;
                 case CTRL:
                 case SHIFT:
-                    mouseReleasedSHIFT(p);
+                    mouseReleasedSHIFT(p, ge);
                     break;
                 case NONE:
-                    mouseReleasedNONE(p);
+                    mouseReleasedNONE(p, ge);
                     break;
             }
             //Set the new bounds of the compositionJPanel before validating it (and redraw it)
@@ -342,7 +343,7 @@ public class CompositionJPanel extends JPanel{
             this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
             panel.revalidate();
 
-            uic.getGEController().modifyGE(ge);
+            uic.modifyGE(this.ge, ge);
 
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;
@@ -356,7 +357,7 @@ public class CompositionJPanel extends JPanel{
       * Sets the new dimension and position of the ge when the mouse is released.
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedNONE(Point p) {
+     private void mouseReleasedNONE(Point p, GraphicalElement ge) {
          switch(moveDirection){
              case TOP:
                  ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
@@ -400,7 +401,7 @@ public class CompositionJPanel extends JPanel{
       * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedSHIFT(Point p) {
+     private void mouseReleasedSHIFT(Point p, GraphicalElement ge) {
          float ration = ((float)ge.getHeight())/ge.getWidth();
          switch(moveDirection){
              case TOP:
@@ -508,7 +509,7 @@ public class CompositionJPanel extends JPanel{
       * When the mouse is released, the CompositionJPanel take the new size and the GraphicalElement is adapted to fit into it.
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedALTGRAPH(Point p) {
+     private void mouseReleasedALTGRAPH(Point p, GraphicalElement ge) {
          Point point;
          switch(moveDirection){
              case TOP:

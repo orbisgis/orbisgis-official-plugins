@@ -232,12 +232,26 @@ public class MainController/* implements StateEditable*/{
     }
 
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
-        //Saves the GraphicalElement state before applying the aligment
+        //Saves the GraphicalElement state before applying the z-index change
         if(!undoRedo) {
             undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ZINDEX_GE, geController.getSelectedGE(), this));
         }
-        //Apply the alignment
+        //Apply the z-index change
         compositionAreaController.changeZIndex(zIndex);
+    }
+
+    public void modifyGE(GraphicalElement original, GraphicalElement copy){
+        if(!undoRedo) {
+            List<GraphicalElement> listGE = new ArrayList<>();
+            listGE.add(original);
+            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.MODIFY_GE, listGE, this));
+        }
+        original.setX(copy.getX());
+        original.setY(copy.getY());
+        original.setWidth(copy.getWidth());
+        original.setHeight(copy.getHeight());
+        original.setRotation(copy.getRotation());
+        geController.modifyGE(original);
     }
 
     public GEManager getGEManager(){
@@ -255,10 +269,13 @@ public class MainController/* implements StateEditable*/{
     public GEController getGEController(){
         return geController;
     }
+    public UndoManager getUndoManager(){
+        return undoManager;
+    }
 
     public static class UndoableEdit extends AbstractUndoableEdit{
 
-        public enum EditType {ADD_GE, REMOVE_GE, CONFIGURATION_GE, MOVE_GE, ZINDEX_GE};
+        public enum EditType {ADD_GE, REMOVE_GE, CONFIGURATION_GE, MOVE_GE, ZINDEX_GE, MODIFY_GE};
 
         private EditType editType;
         private List<GraphicalElement> listGE;
@@ -270,7 +287,7 @@ public class MainController/* implements StateEditable*/{
             this.editType = editType;
             this.listGE = new ArrayList<>();
             for(GraphicalElement ge : listGE) {
-                if((editType == EditType.CONFIGURATION_GE || editType == EditType.MOVE_GE || editType == EditType.ZINDEX_GE)
+                if((editType == EditType.CONFIGURATION_GE || editType == EditType.MOVE_GE || editType == EditType.ZINDEX_GE || editType == EditType.MODIFY_GE)
                         && mainController.getGEList().contains(ge)) {
                     this.listGE.add(ge);
                     this.listGE.add(ge.deepCopy());
@@ -353,6 +370,28 @@ public class MainController/* implements StateEditable*/{
                     mainController.getCompositionAreaController().setZIndex(reverse);
                     mainController.getCompositionAreaController().refreshGE(reverse);
                     break;
+                case MODIFY_GE:
+                    for(int i=0; i<listGE.size()/2; i+=2){
+                        int x = listGE.get(i).getX();
+                        int y = listGE.get(i).getY();
+                        int width = listGE.get(i).getWidth();
+                        int height = listGE.get(i).getHeight();
+                        int rotation = listGE.get(i).getRotation();
+
+                        listGE.get(i).setX(listGE.get(i + 1).getX());
+                        listGE.get(i).setY(listGE.get(i + 1).getY());
+                        listGE.get(i).setWidth(listGE.get(i + 1).getWidth());
+                        listGE.get(i).setHeight(listGE.get(i + 1).getHeight());
+                        listGE.get(i).setRotation(listGE.get(i + 1).getRotation());
+
+                        listGE.get(i + 1).setX(x);
+                        listGE.get(i + 1).setY(y);
+                        listGE.get(i + 1).setWidth(width);
+                        listGE.get(i + 1).setHeight(height);
+                        listGE.get(i + 1).setRotation(rotation);
+                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
+                    }
+                    break;
             }
         }
 
@@ -414,6 +453,28 @@ public class MainController/* implements StateEditable*/{
                     System.out.println(list.toString());
                     mainController.getCompositionAreaController().setZIndex(reverse);
                     mainController.getCompositionAreaController().refreshGE(reverse);
+                    break;
+                case MODIFY_GE:
+                    for(int i=0; i<listGE.size()/2; i+=2){
+                        int x = listGE.get(i).getX();
+                        int y = listGE.get(i).getY();
+                        int width = listGE.get(i).getWidth();
+                        int height = listGE.get(i).getHeight();
+                        int rotation = listGE.get(i).getRotation();
+
+                        listGE.get(i).setX(listGE.get(i + 1).getX());
+                        listGE.get(i).setY(listGE.get(i + 1).getY());
+                        listGE.get(i).setWidth(listGE.get(i + 1).getWidth());
+                        listGE.get(i).setHeight(listGE.get(i + 1).getHeight());
+                        listGE.get(i).setRotation(listGE.get(i + 1).getRotation());
+
+                        listGE.get(i + 1).setX(x);
+                        listGE.get(i + 1).setY(y);
+                        listGE.get(i + 1).setWidth(width);
+                        listGE.get(i + 1).setHeight(height);
+                        listGE.get(i + 1).setRotation(rotation);
+                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
+                    }
                     break;
             }
         }
