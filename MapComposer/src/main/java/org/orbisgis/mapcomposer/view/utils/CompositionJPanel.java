@@ -319,6 +319,7 @@ public class CompositionJPanel extends JPanel{
         if(moveDirection==MoveDirection.CENTER) {
             ge.setX(ge.getX() - startX + p.x);
             ge.setY(ge.getY() - startY + p.y);
+            uic.modifyGE(this.ge, ge);
             this.moveDirection = MoveDirection.NONE;
             this.moveMode = MoveMode.NONE;
         }
