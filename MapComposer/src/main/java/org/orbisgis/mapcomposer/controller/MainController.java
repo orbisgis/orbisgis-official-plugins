@@ -24,6 +24,8 @@
 
 package org.orbisgis.mapcomposer.controller;
 
+import org.orbisgis.mapcomposer.controller.utils.AddGEUndoableEdit;
+import org.orbisgis.mapcomposer.controller.utils.RemoveGEUndoableEdit;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -165,7 +167,11 @@ public class MainController{
      */
     public void removeSelectedGE(){
         if(!undoRedo) {
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.REMOVE_GE, geController.getSelectedGE(), this));
+            boolean flag = true;
+            for(GraphicalElement ge : geController.getSelectedGE()) {
+                undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, flag));
+                flag = false;
+            }
         }
         compositionAreaController.remove(geController.getSelectedGE());
         geController.removeSelectedGE();
@@ -185,7 +191,11 @@ public class MainController{
      */
     public void removeAllGE() {
         if(!undoRedo) {
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.REMOVE_GE, getGEList(), this));
+            boolean flag = true;
+            for(GraphicalElement ge : geController.getSelectedGE()) {
+                undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, flag));
+                flag = false;
+            }
         }
         compositionAreaController.removeAll();
         geController.removeAllGE();
@@ -211,9 +221,10 @@ public class MainController{
      */
     public void addGE(GraphicalElement ge) {
         if(!undoRedo) {
-            List<GraphicalElement> listGE = new ArrayList<>();
+            /*List<GraphicalElement> listGE = new ArrayList<>();
             listGE.add(ge);
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ADD_GE, listGE, this));
+            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ADD_GE, listGE, this));*/
+            undoManager.addEdit(new AddGEUndoableEdit(this, ge, true));
         }
         compositionAreaController.add(ge);
         geController.addGE(ge);
