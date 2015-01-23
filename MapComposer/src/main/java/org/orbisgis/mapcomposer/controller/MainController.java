@@ -25,20 +25,20 @@
 package org.orbisgis.mapcomposer.controller;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.sif.UIFactory;
 
-import java.io.*;
-import java.sql.Ref;
-import java.util.*;
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
+import java.util.ArrayList;
+import java.util.List;
 
+import javax.swing.*;
 import javax.swing.undo.*;
 
 /**
@@ -46,7 +46,7 @@ import javax.swing.undo.*;
  *
  * @author Sylvain PALOMINOS
  */
-public class MainController/* implements StateEditable*/{
+public class MainController{
 
     /** CAManager */
     private CAManager caManager;
@@ -65,6 +65,10 @@ public class MainController/* implements StateEditable*/{
 
     private boolean undoRedo;
 
+    private GraphicalElement.Property mouseWheelChangedProp;
+    private Timer waitEndWheelTimer;
+    private static final int waitEndWheelTime = 1000;
+
     /**
      * Main constructor.
      */
@@ -82,6 +86,8 @@ public class MainController/* implements StateEditable*/{
         undoManager = new UndoManager();
         UIFactory.setMainFrame(mainWindow);
         undoRedo = false;
+        mouseWheelChangedProp = null;
+        waitEndWheelTimer = new Timer(waitEndWheelTime, EventHandler.create(ActionListener.class, this, "wheelEnd"));
     }
 
     public void undo(){
@@ -254,6 +260,20 @@ public class MainController/* implements StateEditable*/{
         geController.modifyGE(original);
     }
 
+    public void changeProperty(GraphicalElement.Property prop, int value){
+        if(mouseWheelChangedProp == null || mouseWheelChangedProp != prop){
+            waitEndWheelTimer.start();
+            mouseWheelChangedProp = prop;
+            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.CHANGE_PROP_GE, geController.getSelectedGE(), this));
+        }
+        geController.changeProperty(prop, value);
+        waitEndWheelTimer.restart();
+    }
+
+    public void wheelEnd(){
+        mouseWheelChangedProp = null;
+    }
+
     public GEManager getGEManager(){
         return geManager;
     }
@@ -275,7 +295,7 @@ public class MainController/* implements StateEditable*/{
 
     public static class UndoableEdit extends AbstractUndoableEdit{
 
-        public enum EditType {ADD_GE, REMOVE_GE, CONFIGURATION_GE, MOVE_GE, ZINDEX_GE, MODIFY_GE};
+        public enum EditType {ADD_GE, REMOVE_GE, CONFIGURATION_GE, MOVE_GE, ZINDEX_GE, MODIFY_GE, CHANGE_PROP_GE};
 
         private EditType editType;
         private List<GraphicalElement> listGE;
@@ -287,7 +307,11 @@ public class MainController/* implements StateEditable*/{
             this.editType = editType;
             this.listGE = new ArrayList<>();
             for(GraphicalElement ge : listGE) {
-                if((editType == EditType.CONFIGURATION_GE || editType == EditType.MOVE_GE || editType == EditType.ZINDEX_GE || editType == EditType.MODIFY_GE)
+                if((editType == EditType.CONFIGURATION_GE ||
+                        editType == EditType.MOVE_GE ||
+                        editType == EditType.ZINDEX_GE ||
+                        editType == EditType.MODIFY_GE ||
+                        editType == EditType.CHANGE_PROP_GE)
                         && mainController.getGEList().contains(ge)) {
                     this.listGE.add(ge);
                     this.listGE.add(ge.deepCopy());
@@ -371,6 +395,7 @@ public class MainController/* implements StateEditable*/{
                     mainController.getCompositionAreaController().refreshGE(reverse);
                     break;
                 case MODIFY_GE:
+                case CHANGE_PROP_GE:
                     for(int i=0; i<listGE.size()/2; i+=2){
                         int x = listGE.get(i).getX();
                         int y = listGE.get(i).getY();
@@ -455,6 +480,7 @@ public class MainController/* implements StateEditable*/{
                     mainController.getCompositionAreaController().refreshGE(reverse);
                     break;
                 case MODIFY_GE:
+                case CHANGE_PROP_GE:
                     for(int i=0; i<listGE.size()/2; i+=2){
                         int x = listGE.get(i).getX();
                         int y = listGE.get(i).getY();

@@ -226,19 +226,19 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinner.isEnabled() && spinner.getName() != null) {
                 switch (spinner.getName()) {
                     case "X":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue());
                         break;
                     case "Y":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue());
                         break;
                     case "WIDTH":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue());
                         break;
                     case "HEIGHT":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue());
                         break;
                     case "ROTATION":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue());
                         break;
                 }
             }
@@ -255,19 +255,19 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinner.isEnabled() && spinner.getName() != null) {
                 switch (spinner.getName()) {
                     case "X":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue() - mwe.getWheelRotation());
                         break;
                     case "Y":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue() - mwe.getWheelRotation());
                         break;
                     case "WIDTH":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue() - mwe.getWheelRotation());
                         break;
                     case "HEIGHT":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue() - mwe.getWheelRotation());
                         break;
                     case "ROTATION":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue() - mwe.getWheelRotation());
                         break;
                 }
             }
