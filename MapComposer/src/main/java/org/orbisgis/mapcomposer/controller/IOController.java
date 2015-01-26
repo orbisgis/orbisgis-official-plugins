@@ -40,8 +40,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This controller manage the save, load and export actions.
@@ -118,7 +116,7 @@ public class IOController {
                             try{
                                 ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
                             } catch (IOException ex) {
-                                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
                             }
                         }
                     }
