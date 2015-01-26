@@ -27,6 +27,7 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -48,7 +49,7 @@ public class OrientationRenderer extends SimpleGERenderer {
         if(file.exists() && file.isFile())
             icon = new ImageIcon(((Orientation)ge).getIconPath());
         else
-            icon = new ImageIcon(MainWindow.class.getResource("compass.png"));
+            icon = MapComposerIcon.getIcon("compass");
 
         //Get the bufferedImage from the image
         BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);

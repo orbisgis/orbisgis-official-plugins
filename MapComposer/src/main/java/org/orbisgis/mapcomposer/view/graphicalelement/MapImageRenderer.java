@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
 
@@ -54,7 +55,7 @@ public class MapImageRenderer extends SimpleGERenderer {
             bi = ((MapImage) ge).getImage();
         } else {
             //Return the icon of the MapImage as BufferedImage
-            ImageIcon icon = new ImageIcon(MainWindow.class.getResource("add_map.png"));
+            ImageIcon icon = MapComposerIcon.getIcon("add_map");
             bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
             Graphics g = bi.createGraphics();
             icon.paintIcon(null, g, 0, 0);

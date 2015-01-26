@@ -27,6 +27,7 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 
 import java.awt.Graphics;
 import java.awt.image.BufferedImage;
@@ -48,7 +49,7 @@ public class ImageRenderer extends SimpleGERenderer {
         if(file.exists() && file.isFile())
             icon = new ImageIcon(((Image)ge).getPath());
         else
-            icon = new ImageIcon(MainWindow.class.getResource("add_picture.png"));
+            icon = MapComposerIcon.getIcon("add_picture");
 
         //Get the bufferedImage from the image
         BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
