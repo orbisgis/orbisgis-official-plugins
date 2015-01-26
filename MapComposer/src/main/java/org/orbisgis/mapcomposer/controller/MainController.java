@@ -24,10 +24,8 @@
 
 package org.orbisgis.mapcomposer.controller;
 
-import org.orbisgis.mapcomposer.controller.utils.AddGEUndoableEdit;
-import org.orbisgis.mapcomposer.controller.utils.RemoveGEUndoableEdit;
+import org.orbisgis.mapcomposer.controller.utils.UndoableEdit.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
@@ -86,6 +84,7 @@ public class MainController{
         mainWindow.setLocationRelativeTo(null);
         compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
         undoManager = new UndoManager();
+        undoManager.setLimit(50);
         UIFactory.setMainFrame(mainWindow);
         undoRedo = false;
         mouseWheelChangedProp = null;
@@ -207,9 +206,7 @@ public class MainController{
      */
     public void removeGE(GraphicalElement ge) {
         if(!undoRedo) {
-            List<GraphicalElement> listGE = new ArrayList<>();
-            listGE.add(ge);
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.REMOVE_GE, listGE, this));
+            undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, true));
         }
         compositionAreaController.remove(ge);
         geController.removeGE(ge);
@@ -221,9 +218,6 @@ public class MainController{
      */
     public void addGE(GraphicalElement ge) {
         if(!undoRedo) {
-            /*List<GraphicalElement> listGE = new ArrayList<>();
-            listGE.add(ge);
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ADD_GE, listGE, this));*/
             undoManager.addEdit(new AddGEUndoableEdit(this, ge, true));
         }
         compositionAreaController.add(ge);
@@ -233,16 +227,16 @@ public class MainController{
     public void validateCAList(List<ConfigurationAttribute> listCA){
         //Saves the GraphicalElement state before applying the configuration
         if(!undoRedo) {
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.CONFIGURATION_GE, geController.getToBeSet(), this));
+            undoManager.addEdit(new ConfigurationGEUndoableEdit(this, geController.getToBeSet(), true));
         }
         //Apply the configuration
         geController.validateCAList(listCA);
     }
 
     public void setSelectedGEAlignment(CompositionAreaController.Align alignment){
-        //Saves the GraphicalElement state before applying the aligment
+        //Saves the GraphicalElement state before applying the alignment
         if(!undoRedo) {
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.MOVE_GE, geController.getSelectedGE(), this));
+            undoManager.addEdit(new MoveGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the alignment
         compositionAreaController.setAlign(alignment);
@@ -251,23 +245,23 @@ public class MainController{
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
         //Saves the GraphicalElement state before applying the z-index change
         if(!undoRedo) {
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ZINDEX_GE, geController.getSelectedGE(), this));
+            undoManager.addEdit(new ZIndexGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the z-index change
         compositionAreaController.changeZIndex(zIndex);
     }
 
-    public void modifyGE(GraphicalElement original, GraphicalElement copy){
+    public void modifyGE(GraphicalElement original, GraphicalElement modifiedCopy){
         if(!undoRedo) {
             List<GraphicalElement> listGE = new ArrayList<>();
             listGE.add(original);
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.MODIFY_GE, listGE, this));
+            undoManager.addEdit(new ModifyGEUndoableEdit(this, listGE, true));
         }
-        original.setX(copy.getX());
-        original.setY(copy.getY());
-        original.setWidth(copy.getWidth());
-        original.setHeight(copy.getHeight());
-        original.setRotation(copy.getRotation());
+        original.setX(modifiedCopy.getX());
+        original.setY(modifiedCopy.getY());
+        original.setWidth(modifiedCopy.getWidth());
+        original.setHeight(modifiedCopy.getHeight());
+        original.setRotation(modifiedCopy.getRotation());
         geController.modifyGE(original);
     }
 
@@ -275,7 +269,7 @@ public class MainController{
         if(mouseWheelChangedProp == null || mouseWheelChangedProp != prop){
             waitEndWheelTimer.start();
             mouseWheelChangedProp = prop;
-            undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.CHANGE_PROP_GE, geController.getSelectedGE(), this));
+            undoManager.addEdit(new ModifyGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         geController.changeProperty(prop, value);
         waitEndWheelTimer.restart();
@@ -299,227 +293,6 @@ public class MainController{
     }
     public GEController getGEController(){
         return geController;
-    }
-    public UndoManager getUndoManager(){
-        return undoManager;
-    }
-
-    public static class UndoableEdit extends AbstractUndoableEdit{
-
-        public enum EditType {ADD_GE, REMOVE_GE, CONFIGURATION_GE, MOVE_GE, ZINDEX_GE, MODIFY_GE, CHANGE_PROP_GE};
-
-        private EditType editType;
-        private List<GraphicalElement> listGE;
-        private MainController mainController;
-
-        private boolean significant;
-
-        public UndoableEdit(EditType editType, List<GraphicalElement> listGE, MainController mainController){
-            this.editType = editType;
-            this.listGE = new ArrayList<>();
-            for(GraphicalElement ge : listGE) {
-                if((editType == EditType.CONFIGURATION_GE ||
-                        editType == EditType.MOVE_GE ||
-                        editType == EditType.ZINDEX_GE ||
-                        editType == EditType.MODIFY_GE ||
-                        editType == EditType.CHANGE_PROP_GE)
-                        && mainController.getGEList().contains(ge)) {
-                    this.listGE.add(ge);
-                    this.listGE.add(ge.deepCopy());
-                    this.significant = true;
-                    System.out.println(editType.name());
-                }
-                else if(editType == EditType.ADD_GE){
-                    this.listGE.add(ge);
-                    this.significant = true;
-                    System.out.println(editType.name());
-                }
-                else if(editType == EditType.REMOVE_GE && !listGE.isEmpty()){
-                    this.listGE.add(ge);
-                    this.significant = true;
-                    System.out.println(editType.name());
-                }
-                else
-                    this.significant = false;
-            }
-            this.mainController = mainController;
-
-        }
-
-        @Override
-        public void redo() throws CannotRedoException {
-            super.redo();
-            switch(editType){
-                case ADD_GE:
-                    for(GraphicalElement ge : listGE)
-                        mainController.addGE(ge);
-                    mainController.getCompositionAreaController().refreshGE(listGE);
-                    break;
-                case REMOVE_GE:
-                    for(GraphicalElement ge : listGE)
-                        mainController.removeGE(ge);
-                    mainController.getCompositionAreaController().refreshGE(listGE);
-                    break;
-                case CONFIGURATION_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        GraphicalElement copy = listGE.get(i).deepCopy();
-                        for(ConfigurationAttribute ca : listGE.get(i+1).getAllAttributes()){
-                            if(ca instanceof RefreshCA)
-                                ((RefreshCA)ca).refresh(mainController);
-                            listGE.get(i).setAttribute(ca);
-                        }
-                        for(ConfigurationAttribute ca : copy.getAllAttributes()){
-                            if(ca instanceof RefreshCA)
-                                ((RefreshCA)ca).refresh(mainController);
-                            listGE.get(i+1).setAttribute(ca);
-                        }
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-                case MOVE_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        int x = listGE.get(i).getX();
-                        int y = listGE.get(i).getY();
-
-                        listGE.get(i).setX(listGE.get(i + 1).getX());
-                        listGE.get(i).setY(listGE.get(i + 1).getY());
-
-                        listGE.get(i+1).setX(x);
-                        listGE.get(i+1).setY(y);
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-                case ZINDEX_GE:
-                    List<GraphicalElement> list = mainController.getGEList();
-                    List<GraphicalElement> reverse = new ArrayList<>();
-                    System.out.println(list.toString());
-                    for(int i = 0; i < listGE.size() / 2; i += 2){
-                        int size = list.size() - 1;
-                        list.remove(listGE.get(i));
-                        list.add(size-listGE.get(i + 1).getZ(), listGE.get(i));
-                        listGE.get(i + 1).setZ(listGE.get(i).getZ());
-                    }
-                    for(GraphicalElement ge : list)
-                        reverse.add(0, ge);
-                    System.out.println(list.toString());
-                    mainController.getCompositionAreaController().setZIndex(reverse);
-                    mainController.getCompositionAreaController().refreshGE(reverse);
-                    break;
-                case MODIFY_GE:
-                case CHANGE_PROP_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        int x = listGE.get(i).getX();
-                        int y = listGE.get(i).getY();
-                        int width = listGE.get(i).getWidth();
-                        int height = listGE.get(i).getHeight();
-                        int rotation = listGE.get(i).getRotation();
-
-                        listGE.get(i).setX(listGE.get(i + 1).getX());
-                        listGE.get(i).setY(listGE.get(i + 1).getY());
-                        listGE.get(i).setWidth(listGE.get(i + 1).getWidth());
-                        listGE.get(i).setHeight(listGE.get(i + 1).getHeight());
-                        listGE.get(i).setRotation(listGE.get(i + 1).getRotation());
-
-                        listGE.get(i + 1).setX(x);
-                        listGE.get(i + 1).setY(y);
-                        listGE.get(i + 1).setWidth(width);
-                        listGE.get(i + 1).setHeight(height);
-                        listGE.get(i + 1).setRotation(rotation);
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-            }
-        }
-
-        @Override
-        public void undo() throws CannotUndoException {
-            super.undo();
-            switch(editType){
-                case ADD_GE:
-                    for(GraphicalElement ge : listGE)
-                        mainController.removeGE(ge);
-                    mainController.getCompositionAreaController().refreshGE(listGE);
-                    break;
-                case REMOVE_GE:
-                    for(GraphicalElement ge : listGE)
-                        mainController.addGE(ge);
-                    mainController.getCompositionAreaController().refreshGE(listGE);
-                    break;
-                case CONFIGURATION_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        GraphicalElement copy = listGE.get(i).deepCopy();
-                        for(ConfigurationAttribute ca : listGE.get(i+1).getAllAttributes()){
-                            if(ca instanceof RefreshCA)
-                                ((RefreshCA)ca).refresh(mainController);
-                            listGE.get(i).setAttribute(ca);
-                        }
-                        for(ConfigurationAttribute ca : copy.getAllAttributes()){
-                            if(ca instanceof RefreshCA)
-                                ((RefreshCA)ca).refresh(mainController);
-                            listGE.get(i+1).setAttribute(ca);
-                        }
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-                case MOVE_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        int x = listGE.get(i).getX();
-                        int y = listGE.get(i).getY();
-
-                        listGE.get(i).setX(listGE.get(i + 1).getX());
-                        listGE.get(i).setY(listGE.get(i + 1).getY());
-
-                        listGE.get(i + 1).setX(x);
-                        listGE.get(i + 1).setY(y);
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-                case ZINDEX_GE:
-                    List<GraphicalElement> list = mainController.getGEList();
-                    List<GraphicalElement> reverse = new ArrayList<>();
-                    System.out.println(list.toString());
-                    for(int i = 0; i < listGE.size() / 2; i += 2){
-                        int size = list.size() - 1;
-                        list.remove(listGE.get(i));
-                        list.add(size-listGE.get(i + 1).getZ(), listGE.get(i));
-                        listGE.get(i + 1).setZ(listGE.get(i).getZ());
-                    }
-                    for(GraphicalElement ge : list)
-                        reverse.add(0, ge);
-                    System.out.println(list.toString());
-                    mainController.getCompositionAreaController().setZIndex(reverse);
-                    mainController.getCompositionAreaController().refreshGE(reverse);
-                    break;
-                case MODIFY_GE:
-                case CHANGE_PROP_GE:
-                    for(int i=0; i<listGE.size()/2; i+=2){
-                        int x = listGE.get(i).getX();
-                        int y = listGE.get(i).getY();
-                        int width = listGE.get(i).getWidth();
-                        int height = listGE.get(i).getHeight();
-                        int rotation = listGE.get(i).getRotation();
-
-                        listGE.get(i).setX(listGE.get(i + 1).getX());
-                        listGE.get(i).setY(listGE.get(i + 1).getY());
-                        listGE.get(i).setWidth(listGE.get(i + 1).getWidth());
-                        listGE.get(i).setHeight(listGE.get(i + 1).getHeight());
-                        listGE.get(i).setRotation(listGE.get(i + 1).getRotation());
-
-                        listGE.get(i + 1).setX(x);
-                        listGE.get(i + 1).setY(y);
-                        listGE.get(i + 1).setWidth(width);
-                        listGE.get(i + 1).setHeight(height);
-                        listGE.get(i + 1).setRotation(rotation);
-                        mainController.getCompositionAreaController().refreshGE(listGE.get(i));
-                    }
-                    break;
-            }
-        }
-
-        @Override
-        public boolean isSignificant(){
-            return significant;
-        }
     }
 }
  

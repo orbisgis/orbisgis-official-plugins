@@ -22,7 +22,7 @@
 * A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
 */
 
-package org.orbisgis.mapcomposer.controller.utils;
+package org.orbisgis.mapcomposer.controller.utils.UndoableEdit;
 
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
@@ -30,64 +30,66 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import javax.swing.undo.CannotRedoException;
 import javax.swing.undo.CannotUndoException;
 import javax.swing.undo.UndoableEdit;
-import java.awt.*;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
+ * This class represents and edition of the CompositionArea : when the user removes an element.
+ * It manages the action to execute when the edit should be undone or redone.
+ *
  * @author Sylvain PALOMINOS
  */
 
-public class MoveGEUndoableEdit implements UndoableEdit {
+public class RemoveGEUndoableEdit implements UndoableEdit {
 
+    /** Main controller of the application */
     private MainController mainController;
 
-    private Map<GraphicalElement, Point> mapGEPoint;
+    /** List of GraphicalElements modified by the edit */
+    private List<GraphicalElement> listGE;
 
+    /** True if this edit is significant, meaning that it should be presented to the user, false otherwise. */
     private boolean significant;
 
+    /** True if the edit can be used, false otherwise. */
     private boolean alive;
 
-    public MoveGEUndoableEdit(MainController mainController, GraphicalElement ge, boolean significant){
+    /**
+     * RemoveGEUndoableEdit constructor.
+     * @param mainController MainController of the Application.
+     * @param ge GraphicalElements concerned by the edit.
+     * @param significant True if the edit is significant, meaning that it should be presented to the user, false otherwise.
+     */
+    public RemoveGEUndoableEdit(MainController mainController, GraphicalElement ge, boolean significant){
         this.mainController = mainController;
-        this.mapGEPoint = new HashMap<>();
-        mapGEPoint.put(ge, new Point(ge.getX(), ge.getY()));
+        this.listGE = new ArrayList<>();
+        this.listGE.add(ge);
         this.significant = significant;
-        alive = true;
+        this.alive = true;
     }
 
     @Override
     public void undo() throws CannotUndoException {
-        for(GraphicalElement ge : mapGEPoint.keySet()) {
-            Point point = new Point(ge.getX(), ge.getY());
-            ge.setX((int) mapGEPoint.get(ge).getX());
-            ge.setY((int) mapGEPoint.get(ge).getY());
-            mapGEPoint.remove(ge);
-            mapGEPoint.put(ge, point);
+        for(GraphicalElement ge : listGE) {
+            mainController.addGE(ge);
         }
     }
 
     @Override
     public boolean canUndo() {
-        System.out.println("canUndo");
-        return (mainController != null && alive);
+        return (mainController != null && alive && listGE != null);
     }
 
     @Override
     public void redo() throws CannotRedoException {
-        for(GraphicalElement ge : mapGEPoint.keySet()) {
-            Point point = new Point(ge.getX(), ge.getY());
-            ge.setX((int) mapGEPoint.get(ge).getX());
-            ge.setY((int) mapGEPoint.get(ge).getY());
-            mapGEPoint.remove(ge);
-            mapGEPoint.put(ge, point);
+        for(GraphicalElement ge : listGE) {
+            mainController.removeGE(ge);
         }
     }
 
     @Override
     public boolean canRedo() {
-        System.out.println("canRedo");
-        return (mainController != null && alive);
+        return (mainController != null && alive && listGE != null);
     }
 
     @Override
@@ -97,15 +99,17 @@ public class MoveGEUndoableEdit implements UndoableEdit {
 
     @Override
     public boolean addEdit(UndoableEdit anEdit) {
+        //First test if the edit in argument is an instance of RemoveGEUndoableEdit and if it's not significant.
+        if(anEdit instanceof AddGEUndoableEdit && !anEdit.isSignificant()){
+            //In this case, merges both edits : adds all the GraphicalElements contained by the edit given in argument to this edit.
+            this.listGE.addAll(((RemoveGEUndoableEdit) anEdit).listGE);
+            return true;
+        }
         return false;
     }
 
     @Override
     public boolean replaceEdit(UndoableEdit anEdit) {
-        if(anEdit instanceof MoveGEUndoableEdit && !anEdit.isSignificant()){
-            this.mapGEPoint.putAll(((MoveGEUndoableEdit) anEdit).mapGEPoint);
-            return true;
-        }
         return false;
     }
 

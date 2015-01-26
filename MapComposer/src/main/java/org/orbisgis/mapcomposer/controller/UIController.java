@@ -179,7 +179,7 @@ public class UIController {
         toBeSet.add(ge);
         mainController.getGEController().setToBeSetList(toBeSet);
         //Create and show the properties dialog.
-        UIPanel panel = mainController.getGEManager().getRenderer(ge.getClass()).createConfigurationPanel(ge.getAllAttributes(), mainController, false);
+        UIPanel panel = mainController.getGEManager().getRenderer(ge.getClass()).createConfigurationPanel(ge.deepCopy().getAllAttributes(), mainController, false);
         if(panel==null)
             panel = new UIDialogProperties(ge.getAllAttributes(), mainController, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
