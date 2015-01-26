@@ -54,19 +54,28 @@ public class MainController{
     /** GEManager */
     private GEManager geManager;
 
+    /** MainWindow displayed to the user */
     private MainWindow mainWindow;
 
+    /** UndoManager in charge of everything about unoing and redoing */
     private UndoManager undoManager;
 
+    /** Controller in charge of the CompositionArea (which is inside the MainWindow) */
     private CompositionAreaController compositionAreaController;
+    /** Controller in charge of exporting, loading and saving */
     private IOController ioController;
+    /** Controller in charge of the interaction between the user and the interface */
     private UIController uiController;
+    /** Controller in charge of all the GraphicalElements created */
     private GEController geController;
 
+    /** True if the controller is actually undoing or redoing an action (used to not register an action done to undo or redo an old action). */
     private boolean undoRedo;
-
+    /** Property actually changed by the user by using the mouse wheel on a spinner of the tool bar. */
     private GraphicalElement.Property mouseWheelChangedProp;
+    /** Timer used to know if the user has stopped to use the wheel since enough time. */
     private Timer waitEndWheelTimer;
+    /** Time after which it's considered that the user has stopped to use the mouse wheel. */
     private static final int waitEndWheelTime = 1000;
 
     /**
@@ -93,8 +102,10 @@ public class MainController{
 
     public void undo(){
         if(undoManager.canUndo()) {
+            //Block the registering of edit actions
             undoRedo = true;
             undoManager.undo();
+            //Enable the registering of edit actions
             undoRedo = false;
         }
         else
@@ -103,8 +114,10 @@ public class MainController{
 
     public void redo(){
         if(undoManager.canRedo()) {
+            //Block the registering of edit actions
             undoRedo = true;
             undoManager.redo();
+            //Enable the registering of edit actions
             undoRedo = false;
         }
         else
@@ -122,6 +135,10 @@ public class MainController{
         return false;
     }
 
+    /**
+     * Returns the MainWindow of the application.
+     * @return The MainWindow of the application.
+     */
     public MainWindow getMainWindow() { return mainWindow; }
 
     /**
@@ -224,6 +241,10 @@ public class MainController{
         geController.addGE(ge);
     }
 
+    /**
+     * Sets all the GraphicalElements with the given ConfigurationAttributes (which were just configured).
+     * @param listCA List of ConfigurationAttributes configured
+     */
     public void validateCAList(List<ConfigurationAttribute> listCA){
         //Saves the GraphicalElement state before applying the configuration
         if(!undoRedo) {
@@ -233,6 +254,10 @@ public class MainController{
         geController.validateCAList(listCA);
     }
 
+    /**
+     * Move the selected GraphicalElement with the given alignment.
+     * @param alignment Alignment to apply.
+     */
     public void setSelectedGEAlignment(CompositionAreaController.Align alignment){
         //Saves the GraphicalElement state before applying the alignment
         if(!undoRedo) {
@@ -242,6 +267,10 @@ public class MainController{
         compositionAreaController.setAlign(alignment);
     }
 
+    /**
+     * Modify the z-index of the selected elements according to the value given in argument.
+     * @param zIndex Modification to apply to the GE.
+     */
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
         //Saves the GraphicalElement state before applying the z-index change
         if(!undoRedo) {
@@ -251,6 +280,11 @@ public class MainController{
         compositionAreaController.changeZIndex(zIndex);
     }
 
+    /**
+     * Modify the basic properties (x and y position, width, height, and rotation) of the original GE with the value contained by the modifiedCopy GE.
+     * @param original GraphicalElement to modify.
+     * @param modifiedCopy Modified copy of the GraphicalElement.
+     */
     public void modifyGE(GraphicalElement original, GraphicalElement modifiedCopy){
         if(!undoRedo) {
             List<GraphicalElement> listGE = new ArrayList<>();
@@ -265,6 +299,11 @@ public class MainController{
         geController.modifyGE(original);
     }
 
+    /**
+     * Change a property of a GraphicalElement.
+     * @param prop Property to modify.
+     * @param value New value of the property.
+     */
     public void changeProperty(GraphicalElement.Property prop, int value){
         if(mouseWheelChangedProp == null || mouseWheelChangedProp != prop){
             waitEndWheelTimer.start();
@@ -275,22 +314,46 @@ public class MainController{
         waitEndWheelTimer.restart();
     }
 
+    /**
+     * Action done when the mouse wheel has stopped.
+     */
     public void wheelEnd(){
         mouseWheelChangedProp = null;
     }
 
+    /**
+     * Returns the GEManager.
+     * @return The GEManager
+     */
     public GEManager getGEManager(){
         return geManager;
     }
+
+    /**
+     * Returns the CompositionAreaController.
+     * @return The CompositionAreaController.
+     */
     public CompositionAreaController getCompositionAreaController(){
         return compositionAreaController;
     }
+    /**
+     * Returns the IOController.
+     * @return The IOController.
+     */
     public IOController getIOController(){
         return ioController;
     }
+    /**
+     * Returns the UIController.
+     * @return The UIController.
+     */
     public UIController getUIController(){
         return uiController;
     }
+    /**
+     * Returns the GEController.
+     * @return The GEController.
+     */
     public GEController getGEController(){
         return geController;
     }
