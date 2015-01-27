@@ -26,7 +26,6 @@ package org.orbisgis.mapcomposer.view.utils;
 
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
 
@@ -38,13 +37,10 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
-import java.io.File;
-import java.io.IOException;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
-import javax.imageio.ImageIO;
 import javax.swing.*;
 
  /**
@@ -87,7 +83,10 @@ public class CompositionJPanel extends JPanel{
     private WaitLayerUI waitLayer;
     private JPanel panel;
 
+    /** Last BufferedImage rendered used for this CompositionJPanel */
     private BufferedImage contentImage;
+    /** Rotation angle corresponding to the contentImage */
+    private int lastRot = 0;
 
     /**
      * Main constructor.
@@ -135,7 +134,7 @@ public class CompositionJPanel extends JPanel{
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(contentImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
         panel.revalidate();
@@ -145,16 +144,16 @@ public class CompositionJPanel extends JPanel{
         panel.setOpaque(false);
         setBorders();
 
-        //Save the unrotated bufferedImage
-        contentImage = bufferedImage;
-
-        //Create the rotation transform fo the buffered image
-        AffineTransform affineTransform= new AffineTransform();
-        affineTransform.rotate(-rad, maxWidth / 2, maxHeight / 2);
-
-        //Apply the transform to the bufferedImage an return it
-        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BICUBIC);
-        contentImage = affineTransformOp.filter(contentImage, null);
+        //Once the image drawn, create a copy of the given BufferedImage with the size of the CompositionJPanel.
+        //The image represent the graphical representation of this CompositionJPanel.
+        BufferedImage bi = new BufferedImage((int) newWidth + 2, (int) newHeight + 2, BufferedImage.TYPE_INT_ARGB);
+        Graphics graph = bi.createGraphics();
+        graph.drawImage(bufferedImage,-(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+        graph.dispose();
+        //Store the copy image as the contentImage
+        contentImage = bi;
+        //Store the rotation corresponding to the contentImage
+        lastRot = rotation;
     }
 
      /**
@@ -186,21 +185,22 @@ public class CompositionJPanel extends JPanel{
                     BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, contentImage.getType());
                     Graphics2D graph = bufferedImage.createGraphics();
 
-                    //Draw the BufferedImage bi into the bigger BufferedImage
+                    //Draw the contentImage saved bi into the bigger BufferedImage
                     graph.drawImage(contentImage,
-                            (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
-                            maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
+                            (maxWidth - contentImage.getWidth()) / 2, (maxHeight - contentImage.getHeight()) / 2,
+                            maxWidth - ((maxWidth - contentImage.getWidth()) / 2), maxHeight - ((maxHeight - contentImage.getHeight()) / 2),
                             0, 0,
                             contentImage.getWidth(), contentImage.getHeight(), null);
                     graph.dispose();
 
-                    //Create the rotation transform fo the buffered image
-                    AffineTransform affineTransform = new AffineTransform();
-                    affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+                    //Create the rotation transform for the buffered image with the difference between the contentImage rotation (lastRot) and the new rotation (ge.getRotation).
+                    AffineTransform affineTransform= new AffineTransform();
+                    affineTransform.rotate(Math.toRadians(ge.getRotation()-lastRot), maxWidth / 2, maxHeight / 2);
+                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+                    bufferedImage = affineTransformOp.filter(bufferedImage, null);
 
-                    //Apply the transform to the bufferedImage an return it
-                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
-                    g.drawImage(affineTransformOp.filter(bufferedImage, null), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                    //Apply the transform to the bufferedImage and draw it
+                    g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
                 }
             }
         }, BorderLayout.CENTER);
