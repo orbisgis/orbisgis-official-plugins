@@ -107,6 +107,7 @@ public class MainController{
             undoManager.undo();
             //Enable the registering of edit actions
             undoRedo = false;
+            uiController.refreshSpin();
         }
         else
             compositionAreaController.setOverlayMessage("can't undo");
@@ -119,6 +120,7 @@ public class MainController{
             undoManager.redo();
             //Enable the registering of edit actions
             undoRedo = false;
+            uiController.refreshSpin();
         }
         else
             compositionAreaController.setOverlayMessage("can't redo");
