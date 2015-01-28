@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -85,8 +86,6 @@ public class CompositionJPanel extends JPanel{
 
     /** Last BufferedImage rendered used for this CompositionJPanel */
     private BufferedImage contentImage;
-    /** Rotation angle corresponding to the contentImage */
-    private int lastRot = 0;
 
     /**
      * Main constructor.
@@ -144,16 +143,24 @@ public class CompositionJPanel extends JPanel{
         panel.setOpaque(false);
         setBorders();
 
-        //Once the image drawn, create a copy of the given BufferedImage with the size of the CompositionJPanel.
-        //The image represent the graphical representation of this CompositionJPanel.
-        BufferedImage bi = new BufferedImage((int) newWidth + 2, (int) newHeight + 2, BufferedImage.TYPE_INT_ARGB);
-        Graphics graph = bi.createGraphics();
-        graph.drawImage(bufferedImage,-(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+        //Once the image drawn, create a copy of the given BufferedImage and recover it's form without rotation
+        AffineTransform affineTransform= new AffineTransform();
+        affineTransform.rotate(-Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+        BufferedImage unrotatedBI = affineTransformOp.filter(bufferedImage, null);
+
+        //Crop it to the good size
+        BufferedImage croppedBI = new BufferedImage((int) ge.getWidth(), (int) ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics graph = croppedBI.createGraphics();
+        graph.drawImage(unrotatedBI,
+                0, 0,
+                ge.getWidth(), ge.getHeight(),
+                (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2), null);
         graph.dispose();
+
         //Store the copy image as the contentImage
-        contentImage = bi;
-        //Store the rotation corresponding to the contentImage
-        lastRot = rotation;
+        contentImage = croppedBI;
     }
 
      /**
@@ -164,7 +171,7 @@ public class CompositionJPanel extends JPanel{
       * @param height Height of the GE represented.
       * @param rotation Rotation of the GE represented.
       */
-    public void modify(int x, int y, int width, int height, int rotation){
+    public void modify(int x, int y,final int width,final int height, int rotation){
         final double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
         final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
@@ -181,26 +188,30 @@ public class CompositionJPanel extends JPanel{
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (contentImage != null) {
-                    //Create a new BufferedImage with the new size (size after rotation)
-                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, contentImage.getType());
-                    Graphics2D graph = bufferedImage.createGraphics();
-
-                    //Draw the contentImage saved bi into the bigger BufferedImage
-                    graph.drawImage(contentImage,
-                            (maxWidth - contentImage.getWidth()) / 2, (maxHeight - contentImage.getHeight()) / 2,
-                            maxWidth - ((maxWidth - contentImage.getWidth()) / 2), maxHeight - ((maxHeight - contentImage.getHeight()) / 2),
-                            0, 0,
-                            contentImage.getWidth(), contentImage.getHeight(), null);
+                    //First scale the contentImage to the new size of the GraphicalELement
+                    Image image = contentImage.getScaledInstance((int)width, (int)height, BufferedImage.SCALE_FAST);
+                    BufferedImage bi = new BufferedImage(width, height, contentImage.getType());
+                    Graphics2D graph = bi.createGraphics();
+                    graph.drawImage(image, 0, 0, null);
                     graph.dispose();
 
-                    //Create the rotation transform for the buffered image with the difference between the contentImage rotation (lastRot) and the new rotation (ge.getRotation).
-                    AffineTransform affineTransform= new AffineTransform();
-                    affineTransform.rotate(Math.toRadians(ge.getRotation()-lastRot), maxWidth / 2, maxHeight / 2);
-                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-                    bufferedImage = affineTransformOp.filter(bufferedImage, null);
+                    //Draw the BufferedImage bi into the bigger BufferedImage to prepare it for the rotation (and to avoid cropping the image).
+                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, bi.getType());
+                    graph = bufferedImage.createGraphics();
+                    graph.drawImage(bi,
+                            (maxWidth - width) / 2, (maxHeight - height) / 2,
+                            maxWidth - ((maxWidth - width) / 2), maxHeight - ((maxHeight - height) / 2),
+                            0, 0,
+                            width, height, null);
+                    graph.dispose();
+
+                    //Create the rotation transform fo the buffered image
+                    AffineTransform affineTransform = new AffineTransform();
+                    affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
 
                     //Apply the transform to the bufferedImage and draw it
-                    g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+                    g.drawImage(affineTransformOp.filter(bufferedImage, null), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
                 }
             }
         }, BorderLayout.CENTER);
