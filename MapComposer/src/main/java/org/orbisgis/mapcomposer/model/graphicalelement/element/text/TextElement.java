@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.util.ArrayList;
@@ -43,7 +44,7 @@ import java.awt.GraphicsEnvironment;
  *
  * @author Sylvain PALOMINOS
  */
-public class TextElement extends SimpleGE{
+public class TextElement extends SimpleGE implements GEProperties{
     /** Fonts allowed */
     private SourceListCA font;
     /** Color of the Text */
@@ -258,7 +259,32 @@ public class TextElement extends SimpleGE{
      * @return The alpha value of the element.
      */
     public int getAlpha() {return this.alpha.getValue();}
-    
+
+    @Override
+    public boolean isDocumentNeeded() {
+        return true;
+    }
+
+    @Override
+    public boolean isAlwaysOnTop() {
+        return false;
+    }
+
+    @Override
+    public boolean isAlwaysOnBack() {
+        return false;
+    }
+
+    @Override
+    public boolean isDrawnByUser() {
+        return true;
+    }
+
+    @Override
+    public boolean isAlwaysRefreshed() {
+        return true;
+    }
+
     /**
      * Enumeration for the text alignment.
      */

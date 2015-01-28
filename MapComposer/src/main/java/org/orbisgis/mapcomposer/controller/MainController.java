@@ -298,6 +298,10 @@ public class MainController{
         original.setWidth(modifiedCopy.getWidth());
         original.setHeight(modifiedCopy.getHeight());
         original.setRotation(modifiedCopy.getRotation());
+
+        if(original instanceof GEProperties)
+            if(((GEProperties)original).isAlwaysRefreshed())
+                compositionAreaController.refreshGE(original);
         geController.modifyGE(original);
     }
 

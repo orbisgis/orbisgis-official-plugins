@@ -51,7 +51,13 @@ public interface GEProperties {
 
     /**
      * This method specify if this GraphicalElement should be draw by the user or if its dimension are automatically set.
-     * @return Trus if the user need to draw it, false otherwise.
+     * @return True if the user need to draw it, false otherwise.
      */
     public boolean isDrawnByUser();
+
+    /**
+     * This method specify if this GraphicalElement should be refreshed (redrawn) after each modification and not just after clicking on the refresh button.
+     * @return True if it should be redrawn after each modification.
+     */
+    public boolean isAlwaysRefreshed();
 }
