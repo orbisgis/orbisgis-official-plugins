@@ -127,7 +127,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
         actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
         actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", "Load the document (Ctrl + L)", "load", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control L")));
+        actions.addAction(createAction(LOAD, "", "Open a document (Ctrl + L)", "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
         actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
         actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
@@ -155,8 +155,8 @@ public class MainWindow extends JFrame implements MainFrameAction{
         actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
         actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
         actions.addAction(createAction(REFRESH, "", "Redraw selected elements (Ctrl + R)", "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
-        actions.addAction(createAction(UNDO, "", "Undo the last action", "rotation", mainController, "undo", null));
-        actions.addAction(createAction(REDO, "", "Redo the last action", "rotation", mainController, "redo", null));
+        actions.addAction(createAction(UNDO, "", "Undo the last action (Ctrl + Z)", "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
+        actions.addAction(createAction(REDO, "", "Redo the last action (Ctrl + Shift + Z)", "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
 
         iconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
