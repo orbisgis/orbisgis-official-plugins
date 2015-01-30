@@ -19,6 +19,7 @@
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <netbeans.hint.license>OrbisGIS</netbeans.hint.license>
+                <maven-scr-plugin-version>1.15.0</maven-scr-plugin-version>
         </properties>
         <repositories>
                 <repository>
