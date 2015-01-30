@@ -9,25 +9,20 @@
     </parent>
     <modelVersion>4.0.0</modelVersion>
     <artifactId>mailto</artifactId>
-    <version>5.0.1-SNAPSHOT</version>
+    <version>5.1.0-SNAPSHOT</version>
     <description>MailTo menu in SQL Console</description>
     <packaging>bundle</packaging>
     <build>
         <plugins>
             <plugin>
-                <groupId>com.carrotgarden.maven</groupId>
-                <artifactId>carrot-maven-scr-plugin</artifactId>
-                <version>3.0.3</version>
-                <configuration>
-                    <enableDebugLogging>false</enableDebugLogging>
-                    <enableErrorLogging>true</enableErrorLogging>
-                    <enableInfoLogging>true</enableInfoLogging>
-                </configuration>
+                <groupId>org.apache.felix</groupId>
+                <artifactId>maven-scr-plugin</artifactId>
+                <version>${maven-scr-plugin-version}</version>
                 <executions>
                     <execution>
+                        <id>generate-scr-scrdescriptor</id>
                         <goals>
-                            <goal>clean</goal>
-                            <goal>generate</goal>
+                            <goal>scr</goal>
                         </goals>
                     </execution>
                 </executions>
@@ -42,7 +37,6 @@
                         <Bundle-Vendor>IRSTV - FR CNRS 2488</Bundle-Vendor>
                         <Bundle-Category>OrbisGIS, Console, Language</Bundle-Category>
                         <Bundle-Icon>org/orbisgis/mailto/mailto.png;size=32</Bundle-Icon>
-                        <Service-Component>OSGI-INF/service-component/*.xml</Service-Component>
                         <Import-Package>org.slf4j;version="[1.6.0,2)",*</Import-Package>
                     </instructions>
                 </configuration>
@@ -74,12 +68,18 @@
         <dependency>
             <groupId>org.slf4j</groupId>
             <artifactId>slf4j-api</artifactId>
-            <version>1.7.5</version>
+            <version>1.6.5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.apache.felix</groupId>
+            <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
+            <version>1.2.4</version>
+            <scope>compile</scope>
         </dependency>
         <dependency>
             <groupId>org.orbisgis</groupId>
-            <artifactId>orbisgis-view</artifactId>
-            <version>5.0.0-SNAPSHOT</version>
+            <artifactId>sqlconsole</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
         </dependency>
         <dependency>
             <groupId>org.xnap.commons</groupId>
