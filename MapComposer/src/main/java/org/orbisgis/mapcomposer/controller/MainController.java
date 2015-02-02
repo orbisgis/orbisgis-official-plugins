@@ -70,7 +70,7 @@ public class MainController{
     private GEController geController;
 
     /** True if the controller is actually undoing or redoing an action (used to not register an action done to undo or redo an old action). */
-    private boolean undoRedo;
+    private boolean undoingRedoing;
     /** Property actually changed by the user by using the mouse wheel on a spinner of the tool bar. */
     private GraphicalElement.Property mouseWheelChangedProp;
     /** Timer used to know if the user has stopped to use the wheel since enough time. */
@@ -95,31 +95,37 @@ public class MainController{
         undoManager = new UndoManager();
         undoManager.setLimit(50);
         UIFactory.setMainFrame(mainWindow);
-        undoRedo = false;
+        undoingRedoing = false;
         mouseWheelChangedProp = null;
         waitEndWheelTimer = new Timer(waitEndWheelTime, EventHandler.create(ActionListener.class, this, "wheelEnd"));
     }
 
+    /**
+     * Action to do when the user ask the application to undo the last action.
+     */
     public void undo(){
         if(undoManager.canUndo()) {
             //Block the registering of edit actions
-            undoRedo = true;
+            undoingRedoing = true;
             undoManager.undo();
             //Enable the registering of edit actions
-            undoRedo = false;
+            undoingRedoing = false;
             uiController.refreshSpin();
         }
         else
             compositionAreaController.setOverlayMessage("can't undo");
     }
 
+    /**
+     * Action to do when the user ask the application to redo the last action.
+     */
     public void redo(){
         if(undoManager.canRedo()) {
             //Block the registering of edit actions
-            undoRedo = true;
+            undoingRedoing = true;
             undoManager.redo();
             //Enable the registering of edit actions
-            undoRedo = false;
+            undoingRedoing = false;
             uiController.refreshSpin();
         }
         else
@@ -184,7 +190,7 @@ public class MainController{
      * Removes all the selected GraphicalElement.
      */
     public void removeSelectedGE(){
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             boolean flag = true;
             for(GraphicalElement ge : geController.getSelectedGE()) {
                 undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, flag));
@@ -208,7 +214,7 @@ public class MainController{
      * Remove all the displayed GE from the panel.
      */
     public void removeAllGE() {
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             boolean flag = true;
             for(GraphicalElement ge : geController.getSelectedGE()) {
                 undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, flag));
@@ -224,7 +230,7 @@ public class MainController{
      * @param ge
      */
     public void removeGE(GraphicalElement ge) {
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             undoManager.addEdit(new RemoveGEUndoableEdit(this, ge, true));
         }
         compositionAreaController.remove(ge);
@@ -236,7 +242,7 @@ public class MainController{
      * @param ge GE to add to the project.
      */
     public void addGE(GraphicalElement ge) {
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             undoManager.addEdit(new AddGEUndoableEdit(this, ge, true));
         }
         compositionAreaController.add(ge);
@@ -249,7 +255,7 @@ public class MainController{
      */
     public void validateCAList(List<ConfigurationAttribute> listCA){
         //Saves the GraphicalElement state before applying the configuration
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             undoManager.addEdit(new ConfigurationGEUndoableEdit(this, geController.getToBeSet(), true));
         }
         //Apply the configuration
@@ -262,7 +268,7 @@ public class MainController{
      */
     public void setSelectedGEAlignment(CompositionAreaController.Align alignment){
         //Saves the GraphicalElement state before applying the alignment
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             undoManager.addEdit(new MoveGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the alignment
@@ -275,7 +281,7 @@ public class MainController{
      */
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
         //Saves the GraphicalElement state before applying the z-index change
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             undoManager.addEdit(new ZIndexGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the z-index change
@@ -288,7 +294,7 @@ public class MainController{
      * @param modifiedCopy Modified copy of the GraphicalElement.
      */
     public void modifyGE(GraphicalElement original, GraphicalElement modifiedCopy){
-        if(!undoRedo) {
+        if(!undoingRedoing) {
             List<GraphicalElement> listGE = new ArrayList<>();
             listGE.add(original);
             undoManager.addEdit(new ModifyGEUndoableEdit(this, listGE, true));

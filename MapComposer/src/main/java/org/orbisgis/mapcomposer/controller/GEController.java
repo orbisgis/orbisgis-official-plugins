@@ -331,6 +331,10 @@ public class GEController {
         toBeSet = list;
     }
 
+    /**
+     * Returns the list of GraphicalElements that will be configured.
+     * @return List of GraphicalElements that will be set.
+     */
     public List<GraphicalElement> getToBeSet(){
         return toBeSet;
     }
