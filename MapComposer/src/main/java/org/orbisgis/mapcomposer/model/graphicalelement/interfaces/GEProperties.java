@@ -60,4 +60,10 @@ public interface GEProperties {
      * @return True if it should be redrawn after each modification.
      */
     public boolean isAlwaysRefreshed();
+
+    /**
+     * This method specify if this GraphicalElement should be placed at the center of the CompositionArea.
+     * @return True if this element is always placed at the center of the CompositionArea.
+     */
+    public boolean isAlwaysCentered();
 }

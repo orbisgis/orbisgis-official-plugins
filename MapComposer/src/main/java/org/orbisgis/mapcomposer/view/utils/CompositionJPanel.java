@@ -26,6 +26,7 @@ package org.orbisgis.mapcomposer.view.utils;
 
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
 
@@ -76,7 +77,7 @@ public class CompositionJPanel extends JPanel{
      private MoveMode moveMode = MoveMode.NONE;
 
     /** Reference to the UIController. */
-    private final MainController uic;
+    private final MainController mainController;
 
     /** Size of the margin of the border for resizing. */
     private static final int margin = 5;
@@ -90,14 +91,14 @@ public class CompositionJPanel extends JPanel{
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
-     * @param uic UIController of the application.
+     * @param mainController UIController of the application.
      */
-    public CompositionJPanel(GraphicalElement ge, MainController uic){
+    public CompositionJPanel(GraphicalElement ge, MainController mainController){
         super(new BorderLayout());
         this.setSize(ge.getWidth(), ge.getHeight());
         panel = new JPanel(new BorderLayout());
         this.add(panel);
-        this.uic=uic;
+        this.mainController = mainController;
         this.ge=ge;
         //Disable mouse listeners if it's a Document panel.
         if(ge instanceof Document)
@@ -117,6 +118,15 @@ public class CompositionJPanel extends JPanel{
         this.add(layer);
     }
 
+    /**
+     * Redraw the GraphicalElement with the given values.
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     * @param rotation
+     * @param bufferedImage New graphical representation of the GE.
+     */
     public void redraw(int x, int y, int width, int height, int rotation, final BufferedImage bufferedImage){
         double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
@@ -138,7 +148,15 @@ public class CompositionJPanel extends JPanel{
         }, BorderLayout.CENTER);
         panel.revalidate();
         //Take account of the border width (2 pixels).
-        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+        if(ge instanceof GEProperties && ((GEProperties)ge).isAlwaysCentered()){
+            this.setPreferredSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+            this.setMaximumSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+            this.setMinimumSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+        }
+        else {
+            Point p = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2));
+            this.setBounds(p.x, p.y, (int) newWidth + 2, (int) newHeight + 2);
+        }
         this.setOpaque(false);
         panel.setOpaque(false);
         setBorders();
@@ -163,14 +181,14 @@ public class CompositionJPanel extends JPanel{
         contentImage = croppedBI;
     }
 
-     /**
-      * Modify the bounding box of the panel without redrawing the content image.
-      * @param x X position of the GE represented.
-      * @param y Y position of the GE represented.
-      * @param width Width of the GE represented.
-      * @param height Height of the GE represented.
-      * @param rotation Rotation of the GE represented.
-      */
+    /**
+     * Modify the bounding box of the panel and redraw the save BufferedImage and no a fresh rendered one.
+     * @param x X position of the GE represented.
+     * @param y Y position of the GE represented.
+     * @param width Width of the GE represented.
+     * @param height Height of the GE represented.
+     * @param rotation Rotation of the GE represented.
+     */
     public void modify(int x, int y,final int width,final int height, int rotation){
         final double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
@@ -217,7 +235,15 @@ public class CompositionJPanel extends JPanel{
         }, BorderLayout.CENTER);
         panel.revalidate();
         //Take account of the border width (2 pixels).
-        this.setBounds(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+        if(ge instanceof GEProperties && ((GEProperties)ge).isAlwaysCentered()){
+            this.setPreferredSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+            this.setMaximumSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+            this.setMinimumSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
+            }
+        else {
+            Point p = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(x + (width - (int) newWidth) / 2, y + (height - (int) newHeight) / 2));
+            this.setBounds(p.x, p.y, (int) newWidth + 2, (int) newHeight + 2);
+        }
         this.setOpaque(false);
         panel.setOpaque(false);
         setBorders();
@@ -227,10 +253,12 @@ public class CompositionJPanel extends JPanel{
      * Draw border if the CompositionJPanel is selected.
      */
     private void setBorders() {
-        if(selected)
-           this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.ORANGE));
-        else
-           this.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        if(!(ge instanceof Document)) {
+            if (selected)
+                this.setBorder(BorderFactory.createMatteBorder(2, 2, 2, 2, Color.ORANGE));
+            else
+                this.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        }
     }
 
     public WaitLayerUI getWaitLayer() {
@@ -243,15 +271,15 @@ public class CompositionJPanel extends JPanel{
      */
     public void mouseClicked(MouseEvent me) {
         if(me.getClickCount()==2)
-            uic.getUIController().showGEProperties(ge);
+            mainController.getUIController().showGEProperties(ge);
         if(selected)
-            uic.unselectGE(ge);
+            mainController.unselectGE(ge);
         else
-            uic.selectGE(ge);
+            mainController.selectGE(ge);
 
         this.moveDirection = MoveDirection.NONE;
         this.moveMode=MoveMode.NONE;
-        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+        mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
@@ -311,8 +339,8 @@ public class CompositionJPanel extends JPanel{
             moveDirection = MoveDirection.CENTER;
 
         if(moveDirection != MoveDirection.CENTER){
-            uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.RESIZE_GE);
-            uic.getMainWindow().getCompositionArea().getOverlay().setStart(start);
+            mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.RESIZE_GE);
+            mainController.getMainWindow().getCompositionArea().getOverlay().setStart(start);
         }
     }
 
@@ -330,7 +358,7 @@ public class CompositionJPanel extends JPanel{
         if(moveDirection==MoveDirection.CENTER) {
             ge.setX(ge.getX() - startX + p.x);
             ge.setY(ge.getY() - startY + p.y);
-            uic.modifyGE(this.ge, ge);
+            mainController.modifyGE(this.ge, ge);
             this.moveDirection = MoveDirection.NONE;
             this.moveMode = MoveMode.NONE;
         }
@@ -351,17 +379,20 @@ public class CompositionJPanel extends JPanel{
             double rad = Math.toRadians(ge.getRotation());
             final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
             final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-            panel.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
-            this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
+            Point point = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(
+                    ge.getX() + (ge.getWidth() - (int) newWidth) / 2,
+                    ge.getY() + (ge.getHeight() - (int) newHeight) / 2));
+            panel.setBounds(point.x, point.y, (int) newWidth + 2, (int) newHeight + 2);
+            this.setBounds(point.x, point.y, (int) newWidth + 2, (int) newHeight + 2);
             panel.revalidate();
 
-            uic.modifyGE(this.ge, ge);
+            mainController.modifyGE(this.ge, ge);
 
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;
         }
-        uic.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
-        uic.getUIController().refreshSpin();
+        mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
+        mainController.getUIController().refreshSpin();
     }
 
      /**
@@ -533,8 +564,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
+                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case TOP_LEFT:
@@ -546,8 +581,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case LEFT:
@@ -559,8 +598,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case BOTTOM_LEFT:
@@ -572,8 +615,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case BOTTOM:
@@ -585,8 +632,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case BOTTOM_RIGHT:
@@ -598,8 +649,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case RIGHT:
@@ -611,8 +666,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
              case TOP_RIGHT :
@@ -624,8 +683,12 @@ public class CompositionJPanel extends JPanel{
                      ge.setWidth(Math.abs(point.x) - 1);
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     ge.setX((int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1);
-                     ge.setY((int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1);
+                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                     ));
+                     ge.setX(geCoord.x);
+                     ge.setY(geCoord.y);
                  }
                  break;
          }
@@ -641,12 +704,15 @@ public class CompositionJPanel extends JPanel{
             double rad = Math.toRadians(ge.getRotation());
             final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
             final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-            this.setBounds(ge.getX()+(ge.getWidth()-(int)newWidth)/2+p.x-startX, ge.getY()+(ge.getHeight()-(int)newHeight)/2+p.y-startY, this.getWidth(), this.getHeight());
+            Point point = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(
+                    ge.getX()+(ge.getWidth()-(int)newWidth)/2+p.x-startX,
+                    ge.getY()+(ge.getHeight()-(int)newHeight)/2+p.y-startY));
+            this.setBounds(point.x, point.y, this.getWidth(), this.getHeight());
         }
         //If the user is resizing the element
         else{
             //Get the position of the mouse in the COmpositionArea
-            Point end = new Point(p.x - uic.getMainWindow().getCompositionArea().getLocationOnScreen().x, p.y - uic.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+            Point end = new Point(p.x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x, p.y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
             //If the user want to resize by saving the element width/height ratio
             if(moveMode==MoveMode.SHIFT){
                 float ratio = (float)this.getHeight()/this.getWidth();
@@ -735,7 +801,7 @@ public class CompositionJPanel extends JPanel{
                         break;
                 }
             }
-            uic.getMainWindow().getCompositionArea().getOverlay().setEnd(end);
+            mainController.getMainWindow().getCompositionArea().getOverlay().setEnd(end);
         }
     }
 
@@ -832,5 +898,13 @@ public class CompositionJPanel extends JPanel{
              y = (int) Math.floor((p.y * cos(rad) + p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
          }
          return new Point(x, y);
+     }
+
+     /**
+      * Returns the GraphicalElement represented by this CompositionJPanel.
+      * @return The GraphicalElement represented
+      */
+     public GraphicalElement getGE(){
+         return  ge;
      }
 }

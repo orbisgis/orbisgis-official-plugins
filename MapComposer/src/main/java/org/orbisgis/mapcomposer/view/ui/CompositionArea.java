@@ -25,15 +25,18 @@
 package org.orbisgis.mapcomposer.view.ui;
 
 import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
-import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Graphics;
+
+import java.awt.*;
+import java.awt.event.ComponentListener;
 import java.awt.event.MouseListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.plaf.LayerUI;
 
 /**
@@ -47,8 +50,8 @@ public class CompositionArea extends JPanel{
     /**JScrollPane of the CompositionArea. */
     private final JScrollPane scrollPane;
     
-    /**Main JPanel of the CompositionArea. */
-    private final JPanel panel = new JPanel(null);
+    /**JPanel corresponding to the Document GE. */
+    private JPanel document = null;
 
     /**Dimension of the document into the CompositionArea. */
     private Dimension dimension = new Dimension(50, 50);
@@ -58,21 +61,32 @@ public class CompositionArea extends JPanel{
 
     /** JLayer used to link the LayerUI and the CompositionArea. */
     private JLayer<JComponent> jLayer;
+
+    /** JLayeredPane where all the CompositionJPanel will be added */
+    private JLayeredPane layeredPane = new JLayeredPane();
+
+    /** MainController */
+    private MainController mainController;
+
     /**
      * Main constructor.
      */
     public CompositionArea(MainController mainController){
         super(new BorderLayout());
+        this.mainController = mainController;
+
         JPanel body = new JPanel(new BorderLayout());
-        body.add(panel, BorderLayout.CENTER);
-        scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        this.add(scrollPane, BorderLayout.CENTER);
+        this.add(body);
+
+        scrollPane = new JScrollPane(layeredPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        body.add(scrollPane, BorderLayout.CENTER);
 
         layerUI = new CompositionAreaOverlay(mainController);
-        jLayer = new JLayer<>(panel, layerUI);
+        jLayer = new JLayer<>(body, layerUI);
         this.add(jLayer);
 
-        panel.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
+        layeredPane.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
+        layeredPane.addComponentListener(EventHandler.create(ComponentListener.class, this, "actuDocumentPosition", null, "componentResized"));
     }
 
     /**
@@ -88,7 +102,23 @@ public class CompositionArea extends JPanel{
      * @param panel CompositionPanel to add.
      */
     public void addGE(CompositionJPanel panel){
-        this.panel.add(panel);
+        if(panel.getGE() instanceof GEProperties && ((GEProperties)panel.getGE()).isAlwaysCentered()){
+            this.layeredPane.add(panel);
+            if(panel.getGE() instanceof Document) {
+                document = panel;
+                int width = ((Document) panel.getGE()).getDimension().width;
+                int height = ((Document) panel.getGE()).getDimension().height;
+                document.setBounds((layeredPane.getWidth()-width)/2, (layeredPane.getHeight()-height)/2, width, height);
+                Border border = BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY);
+                border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
+                border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.DARK_GRAY));
+                document.setBorder(border);
+            }
+            else
+                panel.setBounds(20, 30, panel.getPreferredSize().width, panel.getPreferredSize().height);
+        }
+        else
+        this.layeredPane.add(panel);
     }
     
     /**
@@ -96,8 +126,8 @@ public class CompositionArea extends JPanel{
      * @param panel Panel to remove.
      */
     public void removeGE(CompositionJPanel panel){
-        if(this.panel.isAncestorOf(panel))
-            this.panel.remove(panel);
+        if(this.layeredPane.isAncestorOf(panel))
+            this.layeredPane.remove(panel);
     }
     
     /**
@@ -107,7 +137,17 @@ public class CompositionArea extends JPanel{
      */
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
-        this.panel.setPreferredSize(this.dimension);
+        this.layeredPane.setPreferredSize(this.dimension);
+    }
+
+    /**
+     * Set all the GE bounds according to the new window dimensions.
+     */
+    public void actuDocumentPosition(){
+        if(document != null) {
+            document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
+            mainController.getCompositionAreaController().refreshAllGE();
+        }
     }
 
     /**
@@ -116,23 +156,24 @@ public class CompositionArea extends JPanel{
      * @param i New z-index.
      */
     public void setZIndex(CompositionJPanel comp, int i) {
-        panel.setComponentZOrder(comp, i);
+        if(layeredPane.isAncestorOf(comp))
+            layeredPane.setComponentZOrder(comp, i);
     }
 
     /**
      * Removes all the drawn elements on the CompositionArea.
      */
     public void removeAllGE() {
-        panel.removeAll();
-        panel.revalidate();
+        layeredPane.removeAll();
+        layeredPane.revalidate();
     }
     
     /**
      * Refreshes the CompositionArea.
      */
     public void refresh(){
-        panel.revalidate();
-        panel.repaint();
+        layeredPane.revalidate();
+        layeredPane.repaint();
     }
     
     /**
@@ -142,12 +183,51 @@ public class CompositionArea extends JPanel{
     public BufferedImage getDocBufferedImage(){
         BufferedImage bi = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
         Graphics g = bi.createGraphics();
-        panel.paint(g);
+        layeredPane.paint(g);
         g.dispose();
         return bi;
     }
-
+    /**
+     * Returns the CompositionAreaOverlay associated to the CompositionArea.
+     * @return The CompositionAreaOverlay.
+     */
     public CompositionAreaOverlay getOverlay(){
         return (CompositionAreaOverlay)layerUI;
+    }
+
+    /**
+     * Convert a point on the screen to a new one which represent its position on the document, according to the document position and to the scroll value.
+     * @param screenPoint Point on the screen.
+     * @return Position on the document of screenPoint.
+     */
+    public Point screenPointToDocumentPoint(Point screenPoint){
+        int x = screenPoint.x;
+        x-=document.getX();
+        x+=scrollPane.getHorizontalScrollBar().getValue();
+
+                int y = screenPoint.y;
+        y-=document.getY();
+        y+=scrollPane.getVerticalScrollBar().getValue();
+
+                System.out.println(x+", "+y);
+
+                return new Point(x, y);
+        }
+
+    /**
+     * Convert a point on the document to a new one which represent its position on the screen, according to the document position and to the scroll value.
+     * @param documentPoint Point on the document.
+     * @return Position on the screen of documentPoint.
+     */
+    public Point documentPointToScreenPoint(Point documentPoint){
+        int x = documentPoint.x;
+        x+=document.getX();
+        x-=scrollPane.getHorizontalScrollBar().getValue();
+
+        int y = documentPoint.y;
+        y+=document.getY();
+        y-=scrollPane.getVerticalScrollBar().getValue();
+
+        return new Point(x, y);
     }
 }

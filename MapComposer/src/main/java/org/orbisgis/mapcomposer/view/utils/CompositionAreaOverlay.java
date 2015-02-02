@@ -260,7 +260,8 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                     height = width/ratio;
 
                 }
-                mainController.getGEController().setNewGE(x, y, (int)width, (int)height);
+                Point point = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(x, y));
+                mainController.getGEController().setNewGE(point.x, point.y, (int)width, (int)height);
                 start=null;
                 end=null;
                 ratio=-1;

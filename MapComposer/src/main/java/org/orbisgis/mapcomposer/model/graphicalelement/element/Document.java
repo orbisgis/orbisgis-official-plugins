@@ -75,6 +75,11 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     @Override
     public boolean isAlwaysRefreshed() { return false; }
 
+    @Override
+    public boolean isAlwaysCentered() {
+        return true;
+    }
+
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
     public enum Orientation{PORTRAIT, LANDSCAPE}
     

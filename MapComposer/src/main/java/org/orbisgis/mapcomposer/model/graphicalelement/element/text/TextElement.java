@@ -285,6 +285,11 @@ public class TextElement extends SimpleGE implements GEProperties{
         return true;
     }
 
+    @Override
+    public boolean isAlwaysCentered() {
+        return false;
+    }
+
     /**
      * Enumeration for the text alignment.
      */
