@@ -81,7 +81,7 @@ public class IOController {
             if(list != null) {
                 mainController.removeAllGE();
                 //Add all the GE starting from the last one (to get the good z-index)
-                for (int i = list.size() - 1; i >= 0; i--)
+                for (int i = 0; i < list.size(); i++)
                     mainController.addGE(list.get(i));
             }
         } catch (ParserConfigurationException |SAXException |IOException ex) {
