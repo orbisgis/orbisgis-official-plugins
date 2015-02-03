@@ -27,6 +27,7 @@ package org.orbisgis.mapcomposer.view.ui;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -109,7 +110,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         this.compositionArea = new CompositionArea(mainController);
         //Sets the default size to the window
         this.setSize(1024, 768);
-        this.setIconImage(new ImageIcon(MainWindow.class.getResource("map_composer.png")).getImage());
+        this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
 
         //Creates the panel containing the two tool bars.
         JPanel toolBarPanel = new JPanel();
@@ -123,39 +124,39 @@ public class MainWindow extends JFrame implements MainFrameAction{
         spinnerToolBar.setFloatable(false);
         actions.registerContainer(iconToolBar);
 
-        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer.png", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
-        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration.png", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save.png", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", "Load the document (Ctrl + L)", "load.png", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control L")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer.png", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
+        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
+        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
+        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", "Open a document (Ctrl + L)", "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map.png", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
-        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element (Alt + T)",  "add_text.png", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
-        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element (Alt + L)", "add_legend.png", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
-        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element (Alt + O)", "compass.png", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
-        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element (Alt + S)", "add_scale.png", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
-        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element (Alt + I)", "add_picture.png", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
+        actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
+        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element (Alt + T)",  "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
+        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element (Alt + L)", "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
+        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element (Alt + O)", "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
+        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element (Alt + S)", "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
+        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element (Alt + I)", "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element (Alt + C)", "draw_circle.png", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
-        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element (Alt + Y)", "draw_polygon.png", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
+        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element (Alt + C)", "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
+        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element (Alt + Y)", "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(MOVE_BACK, "", "Move to the back (Alt + PageDown)", "move_back.png", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
-        actions.addAction(createAction(MOVE_DOWN, "", "Move down (Alt + Down)", "move_down.png", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
-        actions.addAction(createAction(MOVE_ON, "", "Move on (Alt + Up)", "move_on.png", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
-        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front (Alt + PageUp)", "move_front.png", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
+        actions.addAction(createAction(MOVE_BACK, "", "Move to the back (Alt + PageDown)", "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
+        actions.addAction(createAction(MOVE_DOWN, "", "Move down (Alt + Down)", "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
+        actions.addAction(createAction(MOVE_ON, "", "Move on (Alt + Up)", "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
+        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front (Alt + PageUp)", "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left (Alt + numpad 4)", "align_to_left.png", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
-        actions.addAction(createAction(ALIGN_TO_CENTER, "", "Align to the center", "align_to_center.png", mainController.getUIController(), "alignToCenter", null));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right (Alt + numpad 6)", "align_to_right.png", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom (Alt + numpad 2)", "align_to_bottom.png", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
-        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle.png", mainController.getUIController(), "alignToMiddle", null));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top (Alt + numpad 8)", "align_to_top.png", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
+        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left (Alt + numpad 4)", "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
+        actions.addAction(createAction(ALIGN_TO_CENTER, "", "Align to the center", "align_to_center", mainController.getUIController(), "alignToCenter", null));
+        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right (Alt + numpad 6)", "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
+        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom (Alt + numpad 2)", "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
+        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle", mainController.getUIController(), "alignToMiddle", null));
+        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top (Alt + numpad 8)", "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties.png", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
-        actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete.png", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
-        actions.addAction(createAction(REFRESH, "", "Redraw selected elements (Ctrl + R)", "refresh.png", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
-        actions.addAction(createAction(UNDO, "", "Undo the last action", "rotation.png", mainController, "undo", null));
-        actions.addAction(createAction(REDO, "", "Redo the last action", "rotation.png", mainController, "redo", null));
+        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
+        actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
+        actions.addAction(createAction(REFRESH, "", "Redraw selected elements (Ctrl + R)", "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
+        actions.addAction(createAction(UNDO, "", "Undo the last action (Ctrl + Z)", "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
+        actions.addAction(createAction(REDO, "", "Redo the last action (Ctrl + Shift + Z)", "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
 
         iconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
@@ -164,7 +165,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
         spinnerY = createSpinner("Y", " Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinnerW = createSpinner("WIDTH", " W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
         spinnerH = createSpinner("HEIGHT", " H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerToolBar.add(new JLabel(new ImageIcon(MainWindow.class.getResource("rotation.png"))));
+        spinnerToolBar.add(new JLabel(MapComposerIcon.getIcon("rotation")));
         spinnerR = createSpinner("ROTATION", "", 0, -360, 360);
         spinnerToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
@@ -226,19 +227,19 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinner.isEnabled() && spinner.getName() != null) {
                 switch (spinner.getName()) {
                     case "X":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue());
                         break;
                     case "Y":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue());
                         break;
                     case "WIDTH":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue());
                         break;
                     case "HEIGHT":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue());
                         break;
                     case "ROTATION":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue());
+                        mainController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue());
                         break;
                 }
             }
@@ -255,19 +256,19 @@ public class MainWindow extends JFrame implements MainFrameAction{
             if(spinner.isEnabled() && spinner.getName() != null) {
                 switch (spinner.getName()) {
                     case "X":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.X, (int) spinnerX.getValue() - mwe.getWheelRotation());
                         break;
                     case "Y":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.Y, (int) spinnerY.getValue() - mwe.getWheelRotation());
                         break;
                     case "WIDTH":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.WIDTH, (int) spinnerW.getValue() - mwe.getWheelRotation());
                         break;
                     case "HEIGHT":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.HEIGHT, (int) spinnerH.getValue() - mwe.getWheelRotation());
                         break;
                     case "ROTATION":
-                        mainController.getGEController().changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue() - mwe.getWheelRotation());
+                        mainController.changeProperty(GraphicalElement.Property.ROTATION, (int) spinnerR.getValue() - mwe.getWheelRotation());
                         break;
                 }
             }
@@ -291,7 +292,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
                             actionID,
                             actionLabel,
                             actionToolTip,
-                            new ImageIcon(MainWindow.class.getResource(actionIconName)),
+                            MapComposerIcon.getIcon(actionIconName),
                             EventHandler.create(ActionListener.class, target, ActionFunctionName),
                             keyStroke
                         );
@@ -333,7 +334,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
         List<Action> actions = new ArrayList<>();
         actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
-                new ImageIcon(MainWindow.class.getResource("map_composer.png")),
+                MapComposerIcon.getIcon("map_composer"),
                 EventHandler.create(ActionListener.class, this, "showMapComposer")).setParent(MENU_TOOLS));
         return actions;
     }

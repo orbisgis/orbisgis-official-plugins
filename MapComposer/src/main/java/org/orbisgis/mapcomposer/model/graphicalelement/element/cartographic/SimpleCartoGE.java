@@ -29,6 +29,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -72,7 +73,16 @@ public abstract class SimpleCartoGE extends SimpleGE implements CartographicElem
     @Override
     public void setAttribute(ConfigurationAttribute ca) {
         super.setAttribute(ca);
-        if(ca.getName().equals(sOWSC))
-            owsc=(OwsContextCA)ca;
+        if(ca.getName().equals(sOWSC)) {
+            owsc = (OwsContextCA) ca;
+        }
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        SimpleCartoGE copy = (SimpleCartoGE) super.deepCopy();
+        copy.owsc = (OwsContextCA) this.owsc.deepCopy();
+
+        return copy;
     }
 }

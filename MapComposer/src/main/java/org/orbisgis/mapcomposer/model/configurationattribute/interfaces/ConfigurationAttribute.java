@@ -126,4 +126,10 @@ public interface ConfigurationAttribute<T> {
      * @see org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler#save(java.util.List, String)
      */
     public Map<String, Object> getAllFields();
+
+    /**
+     * Return a deep copy of the ConfigurationAttribute itself.
+     * @return A deep copy of the ConfigurationAttribute.
+     */
+    public ConfigurationAttribute deepCopy();
 }

@@ -29,6 +29,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -70,6 +71,9 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     public boolean isDrawnByUser() {
         return false;
     }
+
+    @Override
+    public boolean isAlwaysRefreshed() { return false; }
 
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
     public enum Orientation{PORTRAIT, LANDSCAPE}
@@ -166,6 +170,16 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         list.add(orientation);
         list.add(name);
         return list;
+    }
+
+    @Override
+    public GraphicalElement deepCopy() {
+        Document copy = (Document) super.deepCopy();
+        copy.orientation = (SourceListCA) this.orientation.deepCopy();
+        copy.format = (SourceListCA) this.format.deepCopy();
+        copy.name = (StringCA) this.name.deepCopy();
+
+        return copy;
     }
 
     @Override

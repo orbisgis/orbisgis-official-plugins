@@ -188,4 +188,18 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         ret.put("list", s);
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        OwsContextCA copy = new OwsContextCA();
+        List<String> list = new ArrayList<>();
+        for(String s : this.getValue())
+            list.add(s);
+        copy.setValue(list);
+        copy.setReadOnly(this.getReadOnly());
+        copy.setName(this.getName());
+        copy.select(this.getSelected());
+
+        return copy;
+    }
 }

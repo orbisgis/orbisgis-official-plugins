@@ -108,36 +108,36 @@ public class UIController {
     }
 
     public void alignToLeft(){
-        mainController.getCompositionAreaController().setAlign(LEFT);
+        mainController.setSelectedGEAlignment(LEFT);
     }
     public void alignToCenter(){
-        mainController.getCompositionAreaController().setAlign(CENTER);
+        mainController.setSelectedGEAlignment(CENTER);
     }
     public void alignToRight(){
-        mainController.getCompositionAreaController().setAlign(RIGHT);
+        mainController.setSelectedGEAlignment(RIGHT);
     }
     public void alignToBottom(){
-        mainController.getCompositionAreaController().setAlign(BOTTOM);
+        mainController.setSelectedGEAlignment(BOTTOM);
     }
     public void alignToMiddle(){
-        mainController.getCompositionAreaController().setAlign(MIDDLE);
+        mainController.setSelectedGEAlignment(MIDDLE);
     }
     public void alignToTop(){
-        mainController.getCompositionAreaController().setAlign(TOP);
+        mainController.setSelectedGEAlignment(TOP);
     }
 
 
     public void moveBack(){
-        mainController.getCompositionAreaController().changeZIndex(TO_BACK);
+        mainController.setSelectedGEZIndex(TO_BACK);
     }
     public void moveDown(){
-        mainController.getCompositionAreaController().changeZIndex(BACK);
+        mainController.setSelectedGEZIndex(BACK);
     }
     public void moveOn(){
-        mainController.getCompositionAreaController().changeZIndex(FRONT);
+        mainController.setSelectedGEZIndex(FRONT);
     }
     public void moveFront(){
-        mainController.getCompositionAreaController().changeZIndex(TO_FRONT);
+        mainController.setSelectedGEZIndex(TO_FRONT);
     }
 
     /**
@@ -179,7 +179,7 @@ public class UIController {
         toBeSet.add(ge);
         mainController.getGEController().setToBeSetList(toBeSet);
         //Create and show the properties dialog.
-        UIPanel panel = mainController.getGEManager().getRenderer(ge.getClass()).createConfigurationPanel(ge.getAllAttributes(), mainController, false);
+        UIPanel panel = mainController.getGEManager().getRenderer(ge.getClass()).createConfigurationPanel(ge.deepCopy().getAllAttributes(), mainController, false);
         if(panel==null)
             panel = new UIDialogProperties(ge.getAllAttributes(), mainController, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
@@ -221,7 +221,7 @@ public class UIController {
      * @return List of common ConfigurationAttributes (common about the names and not values).
      */
     private List<ConfigurationAttribute> getCommonAttributes(List<GraphicalElement> listGE){
-        List<ConfigurationAttribute> list = listGE.get(0).getAllAttributes();
+        List<ConfigurationAttribute> list = listGE.get(0).deepCopy().getAllAttributes();
         List<ConfigurationAttribute> listToRemove = new ArrayList<>();
         //Compare each the CA of the list to those of the GE from selectedGE
         boolean flag=false;

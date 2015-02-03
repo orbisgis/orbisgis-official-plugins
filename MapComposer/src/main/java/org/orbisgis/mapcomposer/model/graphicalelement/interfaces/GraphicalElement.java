@@ -143,4 +143,10 @@ public interface GraphicalElement {
      * @return List of all the ConfigurationAttribute to save.
      */
     public List<ConfigurationAttribute> getSavableAttributes();
+
+    /**
+     * Return a deep copy of the GraphicalElement itself.
+     * @return A deep copy of the GraphicalElement.
+     */
+    public GraphicalElement deepCopy();
 }

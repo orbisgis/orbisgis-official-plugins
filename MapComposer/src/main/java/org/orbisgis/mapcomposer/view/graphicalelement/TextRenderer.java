@@ -68,7 +68,11 @@ public class TextRenderer extends SimpleGERenderer {
         LineBreakMeasurer measurer;
         //Split the text to draw it line after line
         for(String s : te.getText().split("\n")) {
-            attributedString = new AttributedString(s);
+            //Replace the empty string by "\n"
+            if(s.equals(""))
+                attributedString = new AttributedString("\n");
+            else
+                attributedString = new AttributedString(s);
             attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize()));
             attributedString.addAttribute(TextAttribute.FOREGROUND, te.getColorText());
             //Cut the text if it's too wide for the BufferedImage width

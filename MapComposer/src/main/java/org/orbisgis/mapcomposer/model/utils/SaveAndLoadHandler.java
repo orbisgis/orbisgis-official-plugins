@@ -36,8 +36,6 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
@@ -46,10 +44,6 @@ import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
 
-import javax.imageio.ImageIO;
-import javax.swing.JFileChooser;
-import javax.swing.JFrame;
-import javax.swing.filechooser.FileFilter;
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
 
@@ -63,7 +57,9 @@ import javax.xml.parsers.SAXParserFactory;
 public class SaveAndLoadHandler extends DefaultHandler {
 
     /** String array containing all the version of the MapComposer compatible with the class **/
-    String[] compVersions={"1.0.2", "1.0.3"};
+    private final String[] COMPATIBLE_VERSIONS = {"1.0.4"};
+    /** Version of the actual save */
+    private final String STRING_VERSION = "1.0.4";
 
     /** List of all the GraphicalElement to save **/
     private List<GraphicalElement> listGE;
@@ -170,12 +166,12 @@ public class SaveAndLoadHandler extends DefaultHandler {
         // Check if the version of the saveProject is actually compatible with the MapComposer version.
         if(qName.equals("version")) {
             boolean flag=false;
-            for (int i = 0; i < compVersions.length; i++)
-                if (stringBuffer.toString().equals(compVersions[i]))
+            for (int i = 0; i < COMPATIBLE_VERSIONS.length; i++)
+                if (stringBuffer.toString().equals(COMPATIBLE_VERSIONS[i]))
                     flag = true;
             if (!flag) {
                 String message = "File version " + stringBuffer.toString() + " isn't compatible with the MapComposer version. Should be ";
-                for (String s : compVersions)
+                for (String s : COMPATIBLE_VERSIONS)
                     message += s + ";";
                 throw new SAXException(message);
             }
@@ -267,7 +263,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
     public void save(List<GraphicalElement> list, String path) throws IOException {if(!path.contains(".xml")) path+=".xml";
         FileWriter fw = new FileWriter(path);
         //Write the MapComposer version
-        fw.write("<synchronized>\n\t<version>1.0.3</version>\n");
+        fw.write("<synchronized>\n\t<version>" + STRING_VERSION + "</version>\n");
         //Write all the GraphicalElement from the list argument
         for (GraphicalElement ge : list) {
             //Write the GraphicalElement start xml tag

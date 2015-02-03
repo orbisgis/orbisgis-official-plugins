@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.slf4j.LoggerFactory;
 
 import java.awt.*;
+import java.awt.Image;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -37,6 +38,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.image.AffineTransformOp;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
+
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
@@ -82,6 +84,7 @@ public class CompositionJPanel extends JPanel{
     private WaitLayerUI waitLayer;
     private JPanel panel;
 
+    /** Last BufferedImage rendered used for this CompositionJPanel */
     private BufferedImage contentImage;
 
     /**
@@ -130,7 +133,7 @@ public class CompositionJPanel extends JPanel{
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
-                g.drawImage(contentImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
         panel.revalidate();
@@ -140,16 +143,24 @@ public class CompositionJPanel extends JPanel{
         panel.setOpaque(false);
         setBorders();
 
-        //Save the unrotated bufferedImage
-        contentImage = bufferedImage;
-
-        //Create the rotation transform fo the buffered image
+        //Once the image drawn, create a copy of the given BufferedImage and recover it's form without rotation
         AffineTransform affineTransform= new AffineTransform();
-        affineTransform.rotate(-rad, maxWidth / 2, maxHeight / 2);
+        affineTransform.rotate(-Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+        BufferedImage unrotatedBI = affineTransformOp.filter(bufferedImage, null);
 
-        //Apply the transform to the bufferedImage an return it
-        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BICUBIC);
-        contentImage = affineTransformOp.filter(contentImage, null);
+        //Crop it to the good size
+        BufferedImage croppedBI = new BufferedImage((int) ge.getWidth(), (int) ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics graph = croppedBI.createGraphics();
+        graph.drawImage(unrotatedBI,
+                0, 0,
+                ge.getWidth(), ge.getHeight(),
+                (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2), null);
+        graph.dispose();
+
+        //Store the copy image as the contentImage
+        contentImage = croppedBI;
     }
 
      /**
@@ -160,7 +171,7 @@ public class CompositionJPanel extends JPanel{
       * @param height Height of the GE represented.
       * @param rotation Rotation of the GE represented.
       */
-    public void modify(int x, int y, int width, int height, int rotation){
+    public void modify(int x, int y,final int width,final int height, int rotation){
         final double rad = Math.toRadians(rotation);
         //Width and Height of the rectangle containing the rotated bufferedImage
         final double newWidth = Math.abs(cos(rad)*width)+Math.abs(sin(rad)*height);
@@ -177,24 +188,29 @@ public class CompositionJPanel extends JPanel{
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
                 if (contentImage != null) {
-                    //Create a new BufferedImage with the new size (size after rotation)
-                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, contentImage.getType());
-                    Graphics2D graph = bufferedImage.createGraphics();
+                    //First scale the contentImage to the new size of the GraphicalELement
+                    Image image = contentImage.getScaledInstance((int)width, (int)height, BufferedImage.SCALE_FAST);
+                    BufferedImage bi = new BufferedImage(width, height, contentImage.getType());
+                    Graphics2D graph = bi.createGraphics();
+                    graph.drawImage(image, 0, 0, null);
+                    graph.dispose();
 
-                    //Draw the BufferedImage bi into the bigger BufferedImage
-                    graph.drawImage(contentImage,
-                            (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
-                            maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
+                    //Draw the BufferedImage bi into the bigger BufferedImage to prepare it for the rotation (and to avoid cropping the image).
+                    BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, bi.getType());
+                    graph = bufferedImage.createGraphics();
+                    graph.drawImage(bi,
+                            (maxWidth - width) / 2, (maxHeight - height) / 2,
+                            maxWidth - ((maxWidth - width) / 2), maxHeight - ((maxHeight - height) / 2),
                             0, 0,
-                            contentImage.getWidth(), contentImage.getHeight(), null);
+                            width, height, null);
                     graph.dispose();
 
                     //Create the rotation transform fo the buffered image
                     AffineTransform affineTransform = new AffineTransform();
                     affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
 
-                    //Apply the transform to the bufferedImage an return it
-                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_NEAREST_NEIGHBOR);
+                    //Apply the transform to the bufferedImage and draw it
+                    AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
                     g.drawImage(affineTransformOp.filter(bufferedImage, null), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
                 }
             }
@@ -306,6 +322,7 @@ public class CompositionJPanel extends JPanel{
     * @param p Location on screen of the mouse when it's released.
     */
     public void mouseReleasedHub(Point p){
+        GraphicalElement ge = this.ge.deepCopy();
         //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
         if(p.x==startX && p.y==startY)
             return;
@@ -313,20 +330,21 @@ public class CompositionJPanel extends JPanel{
         if(moveDirection==MoveDirection.CENTER) {
             ge.setX(ge.getX() - startX + p.x);
             ge.setY(ge.getY() - startY + p.y);
+            uic.modifyGE(this.ge, ge);
             this.moveDirection = MoveDirection.NONE;
             this.moveMode = MoveMode.NONE;
         }
         else {
             switch (moveMode) {
                 case ALTGRAPH:
-                    mouseReleasedALTGRAPH(p);
+                    mouseReleasedALTGRAPH(p, ge);
                     break;
                 case CTRL:
                 case SHIFT:
-                    mouseReleasedSHIFT(p);
+                    mouseReleasedSHIFT(p, ge);
                     break;
                 case NONE:
-                    mouseReleasedNONE(p);
+                    mouseReleasedNONE(p, ge);
                     break;
             }
             //Set the new bounds of the compositionJPanel before validating it (and redraw it)
@@ -337,7 +355,7 @@ public class CompositionJPanel extends JPanel{
             this.setBounds(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2, (int) newWidth + 2, (int) newHeight + 2);
             panel.revalidate();
 
-            uic.getGEController().modifyGE(ge);
+            uic.modifyGE(this.ge, ge);
 
             this.moveDirection = MoveDirection.NONE;
             this.moveMode=MoveMode.NONE;
@@ -351,7 +369,7 @@ public class CompositionJPanel extends JPanel{
       * Sets the new dimension and position of the ge when the mouse is released.
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedNONE(Point p) {
+     private void mouseReleasedNONE(Point p, GraphicalElement ge) {
          switch(moveDirection){
              case TOP:
                  ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
@@ -395,7 +413,7 @@ public class CompositionJPanel extends JPanel{
       * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedSHIFT(Point p) {
+     private void mouseReleasedSHIFT(Point p, GraphicalElement ge) {
          float ration = ((float)ge.getHeight())/ge.getWidth();
          switch(moveDirection){
              case TOP:
@@ -503,7 +521,7 @@ public class CompositionJPanel extends JPanel{
       * When the mouse is released, the CompositionJPanel take the new size and the GraphicalElement is adapted to fit into it.
       * @param p Location on screen of the mouse when it's released.
       */
-     private void mouseReleasedALTGRAPH(Point p) {
+     private void mouseReleasedALTGRAPH(Point p, GraphicalElement ge) {
          Point point;
          switch(moveDirection){
              case TOP:

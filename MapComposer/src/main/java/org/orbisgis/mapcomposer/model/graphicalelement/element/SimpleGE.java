@@ -24,9 +24,12 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element;
 
+import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
+import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -101,5 +104,23 @@ public abstract class SimpleGE implements GraphicalElement{
         list.add(height);
         list.add(rotation);
         return list;
+    }
+
+    @Override
+    public GraphicalElement deepCopy(){
+        SimpleGE copy = null;
+        try {
+            copy = getClass().newInstance();
+        } catch (InstantiationException|IllegalAccessException e) {
+            LoggerFactory.getLogger(MainController.class).error(e.getMessage());
+        }
+        copy.x = (IntegerCA) this.x.deepCopy();
+        copy.y = (IntegerCA) this.y.deepCopy();
+        copy.z = this.z;
+        copy.rotation = (IntegerCA) this.rotation.deepCopy();
+        copy.width = (IntegerCA) this.width.deepCopy();
+        copy.height = (IntegerCA) this.height.deepCopy();
+
+        return copy;
     }
 }

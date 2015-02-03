@@ -27,6 +27,7 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.progress.NullProgressMonitor;
 
 import org.slf4j.LoggerFactory;
@@ -55,16 +56,19 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     
     @Override
     public void refresh() {
-        if(getOwsMapContext()!=null && getOwsMapContext().getBoundingBox()!=null)
+        if(getOwsMapContext()!=null && getOwsMapContext().getBoundingBox()!=null) {
             try {
                 mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
                 mapTransform.setImage(new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB));
-                if(!this.getOwsMapContext().isOpen())
+                if (!this.getOwsMapContext().isOpen())
                     this.getOwsMapContext().open(new NullProgressMonitor());
                 this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
             } catch (LayerException ex) {
                 LoggerFactory.getLogger(MapImage.class).error(ex.getMessage());
             }
+        }
+        else
+            mapTransform.setImage(null);
     }
     
     /**
@@ -78,4 +82,9 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
      * @return The MapTransform of the map.
      */
     public MapTransform getMapTransform(){return mapTransform;}
+
+    @Override
+    public GraphicalElement deepCopy() {
+        return super.deepCopy();
+    }
 }

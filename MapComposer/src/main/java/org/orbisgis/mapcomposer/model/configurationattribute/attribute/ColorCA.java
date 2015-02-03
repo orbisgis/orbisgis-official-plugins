@@ -88,4 +88,13 @@ public class ColorCA extends BaseCA<Color> {
         return ret;
     }
 
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        ColorCA copy = new ColorCA();
+        copy.setValue(new Color(this.getValue().getRed(), this.getValue().getGreen(), this.getValue().getBlue()));
+        copy.setName(this.getName());
+        copy.setReadOnly(this.getReadOnly());
+        return copy;
+    }
+
 }

@@ -40,8 +40,6 @@ import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.IOException;
 import java.util.List;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * This controller manage the save, load and export actions.
@@ -83,7 +81,7 @@ public class IOController {
             if(list != null) {
                 mainController.removeAllGE();
                 //Add all the GE starting from the last one (to get the good z-index)
-                for (int i = list.size() - 1; i >= 0; i--)
+                for (int i = 0; i < list.size(); i++)
                     mainController.addGE(list.get(i));
             }
         } catch (ParserConfigurationException |SAXException |IOException ex) {
@@ -118,7 +116,7 @@ public class IOController {
                             try{
                                 ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
                             } catch (IOException ex) {
-                                Logger.getLogger(MainController.class.getName()).log(Level.SEVERE, null, ex);
+                                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
                             }
                         }
                     }

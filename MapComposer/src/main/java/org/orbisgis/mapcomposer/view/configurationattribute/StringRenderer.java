@@ -24,8 +24,10 @@
 
 package org.orbisgis.mapcomposer.view.configurationattribute;
 
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
+import org.slf4j.LoggerFactory;
 
 import java.awt.*;
 import java.beans.EventHandler;
@@ -73,7 +75,7 @@ public class StringRenderer implements CARenderer{
         try {
             ((StringCA)document.getProperty("StringCA")).setValue(document.getText(0, document.getLength()));
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(MainController.class).error(e.getMessage());
         }
     }
 }

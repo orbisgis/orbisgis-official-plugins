@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.configurationattribute;
 
+import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import java.awt.FlowLayout;
@@ -34,6 +35,7 @@ import javax.swing.text.Document;
 
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
+import org.slf4j.LoggerFactory;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -125,7 +127,7 @@ public class SourceRenderer implements CARenderer{
             if(new File(name).exists())
                 sourceCA.setValue(name);
         } catch (BadLocationException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(MainController.class).error(e.getMessage());
         }
     }
 }

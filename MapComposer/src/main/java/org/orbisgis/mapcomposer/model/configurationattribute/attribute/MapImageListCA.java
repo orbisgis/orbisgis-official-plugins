@@ -141,4 +141,18 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
         ret.put("list", s);*/
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        MapImageListCA copy = new MapImageListCA();
+        List<MapImage> list = new ArrayList<>();
+        for(MapImage mapImage : this.getValue())
+            list.add((MapImage)mapImage.deepCopy());
+        copy.setValue(list);
+        copy.setReadOnly(this.getReadOnly());
+        copy.setName(this.getName());
+        copy.select(this.getSelected());
+
+        return copy;
+    }
 }

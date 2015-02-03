@@ -146,4 +146,17 @@ public class FileListCA extends BaseListCA<File> implements RefreshCA{
 
         return ret;
     }
+
+    @Override
+    public ConfigurationAttribute deepCopy() {
+        FileListCA copy = new FileListCA();
+        List<File> list = new ArrayList<>();
+        for(File f : this.getValue())
+            list.add(new File(f.getPath()));
+        copy.setValue(list);
+        copy.setName(this.getName());
+        copy.setReadOnly(this.getReadOnly());
+        copy.select(this.getSelected());
+        return copy;
+    }
 }
