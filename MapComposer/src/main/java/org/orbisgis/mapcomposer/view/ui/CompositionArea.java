@@ -31,8 +31,7 @@ import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 
 import java.awt.*;
-import java.awt.event.ComponentListener;
-import java.awt.event.MouseListener;
+import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import javax.swing.*;
@@ -40,33 +39,45 @@ import javax.swing.border.Border;
 import javax.swing.plaf.LayerUI;
 
 /**
- * Area for the map document composition.
- * All the GraphicalElement will be drawn inside.
+ * Area for the map document composition. It's composed of two parts;
+ * - The area for drawing the GraphicalElements
+ * - A bottom tool bar.
+ *
+ * The area where are drawn the GraphicalElements is composed of (JFrame <- JPanel means a JPanel inside a JFrame):
+ * Layer <- JScrollPanel <- JComponent <- Layer <- JLayeredPane
+ *   |                                       |
+ *   |_ CompositionAreaOverlay               |_ LayeredPaneOverlay
  *
  * @author Sylvain PALOMINOS
  */
 public class CompositionArea extends JPanel{
 
-    /**JScrollPane of the CompositionArea. */
-    private final JScrollPane scrollPane;
-    
-    /**JPanel corresponding to the Document GE. */
-    private JPanel document = null;
-
-    /**Dimension of the document into the CompositionArea. */
-    private Dimension dimension = new Dimension(50, 50);
-
     /** LayerUI use (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
     private LayerUI<JComponent> layerUI;
 
-    /** JLayer used to link the LayerUI and the CompositionArea. */
-    private JLayer<JComponent> jLayer;
+    /**JScrollPane of the CompositionArea. */
+    private final JScrollPane scrollPane;
 
     /** JLayeredPane where all the CompositionJPanel will be added */
-    private JLayeredPane layeredPane = new JLayeredPane();
+    private JLayeredPane layeredPane;
+    
+    /**JPanel corresponding to the Document GE. */
+    private JPanel document;
+
+    /**Dimension of the document into the CompositionArea. */
+    private Dimension dimension;
 
     /** MainController */
     private MainController mainController;
+
+    /** Tool bar added a the bottom of the CompositionArea to display information */
+    private JToolBar bottomJToolBar;
+
+    /** JLabel displaying the mouse position */
+    private JLabel positionJLabel;
+
+    /** Spinner to set the zoom value */
+    private JSpinner spinnerZoom;
 
     /**
      * Main constructor.
@@ -74,51 +85,86 @@ public class CompositionArea extends JPanel{
     public CompositionArea(MainController mainController){
         super(new BorderLayout());
         this.mainController = mainController;
+        this.document = null;
+        this.dimension = new Dimension(50, 50);
 
-        JPanel body = new JPanel(new BorderLayout());
-        this.add(body);
+        //Creates the layer for the layeredPane
+        this.layeredPane = new JLayeredPane();
+        LayerUI LayeredPaneLayerUI = new LayeredPaneOverlay(this);
+        JLayer LayeredPaneJLayer = new JLayer<>(layeredPane, LayeredPaneLayerUI);
 
-        scrollPane = new JScrollPane(layeredPane, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        body.add(scrollPane, BorderLayout.CENTER);
+        //Adds the layer to a JPanel
+        JComponent body = new JPanel(new BorderLayout());
+        body.add(LayeredPaneJLayer, BorderLayout.CENTER);
 
-        layerUI = new CompositionAreaOverlay(mainController);
-        jLayer = new JLayer<>(body, layerUI);
-        this.add(jLayer);
+        //Sets the ScrollPane that will contain the layeredPane and its JLayer
+        scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+
+        //Creates the layer for the whole compositionArea
+        this.layerUI = new CompositionAreaOverlay(mainController);
+        JLayer compositionAreaJLayer = new JLayer<>(scrollPane, this.layerUI);
+
+        //Adds the scrollPane and its layer to the CompositionArea
+        this.add(compositionAreaJLayer, BorderLayout.CENTER);
+
+        //Sets the tool bar at the bottom of the CompositionArea
+        bottomJToolBar = new JToolBar();
+        bottomJToolBar.setLayout(new BorderLayout());
+
+        //Sets the label containig the mouse position
+        positionJLabel = new JLabel("x : px ,  y : px");
+        //Puts it into a JComponent
+        JComponent componentPosition = new JPanel(new FlowLayout());
+        componentPosition.add(positionJLabel);
+        componentPosition.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        //Sets the zoom spinner
+        spinnerZoom = new JSpinner(new SpinnerNumberModel(100, 10, 1000, 1));
+        spinnerZoom.setPreferredSize(new Dimension(80, (int) spinnerZoom.getPreferredSize().getHeight()));
+        //Puts it into a JComponent
+        JComponent component = new JPanel(new FlowLayout());
+        component.add(new JLabel("Zoom : "));
+        component.add(spinnerZoom);
+        component.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+
+        //Adds the two components
+        bottomJToolBar.add(componentPosition, BorderLayout.LINE_START);
+        bottomJToolBar.add(component, BorderLayout.LINE_END);
+        bottomJToolBar.setFloatable(false);
+
+        //Adds the JToolBar
+        this.add(bottomJToolBar, BorderLayout.PAGE_END);
 
         layeredPane.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
         layeredPane.addComponentListener(EventHandler.create(ComponentListener.class, this, "actuDocumentPosition", null, "componentResized"));
     }
-
-    /**
-     * Enable or disable the CompositionAreaOverlay.
-     * @param mode If true enable the overlay, disable it otherwise
-     */
-    public void setOverlayMode(CompositionAreaOverlay.Mode mode){
-        ((CompositionAreaOverlay)layerUI).setMode(mode);
-    }
     
     /**
-     * Adds a CompositionPanel to itself. Should be call only once for each GraphicalElement.
+     * Adds a CompositionPanel. Should be call only once for each GraphicalElement.
      * @param panel CompositionPanel to add.
      */
-    public void addGE(CompositionJPanel panel){
-        if(panel.getGE() instanceof GEProperties && ((GEProperties)panel.getGE()).isAlwaysCentered()){
-            this.layeredPane.add(panel);
-            if(panel.getGE() instanceof Document) {
-                document = panel;
+    public void addCompositionJPanel(CompositionJPanel panel){
+        //verify if the CompositionJPanel has not already been added
+        if(!this.layeredPane.isAncestorOf(panel)) {
+            //First test if the GE represented by the CompositionJPanel should be always centered
+            if (panel.getGE() instanceof GEProperties && ((GEProperties) panel.getGE()).isAlwaysCentered()) {
+                //Add the panel at the center
+                this.layeredPane.add(panel);
                 int width = ((Document) panel.getGE()).getDimension().width;
                 int height = ((Document) panel.getGE()).getDimension().height;
-                document.setBounds((layeredPane.getWidth()-width)/2, (layeredPane.getHeight()-height)/2, width, height);
-                Border border = BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY);
-                border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
-                border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.DARK_GRAY));
-                document.setBorder(border);
+                panel.setBounds((layeredPane.getWidth() - width) / 2, (layeredPane.getHeight() - height) / 2, width, height);
+                //If the GE is an instance of Document, register the CompositionJPanel as this.document and adds the border to it
+                if (panel.getGE() instanceof Document) {
+                    document = panel;
+                    Border border = BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY);
+                    border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
+                    border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(1, 1, 1, 1, Color.DARK_GRAY));
+                    document.setBorder(border);
+                }
             }
             else
-                panel.setBounds(20, 30, panel.getPreferredSize().width, panel.getPreferredSize().height);
+                this.layeredPane.add(panel);
         }
-        else
-        this.layeredPane.add(panel);
     }
     
     /**
@@ -187,6 +233,7 @@ public class CompositionArea extends JPanel{
         g.dispose();
         return bi;
     }
+
     /**
      * Returns the CompositionAreaOverlay associated to the CompositionArea.
      * @return The CompositionAreaOverlay.
@@ -229,5 +276,48 @@ public class CompositionArea extends JPanel{
         y-=scrollPane.getVerticalScrollBar().getValue();
 
         return new Point(x, y);
+    }
+
+    /**
+     * Sets the value of the mouse position in the positionJLabel with the given position in argument (location on screen)
+     * @param position Location on the screen of the mouse.
+     */
+    public void setMousePosition(Point position){
+        if(document != null) {
+            position.translate(-document.getLocationOnScreen().x, -document.getLocationOnScreen().y);
+            positionJLabel.setText("x : " + position.x + "px ,  y : " + position.y + "px");
+        }
+    }
+
+    /**
+     * Overlay used to get the mouse position in the layeredPanel.
+     */
+    private static final class LayeredPaneOverlay extends LayerUI<JComponent>{
+        private CompositionArea compositionArea;
+        /**
+         * Main constructor.
+         */
+        public LayeredPaneOverlay(CompositionArea compositionArea){
+            this.compositionArea = compositionArea;
+        }
+
+        @Override
+        protected void processMouseMotionEvent(MouseEvent e, JLayer<? extends JComponent> l) {
+            compositionArea.setMousePosition(e.getLocationOnScreen());
+        }
+
+        @Override
+        public void installUI(JComponent c) {
+            super.installUI(c);
+            JLayer jlayer = (JLayer)c;
+            jlayer.setLayerEventMask( AWTEvent.MOUSE_MOTION_EVENT_MASK );
+        }
+
+        @Override
+        public void uninstallUI(JComponent c) {
+            JLayer jlayer = (JLayer)c;
+            jlayer.setLayerEventMask(0);
+            super.uninstallUI(c);
+        }
     }
 }

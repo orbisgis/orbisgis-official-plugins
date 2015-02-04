@@ -83,7 +83,7 @@ public class CompositionAreaController {
     public void add(GraphicalElement ge){
         zIndexStack.push(ge);
         elementJPanelMap.put(ge, new CompositionJPanel(ge, mainController));
-        compositionArea.addGE(elementJPanelMap.get(ge));
+        compositionArea.addCompositionJPanel(elementJPanelMap.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }

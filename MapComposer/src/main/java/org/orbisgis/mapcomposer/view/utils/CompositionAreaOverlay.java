@@ -212,6 +212,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
     @Override
     protected void processMouseMotionEvent(MouseEvent e, JLayer<? extends JComponent> l) {
+        System.out.println("b");
         //If the LayerUI is disable, it doesn't consume the mouse event.
         if(mode == Mode.NONE)
             super.processMouseMotionEvent(e, l);
