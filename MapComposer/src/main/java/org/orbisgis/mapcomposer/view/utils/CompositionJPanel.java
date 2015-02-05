@@ -29,6 +29,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.*;
 import java.awt.Image;
@@ -88,6 +90,9 @@ public class CompositionJPanel extends JPanel{
     /** Last BufferedImage rendered used for this CompositionJPanel */
     private BufferedImage contentImage;
 
+     /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(CompositionJPanel.class);
+
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
@@ -110,8 +115,8 @@ public class CompositionJPanel extends JPanel{
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "getLocationOnScreen", "mouseDragged"));
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseMoved", "getPoint", "mouseMoved"));
         }
-        this.setToolTipText("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
-                "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>");
+        this.setToolTipText(i18n.tr("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
+                "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>"));
 
         waitLayer = new WaitLayerUI();
         JLayer<JPanel> layer = new JLayer<>(panel, waitLayer);

@@ -43,13 +43,15 @@ import java.beans.PropertyChangeEvent;
  * @author Sylvain PALOMINOS
  */
 public class CompositionAreaOverlay extends LayerUI<JComponent>{
-    /*Point where the mouse is pressed.*/
+    /** Point where the mouse is pressed.*/
     private Point start;
-    /*Point where the mouse is released.*/
+    /** Point where the mouse is released.*/
     private Point end;
+    /** MainController */
     private MainController mainController;
 
     public enum Mode{NEW_GE, RESIZE_GE, NONE}
+    /** Drawing mode of the Overlay */
     private Mode mode;
 
     /** Stop the overlay if the message has not change during this time */
@@ -66,8 +68,12 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     private static final float MESSAGE_ALPHA = 0.7f;
     /** Border in pixels, on top and bottom of text message */
     private static final int OVERLAY_INNER_BORDER = 2;
-    private String message = "none";
+
+    /** Message to diasplay */
+    private String message;
+    /** Font of the message */
     private Font messageFont;
+    /** Timer for cleaning of the message */
     private Timer timer;
     private int messagePresence;
 
@@ -212,7 +218,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
     @Override
     protected void processMouseMotionEvent(MouseEvent e, JLayer<? extends JComponent> l) {
-        System.out.println("b");
         //If the LayerUI is disable, it doesn't consume the mouse event.
         if(mode == Mode.NONE)
             super.processMouseMotionEvent(e, l);

@@ -43,6 +43,8 @@ import org.orbisgis.sif.components.SaveFilePanel;
 import org.xml.sax.Attributes;
 import org.xml.sax.SAXException;
 import org.xml.sax.helpers.DefaultHandler;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.parsers.SAXParserFactory;
@@ -81,6 +83,9 @@ public class SaveAndLoadHandler extends DefaultHandler {
     private ConfigurationAttribute configurationAttribute;
     /** StringBuffer used to register everything inside Configuration xml tags **/
     private StringBuffer stringBuffer = null;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SaveAndLoadHandler.class);
 
     public SaveAndLoadHandler(GEManager geManager, CAManager caManager){
         // Gets the list of GraphicalElement and Configuration Attributes class
@@ -170,9 +175,9 @@ public class SaveAndLoadHandler extends DefaultHandler {
                 if (stringBuffer.toString().equals(COMPATIBLE_VERSIONS[i]))
                     flag = true;
             if (!flag) {
-                String message = "File version " + stringBuffer.toString() + " isn't compatible with the MapComposer version. Should be ";
+                String message = i18n.tr("File version {0} isn't compatible with the MapComposer version. Should be {1}", stringBuffer.toString(), "");
                 for (String s : COMPATIBLE_VERSIONS)
-                    message += s + ";";
+                    message += s + ", ";
                 throw new SAXException(message);
             }
         }
@@ -192,7 +197,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws SAXException
      */
     public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
-        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", "Load document project");
+        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document project"));
         loadFilePanel.addFilter(new String[]{"xml"}, "XML save files");
         loadFilePanel.loadState();
 
@@ -222,7 +227,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws NoSuchMethodException
      */
     public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
-        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", "Save document project");
+        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document project"));
         saveFilePanel.addFilter(new String[]{"xml"}, "XML save files");
         saveFilePanel.loadState();
 

@@ -30,6 +30,8 @@ import java.util.List;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 /**
  * This class represent the arrow giving the orientation of the map.
@@ -41,11 +43,17 @@ public class Orientation extends SimpleCartoGE{
     
     /** Icon of the orientation*/
     private SourceCA icon;
-    
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Orientation.class);
+
+    /** Displayed ame of the path to the icon*/
+    private static final String sIcon = i18n.tr("Path");
+
     /**Main constructor*/
     public Orientation(){
         super();
-        icon = new SourceCA("Path", false);
+        icon = new SourceCA(sIcon, false);
     }
 
     /**

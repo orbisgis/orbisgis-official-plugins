@@ -30,6 +30,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -53,17 +55,35 @@ public abstract class SimpleGE implements GraphicalElement{
     private IntegerCA width;
     /** Z index of the GE.*/
     private int z;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SimpleGE.class);
+
+    /**Displayed name of the x position*/
+    private static final String sX = i18n.tr("x");
+
+    /**Displayed name of the y position*/
+    private static final String sY = i18n.tr("y");
+
+    /**Displayed name of the rotation*/
+    private static final String sRotation = i18n.tr("Rotation");
+
+    /**Displayed name of the height*/
+    private static final String sHeight = i18n.tr("Height");
+
+    /**Displayed name of the width*/
+    private static final String sWidth = i18n.tr("Width");
     
     /**
      * Main constructor.
      */
     public SimpleGE(){
         //ConfigurationAttribute instantiation
-        x= new IntegerCA("x", false, 0);
-        y= new IntegerCA("y", false, 0);
-        rotation= new IntegerCA("Rotation", false, 0, true, -360, 360);
-        height= new IntegerCA("Height", false, 50, true, 1, Integer.MAX_VALUE);
-        width= new IntegerCA("Width", false, 50, true, 1, Integer.MAX_VALUE);
+        x= new IntegerCA(sX, false, 0);
+        y= new IntegerCA(sY, false, 0);
+        rotation= new IntegerCA(sRotation, false, 0, true, -360, 360);
+        height= new IntegerCA(sHeight, false, 50, true, 1, Integer.MAX_VALUE);
+        width= new IntegerCA(sWidth, false, 50, true, 1, Integer.MAX_VALUE);
     }
     
 //Setters

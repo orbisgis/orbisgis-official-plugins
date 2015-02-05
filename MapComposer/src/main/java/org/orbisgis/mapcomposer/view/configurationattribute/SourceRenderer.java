@@ -36,6 +36,8 @@ import javax.swing.text.Document;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -57,6 +59,9 @@ import java.io.File;
  * @author Sylvain PALOMINOS
  */
 public class SourceRenderer implements CARenderer{
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SourceRenderer.class);
 
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
@@ -80,7 +85,7 @@ public class SourceRenderer implements CARenderer{
             jtf.setText(new File(sourceCA.getValue()).getName());
         else {
             //Load the last path use in a sourceCA
-            OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
+            OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr("Select source"));
             openFilePanel.addFilter(new String[]{"*"}, "All files");
             openFilePanel.loadState();
             jtf.setText(openFilePanel.getCurrentDirectory().getAbsolutePath());
@@ -104,7 +109,7 @@ public class SourceRenderer implements CARenderer{
      * @param event
      */
     public void openLoadPanel(ActionEvent event){
-        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", "Select source");
+        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr("Select source"));
         openFilePanel.addFilter(new String[]{"*"}, "All files");
         openFilePanel.loadState();
         if (UIFactory.showDialog(openFilePanel, true, true)) {

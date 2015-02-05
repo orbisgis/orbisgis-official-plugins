@@ -24,6 +24,9 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import java.awt.Color;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
@@ -38,6 +41,9 @@ public class ColorChooser extends JFrame{
     private final JComponent label;
     private final JButton button;
     final JColorChooser jcc;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(ColorChooser.class);
     
     public ColorChooser(JComponent label){
         this.label = label;
@@ -45,7 +51,7 @@ public class ColorChooser extends JFrame{
         JPanel panel = new JPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
         panel.add(jcc);
-        this.button = new JButton("Ok");
+        this.button = new JButton(i18n.tr("Ok"));
         this.button.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", "source", "mouseClicked"));
         this.button.setSize(40, 20);
         panel.add(button);

@@ -27,6 +27,8 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.util.List;
 
@@ -40,12 +42,19 @@ public class Scale extends SimpleCartoGE{
     /**Link to the MapImage*/
     private MapImageListCA milka;
 
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Scale.class);
+
+    /**Displayed name of the MapImageList ConfigurationAttribute*/
+    private static final String sMILKA = i18n.tr("Link to MapImage");
+
     /**
      * Main constructor.
      */
+
     public Scale() {
         super();
-        milka = new MapImageListCA("Link to MapImage", false);
+        milka = new MapImageListCA(sMILKA, false);
     }
     
     @Override

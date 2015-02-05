@@ -31,6 +31,8 @@ import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
 import org.xml.sax.SAXException;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
 import javax.swing.*;
@@ -54,6 +56,9 @@ public class IOController {
 
     /** MainController to get access to the other controllers*/
     private MainController mainController;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(IOController.class);
 
     public IOController(MainController mainController){
         this.mainController = mainController;
@@ -107,7 +112,7 @@ public class IOController {
                     //Verify if the property state is at DONE
                     if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
                         //Creates and sets the file chooser
-                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", "Export document");
+                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
                         saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
                         saveFilePanel.loadState();
                         if(UIFactory.showDialog(saveFilePanel)){

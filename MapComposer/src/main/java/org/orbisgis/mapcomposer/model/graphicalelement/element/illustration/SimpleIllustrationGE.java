@@ -30,6 +30,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.IllustrationElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -43,11 +45,17 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
     
     /** Path to the data source of the element.*/;
     private SourceCA path;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SimpleIllustrationGE.class);
+
+    /** Displayed name of the path to the illustration*/
+    private static final String sPath = i18n.tr("Path");
     
     /**Main constructor.*/
     public SimpleIllustrationGE(){
         super();
-        path = new SourceCA("Path", false);
+        path = new SourceCA(sPath, false);
     }
     
     /**

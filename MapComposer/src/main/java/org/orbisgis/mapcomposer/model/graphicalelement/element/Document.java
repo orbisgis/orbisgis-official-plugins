@@ -30,6 +30,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.Dimension;
 import java.util.ArrayList;
@@ -51,6 +53,21 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
 
     /**Name of the document*/
     private StringCA name;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Document.class);
+
+    /** Displayed name of the orientation*/
+    private static final String sOrientation = i18n.tr("Orientation");
+
+    /** Displayed name of the format*/
+    private static final String sFormat = i18n.tr("Format");
+
+    /**Displayed name of the name*/
+    private static final String sName = i18n.tr("Name");
+
+    /**Displayed name of the title*/
+    private static final String sDefaultName = i18n.tr("Document title");
 
     @Override
     public boolean isDocumentNeeded() {
@@ -88,9 +105,9 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      */
     public Document(){
         //ConfigurationAttribute instantiation
-        orientation= new SourceListCA("Orientation", false);
-        format= new SourceListCA("Format", false);
-        name= new StringCA("Name", false, "Document title");
+        orientation= new SourceListCA(sOrientation, false);
+        format= new SourceListCA(sFormat, false);
+        name= new StringCA(sName, false, sDefaultName);
         //Sets the orientation CA
         orientation.add(Orientation.LANDSCAPE.name());
         orientation.add(Orientation.PORTRAIT.name());
