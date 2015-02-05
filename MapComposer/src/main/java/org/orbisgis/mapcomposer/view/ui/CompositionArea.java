@@ -29,6 +29,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
+import org.orbisgis.mapcomposer.view.utils.PositionScale;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -79,6 +80,9 @@ public class CompositionArea extends JPanel{
     /** Spinner to set the zoom value */
     private JSpinner spinnerZoom;
 
+    private PositionScale verticalPositionScale;
+    private PositionScale horizontalPositionScale;
+
     /**
      * Main constructor.
      */
@@ -99,6 +103,12 @@ public class CompositionArea extends JPanel{
 
         //Sets the ScrollPane that will contain the layeredPane and its JLayer
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, true);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, true);
+        verticalPositionScale.setPreferredWidth(50);
+        horizontalPositionScale.setPreferredHeight(50);
+        scrollPane.setRowHeaderView(verticalPositionScale);
+        scrollPane.setColumnHeaderView(horizontalPositionScale);
 
         //Creates the layer for the whole compositionArea
         this.layerUI = new CompositionAreaOverlay(mainController);
@@ -249,17 +259,19 @@ public class CompositionArea extends JPanel{
      */
     public Point screenPointToDocumentPoint(Point screenPoint){
         int x = screenPoint.x;
+        x-=scrollPane.getX();
+        x-= scrollPane.getViewport().getX();
         x-=document.getX();
         x+=scrollPane.getHorizontalScrollBar().getValue();
 
-                int y = screenPoint.y;
+        int y = screenPoint.y;
         y-=document.getY();
+        y-=scrollPane.getViewport().getY();
+        //y-=document.getY();
         y+=scrollPane.getVerticalScrollBar().getValue();
 
-                System.out.println(x+", "+y);
-
-                return new Point(x, y);
-        }
+        return new Point(x, y);
+    }
 
     /**
      * Convert a point on the document to a new one which represent its position on the screen, according to the document position and to the scroll value.
@@ -269,11 +281,9 @@ public class CompositionArea extends JPanel{
     public Point documentPointToScreenPoint(Point documentPoint){
         int x = documentPoint.x;
         x+=document.getX();
-        x-=scrollPane.getHorizontalScrollBar().getValue();
 
         int y = documentPoint.y;
         y+=document.getY();
-        y-=scrollPane.getVerticalScrollBar().getValue();
 
         return new Point(x, y);
     }
@@ -284,8 +294,10 @@ public class CompositionArea extends JPanel{
      */
     public void setMousePosition(Point position){
         if(document != null) {
-            position.translate(-document.getLocationOnScreen().x, -document.getLocationOnScreen().y);
-            positionJLabel.setText("x : " + position.x + "px ,  y : " + position.y + "px");
+            Point p = new Point(position.x-50, position.y-50-this.getLocationOnScreen().y);
+            verticalPositionScale.setMousePosition(p);
+            horizontalPositionScale.setMousePosition(p);
+            positionJLabel.setText("x : " + (position.x-document.getLocationOnScreen().x) + "px ,  y : " + (position.y-document.getLocationOnScreen().y) + "px");
         }
     }
 
