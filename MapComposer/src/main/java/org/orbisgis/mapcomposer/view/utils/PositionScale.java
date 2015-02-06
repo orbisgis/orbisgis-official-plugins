@@ -39,19 +39,15 @@ public class PositionScale extends JComponent {
     public static final int SIZE = 35;
 
     public int orientation;
-    public boolean isMetric;
     private int increment;
     private int units;
 
     private Point mousePosition;
-    private boolean justMouse;
 
     public PositionScale(int o, boolean m) {
         orientation = o;
-        isMetric = m;
         setIncrementAndUnits();
         mousePosition = new Point(0, 0);
-        justMouse = false;
     }
 
     public void setMousePosition(Point p){
@@ -60,29 +56,13 @@ public class PositionScale extends JComponent {
         else
             mousePosition = new Point(p.x, p.y);
 
-        justMouse = true;
         this.revalidate();
         this.repaint();
     }
 
-    public void setIsMetric(boolean isMetric) {
-        this.isMetric = isMetric;
-        setIncrementAndUnits();
-        repaint();
-    }
-
     private void setIncrementAndUnits() {
-        if (isMetric) {
-            units = (int)((double)INCH / (double)2.54); // dots per centimeter
-            increment = units;
-        } else {
-            units = INCH;
-            increment = units / 2;
-        }
-    }
-
-    public boolean isMetric() {
-        return this.isMetric;
+        units = (int)((double)INCH / (double)2.54); // dots per centimeter
+        increment = units;
     }
 
     public int getIncrement() {
@@ -101,8 +81,10 @@ public class PositionScale extends JComponent {
         Rectangle drawHere = g.getClipBounds();
 
         // Fill clipping area with dirty brown/orange.
-        g.setColor(new Color(230, 163, 4));
+        g.setColor(Color.LIGHT_GRAY);
         g.fillRect(drawHere.x, drawHere.y, drawHere.width, drawHere.height);
+        g.setColor(Color.BLACK);
+        g.drawRect(drawHere.x, drawHere.y, drawHere.width, drawHere.height);
 
         // Do the ruler labels in a small font that's black.
         g.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -128,7 +110,7 @@ public class PositionScale extends JComponent {
         // Make a special case of 0 to display the number
         // within the rule and draw a units label.
         if (start == 0) {
-            text = Integer.toString(0) + (isMetric ? " cm" : " in");
+            text = Integer.toString(0) + " cm";
             tickLength = 10;
             if (orientation == HORIZONTAL) {
                 g.drawLine(0, SIZE - 1, 0, SIZE - tickLength - 1);
@@ -166,62 +148,8 @@ public class PositionScale extends JComponent {
         Graphics2D graph = (Graphics2D)g;
         graph.setStroke(new BasicStroke(5));
         if (orientation == HORIZONTAL)
-            graph.drawLine(mousePosition.x, 10, mousePosition.x, 40);
+            graph.drawLine(mousePosition.x, 10, mousePosition.x, SIZE-10);
         else
-            graph.drawLine(10, mousePosition.y, 40, mousePosition.y);
-        justMouse = false;
+            graph.drawLine(10, mousePosition.y, SIZE-10, mousePosition.y);
     }
 }
-/*
-public class PositionScale extends JComponent{
-
-    public enum Orientation{HORIZONTAL, VERTICAL};
-
-    private Orientation orientation;
-
-    private Dimension dimension;
-
-    private int factor;
-    private int realValue;
-
-    public void setOrientation(Orientation orientation){
-        this.orientation = orientation;
-        this.revalidate();
-    }
-
-    public void setDimension(Dimension dimension){
-        this.setPreferredSize(dimension);
-        this.setMaximumSize(dimension);
-        this.setMinimumSize(dimension);
-        this.dimension = dimension;
-        this.revalidate();
-    }
-
-    public void setScale(int factor, int realValue){
-        this.factor = factor;
-        this.realValue = realValue;
-        this.revalidate();
-    }
-
-    @Override
-    public void paint(Graphics g) {
-        super.paint(g);
-        Graphics2D graph = (Graphics2D)g;
-        graph.setStroke(new BasicStroke(2));
-        graph.drawLine(0, 0, (int)(dimension.width*0.65), 0);
-        for(int i=0; i<dimension.height; i+=factor){
-            graph.drawLine(0, i, (int)(dimension.width*0.65), i);
-            graph.drawString(""+realValue*(i/factor), (int)(dimension.width*0.70), i);
-        }
-        graph.setStroke(new BasicStroke(1));
-        graph.drawLine(0, 0, (int) (dimension.width * 0.35), 0);
-        for(int i=0; i<dimension.height; i+=factor/2){
-            graph.drawLine(0, i, (int) (dimension.width * 0.35), i);
-        }
-        graph.drawLine(0, 0, (int) (dimension.width * 0.15), 0);
-        for(int i=0; i<dimension.height; i+=factor/10){
-            graph.drawLine(0, i, (int) (dimension.width * 0.15), i);
-        }
-    }
-}
-*/

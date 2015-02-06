@@ -294,7 +294,7 @@ public class CompositionArea extends JPanel{
      */
     public void setMousePosition(Point position){
         if(document != null) {
-            Point p = new Point(position.x-50, position.y-50-this.getLocationOnScreen().y);
+            Point p = new Point(position.x-50-this.getLocationOnScreen().x, position.y-50-this.getLocationOnScreen().y);
             verticalPositionScale.setMousePosition(p);
             horizontalPositionScale.setMousePosition(p);
             positionJLabel.setText("x : " + (position.x-document.getLocationOnScreen().x) + "px ,  y : " + (position.y-document.getLocationOnScreen().y) + "px");

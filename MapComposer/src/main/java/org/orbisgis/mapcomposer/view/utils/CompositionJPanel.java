@@ -716,8 +716,8 @@ public class CompositionJPanel extends JPanel{
         }
         //If the user is resizing the element
         else{
-            //Get the position of the mouse in the COmpositionArea
-            Point end = new Point(p.x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x, p.y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
+            //Get the position of the mouse in the CompositionArea
+            Point end = new Point(p.x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x-50, p.y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y-50);
             //If the user want to resize by saving the element width/height ratio
             if(moveMode==MoveMode.SHIFT){
                 float ratio = (float)this.getHeight()/this.getWidth();

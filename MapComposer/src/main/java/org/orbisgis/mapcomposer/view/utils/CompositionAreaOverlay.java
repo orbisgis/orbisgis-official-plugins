@@ -179,13 +179,13 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                 }
                 //if the ratio is positive, the new GE bounding box have to respect it.
                 else{
-                    x = (end.x < start.x) ? end.x : start.x+50;
-                    y = (end.y < start.y) ? end.y+50 : start.y+50;
+                    x = (end.x < start.x) ? end.x : start.x;
+                    y = (end.y < start.y) ? end.y : start.y;
                     width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
                     height = width/ratio;
 
                 }
-                g2.drawRect(x, y, (int)width, (int)height);
+                g2.drawRect(x+50, y+50, (int)width, (int)height);
                 g2.dispose();
             }
         }
