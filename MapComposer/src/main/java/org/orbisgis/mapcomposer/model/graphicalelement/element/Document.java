@@ -97,6 +97,11 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         return true;
     }
 
+    @Override
+    public boolean isEditedByMouse() {
+        return false;
+    }
+
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
     public enum Orientation{PORTRAIT, LANDSCAPE}
     

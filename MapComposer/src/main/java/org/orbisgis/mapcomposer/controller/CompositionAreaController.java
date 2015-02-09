@@ -265,7 +265,7 @@ public class CompositionAreaController {
      * @param ge GraphicalElement to modify.
      */
     public void modifyCompositionJPanel(GraphicalElement ge){
-        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
+        elementJPanelMap.get(ge).refresh(null);
         if(ge instanceof Document)
             setDocumentDimension((Document) ge);
     }

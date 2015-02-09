@@ -303,6 +303,11 @@ public class TextElement extends SimpleGE implements GEProperties{
         return false;
     }
 
+    @Override
+    public boolean isEditedByMouse() {
+        return true;
+    }
+
     /**
      * Enumeration for the text alignment.
      */
