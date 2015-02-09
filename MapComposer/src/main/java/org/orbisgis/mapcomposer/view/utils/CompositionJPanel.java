@@ -67,11 +67,8 @@ public class CompositionJPanel extends JPanel{
     /**Select state of the panel. */
     private boolean selected=false;
 
-    /**X initial position when user want to move the panel. */
-    private int startX=0;
-
-    /**Y initial position when user want to move the panel. */
-    private int startY=0;
+    /** Initial point where the user clicked to modify the CompositionJPanel. */
+    private Point startPoint;
 
     /**Type of move the user want to do. */
     private enum MoveDirection {TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, CENTER, NONE}
@@ -292,8 +289,7 @@ public class CompositionJPanel extends JPanel{
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
 
-        startX = me.getLocationOnScreen().x;
-        startY = me.getLocationOnScreen().y;
+        startPoint = me.getLocationOnScreen();
 
         Point start = new Point(0, 0);
 
@@ -346,12 +342,12 @@ public class CompositionJPanel extends JPanel{
     public void mouseReleasedHub(Point p){
         GraphicalElement ge = this.ge.deepCopy();
         //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
-        if(p.x==startX && p.y==startY)
+        if(p.x==startPoint.x && p.y==startPoint.y)
             return;
 
         if(moveDirection==MoveDirection.CENTER) {
-            ge.setX(ge.getX() - startX + p.x);
-            ge.setY(ge.getY() - startY + p.y);
+            ge.setX(ge.getX() - startPoint.x + p.x);
+            ge.setY(ge.getY() - startPoint.y + p.y);
             mainController.modifyGE(this.ge, ge);
             this.moveDirection = MoveDirection.NONE;
             this.moveMode = MoveMode.NONE;
@@ -397,38 +393,38 @@ public class CompositionJPanel extends JPanel{
      private void mouseReleasedNONE(Point p, GraphicalElement ge) {
          switch(moveDirection){
              case TOP:
-                 ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startY-p.y));
+                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
+                 ge.setY(ge.getY()-(startPoint.y-p.y));
                  break;
              case TOP_LEFT:
-                 ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startY-p.y));
-                 ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startX-p.x));
+                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
+                 ge.setY(ge.getY()-(startPoint.y-p.y));
+                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
+                 ge.setX(ge.getX()-(startPoint.x-p.x));
                  break;
              case LEFT:
-                 ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startX-p.x));
+                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
+                 ge.setX(ge.getX()-(startPoint.x-p.x));
                  break;
              case BOTTOM_LEFT:
-                 ge.setWidth(Math.abs(startX-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startX-p.x));
-                 ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
+                 ge.setX(ge.getX()-(startPoint.x-p.x));
+                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
                  break;
              case BOTTOM:
-                 ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
                  break;
              case BOTTOM_RIGHT:
-                 ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
-                 ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
                  break;
              case RIGHT:
-                 ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
                  break;
              case TOP_RIGHT :
-                 ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
-                 ge.setHeight(Math.abs(startY-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startY-p.y));
+                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
+                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
+                 ge.setY(ge.getY()-(startPoint.y-p.y));
                  break;
          }
      }
@@ -443,26 +439,26 @@ public class CompositionJPanel extends JPanel{
          switch(moveDirection){
              case TOP:
                  //Set the new height
-                 ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
-                 ge.setY(ge.getY() - (startY - p.y));
+                 ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                 ge.setY(ge.getY() - (startPoint.y - p.y));
                  //Adapt the width
                  ge.setX(ge.getX() - (int) (ge.getHeight() / ration - ge.getWidth()));
                  ge.setWidth((int) (ge.getHeight() / ration));
                  break;
              case TOP_LEFT:
                  //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(startY - p.y + ge.getHeight())/ration > Math.abs(startX-p.x+ge.getWidth())){
+                 if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
                      //Set the new height
-                     ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
-                     ge.setY(ge.getY() - (startY - p.y));
+                     ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                     ge.setY(ge.getY() - (startPoint.y - p.y));
                      //Adapt the width
                      ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
                      ge.setWidth((int) (ge.getHeight() / ration));
                  }
                  else{
                      //Set the new height
-                     ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
-                     ge.setX(ge.getX() - (startX - p.x));
+                     ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                     ge.setX(ge.getX() - (startPoint.x - p.x));
                      //Adapt the width
                      ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
                      ge.setHeight((int) (ge.getWidth() * ration));
@@ -470,69 +466,69 @@ public class CompositionJPanel extends JPanel{
                  break;
              case LEFT:
                  //Set the new width
-                 ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
-                 ge.setX(ge.getX() - (startX - p.x));
+                 ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                 ge.setX(ge.getX() - (startPoint.x - p.x));
                  //Adapt the height
                  ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()));
                  ge.setHeight((int) (ge.getWidth() * ration));
                  break;
              case BOTTOM_LEFT:
                  //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(-(startY-p.y) + ge.getHeight())/ration > Math.abs(startX-p.x+ge.getWidth())){
+                 if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
                      //Set the new height
-                     ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                     ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
                      //Adapt the width
                      ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
                      ge.setWidth((int) (ge.getHeight() / ration));
                  }
                  else{
                      //Set the new width
-                     ge.setWidth(Math.abs(startX - p.x + ge.getWidth()));
-                     ge.setX(ge.getX() - (startX - p.x));
+                     ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                     ge.setX(ge.getX() - (startPoint.x - p.x));
                      //Adapt the height
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
              case BOTTOM:
                  //Set the new height
-                 ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
                  //Adapt the width
                  ge.setWidth((int) (ge.getHeight() / ration));
                  break;
              case BOTTOM_RIGHT:
                  //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(-(startY-p.y) + ge.getHeight())/ration > Math.abs(-(startX - p.x)+ge.getWidth())){
+                 if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
                      //Set the new height
-                     ge.setHeight(Math.abs(-(startY-p.y)+ge.getHeight()));
+                     ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
                      //Adapt the width
                      ge.setWidth((int) (ge.getHeight() / ration));
                      break;
                  }
                  else{
                      //Set the new width
-                     ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                     ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
                      //Adapt the height
                      ge.setHeight((int) (ge.getWidth() * ration));
                  }
                  break;
              case RIGHT:
                  //Set the new width
-                 ge.setWidth(Math.abs(-(startX-p.x)+ge.getWidth()));
+                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
                  //Adapt the height
                  ge.setHeight((int) (ge.getWidth() * ration));
                  break;
              case TOP_RIGHT :
                  //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(startY - p.y + ge.getHeight())/ration > Math.abs(-(startX - p.x)+ge.getWidth())){
+                 if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
                      //Set the new height
-                     ge.setHeight(Math.abs(startY - p.y + ge.getHeight()));
-                     ge.setY(ge.getY() - (startY - p.y));
+                     ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                     ge.setY(ge.getY() - (startPoint.y - p.y));
                      //Adapt the width
                      ge.setWidth((int) (ge.getHeight() / ration));
                  }
                  else{
                      //Set the new width
-                     ge.setWidth(Math.abs(-(startX - p.x) + ge.getWidth()));
+                     ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
                      //Adapt the height
                      ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
                      ge.setHeight((int) (ge.getWidth() * ration));
@@ -551,7 +547,7 @@ public class CompositionJPanel extends JPanel{
          switch(moveDirection){
              case TOP:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(this.getWidth(), -p.y + startY - 1 + this.getHeight()));
+                 point = panelToGE(new Point(this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -560,7 +556,7 @@ public class CompositionJPanel extends JPanel{
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
                              (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
                      ge.setY(geCoord.y);
@@ -568,7 +564,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case TOP_LEFT:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startX - 1 + this.getWidth(), -p.y + startY - 1 + this.getHeight()));
+                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -576,8 +572,8 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
                      ge.setY(geCoord.y);
@@ -585,7 +581,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case LEFT:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startX - 1 + this.getWidth(), this.getHeight()));
+                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -593,7 +589,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
                              (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
@@ -602,7 +598,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case BOTTOM_LEFT:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startX - 1 + this.getWidth(), p.y - startY + this.getHeight()));
+                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), p.y - startPoint.y + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -610,7 +606,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
                              (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
@@ -619,7 +615,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case BOTTOM:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(this.getWidth(), p.y - startY + this.getHeight()));
+                 point = panelToGE(new Point(this.getWidth(), p.y - startPoint.y + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -628,7 +624,7 @@ public class CompositionJPanel extends JPanel{
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
                              (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startPoint.y + this.getHeight())) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
                      ge.setY(geCoord.y);
@@ -636,7 +632,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case BOTTOM_RIGHT:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startX + this.getWidth(), p.y - startY + this.getHeight()));
+                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), p.y - startPoint.y + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -644,8 +640,8 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startY + this.getHeight())) / 2 - 1
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startPoint.y + this.getHeight())) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
                      ge.setY(geCoord.y);
@@ -653,7 +649,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case RIGHT:
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startX + this.getWidth(), this.getHeight()));
+                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -661,7 +657,7 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
                              (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
@@ -670,7 +666,7 @@ public class CompositionJPanel extends JPanel{
                  break;
              case TOP_RIGHT :
                  //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startX + this.getWidth(), -p.y + startY - 1 + this.getHeight()));
+                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
                  //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
                  if((point.x>=margin*2) && (point.y>=margin*2)) {
                      //Set the GraphicalElement new width and height taking into account of the border width
@@ -678,8 +674,8 @@ public class CompositionJPanel extends JPanel{
                      ge.setHeight(Math.abs(point.y) - 1);
                      //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
                      Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startX + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startY + this.getHeight())) / 2 - 1
+                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
+                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
                      ));
                      ge.setX(geCoord.x);
                      ge.setY(geCoord.y);
@@ -699,8 +695,8 @@ public class CompositionJPanel extends JPanel{
             final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
             final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
             Point point = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(
-                    ge.getX() + (ge.getWidth() - (int) newWidth) / 2 + p.x - startX,
-                    ge.getY() + (ge.getHeight() - (int) newHeight) / 2 + p.y - startY));
+                    ge.getX() + (ge.getWidth() - (int) newWidth) / 2 + p.x - startPoint.x,
+                    ge.getY() + (ge.getHeight() - (int) newHeight) / 2 + p.y - startPoint.y));
             this.setBounds(point.x, point.y, this.getWidth(), this.getHeight());
         }
         //If the user is resizing the element
