@@ -33,7 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -234,7 +234,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         private final int h;
 
         /**DPI of the screen. As java don't detect well the dpi, it is set manually.*/
-        private final int dpi = 96;
+        private final int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
 
         /**
          * Main constructor.
