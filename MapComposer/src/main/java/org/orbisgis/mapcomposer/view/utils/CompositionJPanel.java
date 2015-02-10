@@ -28,7 +28,6 @@ import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -70,11 +69,16 @@ public class CompositionJPanel extends JPanel{
     /** Initial point where the user clicked to modify the CompositionJPanel. */
     private Point startPoint;
 
-    /**Type of move the user want to do. */
-    private enum MoveDirection {TOP_LEFT, TOP, TOP_RIGHT, RIGHT, BOTTOM_RIGHT, BOTTOM, BOTTOM_LEFT, LEFT, CENTER, NONE}
+    /**Type of move the user want to do. It uses binary value to cumulate two direction (i.e. TOP and RIGHT = 0x0011)*/
+    private static final int TOP = 0x0001;
+    private static final int RIGHT = 0x0010;
+    private static final int BOTTOM = 0x0100;
+    private static final int LEFT = 0x1000;
+    private static final int NONE = 0x0000;
+    private static final int CENTER = 0x1111;
 
-    /**Id of the move that the user is doing. */
-    private MoveDirection moveDirection = MoveDirection.NONE;
+    /**Value of the move direction that the user is doing. */
+    private int moveDirection = NONE;
 
     /**Type of move the user want to do. */
     private enum MoveMode {NONE, SHIFT, ALTGRAPH, CTRL}
@@ -88,13 +92,16 @@ public class CompositionJPanel extends JPanel{
     /** Size of the margin of the border for resizing. */
     private static final int margin = 5;
 
+    /** Layer used to draw an animation to indicate that something is processing.*/
     private WaitLayerUI waitLayer;
-    private JPanel panel;
+
+    /** Body panel of the CompositionJPanel where is drawn the GraphicalElement.*/
+    private JPanel body;
 
     /** Last BufferedImage rendered used for this CompositionJPanel */
     private BufferedImage contentImage;
 
-     /** Object for the translation*/
+    /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(CompositionJPanel.class);
 
     /**
@@ -119,10 +126,10 @@ public class CompositionJPanel extends JPanel{
             this.setToolTipText(i18n.tr("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
                     "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>"));
         }
-
-        panel = new JPanel(new BorderLayout());
+        //Adds the layer and the body panel
+        body = new JPanel(new BorderLayout());
         waitLayer = new WaitLayerUI();
-        JLayer<JPanel> layer = new JLayer<>(panel, waitLayer);
+        JLayer<JPanel> layer = new JLayer<>(body, waitLayer);
         this.add(layer);
         this.setOpaque(false);
     }
@@ -132,71 +139,71 @@ public class CompositionJPanel extends JPanel{
      * The stored image will be used to be drawn in the CompositionJPanel without rendering the GraphicalElement.
      * @param renderedBufferedImage BufferedImage to store.
      */
-     private void storeLastRenderedImage(BufferedImage renderedBufferedImage){
-         double rad = Math.toRadians(ge.getRotation());
-         //Width and Height of the rectangle containing the rotated bufferedImage
-         final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-         final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-         final int maxWidth = Math.max((int)newWidth, ge.getWidth());
-         final int maxHeight = Math.max((int)newHeight, ge.getHeight());
+    private void storeLastRenderedImage(BufferedImage renderedBufferedImage){
+        double rad = Math.toRadians(ge.getRotation());
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        final int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        final int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-         //create a copy of the given BufferedImage and recover it's form without rotation
-         AffineTransform affineTransform= new AffineTransform();
-         affineTransform.rotate(-Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
-         AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-         BufferedImage unrotatedBI = affineTransformOp.filter(renderedBufferedImage, null);
+        //create a copy of the given BufferedImage and recover it's form without rotation
+        AffineTransform affineTransform= new AffineTransform();
+        affineTransform.rotate(-Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+        BufferedImage unrotatedBI = affineTransformOp.filter(renderedBufferedImage, null);
 
-         //Crop it to the good size
-         BufferedImage croppedBI = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-         Graphics graph = croppedBI.createGraphics();
-         graph.drawImage(unrotatedBI,
-                 0, 0,
-                 ge.getWidth(), ge.getHeight(),
-                 (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
-                 maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2), null);
-         graph.dispose();
+        //Crop it to the good size
+        BufferedImage croppedBI = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+        Graphics graph = croppedBI.createGraphics();
+        graph.drawImage(unrotatedBI,
+                0, 0,
+                ge.getWidth(), ge.getHeight(),
+                (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2), null);
+        graph.dispose();
 
-         //Store the copy image as the contentImage
-         contentImage = croppedBI;
-     }
+        //Store the copy image as the contentImage
+        contentImage = croppedBI;
+    }
 
     /**
      * Returns the contentImage after resizing it and rotating it to fit the GraphicalElement properties (width, height, rotation).
      * @return The ready to draw BufferedImage of the GraphicalElement.
      */
-     private BufferedImage getContentImage(){
-         double rad = Math.toRadians(ge.getRotation());
-         //Width and Height of the rectangle containing the rotated bufferedImage
-         final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-         final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-         final int maxWidth = Math.max((int)newWidth, ge.getWidth());
-         final int maxHeight = Math.max((int)newHeight, ge.getHeight());
+    private BufferedImage getContentImage(){
+        double rad = Math.toRadians(ge.getRotation());
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        final int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        final int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-         //First scale the contentImage to the new size of the GraphicalELement
-         Image image = contentImage.getScaledInstance(ge.getWidth(), ge.getHeight(), BufferedImage.SCALE_FAST);
-         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), contentImage.getType());
-         Graphics2D graph = bi.createGraphics();
-         graph.drawImage(image, 0, 0, null);
-         graph.dispose();
+        //First scale the contentImage to the new size of the GraphicalELement
+        Image image = contentImage.getScaledInstance(ge.getWidth(), ge.getHeight(), BufferedImage.SCALE_FAST);
+        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), contentImage.getType());
+        Graphics2D graph = bi.createGraphics();
+        graph.drawImage(image, 0, 0, null);
+        graph.dispose();
 
-         //Draw the BufferedImage bi into the bigger BufferedImage to prepare it for the rotation (and to avoid cropping the image).
-         BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, bi.getType());
-         graph = bufferedImage.createGraphics();
-         graph.drawImage(bi,
-                 (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
-                 maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
-                 0, 0,
-                 ge.getWidth(), ge.getHeight(), null);
-         graph.dispose();
+        //Draw the BufferedImage bi into the bigger BufferedImage to prepare it for the rotation (and to avoid cropping the image).
+        BufferedImage bufferedImage = new BufferedImage(maxWidth, maxHeight, bi.getType());
+        graph = bufferedImage.createGraphics();
+        graph.drawImage(bi,
+                (maxWidth - ge.getWidth()) / 2, (maxHeight - ge.getHeight()) / 2,
+                maxWidth - ((maxWidth - ge.getWidth()) / 2), maxHeight - ((maxHeight - ge.getHeight()) / 2),
+                0, 0,
+                ge.getWidth(), ge.getHeight(), null);
+        graph.dispose();
 
-         //Create the rotation transform fo the buffered image
-         AffineTransform affineTransform = new AffineTransform();
-         affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
+        //Create the rotation transform fo the buffered image
+        AffineTransform affineTransform = new AffineTransform();
+        affineTransform.rotate(Math.toRadians(ge.getRotation()), maxWidth / 2, maxHeight / 2);
 
-         //Apply the transform to the bufferedImage and draw it
-         AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
-         return affineTransformOp.filter(bufferedImage, null);
-     }
+        //Apply the transform to the bufferedImage and draw it
+        AffineTransformOp affineTransformOp = new AffineTransformOp(affineTransform, AffineTransformOp.TYPE_BILINEAR);
+        return affineTransformOp.filter(bufferedImage, null);
+    }
 
     /**
      * Redraw the GraphicalElement with the given BufferedImage if the argument is not null or with the stored one if the argument is null.
@@ -212,9 +219,9 @@ public class CompositionJPanel extends JPanel{
         final int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
         //Draw the bufferedImage
-        panel.removeAll();
+        body.removeAll();
         //Add the BufferedImage into a JComponent in the CompositionJPanel
-        panel.add(new JComponent() {
+        body.add(new JComponent() {
             //Redefinition of the painComponent method to rotate the component content.
             @Override
             protected void paintComponent(Graphics g) {
@@ -226,22 +233,24 @@ public class CompositionJPanel extends JPanel{
                     g.drawImage(getContentImage(), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
-        panel.revalidate();
-        //Take account of the border width (2 pixels).
+        body.revalidate();
         if(ge instanceof GEProperties && ((GEProperties)ge).isAlwaysCentered()){
+            //Take account of the border width (2 pixels).
             this.setPreferredSize(new Dimension((int) newWidth + 2, (int) newHeight + 2));
         }
         else {
+            //Take account of the border width (2 pixels).
             Point p = new Point(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2);
             p = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(p);
+            //Take account of the border width (2 pixels).
             this.setBounds(p.x, p.y, (int) newWidth + 2, (int) newHeight + 2);
         }
-        panel.setOpaque(false);
+        body.setOpaque(false);
         setBorders();
     }
 
     /**
-     * Draw border if the CompositionJPanel is selected.
+     * Draw borders if the CompositionJPanel is selected.
      */
     private void setBorders() {
         if(!(ge instanceof Document)) {
@@ -252,29 +261,35 @@ public class CompositionJPanel extends JPanel{
         }
     }
 
+    /**
+     * Return the WaitLayerUI used to display animation over the CompositionJPanel.
+     * @return The WaitLayerUI of the CompositionJPanel.
+     */
     public WaitLayerUI getWaitLayer() {
         return waitLayer;
     }
 
-     /**
+    /**
      * Select or unselect the panel on click.
      * @param me Mouse Event.
      */
     public void mouseClicked(MouseEvent me) {
+        //If double click
         if(me.getClickCount()==2)
             mainController.getUIController().showGEProperties(ge);
+        //If simple click
         if(selected)
             mainController.unselectGE(ge);
         else
             mainController.selectGE(ge);
 
-        this.moveDirection = MoveDirection.NONE;
+        this.moveDirection = NONE;
         this.moveMode=MoveMode.NONE;
         mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     /**
-     * Set the moveMod according to the panel border clicked.
+     * Set the move mode of the .action and the start point where the mouse is pressed.
      * @param me Mouse Event.
      */
     public void mousePressed(MouseEvent me) {
@@ -284,72 +299,58 @@ public class CompositionJPanel extends JPanel{
         else if(me.isControlDown()) moveMode = MoveMode.CTRL;
         else moveMode = MoveMode.NONE;
 
-        //Sets the mouse move direction
         double rad = Math.toRadians(ge.getRotation());
         double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
         double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
 
+        //Gets the start point of the mouse movement on the screen and store it
         startPoint = me.getLocationOnScreen();
 
-        Point start = new Point(0, 0);
+        //Sets the mouse move direction and the start corner of the action (for the overlay)
+        Point start = new Point(this.getX(), this.getY()+this.getHeight()-1);
+        if(me.getY() <= margin) {
+            moveDirection |= TOP;
+            start.x = this.getX()+this.getWidth()-1;
+            start.y = this.getY()+this.getHeight()-1;
+        }
+        if(me.getX() <= margin) {
+            moveDirection |= LEFT;
+            start.x = this.getX()+this.getWidth()-1;
+        }
+        if(me.getX() >= newWidth - margin) {
+            moveDirection |= RIGHT;
+            start.x = this.getX();
+            start.y = this.getY();
+        }
+        if(me.getY() >= newHeight-margin) {
+            moveDirection |= BOTTOM;
+            start.y = this.getY();
+        }
+        if(moveDirection == NONE)
+            moveDirection = CENTER;
 
-        if(me.getY()<=margin && me.getX()<=margin) {
-            moveDirection = MoveDirection.TOP_LEFT;
-            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
-        }
-        else if(me.getX()<=margin && me.getY()>=newHeight-margin) {
-            moveDirection = MoveDirection.BOTTOM_LEFT;
-            start = new Point(this.getX()+this.getWidth()-1, this.getY());
-        }
-        else if(me.getY()>=newHeight-margin && me.getX()>=newWidth-margin) {
-            moveDirection = MoveDirection.BOTTOM_RIGHT;
-            start = new Point(this.getX(), this.getY());
-        }
-        else if(me.getX()>=newWidth-margin && me.getY()<=margin) {
-            moveDirection = MoveDirection.TOP_RIGHT;
-            start = new Point(this.getX(), this.getY()+this.getHeight()-1);
-        }
-        else if(me.getY()<=margin) {
-            moveDirection = MoveDirection.TOP;
-            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
-        }
-        else if(me.getX()<=margin) {
-            moveDirection = MoveDirection.LEFT;
-            start = new Point(this.getX()+this.getWidth()-1, this.getY()+this.getHeight()-1);
-        }
-        else if(me.getY()>=newHeight-margin) {
-            moveDirection = MoveDirection.BOTTOM;
-            start = new Point(this.getX(), this.getY());
-        }
-        else if(me.getX()>=newWidth-margin) {
-            moveDirection = MoveDirection.RIGHT;
-            start = new Point(this.getX(), this.getY());
-        }
-        else
-            moveDirection = MoveDirection.CENTER;
-
-        if(moveDirection != MoveDirection.CENTER){
+        if(moveDirection != CENTER){
             mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.RESIZE_GE);
             mainController.getMainWindow().getCompositionArea().getOverlay().setStart(start);
         }
     }
 
     /**
-    * Called when the mouse is released.
-    * It transfer the location of the mouse to the right method according to the mouseMode value;
-    * @param p Location on screen of the mouse when it's released.
-    */
+     * Called when the mouse is released.
+     * It transfer the location of the mouse to the right method according to the mouseMode value;
+     * @param p Location on screen of the mouse when it's released.
+     */
     public void mouseReleasedHub(Point p){
         GraphicalElement ge = this.ge.deepCopy();
         //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
         if(p.x==startPoint.x && p.y==startPoint.y)
             return;
 
-        if(moveDirection==MoveDirection.CENTER) {
+        if(moveDirection==CENTER) {
             ge.setX(ge.getX() - startPoint.x + p.x);
             ge.setY(ge.getY() - startPoint.y + p.y);
             mainController.modifyGE(this.ge, ge);
-            this.moveDirection = MoveDirection.NONE;
+            this.moveDirection = NONE;
             this.moveMode = MoveMode.NONE;
         }
         else {
@@ -365,324 +366,189 @@ public class CompositionJPanel extends JPanel{
                     mouseReleasedNONE(p, ge);
                     break;
             }
-            //Set the new bounds of the compositionJPanel before validating it (and redraw it)
-            double rad = Math.toRadians(ge.getRotation());
-            final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-            final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-            Point point = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(
-                    ge.getX() + (ge.getWidth() - (int) newWidth) / 2,
-                    ge.getY() + (ge.getHeight() - (int) newHeight) / 2));
-            panel.setBounds(point.x, point.y, (int) newWidth + 2, (int) newHeight + 2);
-            this.setBounds(point.x, point.y, (int) newWidth + 2, (int) newHeight + 2);
-            panel.revalidate();
-
             mainController.modifyGE(this.ge, ge);
-
-            this.moveDirection = MoveDirection.NONE;
+            this.moveDirection = NONE;
             this.moveMode=MoveMode.NONE;
         }
         mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
         mainController.getUIController().refreshSpin();
     }
 
-     /**
-      * Move and resize of the GraphicalElement when no key are pressed.
-      * Sets the new dimension and position of the ge when the mouse is released.
-      * @param p Location on screen of the mouse when it's released.
-      */
-     private void mouseReleasedNONE(Point p, GraphicalElement ge) {
-         switch(moveDirection){
-             case TOP:
-                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startPoint.y-p.y));
-                 break;
-             case TOP_LEFT:
-                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startPoint.y-p.y));
-                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startPoint.x-p.x));
-                 break;
-             case LEFT:
-                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startPoint.x-p.x));
-                 break;
-             case BOTTOM_LEFT:
-                 ge.setWidth(Math.abs(startPoint.x-p.x+ge.getWidth()));
-                 ge.setX(ge.getX()-(startPoint.x-p.x));
-                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                 break;
-             case BOTTOM:
-                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                 break;
-             case BOTTOM_RIGHT:
-                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
-                 break;
-             case RIGHT:
-                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
-                 break;
-             case TOP_RIGHT :
-                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
-                 ge.setHeight(Math.abs(startPoint.y-p.y+ge.getHeight()));
-                 ge.setY(ge.getY()-(startPoint.y-p.y));
-                 break;
-         }
-     }
+    /**
+     * Move and resize of the GraphicalElement when no key are pressed.
+     * Sets the new dimension and position of the ge when the mouse is released.
+     * @param p Location on screen of the mouse when it's released.
+     */
+    private void mouseReleasedNONE(Point p, GraphicalElement ge) {
+        if((moveDirection&TOP) != 0) {
+            ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+            ge.setY(ge.getY() - (startPoint.y - p.y));
+        }
+        if((moveDirection&LEFT) != 0) {
+            ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+            ge.setX(ge.getX() - (startPoint.x - p.x));
+        }
+        if((moveDirection&BOTTOM) != 0) {
+            ge.setHeight(Math.abs(-(startPoint.y - p.y) + ge.getHeight()));
+        }
+        if((moveDirection&RIGHT) != 0) {
+            ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
+        }
+    }
 
-     /**
-      * Move and resize of the GraphicalElement when the key SHIFT is pressed.
-      * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
-      * @param p Location on screen of the mouse when it's released.
-      */
-     private void mouseReleasedSHIFT(Point p, GraphicalElement ge) {
-         float ration = ((float)ge.getHeight())/ge.getWidth();
-         switch(moveDirection){
-             case TOP:
-                 //Set the new height
-                 ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                 ge.setY(ge.getY() - (startPoint.y - p.y));
-                 //Adapt the width
-                 ge.setX(ge.getX() - (int) (ge.getHeight() / ration - ge.getWidth()));
-                 ge.setWidth((int) (ge.getHeight() / ration));
-                 break;
-             case TOP_LEFT:
-                 //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
-                     //Set the new height
-                     ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                     ge.setY(ge.getY() - (startPoint.y - p.y));
-                     //Adapt the width
-                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
-                     ge.setWidth((int) (ge.getHeight() / ration));
-                 }
-                 else{
-                     //Set the new height
-                     ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                     ge.setX(ge.getX() - (startPoint.x - p.x));
-                     //Adapt the width
-                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
-                     ge.setHeight((int) (ge.getWidth() * ration));
-                 }
-                 break;
-             case LEFT:
-                 //Set the new width
-                 ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                 ge.setX(ge.getX() - (startPoint.x - p.x));
-                 //Adapt the height
-                 ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()));
-                 ge.setHeight((int) (ge.getWidth() * ration));
-                 break;
-             case BOTTOM_LEFT:
-                 //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
-                     //Set the new height
-                     ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                     //Adapt the width
-                     ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
-                     ge.setWidth((int) (ge.getHeight() / ration));
-                 }
-                 else{
-                     //Set the new width
-                     ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                     ge.setX(ge.getX() - (startPoint.x - p.x));
-                     //Adapt the height
-                     ge.setHeight((int) (ge.getWidth() * ration));
-                 }
-                 break;
-             case BOTTOM:
-                 //Set the new height
-                 ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                 //Adapt the width
-                 ge.setWidth((int) (ge.getHeight() / ration));
-                 break;
-             case BOTTOM_RIGHT:
-                 //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
-                     //Set the new height
-                     ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
-                     //Adapt the width
-                     ge.setWidth((int) (ge.getHeight() / ration));
-                     break;
-                 }
-                 else{
-                     //Set the new width
-                     ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
-                     //Adapt the height
-                     ge.setHeight((int) (ge.getWidth() * ration));
-                 }
-                 break;
-             case RIGHT:
-                 //Set the new width
-                 ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
-                 //Adapt the height
-                 ge.setHeight((int) (ge.getWidth() * ration));
-                 break;
-             case TOP_RIGHT :
-                 //test if the new width corresponding to the new height is wider the the new width
-                 if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
-                     //Set the new height
-                     ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                     ge.setY(ge.getY() - (startPoint.y - p.y));
-                     //Adapt the width
-                     ge.setWidth((int) (ge.getHeight() / ration));
-                 }
-                 else{
-                     //Set the new width
-                     ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
-                     //Adapt the height
-                     ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
-                     ge.setHeight((int) (ge.getWidth() * ration));
-                 }
-                 break;
-         }
-     }
+    /**
+     * Move and resize of the GraphicalElement when the key SHIFT is pressed.
+     * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
+     * @param p Location on screen of the mouse when it's released.
+     */
+    private void mouseReleasedSHIFT(Point p, GraphicalElement ge) {
+        float ration = ((float)ge.getHeight())/ge.getWidth();
+        switch(moveDirection){
+            case TOP:
+                //Set the new height
+                ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                ge.setY(ge.getY() - (startPoint.y - p.y));
+                //Adapt the width
+                ge.setX(ge.getX() - (int) (ge.getHeight() / ration - ge.getWidth()));
+                ge.setWidth((int) (ge.getHeight() / ration));
+                break;
+            case TOP|LEFT:
+                //test if the new width corresponding to the new height is wider the the new width
+                if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
+                    //Set the new height
+                    ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                    ge.setY(ge.getY() - (startPoint.y - p.y));
+                    //Adapt the width
+                    ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
+                    ge.setWidth((int) (ge.getHeight() / ration));
+                }
+                else{
+                    //Set the new height
+                    ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                    ge.setX(ge.getX() - (startPoint.x - p.x));
+                    //Adapt the width
+                    ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
+                    ge.setHeight((int) (ge.getWidth() * ration));
+                }
+                break;
+            case LEFT:
+                //Set the new width
+                ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                ge.setX(ge.getX() - (startPoint.x - p.x));
+                //Adapt the height
+                ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()));
+                ge.setHeight((int) (ge.getWidth() * ration));
+                break;
+            case BOTTOM|LEFT:
+                //test if the new width corresponding to the new height is wider the the new width
+                if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
+                    //Set the new height
+                    ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                    //Adapt the width
+                    ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
+                    ge.setWidth((int) (ge.getHeight() / ration));
+                }
+                else{
+                    //Set the new width
+                    ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
+                    ge.setX(ge.getX() - (startPoint.x - p.x));
+                    //Adapt the height
+                    ge.setHeight((int) (ge.getWidth() * ration));
+                }
+                break;
+            case BOTTOM:
+                //Set the new height
+                ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                //Adapt the width
+                ge.setWidth((int) (ge.getHeight() / ration));
+                break;
+            case BOTTOM|RIGHT:
+                //test if the new width corresponding to the new height is wider the the new width
+                if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
+                    //Set the new height
+                    ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                    //Adapt the width
+                    ge.setWidth((int) (ge.getHeight() / ration));
+                    break;
+                }
+                else{
+                    //Set the new width
+                    ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
+                    //Adapt the height
+                    ge.setHeight((int) (ge.getWidth() * ration));
+                }
+                break;
+            case RIGHT:
+                //Set the new width
+                ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
+                //Adapt the height
+                ge.setHeight((int) (ge.getWidth() * ration));
+                break;
+            case TOP|RIGHT :
+                //test if the new width corresponding to the new height is wider the the new width
+                if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
+                    //Set the new height
+                    ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
+                    ge.setY(ge.getY() - (startPoint.y - p.y));
+                    //Adapt the width
+                    ge.setWidth((int) (ge.getHeight() / ration));
+                }
+                else{
+                    //Set the new width
+                    ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
+                    //Adapt the height
+                    ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
+                    ge.setHeight((int) (ge.getWidth() * ration));
+                }
+                break;
+        }
+    }
 
-     /**
-      * Move and resize of the GraphicalElement when the key ALTGRAPH is pressed.
-      * When the mouse is released, the CompositionJPanel take the new size and the GraphicalElement is adapted to fit into it.
-      * @param p Location on screen of the mouse when it's released.
-      */
-     private void mouseReleasedALTGRAPH(Point p, GraphicalElement ge) {
-         Point point;
-         switch(moveDirection){
-             case TOP:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case TOP_LEFT:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case LEFT:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case BOTTOM_LEFT:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(-p.x + startPoint.x - 1 + this.getWidth(), p.y - startPoint.y + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (point.x - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case BOTTOM:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(this.getWidth(), p.y - startPoint.y + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - this.getWidth()) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startPoint.y + this.getHeight())) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case BOTTOM_RIGHT:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), p.y - startPoint.y + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - (p.y - startPoint.y + this.getHeight())) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case RIGHT:
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (Math.abs(point.y) - this.getHeight()) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-             case TOP_RIGHT :
-                 //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
-                 point = panelToGE(new Point(p.x - startPoint.x + this.getWidth(), -p.y + startPoint.y - 1 + this.getHeight()));
-                 //Test if the resize does not stretch too much the panel (GE width or height under twice the margin size)
-                 if((point.x>=margin*2) && (point.y>=margin*2)) {
-                     //Set the GraphicalElement new width and height taking into account of the border width
-                     ge.setWidth(Math.abs(point.x) - 1);
-                     ge.setHeight(Math.abs(point.y) - 1);
-                     //Move the GraphicalElement to keep the center of the CompositionJPanel at the same position
-                     Point geCoord = mainController.getMainWindow().getCompositionArea().screenPointToDocumentPoint(new Point(
-                             (int) this.getBounds().getX() - (Math.abs(point.x) - (p.x - startPoint.x + this.getWidth())) / 2 - 1,
-                             (int) this.getBounds().getY() - (point.y - (p.y - startPoint.y + this.getHeight())) / 2 - 1
-                     ));
-                     ge.setX(geCoord.x);
-                     ge.setY(geCoord.y);
-                 }
-                 break;
-         }
-     }
+    /**
+     * Move and resize of the GraphicalElement when the key ALTGRAPH is pressed.
+     * @param p Location on screen of the mouse when it's released.
+     */
+    private void mouseReleasedALTGRAPH(Point p, GraphicalElement ge) {
+        Point point = new Point(this.getWidth(), this.getHeight());
+
+        //Get the dimension of the actual margin between the GE size and the CompositionJPanel size
+        Dimension actualMargin = new Dimension((ge.getWidth() - this.getWidth()) / 2, (ge.getHeight() - this.getHeight()) / 2);
+
+        //Store into point the modification done
+        if((moveDirection&TOP) !=  0)
+            point.y = -p.y + startPoint.y + this.getHeight();
+        if((moveDirection&LEFT) !=  0)
+            point.x = -p.x + startPoint.x + this.getWidth();
+        if((moveDirection&BOTTOM) !=  0)
+            point.y = p.y - startPoint.y + this.getHeight();
+        if((moveDirection&RIGHT) !=  0)
+            point.x = p.x - startPoint.x + this.getWidth();
+
+        //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
+        point = panelToGE(point);
+        //Test if the resize does not stretch too much the body (GE width or height under twice the margin size)
+        if((point.x>=margin*2) && (point.y>=margin*2)) {
+            //Set the GraphicalElement new width and height taking into account of the border width
+            ge.setWidth(Math.abs(point.x));
+            ge.setHeight(Math.abs(point.y));
+        }
+
+        //Get the dimension of the future (after resizing) margin between the GE size and the CompositionJPanel size
+        double rad = Math.toRadians(ge.getRotation());
+        //Width and Height of the rectangle containing the rotated bufferedImage
+        double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+        double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+        Dimension futureMargin = new Dimension((ge.getWidth() - (int) newWidth) / 2, (ge.getHeight() - (int) newHeight) / 2);
+
+        //Adds to the position the variation of margin to ensure that the CompositionJPanel won't move.
+        ge.setY(ge.getY() + actualMargin.height - futureMargin.height);
+        ge.setX(ge.getX() + actualMargin.width - futureMargin.width);
+        //If it's needed, move the panel to follow the mouse.
+        if((moveDirection&TOP) !=  0)
+            ge.setY(ge.getY() + ((int) (this.getHeight() - newHeight)));
+        if((moveDirection&LEFT) !=  0)
+            ge.setX(ge.getX()+((int)(this.getWidth()-newWidth)));
+    }
 
     /**
      * Refresh the panel position when the mouse is dragged dragged.
@@ -690,7 +556,7 @@ public class CompositionJPanel extends JPanel{
      */
     public void mouseDragged(Point p) {
         //if the user just want to move the element
-        if (moveDirection == MoveDirection.CENTER) {
+        if (moveDirection == CENTER) {
             double rad = Math.toRadians(ge.getRotation());
             final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
             final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
@@ -721,7 +587,7 @@ public class CompositionJPanel extends JPanel{
                     case LEFT:
                         y = (this.getY()+this.getHeight())+(int)((end.x-(this.getX()+this.getWidth()))*ratio);
                         break;
-                    case BOTTOM_LEFT:
+                    case BOTTOM|LEFT:
                         width = Math.abs(end.x-(this.getX()+this.getWidth()));
                         height = Math.abs(end.y-this.getY());
                         if(width*ratio>height) {
@@ -733,7 +599,7 @@ public class CompositionJPanel extends JPanel{
                             y = end.y;
                         }
                         break;
-                    case BOTTOM_RIGHT:
+                    case BOTTOM|RIGHT:
                         width = Math.abs(end.x-this.getX());
                         height = Math.abs(end.y-this.getY());
                         if(width*ratio>height) {
@@ -745,7 +611,7 @@ public class CompositionJPanel extends JPanel{
                             y = end.y;
                         }
                         break;
-                    case TOP_LEFT:
+                    case TOP|LEFT:
                         width = Math.abs(end.x-(this.getX()+this.getWidth()));
                         height = Math.abs(end.y-(this.getY()+this.getHeight()));
                         if(width*ratio>height) {
@@ -757,7 +623,7 @@ public class CompositionJPanel extends JPanel{
                             y = end.y;
                         }
                         break;
-                    case TOP_RIGHT:
+                    case TOP|RIGHT:
                         width = Math.abs(end.x-this.getX());
                         height = Math.abs(end.y-(this.getY()+this.getHeight()));
                         if(width*ratio>height) {
@@ -825,20 +691,6 @@ public class CompositionJPanel extends JPanel{
             this.setCursor(new Cursor(Cursor.HAND_CURSOR));
     }
 
-    /**
-     * Draw red border to the element for one second.
-     */
-    public void hightlight(){
-        try {
-            this.setBorder(BorderFactory.createMatteBorder(1, 1, 1, 1, Color.red));
-            this.paintImmediately(this.getVisibleRect());
-            Thread.sleep(1000);
-            setBorders();
-        } catch (InterruptedException ex) {
-            LoggerFactory.getLogger(CompositionJPanel.class).error(ex.getMessage());
-        }
-    }
-
     /** Unselect the CompositionJPanel (remove the orange borders). */
     public void unselect(){ this.selected=false; setBorders(); }
 
@@ -856,44 +708,44 @@ public class CompositionJPanel extends JPanel{
             this.setBorder(null);
     }
 
-     /**
-      * Converts point from the CompositionJPanel to the corresponding point in the GraphicalElement.
-      * @param p Point from the CompositionJPanel
-      * @return Corresponding point in the GraphicalElement
-      */
-     private Point panelToGE(Point p){
-         int x = 0;
-         int y = 0;
-         double rad = Math.toRadians(ge.getRotation());
-         int angle = Math.abs(ge.getRotation());
-         if(angle%90==45){
-             //If the angle is of 45 cannot resize
-             return new Point(x, y);
-         }
-         else if(angle>=0 && angle<=90) {
-             x = (int) Math.floor((p.x * cos(rad) - p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-             y = (int) Math.floor((p.y * cos(rad) - p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-         }
-         else if(angle>=90 && angle<=180) {
-             x = -(int) Math.floor((p.x * cos(rad) + p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-             y = -(int) Math.floor((p.y * cos(rad) + p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-         }
-         else if(angle>=180 && angle<=270) {
-             x = -(int) Math.floor((p.x * cos(rad) - p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-             y = -(int) Math.floor((p.y * cos(rad) - p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-         }
-         else if(angle>=270 && angle<=360) {
-             x = (int) Math.floor((p.x * cos(rad) + p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-             y = (int) Math.floor((p.y * cos(rad) + p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
-         }
-         return new Point(x, y);
-     }
+    /**
+     * Converts point from the CompositionJPanel to the corresponding point in the GraphicalElement (in fact apply the reverse transformation that was applyed to the GE).
+     * @param p Point from the CompositionJPanel
+     * @return Corresponding point in the GraphicalElement
+     */
+    private Point panelToGE(Point p){
+        int x = 0;
+        int y = 0;
+        double rad = Math.toRadians(ge.getRotation());
+        int angle = Math.abs(ge.getRotation());
+        if(angle%90==45){
+            //If the angle is of 45 cannot resize
+            return new Point(x, y);
+        }
+        else if(angle>=0 && angle<=90) {
+            x = (int) Math.floor((p.x * cos(rad) - p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+            y = (int) Math.floor((p.y * cos(rad) - p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+        }
+        else if(angle>=90 && angle<=180) {
+            x = -(int) Math.floor((p.x * cos(rad) + p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+            y = -(int) Math.floor((p.y * cos(rad) + p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+        }
+        else if(angle>=180 && angle<=270) {
+            x = -(int) Math.floor((p.x * cos(rad) - p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+            y = -(int) Math.floor((p.y * cos(rad) - p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+        }
+        else if(angle>=270 && angle<=360) {
+            x = (int) Math.floor((p.x * cos(rad) + p.y * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+            y = (int) Math.floor((p.y * cos(rad) + p.x * sin(Math.abs(rad))) / (cos(rad) * cos(rad) - sin(rad) * sin(rad)));
+        }
+        return new Point(x, y);
+    }
 
-     /**
-      * Returns the GraphicalElement represented by this CompositionJPanel.
-      * @return The GraphicalElement represented
-      */
-     public GraphicalElement getGE(){
-         return  ge;
-     }
+    /**
+     * Returns the GraphicalElement represented by this CompositionJPanel.
+     * @return The GraphicalElement represented
+     */
+    public GraphicalElement getGE(){
+        return  ge;
+    }
 }
