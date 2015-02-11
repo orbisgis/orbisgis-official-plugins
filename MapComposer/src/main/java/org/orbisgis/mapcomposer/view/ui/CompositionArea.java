@@ -103,12 +103,13 @@ public class CompositionArea extends JPanel{
 
         //Sets the ScrollPane that will contain the layeredPane and its JLayer
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, true);
-        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, true);
-        verticalPositionScale.setPreferredWidth(50);
-        horizontalPositionScale.setPreferredHeight(50);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL);
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
+        scrollPane.getViewport().getViewPosition();
+        scrollPane.getHorizontalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, horizontalPositionScale, "setScrollValue", ""));
+        scrollPane.getVerticalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, verticalPositionScale, "setScrollValue", ""));
 
         //Creates the layer for the whole compositionArea
         this.layerUI = new CompositionAreaOverlay(mainController);
@@ -168,7 +169,7 @@ public class CompositionArea extends JPanel{
                     document = panel;
                     Border border = BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY);
                     border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
-                    border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(1, 1, 1, 1, Color.DARK_GRAY));
+                    border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.DARK_GRAY));
                     document.setBorder(border);
                 }
             }

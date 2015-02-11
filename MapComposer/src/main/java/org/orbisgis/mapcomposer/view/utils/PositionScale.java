@@ -26,32 +26,53 @@ package org.orbisgis.mapcomposer.view.utils;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.AdjustmentEvent;
 
 /**
+ * This class represent a scale displayed into a JScrollPane as row header view or column header view.
+ * It draw as scale in centimeters which 0 point is on the document origin and with a cursor indicating the mouse position.
+ *
  * @author Sylvain PALOMINOS
  */
 
 public class PositionScale extends JComponent {
-    public static final int DPI = Toolkit.getDefaultToolkit().
-            getScreenResolution();
+    /** Dot per Inch value */
+    public static final int DPI = Toolkit.getDefaultToolkit().getScreenResolution();
+    /** Indicate if the PositionScale is horizontal.*/
     public static final int HORIZONTAL = 0;
+    /** Indicate if the PositionScale is vertical.*/
     public static final int VERTICAL = 1;
+    /** Size of the PositionScale.*/
     public static final int SIZE = 35;
 
+    /** Orientation of the PositionScale*/
     public int orientation;
-    private int increment;
+    /** Size in pixels of a unit (1cm or 1 inch) */
     private int units;
 
+    /** Mouse position in the CompositionArea */
     private Point mousePosition;
+    /** Position of the origin point of the document. Used to know where the 0 should be placed.*/
     private int documentOriginPosition;
+    /** Among of pixel scrolled by the user */
+    private int scrollValue;
 
-    public PositionScale(int o, boolean m) {
-        orientation = o;
-        setIncrementAndUnits();
+    /**
+     * Main constructor.
+     * @param orientation Orientation of the PositionScale
+     */
+    public PositionScale(int orientation) {
+        this.orientation = orientation;
         mousePosition = new Point(0, 0);
         documentOriginPosition = 0;
+        units = (int)((double) DPI / 2.54);
+        this.setPreferredSize(new Dimension(SIZE, SIZE));
     }
 
+    /**
+     * Set the new position of the mouse.
+     * @param p Position of the mouse.
+     */
     public void setMousePosition(Point p){
         if (orientation == HORIZONTAL)
             mousePosition = new Point(p.x, p.y);
@@ -62,66 +83,63 @@ public class PositionScale extends JComponent {
         this.repaint();
     }
 
-    private void setIncrementAndUnits() {
-        units = (int)((double) DPI / (double)2.54); // dots per centimeter
-        increment = units;
-    }
-
-    public int getIncrement() {
-        return increment;
-    }
-
-    public void setPreferredHeight(int ph) {
-        setPreferredSize(new Dimension(SIZE, ph));
-    }
-
-    public void setPreferredWidth(int pw) {
-        setPreferredSize(new Dimension(pw, SIZE));
-    }
-
+    @Override
     protected void paintComponent(Graphics g) {
-
-        Rectangle drawHere = g.getClipBounds();
-        // Fill clipping area with dirty brown/orange.
+        //Fill the scale area with grey color
         g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(drawHere.x, drawHere.y, drawHere.width, drawHere.height);
-        g.setColor(Color.BLACK);
-        g.drawRect(drawHere.x, drawHere.y, drawHere.width, drawHere.height);
+        g.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
 
-        // Do the ruler labels in a small font that's black.
+        //Sets the font and text color
         g.setFont(new Font("SansSerif", Font.PLAIN, 10));
         g.setColor(Color.black);
 
-
-        int size;
-
+        //Get the length of the Scale
+        int length;
         if (orientation == HORIZONTAL)
-            size = this.getWidth();
+            length = this.getWidth();
         else
-            size = this.getHeight();
+            length = this.getHeight();
 
-        int startPos = documentOriginPosition%units;
-        int scale = documentOriginPosition/units;
+        //Get the start position of the document (the 0 inch/cm)
+        int startPos = (documentOriginPosition-scrollValue)%units;
+        int endPos = length;
+        //Get the 1/10 graduation
+        float deciUnits = (float)units/10;
 
-        for(int i=startPos; i<size; i+=units){
+        //Draw the little graduation from the scale start to the first big graduation
+        for(float j=startPos; j>0; j-=deciUnits){
+            if (orientation == HORIZONTAL)
+                g.drawLine((int)j, SIZE - 1, (int)j, SIZE - 10 - 1);
+            else
+                g.drawLine(SIZE - 1, (int)j, SIZE - 10 - 1, (int)j);
+        }
 
-            float deciUnits = (float)units/10;
+        //For each big graduation
+        for(int i=startPos; i<endPos; i+=units){
+            //Between each big graduations draw the little one
             for(float j=i; j<i+units-deciUnits+1; j+=deciUnits){
                 if (orientation == HORIZONTAL)
                     g.drawLine((int)j, SIZE - 1, (int)j, SIZE - 10 - 1);
                 else
                     g.drawLine(SIZE - 1, (int)j, SIZE - 10 - 1, (int)j);
             }
-
+            //Get the value of the big graduation
+            int positionValue = (i+scrollValue+units-1-documentOriginPosition)/units;
+            if(i<documentOriginPosition)
+                positionValue--;
+            //Draw the big graduation and its value
             if (orientation == HORIZONTAL) {
                 g.drawLine(i, SIZE - 1, i, SIZE - 20 - 1);
-                g.drawString(" "+(i/units - scale), i, 21);
+                if(i>0)
+                    g.drawString(Integer.toString(positionValue), i, 21);
             } else {
                 g.drawLine(SIZE - 1, i, SIZE - 20 - 1, i);
-                g.drawString(" "+(i/units - scale), 9, i);
+                if(i>0)
+                    g.drawString(Integer.toString(positionValue), 9, i);
             }
         }
 
+        //Draw the mouse position cursor
         Graphics2D graph = (Graphics2D)g;
         graph.setStroke(new BasicStroke(5));
         if (orientation == HORIZONTAL)
@@ -136,7 +154,15 @@ public class PositionScale extends JComponent {
      */
     public void setDocumentOriginPosition(int documentOriginPosition) {
         this.documentOriginPosition = documentOriginPosition;
-        this.revalidate();
+        this.repaint();
+    }
+
+    /**
+     * Sets the value of the JScrollBar to take it into account on drawing th PositionScale
+     * @param ae
+     */
+    public void setScrollValue(AdjustmentEvent ae){
+        this.scrollValue = ae.getValue();
         this.repaint();
     }
 }
