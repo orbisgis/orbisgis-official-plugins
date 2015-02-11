@@ -43,7 +43,7 @@ public class PositionScale extends JComponent {
     /** Indicate if the PositionScale is vertical.*/
     public static final int VERTICAL = 1;
     /** Size of the PositionScale.*/
-    public static final int SIZE = 35;
+    public static int SIZE;
 
     /** Orientation of the PositionScale*/
     public int orientation;
@@ -61,11 +61,12 @@ public class PositionScale extends JComponent {
      * Main constructor.
      * @param orientation Orientation of the PositionScale
      */
-    public PositionScale(int orientation) {
+    public PositionScale(int orientation, int dimension) {
         this.orientation = orientation;
         mousePosition = new Point(0, 0);
         documentOriginPosition = 0;
         units = (int)((double) DPI / 2.54);
+        SIZE = dimension;
         this.setPreferredSize(new Dimension(SIZE, SIZE));
     }
 

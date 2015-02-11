@@ -185,7 +185,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                     height = width/ratio;
 
                 }
-                g2.drawRect(x+50, y+50, (int)width, (int)height);
+                g2.drawRect(x+mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize(), y+mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize(), (int)width, (int)height);
                 g2.dispose();
             }
         }

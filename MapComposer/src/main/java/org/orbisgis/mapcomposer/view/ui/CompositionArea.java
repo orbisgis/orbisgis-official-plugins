@@ -80,6 +80,8 @@ public class CompositionArea extends JPanel{
     /** Spinner to set the zoom value */
     private JSpinner spinnerZoom;
 
+    private final static int POSITIONSCALE_DIMENSION = 50;
+
     private PositionScale verticalPositionScale;
     private PositionScale horizontalPositionScale;
 
@@ -90,7 +92,6 @@ public class CompositionArea extends JPanel{
         super(new BorderLayout());
         this.mainController = mainController;
         this.document = null;
-        this.dimension = new Dimension(50, 50);
 
         //Creates the layer for the layeredPane
         this.layeredPane = new JLayeredPane();
@@ -103,8 +104,8 @@ public class CompositionArea extends JPanel{
 
         //Sets the ScrollPane that will contain the layeredPane and its JLayer
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        verticalPositionScale = new PositionScale(PositionScale.VERTICAL);
-        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
         scrollPane.getViewport().getViewPosition();
@@ -297,11 +298,15 @@ public class CompositionArea extends JPanel{
      */
     public void setMousePosition(Point position){
         if(document != null) {
-            Point p = new Point(position.x-50-this.getLocationOnScreen().x, position.y-50-this.getLocationOnScreen().y);
+            Point p = new Point(position.x-getScrollPaneHeaderSize()-this.getLocationOnScreen().x, position.y-getScrollPaneHeaderSize()-this.getLocationOnScreen().y);
             verticalPositionScale.setMousePosition(p);
             horizontalPositionScale.setMousePosition(p);
             positionJLabel.setText("x : " + (position.x-document.getLocationOnScreen().x) + "px ,  y : " + (position.y-document.getLocationOnScreen().y) + "px");
         }
+    }
+
+    public int getScrollPaneHeaderSize(){
+        return POSITIONSCALE_DIMENSION;
     }
 
     /**
