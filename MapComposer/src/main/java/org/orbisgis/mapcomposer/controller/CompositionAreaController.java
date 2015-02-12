@@ -117,9 +117,7 @@ public class CompositionAreaController {
      * Removes all the graphicalElement from the CompositionArea.
      */
     public void removeAll(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()) {
-            compositionArea.removeGE(elementJPanelMap.get(ge));
-        }
+        compositionArea.removeAllGE();
         elementJPanelMap = new HashMap<>();
         zIndexStack = new Stack<>();
     }

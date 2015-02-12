@@ -222,6 +222,7 @@ public class CompositionArea extends JPanel{
     public void removeAllGE() {
         layeredPane.removeAll();
         layeredPane.revalidate();
+        document = null;
     }
     
     /**
