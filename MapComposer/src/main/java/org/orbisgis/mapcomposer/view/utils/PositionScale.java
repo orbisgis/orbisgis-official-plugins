@@ -24,30 +24,30 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
-import javax.swing.*;
+import javax.swing.JComponent;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
 
 /**
- * This class represent a scale displayed into a JScrollPane as row header view or column header view.
+ * This class is used as a header view of a JScrollPane
  * It draw as scale in centimeters which 0 point is on the document origin and with a cursor indicating the mouse position.
  *
  * @author Sylvain PALOMINOS
  */
 
 public class PositionScale extends JComponent {
-    /** Dot per Inch value */
+    /** Dot Per Inch value */
     public static final int DPI = Toolkit.getDefaultToolkit().getScreenResolution();
     /** Indicate if the PositionScale is horizontal.*/
     public static final int HORIZONTAL = 0;
     /** Indicate if the PositionScale is vertical.*/
     public static final int VERTICAL = 1;
-    /** Size of the PositionScale.*/
+    /** Size of the PositionScale (width if it is vertical, height if it is horizontal).*/
     public static int SIZE;
 
-    /** Orientation of the PositionScale*/
+    /** Orientation of the PositionScale.*/
     public int orientation;
-    /** Size in pixels of a unit (1cm or 1 inch) */
+    /** Size in pixels of a unit (1 cm or 1 inch) */
     private int units;
 
     /** Mouse position in the CompositionArea */
@@ -75,11 +75,7 @@ public class PositionScale extends JComponent {
      * @param p Position of the mouse.
      */
     public void setMousePosition(Point p){
-        if (orientation == HORIZONTAL)
-            mousePosition = new Point(p.x, p.y);
-        else
-            mousePosition = new Point(p.x, p.y);
-
+        mousePosition = new Point(p.x, p.y);
         this.revalidate();
         this.repaint();
     }
@@ -151,7 +147,7 @@ public class PositionScale extends JComponent {
 
     /**
      * Sets the position of the 0 of the scale according to the document position.
-     * @param documentOriginPosition
+     * @param documentOriginPosition Position of the origin of the document.
      */
     public void setDocumentOriginPosition(int documentOriginPosition) {
         this.documentOriginPosition = documentOriginPosition;
@@ -160,7 +156,7 @@ public class PositionScale extends JComponent {
 
     /**
      * Sets the value of the JScrollBar to take it into account on drawing th PositionScale
-     * @param ae
+     * @param ae AdjustmentEvent happening in the ScrollBar.
      */
     public void setScrollValue(AdjustmentEvent ae){
         this.scrollValue = ae.getValue();

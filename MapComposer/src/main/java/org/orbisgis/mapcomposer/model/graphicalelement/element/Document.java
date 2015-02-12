@@ -121,7 +121,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         format.add(Format.A3.name());
         format.add(Format.A4.name());
         format.add(Format.CUSTOM.name());
-        format.select(Format.A4.name());
+        setFormat(Format.A4);
     }
     
     /**
@@ -140,7 +140,11 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * Sets the format of the document.
      * @param f New format of the document.
      */
-    public void setFormat(Format f){format.select(f.name());}
+    public void setFormat(Format f){
+        format.select(f.name());
+        this.setWidth(Format.valueOf(format.getSelected()).getPixelWidth());
+        this.setHeight(Format.valueOf(format.getSelected()).getPixelHeight());
+    }
     
     /**
      * Return the format of the document.

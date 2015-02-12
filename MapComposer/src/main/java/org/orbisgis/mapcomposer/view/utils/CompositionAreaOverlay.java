@@ -104,7 +104,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     }
 
     /**
-     * Set the start point of the rectangle drawn
+     * Set the start point of the rectangle drawn. The point coordinate origin should be the CompositionAreaOverlay origin.
      * @param start
      */
     public void setStart(Point start) {
@@ -112,7 +112,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     }
 
     /**
-     * Set the end point of the rectangle drawn
+     * Set the end point of the rectangle drawn. The point coordinate origin should be the CompositionAreaOverlay origin.
      * @param end
      */
     public void setEnd(Point end) {
@@ -185,7 +185,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                     height = width/ratio;
 
                 }
-                g2.drawRect(x+mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize(), y+mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize(), (int)width, (int)height);
+                g2.drawRect(x, y, (int)width, (int)height);
                 g2.dispose();
             }
         }

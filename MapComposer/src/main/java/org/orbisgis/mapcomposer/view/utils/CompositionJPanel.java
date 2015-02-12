@@ -70,12 +70,12 @@ public class CompositionJPanel extends JPanel{
     private Point startPoint;
 
     /**Type of move the user want to do. It uses binary value to cumulate two direction (i.e. TOP and RIGHT = 0x0011)*/
-    private static final int TOP = 0x0001;
-    private static final int RIGHT = 0x0010;
-    private static final int BOTTOM = 0x0100;
-    private static final int LEFT = 0x1000;
-    private static final int NONE = 0x0000;
-    private static final int CENTER = 0x1111;
+    private static final int TOP = 0b0001;
+    private static final int RIGHT = 0b0010;
+    private static final int BOTTOM = 0b0100;
+    private static final int LEFT = 0b1000;
+    private static final int NONE = 0b0000;
+    private static final int CENTER = 0b10000;
 
     /**Value of the move direction that the user is doing. */
     private int moveDirection = NONE;
@@ -104,6 +104,9 @@ public class CompositionJPanel extends JPanel{
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(CompositionJPanel.class);
 
+    /** Distance dragged by the mouse */
+    private Dimension drag;
+
     /**
      * Main constructor.
      * @param ge GraphicalElement to display.
@@ -120,11 +123,11 @@ public class CompositionJPanel extends JPanel{
         else{
             this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", "", "mouseClicked"));
             this.addMouseListener(EventHandler.create(MouseListener.class, this, "mousePressed", "", "mousePressed"));
-            this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseReleasedHub", "getLocationOnScreen", "mouseReleased"));
+            this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseReleasedHub", null, "mouseReleased"));
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "getLocationOnScreen", "mouseDragged"));
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseMoved", "getPoint", "mouseMoved"));
             this.setToolTipText(i18n.tr("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
-                    "Holding <strong>Shift</strong> : resire the element and keeps the ratio width/height.</html>"));
+                    "Holding <strong>Shift</strong> : resize the element and keeps the ratio width/height.</html>"));
         }
         //Adds the layer and the body panel
         body = new JPanel(new BorderLayout());
@@ -226,10 +229,11 @@ public class CompositionJPanel extends JPanel{
             @Override
             protected void paintComponent(Graphics g) {
                 super.paintComponent(g);
+                //If the BufferedImage in argument is not null, use it.
                 if (bufferedImage != null) {
                     g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
                     storeLastRenderedImage(bufferedImage);
-                } else if (contentImage != null)
+                } else
                     g.drawImage(getContentImage(), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
             }
         }, BorderLayout.CENTER);
@@ -241,7 +245,7 @@ public class CompositionJPanel extends JPanel{
         else {
             //Take account of the border width (2 pixels).
             Point p = new Point(ge.getX() + (ge.getWidth() - (int) newWidth) / 2, ge.getY() + (ge.getHeight() - (int) newHeight) / 2);
-            p = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(p);
+            p = mainController.getMainWindow().getCompositionArea().documentPointToLayeredPanePoint(p);
             //Take account of the border width (2 pixels).
             this.setBounds(p.x, p.y, (int) newWidth + 2, (int) newHeight + 2);
         }
@@ -293,6 +297,7 @@ public class CompositionJPanel extends JPanel{
      * @param me Mouse Event.
      */
     public void mousePressed(MouseEvent me) {
+        drag = new Dimension(0, 0);
         //Sets the mouse move mode
         if(me.isShiftDown()) moveMode = MoveMode.SHIFT;
         else if(me.isAltGraphDown()) moveMode = MoveMode.ALTGRAPH;
@@ -307,29 +312,30 @@ public class CompositionJPanel extends JPanel{
         startPoint = me.getLocationOnScreen();
 
         //Sets the mouse move direction and the start corner of the action (for the overlay)
-        Point start = new Point(this.getX(), this.getY()+this.getHeight()-1);
+        Point start = new Point(this.getLocationOnScreen());
         if(me.getY() <= margin) {
             moveDirection |= TOP;
-            start.x = this.getX()+this.getWidth()-1;
-            start.y = this.getY()+this.getHeight()-1;
+            start.x=this.getLocationOnScreen().x+this.getWidth()-1;
+            start.y=this.getLocationOnScreen().y+this.getHeight()-1;
         }
         if(me.getX() <= margin) {
             moveDirection |= LEFT;
-            start.x = this.getX()+this.getWidth()-1;
+            start.x=this.getLocationOnScreen().x+this.getWidth() -1;
+            start.y=this.getLocationOnScreen().y+this.getHeight()-1;
         }
         if(me.getX() >= newWidth - margin) {
             moveDirection |= RIGHT;
-            start.x = this.getX();
-            start.y = this.getY();
+            start.x = this.getLocationOnScreen().x;
         }
         if(me.getY() >= newHeight-margin) {
             moveDirection |= BOTTOM;
-            start.y = this.getY();
+            start.y = this.getLocationOnScreen().y;
         }
         if(moveDirection == NONE)
             moveDirection = CENTER;
 
         if(moveDirection != CENTER){
+            start = mainController.getMainWindow().getCompositionArea().screenPointToOverlayPoint(start);
             mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.RESIZE_GE);
             mainController.getMainWindow().getCompositionArea().getOverlay().setStart(start);
         }
@@ -338,38 +344,33 @@ public class CompositionJPanel extends JPanel{
     /**
      * Called when the mouse is released.
      * It transfer the location of the mouse to the right method according to the mouseMode value;
-     * @param p Location on screen of the mouse when it's released.
      */
-    public void mouseReleasedHub(Point p){
+    public void mouseReleasedHub(){
         GraphicalElement ge = this.ge.deepCopy();
         //If the mouse didn't moved, it means the user had clicked, so skips the mouse released actions.
-        if(p.x==startPoint.x && p.y==startPoint.y)
+        if(drag.width==0 && drag.height == 0)
             return;
-
         if(moveDirection==CENTER) {
-            ge.setX(ge.getX() - startPoint.x + p.x);
-            ge.setY(ge.getY() - startPoint.y + p.y);
-            mainController.modifyGE(this.ge, ge);
-            this.moveDirection = NONE;
-            this.moveMode = MoveMode.NONE;
+            ge.setX(ge.getX() + drag.width);
+            ge.setY(ge.getY() + drag.height);
         }
         else {
             switch (moveMode) {
                 case ALTGRAPH:
-                    mouseReleasedALTGRAPH(p, ge);
+                    mouseReleasedALTGRAPH(ge);
                     break;
                 case CTRL:
                 case SHIFT:
-                    mouseReleasedSHIFT(p, ge);
+                    mouseReleasedSHIFT(ge);
                     break;
                 case NONE:
-                    mouseReleasedNONE(p, ge);
+                    mouseReleasedNONE(ge);
                     break;
             }
-            mainController.modifyGE(this.ge, ge);
-            this.moveDirection = NONE;
-            this.moveMode=MoveMode.NONE;
         }
+        this.moveDirection = NONE;
+        this.moveMode = MoveMode.NONE;
+        mainController.modifyGE(this.ge, ge);
         mainController.getMainWindow().getCompositionArea().getOverlay().setMode(CompositionAreaOverlay.Mode.NONE);
         mainController.getUIController().refreshSpin();
     }
@@ -377,128 +378,126 @@ public class CompositionJPanel extends JPanel{
     /**
      * Move and resize of the GraphicalElement when no key are pressed.
      * Sets the new dimension and position of the ge when the mouse is released.
-     * @param p Location on screen of the mouse when it's released.
      */
-    private void mouseReleasedNONE(Point p, GraphicalElement ge) {
+    private void mouseReleasedNONE(GraphicalElement ge) {
         if((moveDirection&TOP) != 0) {
-            ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-            ge.setY(ge.getY() - (startPoint.y - p.y));
+            ge.setHeight(Math.abs(-drag.height + ge.getHeight()));
+            ge.setY(ge.getY() + drag.height);
         }
         if((moveDirection&LEFT) != 0) {
-            ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-            ge.setX(ge.getX() - (startPoint.x - p.x));
+            ge.setWidth(Math.abs(-drag.width + ge.getWidth()));
+            ge.setX(ge.getX() + drag.width);
         }
         if((moveDirection&BOTTOM) != 0) {
-            ge.setHeight(Math.abs(-(startPoint.y - p.y) + ge.getHeight()));
+            ge.setHeight(Math.abs(-(- drag.height) + ge.getHeight()));
         }
         if((moveDirection&RIGHT) != 0) {
-            ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
+            ge.setWidth(Math.abs(-(-drag.width) + ge.getWidth()));
         }
     }
 
     /**
      * Move and resize of the GraphicalElement when the key SHIFT is pressed.
      * Resize the GraphicalElement (like in mouseReleasedNONE()) but keep the image width/height ratio
-     * @param p Location on screen of the mouse when it's released.
      */
-    private void mouseReleasedSHIFT(Point p, GraphicalElement ge) {
-        float ration = ((float)ge.getHeight())/ge.getWidth();
+    private void mouseReleasedSHIFT(GraphicalElement ge) {
+        float ratio = ((float)ge.getHeight())/ge.getWidth();
         switch(moveDirection){
             case TOP:
                 //Set the new height
-                ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                ge.setY(ge.getY() - (startPoint.y - p.y));
+                ge.setHeight(Math.abs(-drag.height + ge.getHeight()));
+                ge.setY(ge.getY() + drag.height);
                 //Adapt the width
-                ge.setX(ge.getX() - (int) (ge.getHeight() / ration - ge.getWidth()));
-                ge.setWidth((int) (ge.getHeight() / ration));
+                ge.setX(ge.getX() - (int) (ge.getHeight() / ratio - ge.getWidth()));
+                ge.setWidth((int) (ge.getHeight() / ratio));
                 break;
             case TOP|LEFT:
                 //test if the new width corresponding to the new height is wider the the new width
-                if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
+                if(Math.abs(-drag.height + ge.getHeight())/ratio > Math.abs(-drag.width+ge.getWidth())){
                     //Set the new height
-                    ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                    ge.setY(ge.getY() - (startPoint.y - p.y));
+                    ge.setHeight(Math.abs(-drag.height + ge.getHeight()));
+                    ge.setY(ge.getY() + drag.height);
                     //Adapt the width
-                    ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
-                    ge.setWidth((int) (ge.getHeight() / ration));
+                    ge.setX(ge.getX() - (int)(ge.getHeight()/ratio -ge.getWidth()));
+                    ge.setWidth((int) (ge.getHeight() / ratio));
                 }
                 else{
                     //Set the new height
-                    ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                    ge.setX(ge.getX() - (startPoint.x - p.x));
+                    ge.setWidth(Math.abs(-drag.width + ge.getWidth()));
+                    ge.setX(ge.getX() + drag.width);
                     //Adapt the width
-                    ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
-                    ge.setHeight((int) (ge.getWidth() * ration));
+                    ge.setY(ge.getY() - (int) (ge.getWidth() * ratio - ge.getHeight()));
+                    ge.setHeight((int) (ge.getWidth() * ratio));
                 }
                 break;
             case LEFT:
                 //Set the new width
-                ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                ge.setX(ge.getX() - (startPoint.x - p.x));
+                ge.setWidth(Math.abs(-drag.width + ge.getWidth()));
+                ge.setX(ge.getX() + drag.width);
                 //Adapt the height
-                ge.setY(ge.getY() - (int)(ge.getWidth()*ration -ge.getHeight()));
-                ge.setHeight((int) (ge.getWidth() * ration));
+                ge.setY(ge.getY() - (int)(ge.getWidth()*ratio -ge.getHeight()));
+                ge.setHeight((int) (ge.getWidth() * ratio));
                 break;
             case BOTTOM|LEFT:
                 //test if the new width corresponding to the new height is wider the the new width
-                if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(startPoint.x-p.x+ge.getWidth())){
+                if(Math.abs(drag.getHeight() + ge.getHeight())/ratio > Math.abs(-drag.width+ge.getWidth())){
                     //Set the new height
-                    ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                    ge.setHeight((int)Math.abs(drag.getHeight()+ge.getHeight()));
                     //Adapt the width
-                    ge.setX(ge.getX() - (int)(ge.getHeight()/ration -ge.getWidth()));
-                    ge.setWidth((int) (ge.getHeight() / ration));
+                    ge.setX(ge.getX() - (int)(ge.getHeight()/ratio -ge.getWidth()));
+                    ge.setWidth((int) (ge.getHeight() / ratio));
                 }
                 else{
                     //Set the new width
-                    ge.setWidth(Math.abs(startPoint.x - p.x + ge.getWidth()));
-                    ge.setX(ge.getX() - (startPoint.x - p.x));
+                    ge.setWidth(Math.abs(-drag.width + ge.getWidth()));
+                    ge.setX(ge.getX() + drag.width);
                     //Adapt the height
-                    ge.setHeight((int) (ge.getWidth() * ration));
+                    ge.setHeight((int) (ge.getWidth() * ratio));
                 }
                 break;
             case BOTTOM:
                 //Set the new height
-                ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                ge.setHeight((int)Math.abs(drag.getHeight()+ge.getHeight()));
                 //Adapt the width
-                ge.setWidth((int) (ge.getHeight() / ration));
+                ge.setWidth((int) (ge.getHeight() / ratio));
                 break;
             case BOTTOM|RIGHT:
                 //test if the new width corresponding to the new height is wider the the new width
-                if(Math.abs(-(startPoint.y-p.y) + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
+                if(Math.abs(drag.getHeight() + ge.getHeight())/ratio > Math.abs(-(-drag.width)+ge.getWidth())){
                     //Set the new height
-                    ge.setHeight(Math.abs(-(startPoint.y-p.y)+ge.getHeight()));
+                    ge.setHeight((int)Math.abs(drag.getHeight()+ge.getHeight()));
                     //Adapt the width
-                    ge.setWidth((int) (ge.getHeight() / ration));
+                    ge.setWidth((int) (ge.getHeight() / ratio));
                     break;
                 }
                 else{
                     //Set the new width
-                    ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
+                    ge.setWidth(Math.abs(drag.width+ge.getWidth()));
                     //Adapt the height
-                    ge.setHeight((int) (ge.getWidth() * ration));
+                    ge.setHeight((int) (ge.getWidth() * ratio));
                 }
                 break;
             case RIGHT:
                 //Set the new width
-                ge.setWidth(Math.abs(-(startPoint.x-p.x)+ge.getWidth()));
+                ge.setWidth(Math.abs(drag.width+ge.getWidth()));
                 //Adapt the height
-                ge.setHeight((int) (ge.getWidth() * ration));
+                ge.setHeight((int) (ge.getWidth() * ratio));
                 break;
             case TOP|RIGHT :
                 //test if the new width corresponding to the new height is wider the the new width
-                if(Math.abs(startPoint.y - p.y + ge.getHeight())/ration > Math.abs(-(startPoint.x - p.x)+ge.getWidth())){
+                if(Math.abs(-drag.height + ge.getHeight())/ratio > Math.abs(drag.width+ge.getWidth())){
                     //Set the new height
-                    ge.setHeight(Math.abs(startPoint.y - p.y + ge.getHeight()));
-                    ge.setY(ge.getY() - (startPoint.y - p.y));
+                    ge.setHeight(Math.abs(-drag.height + ge.getHeight()));
+                    ge.setY(ge.getY() + drag.height);
                     //Adapt the width
-                    ge.setWidth((int) (ge.getHeight() / ration));
+                    ge.setWidth((int) (ge.getHeight() / ratio));
                 }
                 else{
                     //Set the new width
-                    ge.setWidth(Math.abs(-(startPoint.x - p.x) + ge.getWidth()));
+                    ge.setWidth(Math.abs(drag.width + ge.getWidth()));
                     //Adapt the height
-                    ge.setY(ge.getY() - (int) (ge.getWidth() * ration - ge.getHeight()));
-                    ge.setHeight((int) (ge.getWidth() * ration));
+                    ge.setY(ge.getY() - (int) (ge.getWidth() * ratio - ge.getHeight()));
+                    ge.setHeight((int) (ge.getWidth() * ratio));
                 }
                 break;
         }
@@ -506,9 +505,8 @@ public class CompositionJPanel extends JPanel{
 
     /**
      * Move and resize of the GraphicalElement when the key ALTGRAPH is pressed.
-     * @param p Location on screen of the mouse when it's released.
      */
-    private void mouseReleasedALTGRAPH(Point p, GraphicalElement ge) {
+    private void mouseReleasedALTGRAPH(GraphicalElement ge) {
         Point point = new Point(this.getWidth(), this.getHeight());
 
         //Get the dimension of the actual margin between the GE size and the CompositionJPanel size
@@ -516,13 +514,13 @@ public class CompositionJPanel extends JPanel{
 
         //Store into point the modification done
         if((moveDirection&TOP) !=  0)
-            point.y = -p.y + startPoint.y + this.getHeight();
+            point.y = -drag.height + this.getHeight();
         if((moveDirection&LEFT) !=  0)
-            point.x = -p.x + startPoint.x + this.getWidth();
+            point.x = -drag.width + this.getWidth();
         if((moveDirection&BOTTOM) !=  0)
-            point.y = p.y - startPoint.y + this.getHeight();
+            point.y = drag.height + this.getHeight();
         if((moveDirection&RIGHT) !=  0)
-            point.x = p.x - startPoint.x + this.getWidth();
+            point.x = drag.width + this.getWidth();
 
         //Convert the new width and height of the resize CompositionJPanel into the corresponding GraphicalElement width and height
         point = panelToGE(point);
@@ -557,83 +555,71 @@ public class CompositionJPanel extends JPanel{
     public void mouseDragged(Point p) {
         //if the user just want to move the element
         if (moveDirection == CENTER) {
-            double rad = Math.toRadians(ge.getRotation());
-            final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
-            final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
-            Point point = mainController.getMainWindow().getCompositionArea().documentPointToScreenPoint(new Point(
-                    ge.getX() + (ge.getWidth() - (int) newWidth) / 2 + p.x - startPoint.x,
-                    ge.getY() + (ge.getHeight() - (int) newHeight) / 2 + p.y - startPoint.y));
-            this.setBounds(point.x, point.y, this.getWidth(), this.getHeight());
+            //Move the panel to its new location
+            this.setLocation(this.getX() + p.x - startPoint.x, this.getY() + p.y - startPoint.y);
         }
         //If the user is resizing the element
         else{
-            //Get the position of the mouse in the CompositionArea
-            Point end = new Point(
-                    p.x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x-mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize(),
-                    p.y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y-mainController.getMainWindow().getCompositionArea().getScrollPaneHeaderSize());
+            Point end =/*mainController.getMainWindow().getCompositionArea().screenPointToOverlayPoint(*/p;
             //If the user want to resize by saving the element width/height ratio
             if(moveMode==MoveMode.SHIFT){
                 float ratio = (float)this.getHeight()/this.getWidth();
                 int x = end.x, y = end.y;
                 int width, height;
                 switch (moveDirection){
+                    case BOTTOM:
                     case TOP :
-                        x = (this.getX()+this.getWidth())+(int)((end.y-(this.getY()+this.getHeight()))/ratio);
+                        x = (this.getLocationOnScreen().x+this.getWidth())+(int)((end.y-(this.getLocationOnScreen().y+this.getHeight()))/ratio);
                         break;
                     case RIGHT:
-                        y = (this.getY()+this.getHeight())+(int)((end.x-(this.getX()+this.getWidth()))*ratio);
-                        break;
-                    case BOTTOM:
-                        x = (this.getX()+this.getWidth())+(int)((end.y-(this.getY()+this.getHeight()))/ratio);
-                        break;
                     case LEFT:
-                        y = (this.getY()+this.getHeight())+(int)((end.x-(this.getX()+this.getWidth()))*ratio);
+                        y = (this.getLocationOnScreen().y+this.getHeight())+(int)((end.x-(this.getLocationOnScreen().x+this.getWidth()))*ratio);
                         break;
                     case BOTTOM|LEFT:
-                        width = Math.abs(end.x-(this.getX()+this.getWidth()));
-                        height = Math.abs(end.y-this.getY());
+                        width = Math.abs(end.x-(this.getLocationOnScreen().x+this.getWidth()));
+                        height = Math.abs(end.y-this.getLocationOnScreen().y);
                         if(width*ratio>height) {
                             x = end.x;
-                            y = this.getY()+(int)(width*ratio);
+                            y = this.getLocationOnScreen().y+(int)(width*ratio);
                         }
                         else {
-                            x = this.getX()+this.getWidth()-(int)(height/ratio);
+                            x = this.getLocationOnScreen().x+this.getWidth()-(int)(height/ratio);
                             y = end.y;
                         }
                         break;
                     case BOTTOM|RIGHT:
-                        width = Math.abs(end.x-this.getX());
-                        height = Math.abs(end.y-this.getY());
+                        width = Math.abs(end.x-this.getLocationOnScreen().x);
+                        height = Math.abs(end.y-this.getLocationOnScreen().y);
                         if(width*ratio>height) {
                             x = end.x;
-                            y = this.getY()+(int)(width*ratio);
+                            y = this.getLocationOnScreen().y+(int)(width*ratio);
                         }
                         else {
-                            x = this.getX()+(int)(height/ratio);
+                            x = this.getLocationOnScreen().x+(int)(height/ratio);
                             y = end.y;
                         }
                         break;
                     case TOP|LEFT:
-                        width = Math.abs(end.x-(this.getX()+this.getWidth()));
-                        height = Math.abs(end.y-(this.getY()+this.getHeight()));
+                        width = Math.abs(end.x-(this.getLocationOnScreen().x+this.getWidth()));
+                        height = Math.abs(end.y-(this.getLocationOnScreen().y+this.getHeight()));
                         if(width*ratio>height) {
                             x = end.x;
-                            y = this.getY()+this.getHeight()-(int)(width*ratio);
+                            y = this.getLocationOnScreen().y+this.getHeight()-(int)(width*ratio);
                         }
                         else {
-                            x = this.getX() + this.getWidth() - (int) (height / ratio);
+                            x = this.getLocationOnScreen().x + this.getWidth() - (int) (height / ratio);
                             y = end.y;
                         }
                         break;
                     case TOP|RIGHT:
-                        width = Math.abs(end.x-this.getX());
-                        height = Math.abs(end.y-(this.getY()+this.getHeight()));
+                        width = Math.abs(end.x-this.getLocationOnScreen().x);
+                        height = Math.abs(end.y-(this.getLocationOnScreen().y+this.getHeight()));
                         if(width*ratio>height) {
                             x = end.x;
-                            y = this.getY()+this.getHeight()-(int)(width*ratio);
+                            y = this.getLocationOnScreen().y+this.getHeight()-(int)(width*ratio);
                         }
                         else {
-                            x = this.getX()+(int)(height/ratio);
+                            x = this.getLocationOnScreen().x+(int)(height/ratio);
                             y = end.y;
                         }
                         break;
@@ -644,21 +630,28 @@ public class CompositionJPanel extends JPanel{
             else{
                 switch (moveDirection){
                     case TOP :
-                        end = new Point(this.getX(), end.y);
+                        end.x = this.getLocationOnScreen().x;
                         break;
                     case RIGHT:
-                        end = new Point(end.x, this.getY()+this.getHeight()-1);
+                        end.y = this.getLocationOnScreen().y+this.getHeight()-1;
                         break;
                     case BOTTOM:
-                        end = new Point(this.getX()+this.getWidth()-1, end.y);
+                        end.x = getLocationOnScreen().x+this.getWidth()-1;
                         break;
                     case LEFT:
-                        end = new Point(end.x, this.getY());
+                        end.y = this.getLocationOnScreen().y;
                         break;
                 }
             }
+            end = mainController.getMainWindow().getCompositionArea().screenPointToOverlayPoint(end);
+
             mainController.getMainWindow().getCompositionArea().getOverlay().setEnd(end);
         }
+
+        //Store the mouse point as new start point to avoid redoing a movement.
+        drag.width+=p.x - startPoint.x;
+        drag.height+=p.y - startPoint.y;
+        startPoint=p;
     }
 
     /**

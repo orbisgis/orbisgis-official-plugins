@@ -53,11 +53,11 @@ import javax.swing.plaf.LayerUI;
  */
 public class CompositionArea extends JPanel{
 
-    /** LayerUI use (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
+    /** LayerUI used (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
     private LayerUI<JComponent> layerUI;
 
     /**JScrollPane of the CompositionArea. */
-    private final JScrollPane scrollPane;
+    private JScrollPane scrollPane;
 
     /** JLayeredPane where all the CompositionJPanel will be added */
     private JLayeredPane layeredPane;
@@ -71,18 +71,16 @@ public class CompositionArea extends JPanel{
     /** MainController */
     private MainController mainController;
 
-    /** Tool bar added a the bottom of the CompositionArea to display information */
-    private JToolBar bottomJToolBar;
-
     /** JLabel displaying the mouse position */
     private JLabel positionJLabel;
 
-    /** Spinner to set the zoom value */
-    private JSpinner spinnerZoom;
-
+    /** Fixed size of the PositionScale used as header view in the JScrollPane */
     private final static int POSITIONSCALE_DIMENSION = 50;
 
+    /** The vertical PositionScale */
     private PositionScale verticalPositionScale;
+
+    /** The horizontal PositionScale */
     private PositionScale horizontalPositionScale;
 
     /**
@@ -95,14 +93,14 @@ public class CompositionArea extends JPanel{
 
         //Creates the layer for the layeredPane
         this.layeredPane = new JLayeredPane();
-        LayerUI LayeredPaneLayerUI = new LayeredPaneOverlay(this);
+        LayerUI<JComponent> LayeredPaneLayerUI = new LayeredPaneOverlay(this);
         JLayer LayeredPaneJLayer = new JLayer<>(layeredPane, LayeredPaneLayerUI);
 
         //Adds the layer to a JPanel
         JComponent body = new JPanel(new BorderLayout());
         body.add(LayeredPaneJLayer, BorderLayout.CENTER);
 
-        //Sets the ScrollPane that will contain the layeredPane and its JLayer
+        //Sets the ScrollPane that will contain the layeredPane and sets its header view.
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
         horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
@@ -120,7 +118,7 @@ public class CompositionArea extends JPanel{
         this.add(compositionAreaJLayer, BorderLayout.CENTER);
 
         //Sets the tool bar at the bottom of the CompositionArea
-        bottomJToolBar = new JToolBar();
+        JToolBar bottomJToolBar = new JToolBar();
         bottomJToolBar.setLayout(new BorderLayout());
 
         //Sets the label containig the mouse position
@@ -131,7 +129,7 @@ public class CompositionArea extends JPanel{
         componentPosition.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
         //Sets the zoom spinner
-        spinnerZoom = new JSpinner(new SpinnerNumberModel(100, 10, 1000, 1));
+        JSpinner spinnerZoom = new JSpinner(new SpinnerNumberModel(100, 10, 1000, 1));
         spinnerZoom.setPreferredSize(new Dimension(80, (int) spinnerZoom.getPreferredSize().getHeight()));
         //Puts it into a JComponent
         JComponent component = new JPanel(new FlowLayout());
@@ -160,10 +158,8 @@ public class CompositionArea extends JPanel{
         if(!this.layeredPane.isAncestorOf(panel)) {
             //First test if the GE represented by the CompositionJPanel should be always centered
             if (panel.getGE() instanceof GEProperties && ((GEProperties) panel.getGE()).isAlwaysCentered()) {
-                //Add the panel at the center
-                this.layeredPane.add(panel);
-                int width = ((Document) panel.getGE()).getDimension().width;
-                int height = ((Document) panel.getGE()).getDimension().height;
+                int width = panel.getGE().getWidth();
+                int height = panel.getGE().getHeight();
                 panel.setBounds((layeredPane.getWidth() - width) / 2, (layeredPane.getHeight() - height) / 2, width, height);
                 //If the GE is an instance of Document, register the CompositionJPanel as this.document and adds the border to it
                 if (panel.getGE() instanceof Document) {
@@ -174,8 +170,7 @@ public class CompositionArea extends JPanel{
                     document.setBorder(border);
                 }
             }
-            else
-                this.layeredPane.add(panel);
+            this.layeredPane.add(panel);
         }
     }
     
@@ -196,6 +191,7 @@ public class CompositionArea extends JPanel{
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.layeredPane.setPreferredSize(this.dimension);
+        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
     }
 
     /**
@@ -259,30 +255,47 @@ public class CompositionArea extends JPanel{
     /**
      * Convert a point on the screen to a new one which represent its position on the document, according to the document position and to the scroll value.
      * @param screenPoint Point on the screen.
-     * @return Position on the document of screenPoint.
+     * @return Position on the document of the screenPoint.
      */
     public Point screenPointToDocumentPoint(Point screenPoint){
         int x = screenPoint.x;
         x-=scrollPane.getX();
-        x-= scrollPane.getViewport().getX();
+        x-=scrollPane.getViewport().getX();
         x-=document.getX();
         x+=scrollPane.getHorizontalScrollBar().getValue();
 
         int y = screenPoint.y;
-        y-=document.getY();
+        y-=scrollPane.getY();
         y-=scrollPane.getViewport().getY();
-        //y-=document.getY();
+        y-=document.getY();
         y+=scrollPane.getVerticalScrollBar().getValue();
 
         return new Point(x, y);
     }
 
     /**
-     * Convert a point on the document to a new one which represent its position on the screen, according to the document position and to the scroll value.
-     * @param documentPoint Point on the document.
-     * @return Position on the screen of documentPoint.
+     * Convert a point on the screen to a new one which represent its position on the CompositionAreaOverlay, according to the scroll value.
+     * @param screenPoint Point on the screen.
+     * @return Position on the CompositionAreaOverlay of the screenPoint.
      */
-    public Point documentPointToScreenPoint(Point documentPoint){
+    public Point screenPointToOverlayPoint(Point screenPoint){
+        int x = screenPoint.x;
+        x-=this.getLocationOnScreen().x;
+        x-=scrollPane.getX();
+
+        int y = screenPoint.y;
+        y-=this.getLocationOnScreen().y;
+        y-= scrollPane.getY();
+
+        return new Point(x, y);
+    }
+
+    /**
+     * Convert a point on the document to a new one which represent its position on the layeredPane, according to the document position.
+     * @param documentPoint Point on the document.
+     * @return Position on the screen of the documentPoint.
+     */
+    public Point documentPointToLayeredPanePoint(Point documentPoint){
         int x = documentPoint.x;
         x+=document.getX();
 
@@ -298,15 +311,11 @@ public class CompositionArea extends JPanel{
      */
     public void setMousePosition(Point position){
         if(document != null) {
-            Point p = new Point(position.x-getScrollPaneHeaderSize()-this.getLocationOnScreen().x, position.y-getScrollPaneHeaderSize()-this.getLocationOnScreen().y);
+            Point p = screenPointToOverlayPoint(position);
             verticalPositionScale.setMousePosition(p);
             horizontalPositionScale.setMousePosition(p);
             positionJLabel.setText("x : " + (position.x-document.getLocationOnScreen().x) + "px ,  y : " + (position.y-document.getLocationOnScreen().y) + "px");
         }
-    }
-
-    public int getScrollPaneHeaderSize(){
-        return POSITIONSCALE_DIMENSION;
     }
 
     /**
