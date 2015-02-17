@@ -35,6 +35,8 @@ import java.awt.*;
 import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.LayerUI;
@@ -51,7 +53,7 @@ import javax.swing.plaf.LayerUI;
  *
  * @author Sylvain PALOMINOS
  */
-public class CompositionArea extends JPanel{
+public class CompositionArea extends JPanel {
 
     /** LayerUI used (in this case it's a CompositionAreaOverlay) to display information in the CompositionArea. */
     private LayerUI<JComponent> layerUI;
@@ -83,6 +85,15 @@ public class CompositionArea extends JPanel{
     /** The horizontal PositionScale */
     private PositionScale horizontalPositionScale;
 
+    public static final int UNIT_INCH = 1;
+    public static final int UNIT_MM = 2;
+
+    /** Dimension unit used */
+    private int unit;
+
+    /** Corner button of the ScrollPane to change the dimension unit */
+    private JButton inchOrCm;
+
     /**
      * Main constructor.
      */
@@ -90,6 +101,7 @@ public class CompositionArea extends JPanel{
         super(new BorderLayout());
         this.mainController = mainController;
         this.document = null;
+        this.unit = UNIT_INCH;
 
         //Creates the layer for the layeredPane
         this.layeredPane = new JLayeredPane();
@@ -104,12 +116,15 @@ public class CompositionArea extends JPanel{
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
         horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
+        inchOrCm = new JButton("in");
+        inchOrCm.setFont(new Font("Arial", Font.PLAIN, 8));
+        inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
         scrollPane.getViewport().getViewPosition();
         scrollPane.getHorizontalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, horizontalPositionScale, "setScrollValue", ""));
         scrollPane.getVerticalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, verticalPositionScale, "setScrollValue", ""));
-
+        scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, inchOrCm);
         //Creates the layer for the whole compositionArea
         this.layerUI = new CompositionAreaOverlay(mainController);
         JLayer compositionAreaJLayer = new JLayer<>(scrollPane, this.layerUI);
@@ -121,8 +136,8 @@ public class CompositionArea extends JPanel{
         JToolBar bottomJToolBar = new JToolBar();
         bottomJToolBar.setLayout(new BorderLayout());
 
-        //Sets the label containig the mouse position
-        positionJLabel = new JLabel("x : px ,  y : px");
+        //Sets the label containing the mouse position
+        positionJLabel = new JLabel();
         //Puts it into a JComponent
         JComponent componentPosition = new JPanel(new FlowLayout());
         componentPosition.add(positionJLabel);
@@ -147,6 +162,25 @@ public class CompositionArea extends JPanel{
 
         layeredPane.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
         layeredPane.addComponentListener(EventHandler.create(ComponentListener.class, this, "actuDocumentPosition", null, "componentResized"));
+    }
+
+    /**
+     * Changes the unit used for the dimensions.
+     */
+    public void toggleInchOrCm(){
+        if(unit == UNIT_INCH){
+            unit = UNIT_MM;
+            inchOrCm.setText("mm");
+            verticalPositionScale.setUnit(UNIT_MM);
+            horizontalPositionScale.setUnit(UNIT_MM);
+        }
+        else if(unit == UNIT_MM){
+            unit = UNIT_INCH;
+            inchOrCm.setText("in");
+            verticalPositionScale.setUnit(UNIT_INCH);
+            horizontalPositionScale.setUnit(UNIT_INCH);
+        }
+        positionJLabel.revalidate();
     }
     
     /**
@@ -315,7 +349,23 @@ public class CompositionArea extends JPanel{
             Point p = screenPointToOverlayPoint(position);
             verticalPositionScale.setMousePosition(p);
             horizontalPositionScale.setMousePosition(p);
-            positionJLabel.setText("x : " + (position.x-document.getLocationOnScreen().x) + "px ,  y : " + (position.y-document.getLocationOnScreen().y) + "px");
+
+            //Calculate the position in inch or mm of the mouse for the positionLabel
+            float x = (float)(position.x-document.getLocationOnScreen().x) / PositionScale.DPI;
+            float y = (float)(position.y-document.getLocationOnScreen().y) / PositionScale.DPI;
+            String unitName = "px";
+            DecimalFormat df = new DecimalFormat();
+            if(unit == UNIT_INCH) {
+                df.setMaximumFractionDigits(2);
+                unitName = "in";
+            }
+            else if(unit == UNIT_MM) {
+                df.setMaximumFractionDigits(0);
+                x *= 25.4;
+                y *= 25.4;
+                unitName = "mm";
+            }
+            positionJLabel.setText("x : " + df.format(x) + unitName + " , y : " + df.format(y) + unitName);
         }
     }
 

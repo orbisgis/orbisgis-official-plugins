@@ -24,6 +24,8 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
+import org.orbisgis.mapcomposer.view.ui.CompositionArea;
+
 import javax.swing.JComponent;
 import java.awt.*;
 import java.awt.event.AdjustmentEvent;
@@ -65,7 +67,7 @@ public class PositionScale extends JComponent {
         this.orientation = orientation;
         mousePosition = new Point(0, 0);
         documentOriginPosition = 0;
-        units = (int)((double) DPI / 2.54);
+        units = DPI;
         SIZE = dimension;
         this.setPreferredSize(new Dimension(SIZE, SIZE));
     }
@@ -160,6 +162,22 @@ public class PositionScale extends JComponent {
      */
     public void setScrollValue(AdjustmentEvent ae){
         this.scrollValue = ae.getValue();
+        this.repaint();
+    }
+
+    /**
+     * Sets the dimension unit (inch or mm)
+     *  1 for inch
+     *  2 for mm
+     * @param unit Unit to use for the scale.
+     */
+    public void setUnit(int unit) {
+        if(unit == CompositionArea.UNIT_INCH){
+            units = (int)((double) DPI);
+        }
+        else if(unit == CompositionArea.UNIT_MM){
+            units = (int)((double) DPI / 2.54);
+        }
         this.repaint();
     }
 }
