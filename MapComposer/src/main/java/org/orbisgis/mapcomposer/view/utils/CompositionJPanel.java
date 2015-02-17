@@ -233,8 +233,10 @@ public class CompositionJPanel extends JPanel{
                 if (bufferedImage != null) {
                     g.drawImage(bufferedImage, -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
                     storeLastRenderedImage(bufferedImage);
-                } else
+                }
+                else if(contentImage != null) {
                     g.drawImage(getContentImage(), -(maxWidth - (int) newWidth) / 2, -(maxHeight - (int) newHeight) / 2, null);
+                }
             }
         }, BorderLayout.CENTER);
         body.revalidate();
