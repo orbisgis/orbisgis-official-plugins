@@ -273,7 +273,7 @@ public class MainController{
      */
     public void setSelectedGEAlignment(CompositionAreaController.Align alignment){
         //Saves the GraphicalElement state before applying the alignment
-        if(!undoingRedoing) {
+        if(!undoingRedoing && !geController.getSelectedGE().isEmpty()) {
             undoManager.addEdit(new MoveGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the alignment
@@ -286,7 +286,7 @@ public class MainController{
      */
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
         //Saves the GraphicalElement state before applying the z-index change
-        if(!undoingRedoing) {
+        if(!undoingRedoing && !geController.getSelectedGE().isEmpty()) {
             undoManager.addEdit(new ZIndexGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the z-index change
