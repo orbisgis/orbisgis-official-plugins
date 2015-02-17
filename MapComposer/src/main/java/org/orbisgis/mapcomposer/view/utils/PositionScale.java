@@ -72,10 +72,10 @@ public class PositionScale extends JComponent {
 
     /**
      * Set the new position of the mouse.
-     * @param p Position of the mouse.
+     * @param p Position of the mouse in the CompositionJPanel.
      */
     public void setMousePosition(Point p){
-        mousePosition = new Point(p.x, p.y);
+        mousePosition = new Point(p.x - SIZE, p.y - SIZE);
         this.revalidate();
         this.repaint();
     }
