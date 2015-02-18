@@ -62,7 +62,6 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
                 mapTransform.setImage(new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB));
                 if (!this.getOwsMapContext().isOpen())
                     this.getOwsMapContext().open(new NullProgressMonitor());
-                this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
             } catch (LayerException ex) {
                 LoggerFactory.getLogger(MapImage.class).error(ex.getMessage());
             }
@@ -72,10 +71,13 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     }
     
     /**
-     * Returns the BufferedImage of the map.
+     * Draw and returns the BufferedImage of the map.
      * @return The bufferedImage of the map.
      */
-    public BufferedImage getImage(){return mapTransform.getImage(); }
+    public BufferedImage getImage(){
+        this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
+        return mapTransform.getImage();
+    }
     
     /**
      * Returns the MapTransform of the map.
