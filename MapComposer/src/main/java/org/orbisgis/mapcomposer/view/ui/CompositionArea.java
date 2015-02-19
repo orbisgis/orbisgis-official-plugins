@@ -256,12 +256,12 @@ public class CompositionArea extends JPanel {
     }
 
     /**
-     * Set all the GE bounds according to the new window dimensions.
+     * Sets all the GE bounds according to the new window dimensions.
      */
     public void actuDocumentPosition(){
         if(document != null) {
             document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
-            mainController.getCompositionAreaController().refreshAllGE();
+            mainController.getCompositionAreaController().actuAllGE();
             horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2);
             verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2);
         }

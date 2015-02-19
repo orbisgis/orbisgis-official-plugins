@@ -284,6 +284,15 @@ public class CompositionAreaController {
     }
 
     /**
+     * Like the RefreshAllGE method but without doing any rendering.
+     */
+    public void actuAllGE(){
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            modifyCompositionJPanel(ge);
+        }
+    }
+
+    /**
      * Redraws all the selected GraphicalElements
      */
     public void refreshGE(List<GraphicalElement> listGE){
