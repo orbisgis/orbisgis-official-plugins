@@ -35,7 +35,7 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.SwingWorker;
 import javax.xml.parsers.ParserConfigurationException;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -59,6 +59,10 @@ public class IOController {
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(IOController.class);
+
+    private final static int pngId = 111531;
+    private final static int htmlId = 3213613;
+    private final static int pdfId = 111220;
 
     public IOController(MainController mainController){
         this.mainController = mainController;
@@ -114,14 +118,23 @@ public class IOController {
                         //Creates and sets the file chooser
                         SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
                         saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+                        saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
+                        saveFilePanel.addFilter(new String[]{"pdf"}, "PDF files");
                         saveFilePanel.loadState();
                         if(UIFactory.showDialog(saveFilePanel)){
                             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
-
-                            try{
-                                ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
-                            } catch (IOException ex) {
-                                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+                            switch(saveFilePanel.getCurrentFilterId()){
+                                case pngId:
+                                    try{
+                                        ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
+                                    } catch (IOException ex) {
+                                        LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+                                    }
+                                    break;
+                                case htmlId:
+                                    break;
+                                case pdfId:
+                                    break;
                             }
                         }
                     }
