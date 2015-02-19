@@ -131,9 +131,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
         actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
         actions.addAction(createAction(CONFIGURATION, "", i18n.tr("Show the document configuration dialog (Ctrl + D)"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
+        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
         actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
         actions.addAction(createAction(ADD_TEXT,  "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));

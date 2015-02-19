@@ -75,7 +75,9 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
      * @return The bufferedImage of the map.
      */
     public BufferedImage getImage(){
-        this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
+        //First test if a valid OWSContext is selected before drawing it
+        if(getOwsPath() != null)
+            this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
         return mapTransform.getImage();
     }
     
