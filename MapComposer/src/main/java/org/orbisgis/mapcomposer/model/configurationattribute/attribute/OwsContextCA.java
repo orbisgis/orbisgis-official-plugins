@@ -199,6 +199,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         copy.setReadOnly(this.getReadOnly());
         copy.setName(this.getName());
         copy.select(this.getSelected());
+        copy.refresh(null);
 
         return copy;
     }

@@ -44,7 +44,7 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     /** MapTransform used to generate the map image.
      * This class come from OrbisGIS
      */
-    private final MapTransform mapTransform;
+    private MapTransform mapTransform;
     
     /**
      * Main constructor.
@@ -89,6 +89,8 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
 
     @Override
     public GraphicalElement deepCopy() {
-        return super.deepCopy();
+        MapImage mapImage = (MapImage)super.deepCopy();
+        mapImage.refresh();
+        return mapImage;
     }
 }

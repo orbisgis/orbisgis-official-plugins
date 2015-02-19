@@ -37,11 +37,13 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.JProgressBar;
 import javax.xml.parsers.ParserConfigurationException;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -101,8 +103,10 @@ public class IOController {
      * Exports to document into png file.
      * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
      * Then exports the CompositionArea.
+     * @param listGEToExport List of GraphicalElement to export.
+     * @param progressBar Progress bar where should be shown the progression. Can be null.
      */
-    public void export(List<GraphicalElement> listGEToExport){
+    public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
         SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
         saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
         saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
@@ -110,47 +114,88 @@ public class IOController {
         saveFilePanel.loadState();
         if(UIFactory.showDialog(saveFilePanel)){
             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
+            Thread threadExport = null;
             switch(saveFilePanel.getCurrentFilterId()){
                 case pngId:
-                    exportAsPNG(listGEToExport, path);
+                    //exportAsPNG(listGEToExport, path, progressBar);
+                    threadExport = new ExportAsPNG(listGEToExport, path, progressBar, geManager);
                     break;
                 case htmlId:
                     break;
                 case pdfId:
                     break;
             }
+            if(threadExport != null)
+                threadExport.start();
         }
     }
 
+
     /**
-     * Export the Document as a PNG image file.
-     * @param listGEToExport List of GraphicalElement to export.
-     * @param path File path to export.
+     * This thread exports the document as a PNG image file.
      */
-    private void exportAsPNG(List<GraphicalElement> listGEToExport, String path){
-        try{
-            BufferedImage bi = null;
-            //Find the Document GE to create the BufferedImage where all the GE will be drawn
+    private static class ExportAsPNG extends Thread{
+        private List<GraphicalElement> listGEToExport;
+        private String path;
+        private JProgressBar progressBar;
+        private GEManager geManager;
+
+        /**
+         * Main constructor
+         * @param listGEToExport List of GraphicalElement to export.
+         * @param path File path to export.
+         * @param progressBar Progress bar where the progression is shown.
+         */
+        public ExportAsPNG(List<GraphicalElement> listGEToExport, String path, JProgressBar progressBar, GEManager geManager){
+            //As this class is a thread, the GE can be modified before being export, they have to be cloned
+            this.listGEToExport = new ArrayList<>();
             for(GraphicalElement ge : listGEToExport){
-                if(ge instanceof Document){
-                    bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                }
+                this.listGEToExport.add(ge.deepCopy());
             }
-            //If no Document was created, throw an exception
-            if(bi == null){
-                throw new IllegalArgumentException("Error on export : The list of GraphicalElement to export does not contain any Document GE.");
-            }
-            //Else draw each GraphicalElement in the BufferedImage
-            else {
-                Graphics2D graphics2D = bi.createGraphics();
+            this.path = path;
+            this.progressBar = progressBar;
+            this.geManager = geManager;
+        }
+
+        @Override
+        public void run() {
+            try{
+                BufferedImage bi = null;
+                //Find the Document GE to create the BufferedImage where all the GE will be drawn
                 for(GraphicalElement ge : listGEToExport){
-                    graphics2D.drawImage(geManager.getRenderer(ge.getClass()).createImageFromGE(ge), ge.getX(), ge.getY(), null);
+                    if(ge instanceof Document){
+                        bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
+                    }
                 }
-                graphics2D.dispose();
-                ImageIO.write(bi, "png", new File(path));
+                if(progressBar != null) {
+                    progressBar.setValue(0);
+                }
+
+                //If no Document was created, throw an exception
+                if(bi == null){
+                    throw new IllegalArgumentException("Error on export : The list of GraphicalElement to export does not contain any Document GE.");
+                }
+                //Else draw each GraphicalElement in the BufferedImage
+                else {
+                    Graphics2D graphics2D = bi.createGraphics();
+                    for(GraphicalElement ge : listGEToExport){
+                        graphics2D.drawImage(geManager.getRenderer(ge.getClass()).createImageFromGE(ge), ge.getX(), ge.getY(), null);
+                        if(progressBar != null) {
+                            progressBar.setValue((listGEToExport.indexOf(ge)*100)/listGEToExport.size());
+                            progressBar.repaint();
+                        }
+                        System.out.println("one more");
+                    }
+                    graphics2D.dispose();
+                    ImageIO.write(bi, "png", new File(path));
+                }
+                if(progressBar != null) {
+                    progressBar.setValue(progressBar.getMaximum());
+                }
+                System.out.println("finish");
+            } catch (IllegalArgumentException|IOException ex) {
+                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
             }
-        } catch (IllegalArgumentException|IOException ex) {
-            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
     }
 }
