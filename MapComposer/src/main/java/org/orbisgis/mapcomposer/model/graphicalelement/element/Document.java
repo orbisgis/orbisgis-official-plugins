@@ -30,8 +30,10 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
-import java.awt.Dimension;
+import java.awt.*;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -51,6 +53,21 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
 
     /**Name of the document*/
     private StringCA name;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Document.class);
+
+    /** Displayed name of the orientation*/
+    private static final String sOrientation = i18n.tr("Orientation");
+
+    /** Displayed name of the format*/
+    private static final String sFormat = i18n.tr("Format");
+
+    /**Displayed name of the name*/
+    private static final String sName = i18n.tr("Name");
+
+    /**Displayed name of the title*/
+    private static final String sDefaultName = i18n.tr("Document title");
 
     @Override
     public boolean isDocumentNeeded() {
@@ -75,6 +92,16 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     @Override
     public boolean isAlwaysRefreshed() { return false; }
 
+    @Override
+    public boolean isAlwaysCentered() {
+        return true;
+    }
+
+    @Override
+    public boolean isEditedByMouse() {
+        return false;
+    }
+
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
     public enum Orientation{PORTRAIT, LANDSCAPE}
     
@@ -83,9 +110,9 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      */
     public Document(){
         //ConfigurationAttribute instantiation
-        orientation= new SourceListCA("Orientation", false);
-        format= new SourceListCA("Format", false);
-        name= new StringCA("Name", false, "Document title");
+        orientation= new SourceListCA(sOrientation, false);
+        format= new SourceListCA(sFormat, false);
+        name= new StringCA(sName, false, sDefaultName);
         //Sets the orientation CA
         orientation.add(Orientation.LANDSCAPE.name());
         orientation.add(Orientation.PORTRAIT.name());
@@ -94,7 +121,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         format.add(Format.A3.name());
         format.add(Format.A4.name());
         format.add(Format.CUSTOM.name());
-        format.select(Format.A4.name());
+        setFormat(Format.A4);
     }
     
     /**
@@ -113,7 +140,11 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * Sets the format of the document.
      * @param f New format of the document.
      */
-    public void setFormat(Format f){format.select(f.name());}
+    public void setFormat(Format f){
+        format.select(f.name());
+        this.setWidth(Format.valueOf(format.getSelected()).getPixelWidth());
+        this.setHeight(Format.valueOf(format.getSelected()).getPixelHeight());
+    }
     
     /**
      * Return the format of the document.
@@ -207,7 +238,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         private final int h;
 
         /**DPI of the screen. As java don't detect well the dpi, it is set manually.*/
-        private final int dpi = 96;
+        private final int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
 
         /**
          * Main constructor.

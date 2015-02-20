@@ -83,7 +83,7 @@ public class CompositionAreaController {
     public void add(GraphicalElement ge){
         zIndexStack.push(ge);
         elementJPanelMap.put(ge, new CompositionJPanel(ge, mainController));
-        compositionArea.add(elementJPanelMap.get(ge));
+        compositionArea.addCompositionJPanel(elementJPanelMap.get(ge));
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
@@ -117,9 +117,7 @@ public class CompositionAreaController {
      * Removes all the graphicalElement from the CompositionArea.
      */
     public void removeAll(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()) {
-            compositionArea.removeGE(elementJPanelMap.get(ge));
-        }
+        compositionArea.removeAllGE();
         elementJPanelMap = new HashMap<>();
         zIndexStack = new Stack<>();
     }
@@ -265,7 +263,7 @@ public class CompositionAreaController {
      * @param ge GraphicalElement to modify.
      */
     public void modifyCompositionJPanel(GraphicalElement ge){
-        elementJPanelMap.get(ge).modify(ge.getX(), ge.getY(), ge.getWidth(), ge.getHeight(), ge.getRotation());
+        elementJPanelMap.get(ge).refresh(null);
         if(ge instanceof Document)
             setDocumentDimension((Document) ge);
     }
@@ -344,7 +342,7 @@ public class CompositionAreaController {
                         //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(xMin-(ge.getWidth()-(int)newWidth)/2);
+                        ge.setX(compositionArea.screenPointToDocumentPoint(new Point (xMin-(ge.getWidth()-(int)newWidth)/2, 0)).x);
                     }
                     break;
                 case CENTER:
@@ -374,7 +372,7 @@ public class CompositionAreaController {
                         //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(xMax-ge.getWidth()+(ge.getWidth()-(int)newWidth)/2);
+                        ge.setX(compositionArea.screenPointToDocumentPoint(new Point (xMax-ge.getWidth()+(ge.getWidth()-(int)newWidth)/2, 0)).x);
                     }
                     break;
                 case TOP:
@@ -389,7 +387,7 @@ public class CompositionAreaController {
                         //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
-                        ge.setY(yMin - (ge.getHeight() - (int) newHeight) / 2);
+                        ge.setY(compositionArea.screenPointToDocumentPoint(new Point (0, yMin - (ge.getHeight() - (int) newHeight) / 2)).y);
                     }
                     break;
                 case MIDDLE:
@@ -419,7 +417,7 @@ public class CompositionAreaController {
                         //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
                         double rad = Math.toRadians(ge.getRotation());
                         double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
-                        ge.setY(yMax - ge.getHeight() + (ge.getHeight()-(int)newHeight)/2);
+                        ge.setY(compositionArea.screenPointToDocumentPoint(new Point (0, yMax - ge.getHeight() + (ge.getHeight()-(int)newHeight)/2)).y);
                     }
                     break;
             }

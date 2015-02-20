@@ -32,6 +32,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.sif.UIFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -78,6 +80,9 @@ public class MainController{
     /** Time after which it's considered that the user has stopped to use the mouse wheel. */
     private static final int waitEndWheelTime = 1000;
 
+    /** Object for the translation*/
+    private final static I18n i18n = I18nFactory.getI18n(MainController.class);
+
     /**
      * Main constructor.
      */
@@ -113,7 +118,7 @@ public class MainController{
             uiController.refreshSpin();
         }
         else
-            compositionAreaController.setOverlayMessage("can't undo");
+            compositionAreaController.setOverlayMessage(i18n.tr("Can't undo"));
     }
 
     /**
@@ -129,7 +134,7 @@ public class MainController{
             uiController.refreshSpin();
         }
         else
-            compositionAreaController.setOverlayMessage("can't redo");
+            compositionAreaController.setOverlayMessage(i18n.tr("Can't redo"));
     }
 
     /**
@@ -268,7 +273,7 @@ public class MainController{
      */
     public void setSelectedGEAlignment(CompositionAreaController.Align alignment){
         //Saves the GraphicalElement state before applying the alignment
-        if(!undoingRedoing) {
+        if(!undoingRedoing && !geController.getSelectedGE().isEmpty()) {
             undoManager.addEdit(new MoveGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the alignment
@@ -281,7 +286,7 @@ public class MainController{
      */
     public void setSelectedGEZIndex(CompositionAreaController.ZIndex zIndex){
         //Saves the GraphicalElement state before applying the z-index change
-        if(!undoingRedoing) {
+        if(!undoingRedoing && !geController.getSelectedGE().isEmpty()) {
             undoManager.addEdit(new ZIndexGEUndoableEdit(this, geController.getSelectedGE(), true));
         }
         //Apply the z-index change

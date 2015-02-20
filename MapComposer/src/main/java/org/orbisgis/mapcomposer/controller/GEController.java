@@ -33,6 +33,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.sif.SIFDialog;
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
 import java.awt.event.WindowEvent;
@@ -66,6 +68,9 @@ public class GEController {
 
     /** MainController */
     private MainController mainController;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(GEController.class);
 
     public GEController(MainController mainController){
         selectedGE = new ArrayList<>();
@@ -244,13 +249,13 @@ public class GEController {
             newGE = newGEClass.newInstance();
             //Test if the newGE doesn't implement GEProperties and if there isn't a Document GE
             if( !(newGE instanceof GEProperties) && !mainController.isDocumentCreated()) {
-                mainController.getCompositionAreaController().setOverlayMessage("First create a new document or open an existing project.");
+                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document or open an existing project."));
                 return;
             }
 
             //Test if the newGE implements GEProperties and if it needs a Document GE and if there isn't a Document GE
             if( newGE instanceof GEProperties && ((GEProperties)newGE).isDocumentNeeded() && !mainController.isDocumentCreated()) {
-                mainController.getCompositionAreaController().setOverlayMessage("First create a new document or open an existing project.");
+                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document or open an existing project."));
                 return;
             }
 
@@ -293,7 +298,7 @@ public class GEController {
                         }
                     }
                     mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-                    mainController.getCompositionAreaController().setOverlayMessage("Now you can draw the GraphicalElement.");
+                    mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Now you can draw the GraphicalElement."));
                 }
 
                 List<GraphicalElement> list = new ArrayList<>();

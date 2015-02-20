@@ -38,6 +38,9 @@ import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.UIPanel;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import java.util.ArrayList;
 import java.util.List;
 
@@ -53,6 +56,9 @@ import static org.orbisgis.mapcomposer.controller.CompositionAreaController.ZInd
 public class UIController {
 
     private MainController mainController;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(UIController.class);
 
     public UIController(MainController mainController){
         this.mainController = mainController;
@@ -77,7 +83,7 @@ public class UIController {
     }
 
     public void createLegend(){
-        mainController.getCompositionAreaController().setOverlayMessage("Action not supported yet");
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
     }
 
     public void createOrientation(){
@@ -100,11 +106,11 @@ public class UIController {
     }
 
     public void createCircle(){
-        mainController.getCompositionAreaController().setOverlayMessage("Action not supported yet");
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
     }
 
     public void createPolygon(){
-        mainController.getCompositionAreaController().setOverlayMessage("Action not supported yet");
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
     }
 
     public void alignToLeft(){

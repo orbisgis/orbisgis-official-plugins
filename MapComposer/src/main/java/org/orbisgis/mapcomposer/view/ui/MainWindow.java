@@ -40,6 +40,8 @@ import javax.swing.event.ChangeListener;
 import org.orbisgis.view.components.actions.ActionCommands;
 import org.orbisgis.viewapi.components.actions.DefaultAction;
 import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 /**
  * Main window of the map composer. It contains several tool bar and the CompositionArea.
@@ -103,6 +105,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
     private MainController mainController;
     private CompositionArea compositionArea;
 
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
+
     /** Public main constructor. */
     public MainWindow(MainController mainController){
         super("Map composer");
@@ -124,39 +129,39 @@ public class MainWindow extends JFrame implements MainFrameAction{
         spinnerToolBar.setFloatable(false);
         actions.registerContainer(iconToolBar);
 
-        actions.addAction(createAction(NEW_COMPOSER, "", "Create a new document (Ctrl + N)", "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
-        actions.addAction(createAction(CONFIGURATION, "", "Show the document configuration dialog (Ctrl + D)", "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", "Save the document (Ctrl + S)", "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", "Open a document (Ctrl + L)", "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", "Export the document (Ctrl + E)", "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
+        actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
+        actions.addAction(createAction(CONFIGURATION, "", i18n.tr("Show the document configuration dialog (Ctrl + D)"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
+        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ADD_MAP, "", "Add a map element (Alt + M)", "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
-        actions.addAction(createAction(ADD_TEXT,  "", "Add a text element (Alt + T)",  "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
-        actions.addAction(createAction(ADD_LEGEND, "", "Add a legend element (Alt + L)", "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
-        actions.addAction(createAction(ADD_ORIENTATION, "", "Add an orientation element (Alt + O)", "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
-        actions.addAction(createAction(ADD_SCALE, "", "Add a scale element (Alt + S)", "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
-        actions.addAction(createAction(ADD_PICTURE, "", "Add a picture element (Alt + I)", "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
+        actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
+        actions.addAction(createAction(ADD_TEXT,  "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
+        actions.addAction(createAction(ADD_LEGEND, "", i18n.tr("Add a legend element (Alt + L)"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
+        actions.addAction(createAction(ADD_ORIENTATION, "", i18n.tr("Add an orientation element (Alt + O)"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
+        actions.addAction(createAction(ADD_SCALE, "", i18n.tr("Add a scale element (Alt + S)"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
+        actions.addAction(createAction(ADD_PICTURE, "", i18n.tr("Add a picture element (Alt + I)"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", "Add a circle element (Alt + C)", "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
-        actions.addAction(createAction(DRAW_POLYGON, "", "Add a polygon element (Alt + Y)", "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
+        actions.addAction(createAction(DRAW_CIRCLE, "", i18n.tr("Add a circle element (Alt + C)"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
+        actions.addAction(createAction(DRAW_POLYGON, "", i18n.tr("Add a polygon element (Alt + Y)"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(MOVE_BACK, "", "Move to the back (Alt + PageDown)", "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
-        actions.addAction(createAction(MOVE_DOWN, "", "Move down (Alt + Down)", "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
-        actions.addAction(createAction(MOVE_ON, "", "Move on (Alt + Up)", "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
-        actions.addAction(createAction(MOVE_FRONT, "", "Move to the front (Alt + PageUp)", "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
+        actions.addAction(createAction(MOVE_BACK, "", i18n.tr("Move to the back (Alt + PageDown)"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
+        actions.addAction(createAction(MOVE_DOWN, "", i18n.tr("Move down (Alt + Down)"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
+        actions.addAction(createAction(MOVE_ON, "", i18n.tr("Move on (Alt + Up)"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
+        actions.addAction(createAction(MOVE_FRONT, "", i18n.tr("Move to the front (Alt + PageUp)"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", "Align to the left (Alt + numpad 4)", "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
-        actions.addAction(createAction(ALIGN_TO_CENTER, "", "Align to the center", "align_to_center", mainController.getUIController(), "alignToCenter", null));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", "Align to the right (Alt + numpad 6)", "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", "Align to the bottom (Alt + numpad 2)", "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
-        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", "Align to the middle", "align_to_middle", mainController.getUIController(), "alignToMiddle", null));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", "Align to the top (Alt + numpad 8)", "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
+        actions.addAction(createAction(ALIGN_TO_LEFT, "", i18n.tr("Align to the left (Alt + numpad 4)"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
+        actions.addAction(createAction(ALIGN_TO_CENTER, "", i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null));
+        actions.addAction(createAction(ALIGN_TO_RIGHT, "", i18n.tr("Align to the right (Alt + numpad 6)"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
+        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", i18n.tr("Align to the bottom (Alt + numpad 2)"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
+        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null));
+        actions.addAction(createAction(ALIGN_TO_TOP, "", i18n.tr("Align to the top (Alt + numpad 8)"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
         addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(PROPERTIES, "", "Show selected elements properties (Ctrl + P)", "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
-        actions.addAction(createAction(DELETE, "", "Delete selected elements (DELETE)", "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
-        actions.addAction(createAction(REFRESH, "", "Redraw selected elements (Ctrl + R)", "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
-        actions.addAction(createAction(UNDO, "", "Undo the last action (Ctrl + Z)", "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
-        actions.addAction(createAction(REDO, "", "Redo the last action (Ctrl + Shift + Z)", "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
+        actions.addAction(createAction(PROPERTIES, "", i18n.tr("Show selected elements properties (Ctrl + P)"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
+        actions.addAction(createAction(DELETE, "", i18n.tr("Delete selected elements (DELETE)"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
+        actions.addAction(createAction(REFRESH, "", i18n.tr("Redraw selected elements (Ctrl + R)"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
+        actions.addAction(createAction(UNDO, "", i18n.tr("Undo the last action (Ctrl + Z)"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
+        actions.addAction(createAction(REDO, "", i18n.tr("Redo the last action (Ctrl + Shift + Z)"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
 
         iconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 

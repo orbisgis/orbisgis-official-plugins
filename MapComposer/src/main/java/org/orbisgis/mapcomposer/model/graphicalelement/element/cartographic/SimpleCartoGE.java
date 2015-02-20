@@ -30,6 +30,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContex
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -44,7 +46,11 @@ public abstract class SimpleCartoGE extends SimpleGE implements CartographicElem
     /** OWS-Context source.*/
     private OwsContextCA owsc;
 
-    public static final String sOWSC = "OWS-Context path";
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SimpleCartoGE.class);
+
+    /** Displayed name of the Ows-Context*/
+    public static final String sOWSC = i18n.tr("OWS-Context path");
     
     /**Main constructor.*/
     public SimpleCartoGE(){

@@ -27,6 +27,8 @@ package org.orbisgis.mapcomposer.view.utils;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.sif.UIPanel;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,6 +56,9 @@ public class UIDialogProperties implements UIPanel {
 
     /** MainController. */
     private MainController mainController;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(UIDialogProperties.class);
 
     /**
      * Main constructor that build itself the Component to display from the caList of ConfigurationAttribute given
@@ -114,7 +119,7 @@ public class UIDialogProperties implements UIPanel {
 
     @Override
     public String getTitle() {
-        return "Configuration";
+        return i18n.tr("Configuration");
     }
 
     @Override

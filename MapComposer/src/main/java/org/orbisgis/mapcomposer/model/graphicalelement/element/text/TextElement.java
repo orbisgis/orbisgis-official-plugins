@@ -32,6 +32,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,15 +64,26 @@ public class TextElement extends SimpleGE implements GEProperties{
     /** Alpha (transparency value) */
     private IntegerCA alpha;
 
-    public static final String sText = "Text";
-    public static final String sTextColor = "Text color";
-    public static final String sBackColor = "Background color";
-    public static final String sAlignment = "Alignment";
-    public static final String sStyle = "Style";
-    public static final String sAlpha = "Alpha";
-    public static final String sFont = "Font";
-    public static final String sFontSize = "Font size";
-    
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(TextElement.class);
+
+    /** Displayed name of the text*/
+    public static final String sText = i18n.tr("Text");
+    /** Displayed name of the text color*/
+    public static final String sTextColor = i18n.tr("Text color");
+    /** Displayed name of the background color*/
+    public static final String sBackColor = i18n.tr("Background color");
+    /** Displayed name of the alignment*/
+    public static final String sAlignment = i18n.tr("Alignment");
+    /** Displayed name of the style*/
+    public static final String sStyle = i18n.tr("Style");
+    /** Displayed name of the alpha*/
+    public static final String sAlpha = i18n.tr("Alpha");
+    /** Displayed name of the font*/
+    public static final String sFont = i18n.tr("Font");
+    /** Displayed name of the font size*/
+    public static final String sFontSize = i18n.tr("Font size");
+
     /**
      * Public main constructor.
      */
@@ -82,7 +95,7 @@ public class TextElement extends SimpleGE implements GEProperties{
         this.alignment = new SourceListCA(sAlignment, false);
         this.style = new SourceListCA(sStyle, false);
         this.fontSize = new IntegerCA(sFontSize, false, 12, true, 1, Integer.MAX_VALUE);
-        this.text = new StringCA(sText, false, "Some text");
+        this.text = new StringCA(sText, false, i18n.tr("Some text"));
         this.alpha = new IntegerCA(sAlpha, false, 0, true, 0, 255);
         //ConfigurationAttribute initialisation
         for(String s : GraphicsEnvironment.getLocalGraphicsEnvironment().getAvailableFontFamilyNames()){
@@ -282,6 +295,16 @@ public class TextElement extends SimpleGE implements GEProperties{
 
     @Override
     public boolean isAlwaysRefreshed() {
+        return true;
+    }
+
+    @Override
+    public boolean isAlwaysCentered() {
+        return false;
+    }
+
+    @Override
+    public boolean isEditedByMouse() {
         return true;
     }
 
