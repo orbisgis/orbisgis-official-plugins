@@ -353,6 +353,25 @@ public class CompositionArea extends JPanel {
     }
 
     /**
+     * Convert a point on the overlay to a new one which represent its position on the Document GE, according to the scroll value.
+     * @param screenPoint Point on the overlay.
+     * @return Position on the Document GE of the screenPoint.
+     */
+    public Point overlayPointToDocumentPoint(Point screenPoint){
+        int x = screenPoint.x;
+        x-=scrollPane.getX();
+        x-=document.getX();
+        x+=scrollPane.getHorizontalScrollBar().getValue();
+
+        int y = screenPoint.y;
+        y-=scrollPane.getY();
+        y-=document.getY();
+        y+=scrollPane.getVerticalScrollBar().getValue();
+
+        return new Point(x, y);
+    }
+
+    /**
      * Convert a point on the document to a new one which represent its position on the layeredPane, according to the document position.
      * @param documentPoint Point on the document.
      * @return Position on the screen of the documentPoint.
@@ -426,5 +445,13 @@ public class CompositionArea extends JPanel {
             jlayer.setLayerEventMask(0);
             super.uninstallUI(c);
         }
+    }
+
+    /**
+     * Returns the bounds of the document panel.
+     * @return The bounds of the document panel.
+     */
+    public Rectangle getDocumentBounds(){
+        return document.getBounds();
     }
 }
