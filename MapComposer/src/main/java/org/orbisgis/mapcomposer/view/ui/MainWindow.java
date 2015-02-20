@@ -24,6 +24,8 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
+import org.orbisgis.corejdbc.DataManager;
+import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
@@ -37,9 +39,11 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
-import org.orbisgis.view.components.actions.ActionCommands;
-import org.orbisgis.viewapi.components.actions.DefaultAction;
-import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
+import org.orbisgis.sif.components.actions.ActionCommands;
+import org.orbisgis.sif.components.actions.DefaultAction;
+import org.orbisgis.wkguiapi.ViewWorkspace;
+import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Component;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -49,7 +53,8 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Sylvain PALOMINOS
  */
-public class MainWindow extends JFrame implements MainFrameAction{
+@Component
+public class MainWindow extends JFrame implements MainFrameAction {
 
     //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
@@ -82,6 +87,11 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public static final String UNDO = "UNDO";
     public static final String REDO = "REDO";
 
+    /** ViewWorkspace of OrbisGIS */
+    private ViewWorkspace viewWorkspace;
+    /** DataManager of OrbisGIS */
+    private DataManager dataManager;
+
     /** ActionCommands for the buttons. */
     private final ActionCommands actions = new ActionCommands();
     /** JToolBar for the buttons. It's registered in the action ActionCommands. */
@@ -109,9 +119,10 @@ public class MainWindow extends JFrame implements MainFrameAction{
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
     /** Public main constructor. */
-    public MainWindow(MainController mainController){
+    public MainWindow(){
         super("Map composer");
-        this.mainController = mainController;
+        this.setLocationRelativeTo(null);
+        this.mainController = new MainController(this);
         this.compositionArea = new CompositionArea(mainController);
         //Sets the default size to the window
         this.setSize(1024, 768);
@@ -282,7 +293,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
     /**
      * Create a DefaultAction with the given value.
-     * @see org.orbisgis.viewapi.components.actions.DefaultAction
      * @param actionID Action identifier
      * @param actionLabel Short label
      * @param actionToolTip Tool tip text
@@ -336,7 +346,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
 
     @Override
-    public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
+    public List<Action> createActions(org.orbisgis.mainframe.api.MainWindow  target) {
         List<Action> actions = new ArrayList<>();
         actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
                 MapComposerIcon.getIcon("map_composer"),
@@ -347,7 +357,33 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void showMapComposer(){this.setVisible(true);}
 
     @Override
-    public void disposeActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target, List<Action> actions) {
+    public void disposeActions(org.orbisgis.mainframe.api.MainWindow  target, List<Action> actions) {
         this.dispose();
+    }
+
+
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+    @Reference
+    protected void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    public ViewWorkspace getViewWorkspace() {
+        return viewWorkspace;
+    }
+    @Reference
+    protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.viewWorkspace = viewWorkspace;
+    }
+
+    protected void unsetDataManager(DataManager dataManager) {
+        this.dataManager = null;
+    }
+
+    protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.viewWorkspace = null;
     }
 }

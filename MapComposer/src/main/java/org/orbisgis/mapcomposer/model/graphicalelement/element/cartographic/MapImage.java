@@ -24,11 +24,11 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
+import org.orbisgis.commons.progress.NullProgressMonitor;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.progress.NullProgressMonitor;
 
 import org.slf4j.LoggerFactory;
 

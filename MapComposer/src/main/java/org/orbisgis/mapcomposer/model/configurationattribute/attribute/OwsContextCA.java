@@ -24,22 +24,23 @@
 
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
+import org.orbisgis.commons.progress.NullProgressMonitor;
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
-import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
-import org.orbisgis.progress.NullProgressMonitor;
+import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.slf4j.LoggerFactory;
 
 /**
@@ -59,6 +60,9 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
 
     /** OwsMapContext corresponding to the path selected in the list.*/
     private OwsMapContext omc;
+
+    private DataManager dataManager;
+    private ViewWorkspace viewWorkspace;
 
     /**
      * Empty constructor used in the SaveHandler, on loading a project save.
@@ -92,7 +96,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         loadListFiles();
         //Refresh of the selected file
         if(omc==null)
-            omc = new OwsMapContext(LinkToOrbisGIS.getInstance().getDataManager());
+            omc = new OwsMapContext(dataManager);
         try {
             reloadSelectedOMC();
         } catch (FileNotFoundException ex) {
@@ -122,7 +126,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
      * Go to the workspace and add to the list all the .ows files.
      */
     private void loadListFiles(){
-        File f = new File(LinkToOrbisGIS.getInstance().getViewWorkspace().getCoreWorkspace().getWorkspaceFolder()+"/maps/");
+        File f = new File(viewWorkspace.getCoreWorkspace().getWorkspaceFolder()+"/maps/");
         //save the selected path
         String s = getSelected();
         list=new ArrayList<>();

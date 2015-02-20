@@ -24,12 +24,12 @@
 
 package org.orbisgis.mapcomposer.model.configurationattribute.attribute;
 
-import org.mozilla.javascript.edu.emory.mathcs.backport.java.util.Arrays;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Map;
 
