@@ -232,23 +232,6 @@ public class CompositionAreaController {
     }
 
     /**
-     * Return the BufferedImage of the Document.
-     * @return The BufferedImage of the Document.
-     */
-    public BufferedImage getCompositionAreaBufferedImage(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(false);
-        }
-        BufferedImage bi = compositionArea.getDocBufferedImage();
-
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(true);
-        }
-
-        return bi;
-    }
-
-    /**
      * Returns true if the given GraphicalElement is already drawn in the CompositionArea, false otherwise.
      * @param ge GraphicalElement to test.
      * @return True if drawn in the CompositionArea, false otherwise.

@@ -695,17 +695,6 @@ public class CompositionJPanel extends JPanel{
     public void select(){ this.selected=true; setBorders(); }
 
     /**
-     * Enable or disable the grey and orange borders of the displayed elements.
-     * @param enable Display the borders if true, hide them otherwise.
-     */
-    public void enableBorders(boolean enable){
-        if(enable)
-            this.setBorders();
-        else
-            this.setBorder(null);
-    }
-
-    /**
      * Converts point from the CompositionJPanel to the corresponding point in the GraphicalElement (in fact apply the reverse transformation that was applyed to the GE).
      * @param p Point from the CompositionJPanel
      * @return Corresponding point in the GraphicalElement

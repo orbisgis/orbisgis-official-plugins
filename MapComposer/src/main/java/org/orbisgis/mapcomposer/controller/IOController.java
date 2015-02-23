@@ -24,6 +24,8 @@
 
 package org.orbisgis.mapcomposer.controller;
 
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPDFThread;
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPNGThread;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
@@ -54,7 +56,7 @@ import java.util.List;
 
 public class IOController {
 
-    /** SaveAndLoadHandler */
+    /** SaveAndLoadHandler which manage saving as xml and loading the GraphicalElements*/
     private SaveAndLoadHandler saveNLoadHandler;
 
     /** Object for the translation*/
@@ -77,7 +79,8 @@ public class IOController {
     }
 
     /**
-     * Run saveProject function of the SaveHandler.
+     * Runs saveProject function of the SaveHandler.
+     * @param listGEToSave List of GraphicalElements to save.
      */
     public void saveDocument(List<GraphicalElement> listGEToSave){
         try {
@@ -89,6 +92,7 @@ public class IOController {
 
     /**
      * Run loadProject function from the SaveHandler and draw loaded GE.
+     * @return The list of GraphicalElements just loaded.
      */
     public List<GraphicalElement> loadDocument(){
         try {
@@ -100,102 +104,36 @@ public class IOController {
     }
 
     /**
-     * Exports to document into png file.
-     * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
-     * Then exports the CompositionArea.
+     * Exports the document into the format selected in the export dialog window (SaveFilePanel class)
      * @param listGEToExport List of GraphicalElement to export.
      * @param progressBar Progress bar where should be shown the progression. Can be null.
      */
     public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
+        //Creates the export dialog window
         SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
+        //Adds the file type filters
         saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-        saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
+        //saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
         saveFilePanel.addFilter(new String[]{"pdf"}, "PDF files");
         saveFilePanel.loadState();
+        //Wait the window answer and if the user validate
         if(UIFactory.showDialog(saveFilePanel)){
             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
             Thread threadExport = null;
+            //Create the good exporting thread according to the file type selected by the user
             switch(saveFilePanel.getCurrentFilterId()){
                 case pngId:
-                    //exportAsPNG(listGEToExport, path, progressBar);
-                    threadExport = new ExportAsPNG(listGEToExport, path, progressBar, geManager);
+                    threadExport = new ExportPNGThread(listGEToExport, path, progressBar, geManager);
                     break;
                 case htmlId:
                     break;
                 case pdfId:
+                    threadExport = new ExportPDFThread(listGEToExport, path, progressBar, geManager);
                     break;
             }
+            //Run the export into another thread not to freeze the MapComposer
             if(threadExport != null)
                 threadExport.start();
-        }
-    }
-
-
-    /**
-     * This thread exports the document as a PNG image file.
-     */
-    private static class ExportAsPNG extends Thread{
-        private List<GraphicalElement> listGEToExport;
-        private String path;
-        private JProgressBar progressBar;
-        private GEManager geManager;
-
-        /**
-         * Main constructor
-         * @param listGEToExport List of GraphicalElement to export.
-         * @param path File path to export.
-         * @param progressBar Progress bar where the progression is shown.
-         */
-        public ExportAsPNG(List<GraphicalElement> listGEToExport, String path, JProgressBar progressBar, GEManager geManager){
-            //As this class is a thread, the GE can be modified before being export, they have to be cloned
-            this.listGEToExport = new ArrayList<>();
-            for(GraphicalElement ge : listGEToExport){
-                this.listGEToExport.add(ge.deepCopy());
-            }
-            this.path = path;
-            this.progressBar = progressBar;
-            this.geManager = geManager;
-        }
-
-        @Override
-        public void run() {
-            try{
-                BufferedImage bi = null;
-                //Find the Document GE to create the BufferedImage where all the GE will be drawn
-                for(GraphicalElement ge : listGEToExport){
-                    if(ge instanceof Document){
-                        bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-                    }
-                }
-                if(progressBar != null) {
-                    progressBar.setValue(0);
-                }
-
-                //If no Document was created, throw an exception
-                if(bi == null){
-                    throw new IllegalArgumentException("Error on export : The list of GraphicalElement to export does not contain any Document GE.");
-                }
-                //Else draw each GraphicalElement in the BufferedImage
-                else {
-                    Graphics2D graphics2D = bi.createGraphics();
-                    for(GraphicalElement ge : listGEToExport){
-                        graphics2D.drawImage(geManager.getRenderer(ge.getClass()).createImageFromGE(ge), ge.getX(), ge.getY(), null);
-                        if(progressBar != null) {
-                            progressBar.setValue((listGEToExport.indexOf(ge)*100)/listGEToExport.size());
-                            progressBar.repaint();
-                        }
-                        System.out.println("one more");
-                    }
-                    graphics2D.dispose();
-                    ImageIO.write(bi, "png", new File(path));
-                }
-                if(progressBar != null) {
-                    progressBar.setValue(progressBar.getMaximum());
-                }
-                System.out.println("finish");
-            } catch (IllegalArgumentException|IOException ex) {
-                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
-            }
         }
     }
 }

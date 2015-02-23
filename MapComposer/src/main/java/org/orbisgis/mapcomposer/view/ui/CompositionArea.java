@@ -293,18 +293,6 @@ public class CompositionArea extends JPanel {
         layeredPane.revalidate();
         layeredPane.repaint();
     }
-    
-    /**
-     * Returns the buffered image corresponding to the whole CompositionArea.
-     * @return The buffered image corresponding to the CompositionArea.
-     */
-    public BufferedImage getDocBufferedImage(){
-        BufferedImage bi = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.createGraphics();
-        layeredPane.paint(g);
-        g.dispose();
-        return bi;
-    }
 
     /**
      * Returns the CompositionAreaOverlay associated to the CompositionArea.
