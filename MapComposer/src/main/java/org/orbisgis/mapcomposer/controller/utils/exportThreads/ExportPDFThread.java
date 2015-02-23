@@ -30,6 +30,7 @@ import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfWriter;
 import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.slf4j.LoggerFactory;
@@ -106,7 +107,11 @@ public class ExportPDFThread extends Thread {
             for(GraphicalElement ge : listGEToExport){
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
                     continue;
-
+                //If the alpha value is 0, the whole TextElement is transparent.
+                // This should be resolved when the TextElement will be processed as a text and not an image.
+                if(ge instanceof TextElement)
+                    if(((TextElement)ge).getAlpha()==0)
+                        ((TextElement)ge).setAlpha(1);
                 BufferedImage bi = geManager.getRenderer(ge.getClass()).createImageFromGE(ge);
                 Image img = Image.getInstance(bi, null);
                 img.setAbsolutePosition(ge.getX(), height-ge.getHeight()-ge.getY());
