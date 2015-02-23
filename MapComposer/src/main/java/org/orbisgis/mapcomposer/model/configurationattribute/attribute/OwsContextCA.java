@@ -70,6 +70,8 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     public OwsContextCA(){
         super("void", false);
         this.list  = new ArrayList<>();
+        dataManager = null;
+        viewWorkspace = null;
     }
 
     /**
@@ -82,6 +84,8 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         list = new ArrayList<>();
         index = 0;
         omc = null;
+        dataManager = null;
+        viewWorkspace = null;
     }
 
     /**
@@ -91,7 +95,11 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
     public OwsMapContext getOwsMapContext(){return omc;}
 
     @Override
-    public void refresh(MainController uic) {
+    public void refresh(MainController mainController) {
+        if(dataManager == null)
+            dataManager = mainController.getMainWindow().getDataManager();
+        if(viewWorkspace == null)
+            viewWorkspace = mainController.getMainWindow().getViewWorkspace();
         //Refresh of the file list
         loadListFiles();
         //Refresh of the selected file
@@ -203,6 +211,8 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         copy.setReadOnly(this.getReadOnly());
         copy.setName(this.getName());
         copy.select(this.getSelected());
+        copy.viewWorkspace = viewWorkspace;
+        copy.dataManager = dataManager;
         copy.refresh(null);
 
         return copy;

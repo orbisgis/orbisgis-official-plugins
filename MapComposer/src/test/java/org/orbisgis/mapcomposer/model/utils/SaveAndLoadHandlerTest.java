@@ -19,11 +19,10 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class SaveAndLoadHandlerTest {
-/*
     @Test
     public final void testSaveNLoad(){
         SaveAndLoadHandler sh = new SaveAndLoadHandler(new GEManager(), new CAManager());
-        List<GraphicalElement> listGE = new ArrayList<GraphicalElement>();
+        List<GraphicalElement> listGE = new ArrayList<>();
         listGE.add(new Document());
         listGE.add(new Image());
         listGE.add(new MapImage());
@@ -50,5 +49,5 @@ public class SaveAndLoadHandlerTest {
                 if(!ge.equals(g))
                     Assert.assertNotSame("\nSaved and loaded GraphicalElement are differents : saved = "+ge.toString()+", loaded = "+g.toString(), ge, g);
 
-    }*/
+    }
 }

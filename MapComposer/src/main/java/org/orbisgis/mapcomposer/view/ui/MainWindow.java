@@ -124,6 +124,7 @@ public class MainWindow extends JFrame implements MainFrameAction {
         this.setLocationRelativeTo(null);
         this.mainController = new MainController(this);
         this.compositionArea = new CompositionArea(mainController);
+        mainController.getCompositionAreaController().setCompositionArea(compositionArea);
         //Sets the default size to the window
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
