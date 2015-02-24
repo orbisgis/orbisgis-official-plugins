@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.controller;
 
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.controller.utils.UndoableEdit.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -32,6 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.sif.UIFactory;
+import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -82,11 +84,16 @@ public class MainController{
 
     /** Object for the translation*/
     private final static I18n i18n = I18nFactory.getI18n(MainController.class);
+    
+    /** ViewWorkspace of OrbisGIS */
+    private ViewWorkspace viewWorkspace;
+    /** DataManager of OrbisGIS */
+    private DataManager dataManager;
 
     /**
      * Main constructor.
      */
-    public MainController(MainWindow mainWindow){
+    public MainController(){
         //Initialize the different attributes
         caManager = new CAManager();
         geManager = new GEManager();
@@ -94,7 +101,6 @@ public class MainController{
         uiController = new UIController(this);
         geController = new GEController(this);
         compositionAreaController = new CompositionAreaController(this);
-        this.mainWindow = mainWindow;
         compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
         undoManager = new UndoManager();
         undoManager.setLimit(50);
@@ -102,6 +108,10 @@ public class MainController{
         undoingRedoing = false;
         mouseWheelChangedProp = null;
         waitEndWheelTimer = new Timer(waitEndWheelTime, EventHandler.create(ActionListener.class, this, "wheelEnd"));
+    }
+
+    public void setMainWindow(MainWindow mainWindow){
+        this.mainWindow = mainWindow;
     }
 
     /**
@@ -400,6 +410,22 @@ public class MainController{
      */
     public GEController getGEController(){
         return geController;
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    public void setViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.viewWorkspace = viewWorkspace;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    public ViewWorkspace getViewWorkspace() {
+        return viewWorkspace;
     }
 }
  

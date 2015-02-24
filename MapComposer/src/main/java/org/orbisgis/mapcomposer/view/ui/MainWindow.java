@@ -87,11 +87,6 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public static final String UNDO = "UNDO";
     public static final String REDO = "REDO";
 
-    /** ViewWorkspace of OrbisGIS */
-    private ViewWorkspace viewWorkspace;
-    /** DataManager of OrbisGIS */
-    private DataManager dataManager;
-
     /** ActionCommands for the buttons. */
     private final ActionCommands actions = new ActionCommands();
     /** JToolBar for the buttons. It's registered in the action ActionCommands. */
@@ -122,7 +117,8 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public MainWindow(){
         super("Map composer");
         this.setLocationRelativeTo(null);
-        this.mainController = new MainController(this);
+        this.mainController = new MainController();
+        this.mainController.setMainWindow(this);
         this.compositionArea = new CompositionArea(mainController);
         mainController.getCompositionAreaController().setCompositionArea(compositionArea);
         //Sets the default size to the window
@@ -364,27 +360,21 @@ public class MainWindow extends JFrame implements MainFrameAction {
 
 
 
-    public DataManager getDataManager() {
-        return dataManager;
-    }
     @Reference
     protected void setDataManager(DataManager dataManager) {
-        this.dataManager = dataManager;
+        this.mainController.setDataManager(dataManager);
     }
 
-    public ViewWorkspace getViewWorkspace() {
-        return viewWorkspace;
-    }
     @Reference
     protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
-        this.viewWorkspace = viewWorkspace;
+        this.mainController.setViewWorkspace(viewWorkspace);
     }
 
     protected void unsetDataManager(DataManager dataManager) {
-        this.dataManager = null;
+        this.mainController.setDataManager(null);
     }
 
     protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
-        this.viewWorkspace = null;
+        this.mainController.setViewWorkspace(null);
     }
 }
