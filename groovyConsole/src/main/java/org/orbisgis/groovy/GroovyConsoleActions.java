@@ -1,6 +1,7 @@
 package org.orbisgis.groovy;
 
-import org.orbisgis.viewapi.components.actions.ActionFactoryService;
+
+import org.orbisgis.sif.components.actions.ActionFactoryService;
 
 /**
  * @author Nicolas Fortin

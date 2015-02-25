@@ -41,40 +41,37 @@ import java.io.PrintStream;
 import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.concurrent.ExecutorService;
 import javax.sql.DataSource;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
-import org.apache.log4j.Level;
-import org.apache.log4j.Logger;
 import org.fife.rsta.ac.LanguageSupportFactory;
 import org.fife.rsta.ac.groovy.GroovyLanguageSupport;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
-import org.orbisgis.core.Services;
+import org.orbisgis.commons.progress.SwingWorkerPM;
 import org.orbisgis.coremap.layerModel.MapContext;
+import org.orbisgis.groovy.icons.GroovyIcon;
 import org.orbisgis.mapeditorapi.MapElement;
-import org.orbisgis.progress.ProgressMonitor;
+import org.orbisgis.sif.CommentUtil;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
-import org.orbisgis.view.background.BackgroundJob;
-import org.orbisgis.view.background.BackgroundManager;
-import org.orbisgis.view.components.Log4JOutputStream;
-import org.orbisgis.view.components.actions.ActionCommands;
-import org.orbisgis.view.components.findReplace.FindReplaceDialog;
-import org.orbisgis.view.icons.OrbisGISIcon;
-import org.orbisgis.view.util.CommentUtil;
-import org.orbisgis.viewapi.components.actions.DefaultAction;
-import org.orbisgis.viewapi.docking.DockingPanelParameters;
-import org.orbisgis.viewapi.edition.EditableElement;
-import org.orbisgis.viewapi.edition.EditorDockable;
-import org.orbisgis.viewapi.edition.EditorManager;
+import org.orbisgis.sif.components.actions.ActionCommands;
+import org.orbisgis.sif.components.actions.DefaultAction;
+import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
+import org.orbisgis.sif.docking.DockingPanelParameters;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditorDockable;
+import org.orbisgis.sif.edition.EditorManager;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -88,10 +85,10 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     public static final String EDITOR_NAME = "Groovy";
     private static final I18n I18N = I18nFactory.getI18n(GroovyConsolePanel.class);
-    private static final Logger LOGGER = Logger.getLogger("gui." + GroovyConsolePanel.class);
-    private static final Logger LOGGER_POPUP = Logger.getLogger("gui.popup" + GroovyConsolePanel.class);
-    private final Log4JOutputStream infoLogger = new Log4JOutputStream(LOGGER, Level.INFO);
-    private final Log4JOutputStream errorLogger = new Log4JOutputStream(LOGGER, Level.ERROR);
+    private static final Logger LOGGER = LoggerFactory.getLogger("gui." + GroovyConsolePanel.class);
+    private static final Logger LOGGER_POPUP = LoggerFactory.getLogger("gui.popup" + GroovyConsolePanel.class);
+    private final SLF4JOutputStream infoLogger = new SLF4JOutputStream(LOGGER, SLF4JOutputStream.Level.INFO);
+    private final SLF4JOutputStream errorLogger = new SLF4JOutputStream(LOGGER, SLF4JOutputStream.Level.ERROR);
     private DockingPanelParameters parameters = new DockingPanelParameters();
     private ActionCommands actions = new ActionCommands();
     private GroovyLanguageSupport gls;
@@ -111,6 +108,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private JLabel statusMessage = new JLabel();
     private Map<String, Object> variables = new HashMap<String, Object>();
     private Map<String, Object> properties = new HashMap<String, Object>();
+    private ExecutorService executorService;
 
     /**
      * Create the groovy console panel
@@ -145,6 +143,23 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             setMapContext(mapElement.getMapContext());
         }
     }
+
+    @Reference
+    public void setExecutorService(ExecutorService executorService) {
+        this.executorService = executorService;
+    }
+    public void unsetExecutorService(ExecutorService executorService) {
+        this.executorService = null;
+    }
+
+    private void execute(SwingWorker swingWorker) {
+        if(executorService != null) {
+            executorService.execute(swingWorker);
+        } else {
+            swingWorker.execute();
+        }
+    }
+
 
     public void unsetEditorManager(EditorManager editorManager) {
     }
@@ -209,7 +224,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         //Execute action
         executeAction = new DefaultAction(GroovyConsoleActions.A_EXECUTE, I18N.tr("Execute"),
                 I18N.tr("Execute the groovy script"),
-                OrbisGISIcon.getIcon("execute"),
+                GroovyIcon.getIcon("execute"),
                 EventHandler.create(ActionListener.class, this, "onExecute"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(executeAction);
@@ -218,7 +233,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         clearAction = new DefaultAction(GroovyConsoleActions.A_CLEAR,
                 I18N.tr("Clear"),
                 I18N.tr("Erase the content of the editor"),
-                OrbisGISIcon.getIcon("erase"),
+                GroovyIcon.getIcon("erase"),
                 EventHandler.create(ActionListener.class, this, "onClear"),
                 null);
         actions.addAction(clearAction);
@@ -227,14 +242,14 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         actions.addAction(new DefaultAction(GroovyConsoleActions.A_OPEN,
                 I18N.tr("Open"),
                 I18N.tr("Load a file in this editor"),
-                OrbisGISIcon.getIcon("open"),
+                GroovyIcon.getIcon("open"),
                 EventHandler.create(ActionListener.class, this, "onOpenFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)));
         //Save
         saveAction = new DefaultAction(GroovyConsoleActions.A_SAVE,
                 I18N.tr("Save"),
                 I18N.tr("Save the editor content into a file"),
-                OrbisGISIcon.getIcon("save"),
+                GroovyIcon.getIcon("save"),
                 EventHandler.create(ActionListener.class, this, "onSaveFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(saveAction);
@@ -242,7 +257,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         findAction = new DefaultAction(GroovyConsoleActions.A_SEARCH,
                 I18N.tr("Search.."),
                 I18N.tr("Search text in the document"),
-                OrbisGISIcon.getIcon("find"),
+                GroovyIcon.getIcon("find"),
                 EventHandler.create(ActionListener.class, this, "openFindReplaceDialog"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)).addStroke(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(findAction);
@@ -371,9 +386,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         if(executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
             GroovyJob groovyJob = new GroovyJob(text, properties, variables,
-                    new  Log4JOutputStream[] {infoLogger, errorLogger}, executeAction);
-            BackgroundManager backgroundManager = Services.getService(BackgroundManager.class);
-            backgroundManager.nonBlockingBackgroundOperation(groovyJob);
+                    new  SLF4JOutputStream[] {infoLogger, errorLogger}, executeAction);
+            execute(groovyJob);
         }
     }
 
@@ -458,68 +472,26 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     /**
      * Execute the provided script in groovy
      */
-    private static class GroovyJob implements BackgroundJob {
+    private static class GroovyJob extends SwingWorkerPM {
 
         private String script;
-        private Log4JOutputStream[] loggers;
+        private SLF4JOutputStream[] loggers;
         private Map<String, Object> variables;
         private Map<String, Object> properties;
         private Action executeAction;
 
-        public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers, Action executeAction) {
+        public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, SLF4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
             this.loggers = loggers;
             this.variables = variables;
             this.properties = properties;
             this.executeAction = executeAction;
+            setTaskName(I18N.tr("Execute Groovy script"));
         }
 
         @Override
-        public void run(ProgressMonitor progressMonitor) {
-            variables.put("pm", progressMonitor);
-            GroovyExecutor groovyExecutor = new GroovyExecutor(script, properties, variables, loggers, executeAction);
-            progressMonitor.addPropertyChangeListener(ProgressMonitor.PROP_CANCEL,
-                    EventHandler.create(PropertyChangeListener.class, groovyExecutor, "stop"));
-            groovyExecutor.execute();
-            while(!(groovyExecutor.isDone() || groovyExecutor.isCancelled() )) {
-                try {
-                    Thread.sleep(500);
-                } catch (Exception ex) {
-                    break;
-                }
-            }
-        }
-
-        @Override
-        public String getTaskName() {
-            return I18N.tr("Execute Groovy script");
-        }
-    }
-
-    public static class GroovyExecutor extends SwingWorker<Object, Object> {
-
-        private String script;
-        private Log4JOutputStream[] loggers;
-        private Map<String, Object> variables;
-        private Map<String, Object> properties;
-        private Action executeAction;
-        private Thread runThread;
-
-        public GroovyExecutor(String script,Map<String, Object> properties, Map<String, Object> variables, Log4JOutputStream[] loggers, Action executeAction) {
-            this.script = script;
-            this.loggers = loggers;
-            this.variables = variables;
-            this.properties = properties;
-            this.executeAction = executeAction;
-        }
-
-        public void stop() {
-            cancel(true);
-        }
-
-        @Override
-        protected Object doInBackground() {
-            runThread = Thread.currentThread();
+        protected Object doInBackground() throws Exception {
+            variables.put("pm", getProgressMonitor());
             executeAction.setEnabled(false);
             try {
                 GroovyShell groovyShell = new GroovyShell();
@@ -534,7 +506,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 LOGGER.error(I18N.tr("Cannot execute the script"), e);
             } finally {
                 executeAction.setEnabled(true);
-                for(Log4JOutputStream logger : loggers) {
+                for(SLF4JOutputStream logger : loggers) {
                     try {
                         logger.flush();
                     } catch (IOException e) {
