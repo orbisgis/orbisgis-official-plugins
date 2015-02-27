@@ -1,11 +1,15 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/maven-v4_0_0.xsd">
         <modelVersion>4.0.0</modelVersion>
-        <groupId>org.orbisgis</groupId>
         <artifactId>orbisgis-view-plugins</artifactId>
         <packaging>pom</packaging>
-        <version>1.1-SNAPSHOT</version>
+        <version>5.1</version>
         <name>OrbisGIS View Plugins</name>
+        <parent>
+                <groupId>org.orbisgis</groupId>
+                <artifactId>orbisgis-nexus</artifactId>
+                <version>1</version>
+        </parent>
         <organization>
                 <name>IRSTV CNRS-FR-2488</name>
                 <url>http://www.irstv.fr/</url>
@@ -14,12 +18,13 @@
         <modules>
                 <module>memory</module>
                 <module>groovyConsole</module>
-            <module>mailto</module>
+                <module>mailto</module>
         </modules>
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
                 <netbeans.hint.license>OrbisGIS</netbeans.hint.license>
                 <maven-scr-plugin-version>1.15.0</maven-scr-plugin-version>
+                <gettext-maven-plugin-version>1.2.4</gettext-maven-plugin-version>
         </properties>
         <repositories>
                 <repository>
@@ -40,26 +45,14 @@
                         <url>http://repo.orbisgis.org</url>
                 </pluginRepository>
         </pluginRepositories>
-	<distributionManagement>
-	  <snapshotRepository>
-	    <id>nexus-orbisgis-snapshots</id>
-	    <name>Internal Snaphots</name>
-	    <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-snapshot/</url>
-	  </snapshotRepository>
-	  <repository>
-	    <id>nexus-orbisgis-release</id>
-	    <name>Internal Releases</name>
-	    <url>http://nexus.orbisgis.org/content/repositories/osgi-maven/</url>
-	  </repository>
-	</distributionManagement>
         <build>
                 <plugins>
                         <plugin>
                                 <artifactId>maven-compiler-plugin</artifactId>
                                 <version>2.3.2</version>
                                 <configuration>
-                                        <source>1.6</source>
-                                        <target>1.6</target>
+                                        <source>1.7</source>
+                                        <target>1.7</target>
                                 </configuration>
                         </plugin>
                         <plugin>
@@ -79,12 +72,5 @@
                                 </configuration>
                         </plugin>
                 </plugins>
-                <extensions>
-                        <extension>
-                                <groupId>org.apache.maven.wagon</groupId>
-                                <artifactId>wagon-ssh</artifactId>
-                                <version>2.2</version>
-                        </extension>
-                </extensions>
         </build>
 </project>

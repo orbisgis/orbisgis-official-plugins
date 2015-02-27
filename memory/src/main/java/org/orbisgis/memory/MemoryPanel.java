@@ -35,8 +35,12 @@ import java.util.TimerTask;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
-import org.orbisgis.viewapi.docking.DockingPanel;
-import org.orbisgis.viewapi.docking.DockingPanelParameters;
+
+import org.orbisgis.sif.docking.DockingPanel;
+import org.orbisgis.sif.docking.DockingPanelParameters;
+import org.osgi.service.component.annotations.Activate;
+import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -45,6 +49,7 @@ import org.xnap.commons.i18n.I18nFactory;
  * @author Erwan Bocher
  * @author Nicolas Fortin
  */
+@Component
 public class MemoryPanel extends JPanel implements DockingPanel {
     private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
     private static final int MEMORY_REFRESH_RATE = 500; // Refresh rate in ms
@@ -55,22 +60,25 @@ public class MemoryPanel extends JPanel implements DockingPanel {
 
     public MemoryPanel() {
         refreshTimer = new Timer(true);
-        refreshTimer.scheduleAtFixedRate(new TimerTask() {
-            @Override
-            public void run() {
-                MemoryPanel.this.repaint();
-            }
-        }, MEMORY_REFRESH_RATE, MEMORY_REFRESH_RATE);
 
         dockingPanelParameters.setName("MemoryPanel");
         dockingPanelParameters.setTitle(_.tr("Java Memory Usage"));
         dockingPanelParameters.setTitleIcon(new ImageIcon(MemoryPanel.class.getResource("utilities-system-monitor.png")));
     }
 
-    @Override
-    public void removeNotify() {
-        super.removeNotify();
+    @Deactivate
+    public void deactivate() {
         refreshTimer.cancel();
+    }
+
+    @Activate
+    public void activate() {
+        refreshTimer.scheduleAtFixedRate(new TimerTask() {
+            @Override
+            public void run() {
+                MemoryPanel.this.repaint();
+            }
+        }, MEMORY_REFRESH_RATE, MEMORY_REFRESH_RATE);
     }
 
     @Override
