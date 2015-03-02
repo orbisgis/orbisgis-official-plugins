@@ -101,10 +101,8 @@ public class MainController{
         uiController = new UIController(this);
         geController = new GEController(this);
         compositionAreaController = new CompositionAreaController(this);
-        compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
         undoManager = new UndoManager();
         undoManager.setLimit(50);
-        UIFactory.setMainFrame(mainWindow);
         undoingRedoing = false;
         mouseWheelChangedProp = null;
         waitEndWheelTimer = new Timer(waitEndWheelTime, EventHandler.create(ActionListener.class, this, "wheelEnd"));
@@ -112,6 +110,7 @@ public class MainController{
 
     public void setMainWindow(MainWindow mainWindow){
         this.mainWindow = mainWindow;
+        compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
     }
 
     /**

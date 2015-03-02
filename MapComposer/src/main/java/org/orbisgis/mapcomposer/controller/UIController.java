@@ -33,6 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scal
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.mapcomposer.view.graphicalelement.CustomConfigurationPanel;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
@@ -162,12 +163,12 @@ public class UIController {
             toBeSet.addAll(selectedGE);
             mainController.getGEController().setToBeSetList(toBeSet);
             //Create and show the properties dialog.
-            UIPanel panel = null;
-            if(hasSameClass) {
+            UIPanel panel;
+            if(hasSameClass && mainController.getGEManager().getRenderer(selectedGE.get(0).getClass()) instanceof CustomConfigurationPanel) {
                 //Try to create an equivalent GE with the common attributes
-                panel = mainController.getGEManager().getRenderer(selectedGE.get(0).getClass()).createConfigurationPanel(getCommonAttributes(toBeSet), mainController, true);
+                panel = ((CustomConfigurationPanel)mainController.getGEManager().getRenderer(selectedGE.get(0).getClass())).createConfigurationPanel(getCommonAttributes(toBeSet), mainController, true);
             }
-            if(panel==null)
+            else
                 panel = new UIDialogProperties(getCommonAttributes(toBeSet), mainController, true);
             SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
             dialog.setVisible(true);
@@ -185,9 +186,9 @@ public class UIController {
         toBeSet.add(ge);
         mainController.getGEController().setToBeSetList(toBeSet);
         //Create and show the properties dialog.
-        UIPanel panel = mainController.getGEManager().getRenderer(ge.getClass()).createConfigurationPanel(ge.deepCopy().getAllAttributes(), mainController, false);
-        if(panel==null)
-            panel = new UIDialogProperties(ge.getAllAttributes(), mainController, false);
+        UIPanel panel = new UIDialogProperties(ge.getAllAttributes(), mainController, false);
+        if(mainController.getGEManager().getRenderer(ge.getClass()) instanceof CustomConfigurationPanel)
+            panel = ((CustomConfigurationPanel)mainController.getGEManager().getRenderer(ge.getClass())).createConfigurationPanel(ge.deepCopy().getAllAttributes(), mainController, false);
         SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
         dialog.setVisible(true);
         dialog.pack();
