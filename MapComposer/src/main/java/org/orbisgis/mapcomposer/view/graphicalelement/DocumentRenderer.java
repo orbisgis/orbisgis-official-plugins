@@ -34,15 +34,19 @@ import java.awt.image.BufferedImage;
  *
  * @author Sylvain PALOMINOS
  */
-public class DocumentRenderer extends SimpleGERenderer {
+public class DocumentRenderer implements RendererRaster, RendererVector{
 
     @Override
-    public BufferedImage createImageFromGE(GraphicalElement ge) {
+    public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
         //Returns a white rectangle without applying any rotation
+        graphics2D.setPaint(new Color(255, 255, 255));
+        graphics2D.fillRect(0, 0, ge.getWidth(), ge.getHeight());
+    }
+
+    @Override
+    public BufferedImage createGEImage(GraphicalElement ge) {
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = bi.createGraphics();
-        graphics.setPaint(new Color(255, 255, 255));
-        graphics.fillRect(0, 0, bi.getWidth(), bi.getHeight());
+        drawGE(bi.createGraphics(), ge);
         return bi;
     }
 }

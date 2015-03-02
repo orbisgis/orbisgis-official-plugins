@@ -24,13 +24,12 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.coremap.renderer.ImageRenderer;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
-import org.orbisgis.mapcomposer.view.ui.MainWindow;
-import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
 
@@ -40,38 +39,59 @@ import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 /**
  * Renderer associated to the Cartographic GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public class MapImageRenderer extends SimpleGERenderer {
+public class MapImageRenderer implements RendererRaster, RendererVector, CustomConfigurationPanel {
 
     @Override
-    public BufferedImage createImageFromGE(GraphicalElement ge) {
-        BufferedImage bi;
-        // Draw in a BufferedImage the map image
-        if (((MapImage) ge).getImage() != null) {
-            bi = ((MapImage) ge).getImage();
-        } else {
-            //Return the icon of the MapImage as BufferedImage
-            ImageIcon icon = MapComposerIcon.getIcon("add_map");
-            bi = new BufferedImage(icon.getIconWidth(), icon.getIconHeight(), BufferedImage.TYPE_INT_ARGB);
-            Graphics g = bi.createGraphics();
-            icon.paintIcon(null, g, 0, 0);
-            g.dispose();
-        }
+    public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
+        MapImage mi = (MapImage)ge;
 
-        //Scale the bufferedImage to the GraphicalElement size
-        java.awt.Image image = bi.getScaledInstance(ge.getWidth(), ge.getHeight(), Image.SCALE_SMOOTH);
-        BufferedImage resize = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics graph = resize.createGraphics();
-        graph.drawImage(image, 0, 0, null);
-        graph.dispose();
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
-        return applyRotationToBufferedImage(resize, ge);
+        //Get the center of the graphical representation according to the GE dimension and rotation
+        int x = Math.max((int)newWidth, ge.getWidth())/2;
+        int y = Math.max((int)newHeight, ge.getHeight())/2;
+
+        graphics2D.rotate(rad, x, y);
+
+        ImageRenderer renderer = new ImageRenderer();
+        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
     }
 
+    @Override
+    public BufferedImage createGEImage(GraphicalElement ge) {
+        MapImage mi = (MapImage)ge;
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+        int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
+        BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = bi.createGraphics();
+
+        int x = Math.max((int)newWidth, ge.getWidth())/2;
+        int y = Math.max((int)newHeight, ge.getHeight())/2;
+        graphics2D.rotate(rad, x, y);
+
+        ImageRenderer renderer = new ImageRenderer();
+        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+
+        return bi;
+    }
+
+    @Override
     public UIPanel createConfigurationPanel(java.util.List<ConfigurationAttribute> caList, MainController uic, boolean enableLock){
         //Create the UIDialogProperties that will be returned
         UIDialogProperties uid = new UIDialogProperties(uic);
