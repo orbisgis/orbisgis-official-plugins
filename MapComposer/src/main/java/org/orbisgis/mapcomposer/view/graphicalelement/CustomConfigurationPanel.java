@@ -24,11 +24,27 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.sif.UIPanel;
+
+import java.util.List;
+
 /**
- * Base interface for the implementation of a rendering class associated to a GraphicalElement.
- * A renderer have to, at least, implement RenderVector or/and RenderRaster to be rendered by the MapComposer.
+ * This interface for the GERenderers allow to customize the configuration panel displayed on configuration a GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public interface  GERenderer {
+
+public interface CustomConfigurationPanel {
+
+    /**
+     * This methods allow to create a custom UIPanel displayed in the configuration dialog.
+     *
+     * @param caList List of ConfigurationAttribute to configure.
+     * @param uic UIController.
+     * @param enableLock If true, checkboxes enabling and disabling the ConfigurationAttributes configuration are displayed. They aren't if false;
+     * @return Null to use the default UIPanel constitution, not null to use a custom one.
+     */
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, MainController uic, boolean enableLock);
 }

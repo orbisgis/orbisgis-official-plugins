@@ -24,11 +24,25 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+
+import java.awt.Graphics2D;
+
+
 /**
- * Base interface for the implementation of a rendering class associated to a GraphicalElement.
- * A renderer have to, at least, implement RenderVector or/and RenderRaster to be rendered by the MapComposer.
+ * This interface extends the GERenderer interface.
+ * A renderer implementing this interface is able to render a GraphicalElement in a Graphics2D (vector image).
+ * To be able to render a GraphicalElement into a raster and a vector image, a Renderer should also implements RendererRaster interface.
  *
  * @author Sylvain PALOMINOS
  */
-public interface  GERenderer {
+
+public interface RendererVector extends GERenderer{
+
+    /**
+     * This method creates from the given GraphicalElement its vector representation in the given Graphics2D.
+     * @param ge  The GraphicalElement to render, not null
+     * @param graphics2D  The Graphics2D where is rendered the GraphicalElement, not null
+     */
+    public void drawGE(Graphics2D graphics2D, GraphicalElement ge);
 }

@@ -24,11 +24,24 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+
+import java.awt.image.BufferedImage;
+
 /**
- * Base interface for the implementation of a rendering class associated to a GraphicalElement.
- * A renderer have to, at least, implement RenderVector or/and RenderRaster to be rendered by the MapComposer.
+ * This interface extends the GERenderer interface.
+ * A renderer implementing this interface is able to render a GraphicalElement into a BufferedImage (raster image).
+ * To be able to render a GraphicalElement into a raster and a vector image, a Renderer should also implements RendererVector interface.
  *
  * @author Sylvain PALOMINOS
  */
-public interface  GERenderer {
+
+public interface RendererRaster extends GERenderer{
+
+    /**
+     * This method creates from the given GraphicalElement its raster representation as a bufferedImage.
+     * @param ge  The GraphicalElement to render, not null
+     * @return A BufferedImage containing the representation of the GraphicalElement.
+     */
+    public BufferedImage createGEImage( GraphicalElement ge);
 }
