@@ -39,6 +39,7 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
+import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
@@ -117,6 +118,7 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public MainWindow(){
         super("Map composer");
         this.setLocationRelativeTo(null);
+        UIFactory.setMainFrame(this);
         this.mainController = new MainController();
         this.mainController.setMainWindow(this);
         this.compositionArea = new CompositionArea(mainController);
@@ -358,7 +360,12 @@ public class MainWindow extends JFrame implements MainFrameAction {
         this.dispose();
     }
 
-
+    protected DataManager getDataManager(){
+        return mainController.getDataManager();
+    }
+    protected ViewWorkspace getViewWorkspace(){
+        return mainController.getViewWorkspace();
+    }
 
     @Reference
     protected void setDataManager(DataManager dataManager) {
