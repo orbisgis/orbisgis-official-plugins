@@ -24,12 +24,12 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.coremap.renderer.ImageRenderer;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
+import org.orbisgis.mapcomposer.view.utils.Graphics2DRenderer;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
 
@@ -54,14 +54,14 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
         MapImage mi = (MapImage)ge;
 
         double rad = Math.toRadians(ge.getRotation());
-        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
-        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+        double newHeight = Math.abs(sin(rad) * ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad) * ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
         graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
 
         graphics2D.rotate(rad, ge.getWidth()/2, ge.getHeight()/2);
 
-        ImageRenderer renderer = new ImageRenderer();
+        Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
         renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
     }
 
@@ -71,12 +71,19 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
-        int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        int maxWidth = Math.max((int) newWidth, ge.getWidth());
         int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
         BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = bi.createGraphics();
+        MapImage mi = (MapImage)ge;
 
-        drawGE(bi.createGraphics(), ge);
+        graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
+
+        graphics2D.rotate(rad, ge.getWidth()/2, ge.getHeight()/2);
+
+        Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
+        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
 
         return bi;
     }

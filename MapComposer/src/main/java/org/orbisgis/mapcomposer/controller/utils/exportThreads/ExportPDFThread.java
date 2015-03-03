@@ -128,7 +128,6 @@ public class ExportPDFThread extends Thread {
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
                     continue;
 
-
                 double rad = Math.toRadians(ge.getRotation());
                 double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
                 double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
@@ -136,31 +135,24 @@ public class ExportPDFThread extends Thread {
                 int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-                PdfLayer layer;
-                PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
-                Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
-
                 if(geManager.getRenderer(ge.getClass()) instanceof RendererVector) {
-                    layer = new PdfLayer("test", writer);
+                    PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
+                    Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
+                    PdfLayer layer = new PdfLayer("layer", writer);
                     cb.beginLayer(layer);
                     ((RendererVector)geManager.getRenderer(ge.getClass())).drawGE(g2dTemplate, ge);
                     cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
+                    g2dTemplate.dispose();
+                    cb.endLayer();
                 }
 
                 else {
-                    layer = new PdfLayer("test", writer);
-                    cb.beginLayer(layer);
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
                     BufferedImage bi = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
                     ImageIO.write(bi, "png", baos);
                     Image image = Image.getInstance(baos.toByteArray());
                     image.setAbsolutePosition(ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
                     pdfDocument.add(image);
-                }
-
-                if(layer != null) {
-                    g2dTemplate.dispose();
-                    cb.endLayer();
                 }
 
                 progressBar.setValue((listGEToExport.indexOf(ge) * 100) / listGEToExport.size());
