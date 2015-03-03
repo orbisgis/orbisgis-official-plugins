@@ -57,11 +57,9 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
-        //Get the center of the graphical representation according to the GE dimension and rotation
-        int x = Math.max((int)newWidth, ge.getWidth())/2;
-        int y = Math.max((int)newHeight, ge.getHeight())/2;
+        graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
 
-        graphics2D.rotate(rad, x, y);
+        graphics2D.rotate(rad, ge.getWidth()/2, ge.getHeight()/2);
 
         ImageRenderer renderer = new ImageRenderer();
         renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
@@ -69,8 +67,6 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
 
     @Override
     public BufferedImage createGEImage(GraphicalElement ge) {
-        MapImage mi = (MapImage)ge;
-
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
@@ -79,14 +75,8 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
         int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
         BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics2D = bi.createGraphics();
 
-        int x = Math.max((int)newWidth, ge.getWidth())/2;
-        int y = Math.max((int)newHeight, ge.getHeight())/2;
-        graphics2D.rotate(rad, x, y);
-
-        ImageRenderer renderer = new ImageRenderer();
-        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+        drawGE(bi.createGraphics(), ge);
 
         return bi;
     }

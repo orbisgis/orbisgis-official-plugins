@@ -28,6 +28,7 @@ import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
+import org.orbisgis.mapcomposer.view.graphicalelement.RendererRaster;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -40,6 +41,9 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 /**
  * This thread exports the document as a PNG image file.
@@ -73,6 +77,7 @@ public class ExportPNGThread extends Thread {
         }
         this.path = path;
         this.geManager = geManager;
+        //If the ProgressBar is null, instantiate one
         if(progressBar != null)
             this.progressBar = progressBar;
         else
@@ -99,7 +104,16 @@ public class ExportPNGThread extends Thread {
             //Draw each GraphicalElement in the BufferedImage
             Graphics2D graphics2D = bi.createGraphics();
             for(GraphicalElement ge : listGEToExport){
-                graphics2D.drawImage(geManager.getRenderer(ge.getClass()).createImageFromGE(ge), ge.getX(), ge.getY(), null);
+                double rad = Math.toRadians(ge.getRotation());
+                //Width and Height of the rectangle containing the rotated bufferedImage
+                final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
+                final double newHeight = Math.abs(cos(rad)*ge.getHeight())+Math.abs(sin(rad)*ge.getWidth());
+                final int maxWidth = Math.max((int)newWidth, ge.getWidth());
+                final int maxHeight = Math.max((int)newHeight, ge.getHeight());
+                //Draw the GraphicalElement in a Graphics2D
+                BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
+                graphics2D.drawImage(bufferedImage, ge.getX() + (ge.getWidth() - maxWidth) / 2, ge.getY() + (ge.getHeight() - maxHeight) / 2, null);
+                //Set the progress bar value
                 progressBar.setValue((listGEToExport.indexOf(ge) * 100) / listGEToExport.size());
                 progressBar.revalidate();
             }

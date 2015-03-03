@@ -28,21 +28,34 @@ import com.itextpdf.text.Document;
 import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
+import com.itextpdf.text.pdf.PdfContentByte;
+import com.itextpdf.text.pdf.PdfGraphics2D;
+import com.itextpdf.text.pdf.PdfLayer;
+import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
+import org.orbisgis.core_export.PdfRenderer;
 import org.orbisgis.mapcomposer.controller.MainController;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
+import org.orbisgis.mapcomposer.view.graphicalelement.RendererRaster;
+import org.orbisgis.mapcomposer.view.graphicalelement.RendererVector;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import javax.imageio.ImageIO;
 import javax.swing.JProgressBar;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 /**
  * This thread exports the document as a PDF file.
@@ -58,6 +71,8 @@ public class ExportPDFThread extends Thread {
     private JProgressBar progressBar;
     /** GeManager used to get the GraphicalElement rendering methods. */
     private GEManager geManager;
+
+    private int width, height;
 
     /** Translation*/
     private static final I18n i18n = I18nFactory.getI18n(ExportPDFThread.class);
@@ -85,12 +100,12 @@ public class ExportPDFThread extends Thread {
     public void run() {
         try{
             Document pdfDocument = null;
-            int height = 0;
             //Find the Document GE to create the BufferedImage where all the GE will be drawn
             for(GraphicalElement ge : listGEToExport){
                 if(ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document){
-                    pdfDocument = new Document(new Rectangle(ge.getWidth(), ge.getHeight()), 0, 0, 0, 0);
+                    pdfDocument = new Document(new Rectangle(ge.getWidth(), ge.getHeight()));
                     height = ge.getHeight();
+                    width = ge.getWidth();
                 }
             }
             //If no Document was created, throw an exception
@@ -98,8 +113,13 @@ public class ExportPDFThread extends Thread {
                 throw new IllegalArgumentException(i18n.tr("Error on export : The list of GraphicalElement to export does not contain any Document GE."));
             }
             //Open the document
-            PdfWriter.getInstance(pdfDocument, new FileOutputStream(path));
+            PdfWriter writer = PdfWriter.getInstance(pdfDocument, new FileOutputStream(path));
+            writer.setUserProperties(true);
+            writer.setRgbTransparencyBlending(true);
+            writer.setTagged();
             pdfDocument.open();
+
+            PdfContentByte cb = writer.getDirectContent();
 
             progressBar.setValue(0);
 
@@ -107,15 +127,42 @@ public class ExportPDFThread extends Thread {
             for(GraphicalElement ge : listGEToExport){
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
                     continue;
-                //If the alpha value is 0, the whole TextElement is transparent.
-                // This should be resolved when the TextElement will be processed as a text and not an image.
-                if(ge instanceof TextElement)
-                    if(((TextElement)ge).getAlpha()==0)
-                        ((TextElement)ge).setAlpha(1);
-                BufferedImage bi = geManager.getRenderer(ge.getClass()).createImageFromGE(ge);
-                Image img = Image.getInstance(bi, null);
-                img.setAbsolutePosition(ge.getX(), height-ge.getHeight()-ge.getY());
-                pdfDocument.add(img);
+
+
+                double rad = Math.toRadians(ge.getRotation());
+                double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+                double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+                int maxWidth = Math.max((int)newWidth, ge.getWidth());
+                int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
+                PdfLayer layer;
+                PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
+                Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
+
+                if(geManager.getRenderer(ge.getClass()) instanceof RendererVector) {
+                    layer = new PdfLayer("test", writer);
+                    cb.beginLayer(layer);
+                    ((RendererVector)geManager.getRenderer(ge.getClass())).drawGE(g2dTemplate, ge);
+                    cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
+                }
+
+                else {
+                    layer = new PdfLayer("test", writer);
+                    cb.beginLayer(layer);
+                    ByteArrayOutputStream baos = new ByteArrayOutputStream();
+                    BufferedImage bi = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
+                    ImageIO.write(bi, "png", baos);
+                    Image image = Image.getInstance(baos.toByteArray());
+                    image.setAbsolutePosition(ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
+                    pdfDocument.add(image);
+                }
+
+                if(layer != null) {
+                    g2dTemplate.dispose();
+                    cb.endLayer();
+                }
+
                 progressBar.setValue((listGEToExport.indexOf(ge) * 100) / listGEToExport.size());
                 progressBar.revalidate();
             }
