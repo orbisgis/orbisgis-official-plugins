@@ -162,6 +162,7 @@ public class GEController {
      * Removes all the selected GraphicalElement.
      */
     public void removeSelectedGE(){
+        listGE.removeAll(selectedGE);
         selectedGE=new ArrayList<>();
     }
 
@@ -178,6 +179,7 @@ public class GEController {
      */
     public void removeAllGE() {
         selectedGE = new ArrayList<>();
+        listGE = new ArrayList<>();
     }
 
     /**
@@ -186,6 +188,7 @@ public class GEController {
      */
     public void removeGE(GraphicalElement ge) {
         selectedGE.remove(ge);
+        listGE.remove(ge);
     }
 
     /**

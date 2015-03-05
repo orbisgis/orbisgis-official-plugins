@@ -24,11 +24,11 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
+import org.orbisgis.commons.progress.NullProgressMonitor;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.progress.NullProgressMonitor;
 
 import org.slf4j.LoggerFactory;
 
@@ -44,7 +44,7 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     /** MapTransform used to generate the map image.
      * This class come from OrbisGIS
      */
-    private final MapTransform mapTransform;
+    private MapTransform mapTransform;
     
     /**
      * Main constructor.
@@ -62,7 +62,6 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
                 mapTransform.setImage(new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB));
                 if (!this.getOwsMapContext().isOpen())
                     this.getOwsMapContext().open(new NullProgressMonitor());
-                this.getOwsMapContext().draw(mapTransform, new NullProgressMonitor());
             } catch (LayerException ex) {
                 LoggerFactory.getLogger(MapImage.class).error(ex.getMessage());
             }
@@ -72,12 +71,6 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     }
     
     /**
-     * Returns the BufferedImage of the map.
-     * @return The bufferedImage of the map.
-     */
-    public BufferedImage getImage(){return mapTransform.getImage(); }
-    
-    /**
      * Returns the MapTransform of the map.
      * @return The MapTransform of the map.
      */
@@ -85,6 +78,8 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
 
     @Override
     public GraphicalElement deepCopy() {
-        return super.deepCopy();
+        MapImage mapImage = (MapImage)super.deepCopy();
+        mapImage.refresh();
+        return mapImage;
     }
 }

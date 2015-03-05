@@ -74,7 +74,7 @@ public class GEManager {
      * @param geClass Class of the GE.
      * @param renderer Class of its Renderer.
      */
-    public void registerGE(Class<? extends GraphicalElement> geClass, SimpleGERenderer renderer){
+    public void registerGE(Class<? extends GraphicalElement> geClass, GERenderer renderer){
         mapRenderer.put(geClass, renderer);
     }
 

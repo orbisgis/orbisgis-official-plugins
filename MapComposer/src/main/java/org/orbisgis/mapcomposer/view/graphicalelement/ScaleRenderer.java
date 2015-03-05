@@ -30,17 +30,28 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scal
 import java.awt.*;
 import java.awt.image.BufferedImage;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 /**
  * Renderer associated to the scale GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public class ScaleRenderer extends SimpleGERenderer {
+public class ScaleRenderer implements RendererRaster, RendererVector {
     /**Dot per millimeter screen resolution. */
     private double dpmm;
 
     @Override
-    public BufferedImage createImageFromGE(GraphicalElement ge) {
+    public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+        int x = Math.max((int)newWidth, ge.getWidth())/2;
+        int y = Math.max((int)newHeight, ge.getHeight())/2;
+        graphics2D.rotate(rad, x, y);
 
         int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
         this.dpmm = (((double)dpi)/25.4);
@@ -66,36 +77,48 @@ public class ScaleRenderer extends SimpleGERenderer {
         resolution*=dpmm;
         
         //Draw the BufferedImage
-        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D g = bi.createGraphics();
-        g.setBackground(Color.black);
-        g.setColor(Color.black);
+        graphics2D.setBackground(Color.black);
+        graphics2D.setColor(Color.black);
         
         boolean updown = false;
         int i=0;
         int width = ge.getWidth();
         while(width>=resolution){
             if(updown){
-                g.drawRect(i * resolution, 0, resolution, ge.getHeight()/2-1);
-                g.fillRect(i * resolution, ge.getHeight() / 2, resolution, ge.getHeight() -ge.getHeight()/2);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, resolution, ge.getHeight()/2-1);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+ge.getHeight() / 2, resolution, ge.getHeight() -ge.getHeight()/2);
             }
             else{
-                g.fillRect(i * resolution, 0, resolution, ge.getHeight()/2-1);
-                g.drawRect(i * resolution, (ge.getHeight() - 1) / 2, resolution, ge.getHeight() -ge.getHeight()/2);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, resolution, ge.getHeight()/2-1);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+(ge.getHeight() - 1) / 2, resolution, ge.getHeight() -ge.getHeight()/2);
             }
             updown=!updown;
             width-=resolution;
             i++;
         }
         if(updown){
-            g.drawRect(i * resolution, 0, width - 1, ge.getHeight()/2-1);
-            g.fillRect(i * resolution, ge.getHeight() / 2, width, ge.getHeight() -ge.getHeight()/2);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, width - 1, ge.getHeight()/2-1);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+ge.getHeight() / 2, width, ge.getHeight() -ge.getHeight()/2);
         }
         else{
-            g.fillRect(i * resolution, 0, width, ge.getHeight()/2-1);
-            g.drawRect(i * resolution, (ge.getHeight() - 1) / 2, width - 1, ge.getHeight() -ge.getHeight()/2);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, width, ge.getHeight()/2-1);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+(ge.getHeight() - 1) / 2, width - 1, ge.getHeight() -ge.getHeight()/2);
         }
-        g.dispose();
-        return applyRotationToBufferedImage(bi, ge);
+        graphics2D.dispose();
+    }
+
+    @Override
+    public BufferedImage createGEImage(GraphicalElement ge) {
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+        int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
+        BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+        drawGE(bi.createGraphics(), ge);
+        return bi;
     }
 }

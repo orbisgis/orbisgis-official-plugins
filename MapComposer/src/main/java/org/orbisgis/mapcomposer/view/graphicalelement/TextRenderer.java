@@ -45,25 +45,35 @@ import java.text.AttributedString;
 import java.util.ArrayList;
 import java.util.List;
 
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
+
 /**
  * Renderer associated to the scale GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public class TextRenderer extends SimpleGERenderer {
+public class TextRenderer implements RendererRaster, RendererVector, CustomConfigurationPanel {
 
     @Override
-    public BufferedImage createImageFromGE(GraphicalElement ge){
+    public void drawGE(Graphics2D graphics2D, GraphicalElement ge){
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+        int x = Math.max((int)newWidth, ge.getWidth())/2;
+        int y = Math.max((int)newHeight, ge.getHeight())/2;
+        graphics2D.rotate(rad, x, y);
+
         TextElement te = ((TextElement)ge);
         //Drawing on a BufferedImage the text.
-        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graph = bi.createGraphics();
-        graph.setColor(new Color(te.getColorBack().getRed(), te.getColorBack().getGreen(), te.getColorBack().getBlue(), te.getAlpha()));
-        graph.fillRect(0, 0, te.getWidth(), te.getHeight());
-        graph = bi.createGraphics();
+        graphics2D.setColor(new Color(te.getColorBack().getRed(), te.getColorBack().getGreen(), te.getColorBack().getBlue(), te.getAlpha()));
+        graphics2D.fillRect(x - ge.getWidth()/2, y - ge.getHeight()/2, te.getWidth(), te.getHeight());
+        //graph = bi.createGraphics();
 
         //Draw the string and make it fit to the TextElement bounds
-        int y = 0;
+        int textY = y - ge.getHeight()/2;
         AttributedString attributedString;
         LineBreakMeasurer measurer;
         //Split the text to draw it line after line
@@ -78,28 +88,41 @@ public class TextRenderer extends SimpleGERenderer {
             attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize()));
             attributedString.addAttribute(TextAttribute.FOREGROUND, te.getColorText());
             //Cut the text if it's too wide for the BufferedImage width
-            int x = 0;
-            measurer = new LineBreakMeasurer(attributedString.getIterator(), graph.getFontRenderContext());
+            int textX = x - ge.getWidth()/2;
+            measurer = new LineBreakMeasurer(attributedString.getIterator(), graphics2D.getFontRenderContext());
             while (measurer.getPosition() < attributedString.getIterator().getEndIndex()) {
                 TextLayout textLayout = measurer.nextLayout(te.getWidth());
-                y += textLayout.getAscent();
+                textY += textLayout.getAscent();
                 switch (te.getAlignment()) {
                     case LEFT:
-                        x = 0;
+                        textX = x - ge.getWidth()/2 + 0;
                         break;
                     case CENTER:
-                        x = (int) ((te.getWidth() - textLayout.getBounds().getWidth()) / 2);
+                        textX = x - ge.getWidth()/2 + (int) ((te.getWidth() - textLayout.getBounds().getWidth()) / 2);
                         break;
                     case RIGHT:
-                        x = (int) (te.getWidth() - textLayout.getBounds().getWidth());
+                        textX = x - ge.getWidth()/2 + (int) (te.getWidth() - textLayout.getBounds().getWidth());
                         break;
                 }
-                textLayout.draw(graph, x, y);
-                y += textLayout.getDescent() + textLayout.getLeading();
+                textLayout.draw(graphics2D, textX, textY);
+                textY += textLayout.getDescent() + textLayout.getLeading();
             }
         }
+    }
 
-        return applyRotationToBufferedImage(bi, ge);
+    @Override
+    public BufferedImage createGEImage(GraphicalElement ge) {
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
+        double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
+
+        int maxWidth = Math.max((int)newWidth, ge.getWidth());
+        int maxHeight = Math.max((int)newHeight, ge.getHeight());
+
+        BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+        drawGE(bi.createGraphics(), ge);
+        return bi;
     }
 
     @Override

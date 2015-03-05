@@ -36,7 +36,6 @@ import java.awt.event.*;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import java.text.DecimalFormat;
-import java.text.DecimalFormatSymbols;
 import javax.swing.*;
 import javax.swing.border.Border;
 import javax.swing.plaf.LayerUI;
@@ -84,6 +83,9 @@ public class CompositionArea extends JPanel {
 
     /** The horizontal PositionScale */
     private PositionScale horizontalPositionScale;
+
+    /** ProgressBar to indicate the progression on exporting the document */
+    private JProgressBar progressBar;
 
     public static final int UNIT_INCH = 1;
     public static final int UNIT_MM = 2;
@@ -152,8 +154,13 @@ public class CompositionArea extends JPanel {
         component.add(spinnerZoom);
         component.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
+        //Sets the progress bar
+        progressBar = new JProgressBar();
+        //progressBar.setVisible(false);
+
         //Adds the two components
         bottomJToolBar.add(componentPosition, BorderLayout.LINE_START);
+        bottomJToolBar.add(progressBar, BorderLayout.CENTER);
         bottomJToolBar.add(component, BorderLayout.LINE_END);
         bottomJToolBar.setFloatable(false);
 
@@ -162,6 +169,26 @@ public class CompositionArea extends JPanel {
 
         layeredPane.addMouseListener(EventHandler.create(MouseListener.class, mainController, "unselectAllGE", null, "mouseClicked"));
         layeredPane.addComponentListener(EventHandler.create(ComponentListener.class, this, "actuDocumentPosition", null, "componentResized"));
+    }
+
+    /**
+     * Sets the value of the JProgressBar.
+     * @param value New value of the JProgressBar.
+     */
+    public void setProgressBarValue(int value){
+        progressBar.setString("Running");
+        progressBar.setValue(value);
+        if(value == progressBar.getMaximum()){
+            progressBar.setString("Done");
+        }
+    }
+
+    /**
+     * Returns the JProgressBar of the CompositionArea.
+     * @return The JProgressBar of the CompositionArea.
+     */
+    public JProgressBar getProgressionBar(){
+        return progressBar;
     }
 
     /**
@@ -229,12 +256,12 @@ public class CompositionArea extends JPanel {
     }
 
     /**
-     * Set all the GE bounds according to the new window dimensions.
+     * Sets all the GE bounds according to the new window dimensions.
      */
     public void actuDocumentPosition(){
         if(document != null) {
             document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
-            mainController.getCompositionAreaController().refreshAllGE();
+            mainController.getCompositionAreaController().actuAllGE();
             horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2);
             verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2);
         }
@@ -265,18 +292,6 @@ public class CompositionArea extends JPanel {
     public void refresh(){
         layeredPane.revalidate();
         layeredPane.repaint();
-    }
-    
-    /**
-     * Returns the buffered image corresponding to the whole CompositionArea.
-     * @return The buffered image corresponding to the CompositionArea.
-     */
-    public BufferedImage getDocBufferedImage(){
-        BufferedImage bi = new BufferedImage(dimension.width, dimension.height, BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.createGraphics();
-        layeredPane.paint(g);
-        g.dispose();
-        return bi;
     }
 
     /**
@@ -321,6 +336,25 @@ public class CompositionArea extends JPanel {
         int y = screenPoint.y;
         y-=this.getLocationOnScreen().y;
         y-= scrollPane.getY();
+
+        return new Point(x, y);
+    }
+
+    /**
+     * Convert a point on the overlay to a new one which represent its position on the Document GE, according to the scroll value.
+     * @param screenPoint Point on the overlay.
+     * @return Position on the Document GE of the screenPoint.
+     */
+    public Point overlayPointToDocumentPoint(Point screenPoint){
+        int x = screenPoint.x;
+        x-=scrollPane.getX();
+        x-=document.getX();
+        x+=scrollPane.getHorizontalScrollBar().getValue();
+
+        int y = screenPoint.y;
+        y-=scrollPane.getY();
+        y-=document.getY();
+        y+=scrollPane.getVerticalScrollBar().getValue();
 
         return new Point(x, y);
     }
@@ -399,5 +433,13 @@ public class CompositionArea extends JPanel {
             jlayer.setLayerEventMask(0);
             super.uninstallUI(c);
         }
+    }
+
+    /**
+     * Returns the bounds of the document panel.
+     * @return The bounds of the document panel.
+     */
+    public Rectangle getDocumentBounds(){
+        return document.getBounds();
     }
 }

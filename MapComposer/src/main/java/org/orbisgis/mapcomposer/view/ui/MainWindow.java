@@ -24,6 +24,8 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
+import org.orbisgis.corejdbc.DataManager;
+import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
@@ -37,9 +39,12 @@ import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
 
-import org.orbisgis.view.components.actions.ActionCommands;
-import org.orbisgis.viewapi.components.actions.DefaultAction;
-import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
+import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.components.actions.ActionCommands;
+import org.orbisgis.sif.components.actions.DefaultAction;
+import org.orbisgis.wkguiapi.ViewWorkspace;
+import org.osgi.service.component.annotations.*;
+import org.osgi.service.component.annotations.Component;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -49,7 +54,8 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Sylvain PALOMINOS
  */
-public class MainWindow extends JFrame implements MainFrameAction{
+@Component
+public class MainWindow extends JFrame implements MainFrameAction {
 
     //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
@@ -109,10 +115,14 @@ public class MainWindow extends JFrame implements MainFrameAction{
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
     /** Public main constructor. */
-    public MainWindow(MainController mainController){
+    public MainWindow(){
         super("Map composer");
-        this.mainController = mainController;
+        this.setLocationRelativeTo(null);
+        UIFactory.setMainFrame(this);
+        this.mainController = new MainController();
+        this.mainController.setMainWindow(this);
         this.compositionArea = new CompositionArea(mainController);
+        mainController.getCompositionAreaController().setCompositionArea(compositionArea);
         //Sets the default size to the window
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
@@ -131,9 +141,9 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
         actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
         actions.addAction(createAction(CONFIGURATION, "", i18n.tr("Show the document configuration dialog (Ctrl + D)"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController.getIOController(), "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController.getIOController(), "loadDocument", KeyStroke.getKeyStroke("control O")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController.getIOController(), "export", KeyStroke.getKeyStroke("control E")));
+        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S")));
+        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O")));
+        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
         actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
         actions.addAction(createAction(ADD_TEXT,  "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
@@ -282,7 +292,6 @@ public class MainWindow extends JFrame implements MainFrameAction{
 
     /**
      * Create a DefaultAction with the given value.
-     * @see org.orbisgis.viewapi.components.actions.DefaultAction
      * @param actionID Action identifier
      * @param actionLabel Short label
      * @param actionToolTip Tool tip text
@@ -336,7 +345,7 @@ public class MainWindow extends JFrame implements MainFrameAction{
     }
 
     @Override
-    public List<Action> createActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target) {
+    public List<Action> createActions(org.orbisgis.mainframe.api.MainWindow  target) {
         List<Action> actions = new ArrayList<>();
         actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
                 MapComposerIcon.getIcon("map_composer"),
@@ -347,7 +356,32 @@ public class MainWindow extends JFrame implements MainFrameAction{
     public void showMapComposer(){this.setVisible(true);}
 
     @Override
-    public void disposeActions(org.orbisgis.viewapi.main.frames.ext.MainWindow target, List<Action> actions) {
+    public void disposeActions(org.orbisgis.mainframe.api.MainWindow  target, List<Action> actions) {
         this.dispose();
+    }
+
+    protected DataManager getDataManager(){
+        return mainController.getDataManager();
+    }
+    protected ViewWorkspace getViewWorkspace(){
+        return mainController.getViewWorkspace();
+    }
+
+    @Reference
+    protected void setDataManager(DataManager dataManager) {
+        this.mainController.setDataManager(dataManager);
+    }
+
+    @Reference
+    protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.mainController.setViewWorkspace(viewWorkspace);
+    }
+
+    protected void unsetDataManager(DataManager dataManager) {
+        this.mainController.setDataManager(null);
+    }
+
+    protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.mainController.setViewWorkspace(null);
     }
 }

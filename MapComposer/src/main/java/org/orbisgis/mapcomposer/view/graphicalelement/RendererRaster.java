@@ -22,39 +22,26 @@
 * A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
 */
 
-package org.orbisgis.mapcomposer;
+package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.MainController;
-import org.orbisgis.mapcomposer.model.utils.LinkToOrbisGIS;
-import org.orbisgis.viewapi.main.frames.ext.MainFrameAction;
-import org.osgi.framework.BundleActivator;
-import org.osgi.framework.BundleContext;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+
+import java.awt.image.BufferedImage;
 
 /**
- * Registers services provided by this plugin bundle.
+ * This interface extends the GERenderer interface.
+ * A renderer implementing this interface is able to render a GraphicalElement into a BufferedImage (raster image).
+ * To be able to render a GraphicalElement into a raster and a vector image, a Renderer should also implements RendererVector interface.
  *
  * @author Sylvain PALOMINOS
  */
-public class Activator implements BundleActivator {
-        /**
-         * Starting bundle, register services.
-         * @param bc
-         * @throws Exception
-         */
-        @Override
-        public void start(BundleContext bc) throws Exception {
-            MainController uic = new MainController();
-            bc.registerService(MainFrameAction.class,uic.getMainWindow(),null);
-            LinkToOrbisGIS.setBundleContext(bc);
-        }
 
-        /**
-         * Called before the bundle is unloaded.
-         * @param bc
-         * @throws Exception
-         */
-        @Override
-        public void stop(BundleContext bc) throws Exception {
+public interface RendererRaster extends GERenderer{
 
-        }
+    /**
+     * This method creates from the given GraphicalElement its raster representation as a bufferedImage.
+     * @param ge  The GraphicalElement to render, not null
+     * @return A BufferedImage containing the representation of the GraphicalElement.
+     */
+    public BufferedImage createGEImage( GraphicalElement ge);
 }

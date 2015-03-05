@@ -232,23 +232,6 @@ public class CompositionAreaController {
     }
 
     /**
-     * Return the BufferedImage of the Document.
-     * @return The BufferedImage of the Document.
-     */
-    public BufferedImage getCompositionAreaBufferedImage(){
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(false);
-        }
-        BufferedImage bi = compositionArea.getDocBufferedImage();
-
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            elementJPanelMap.get(ge).enableBorders(true);
-        }
-
-        return bi;
-    }
-
-    /**
      * Returns true if the given GraphicalElement is already drawn in the CompositionArea, false otherwise.
      * @param ge GraphicalElement to test.
      * @return True if drawn in the CompositionArea, false otherwise.
@@ -281,6 +264,15 @@ public class CompositionAreaController {
             lastRenderWorker = rw;
         }
         return lastRenderWorker;
+    }
+
+    /**
+     * Like the RefreshAllGE method but without doing any rendering.
+     */
+    public void actuAllGE(){
+        for(GraphicalElement ge : elementJPanelMap.keySet()){
+            modifyCompositionJPanel(ge);
+        }
     }
 
     /**
@@ -324,105 +316,116 @@ public class CompositionAreaController {
      */
     public void setAlign(Align alignment) {
         List<GraphicalElement> selectedGE = mainController.getGEController().getSelectedGE();
-        if(selectedGE.size()>0){
-            int xMin;
-            int xMax;
-            int yMin;
-            int yMax;
-            switch(alignment){
-                case LEFT:
-                    //Obtain the minimum x position of all the CompositionJPanel from the CompositionArea
-                    //The x position get take into account the rotation of the GraphicalElement.
-                    xMin=elementJPanelMap.get(selectedGE.get(0)).getX();
+        int xMin, xMax, yMin, yMax;
+        boolean alignWithDoc = false;
+        if(selectedGE.size() == 0)
+            return;
+        //If ony one GE is selected, it will ve align with the document
+        if(selectedGE.size() == 1) {
+            xMin = compositionArea.getDocumentBounds().x;
+            xMax = compositionArea.getDocumentBounds().x + compositionArea.getDocumentBounds().width;
+            yMin = compositionArea.getDocumentBounds().y;
+            yMax = compositionArea.getDocumentBounds().y + compositionArea.getDocumentBounds().height;
+            alignWithDoc = true;
+        }
+        //If more than one GE is selected, align them between themselves
+        else{
+            xMin = elementJPanelMap.get(selectedGE.get(0)).getX();
+            xMax = elementJPanelMap.get(selectedGE.get(0)).getX() + elementJPanelMap.get(selectedGE.get(0)).getWidth();
+            yMin = elementJPanelMap.get(selectedGE.get(0)).getY();
+            yMax = elementJPanelMap.get(selectedGE.get(0)).getY() + elementJPanelMap.get(selectedGE.get(0)).getHeight();
+        }
+        switch(alignment){
+            case LEFT:
+                //Obtain the minimum x position of all the CompositionJPanel from the CompositionArea
+                //The x position get take into account the rotation of the GraphicalElement.
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getX() < xMin)
                             xMin = elementJPanelMap.get(ge).getX();
-                    //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : selectedGE){
-                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(compositionArea.screenPointToDocumentPoint(new Point (xMin-(ge.getWidth()-(int)newWidth)/2, 0)).x);
-                    }
-                    break;
-                case CENTER:
-                    xMin=selectedGE.get(0).getX();
-                    xMax=selectedGE.get(0).getX()+selectedGE.get(0).getWidth();
+                //Set all the GraphicalElement x position to the one get before
+                for(GraphicalElement ge : selectedGE){
+                    //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
+                    double rad = Math.toRadians(ge.getRotation());
+                    double newWidth = Math.floor(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
+                    ge.setX(compositionArea.overlayPointToDocumentPoint(new Point(xMin - (ge.getWidth() - (int) newWidth) / 2, 0)).x);
+                }
+                break;
+            case CENTER:
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE) {
                         if (ge.getX() < xMin)
                             xMin = ge.getX();
                         if (ge.getX()+ge.getWidth() > xMax)
                             xMax = ge.getX()+ge.getWidth();
                     }
-                    int xMid = (xMax+xMin)/2;
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setX(xMid-ge.getWidth()/2);
-                    break;
-                case RIGHT:
-                    //Obtain the maximum x position of all the CompositionJPanel from the CompositionArea
-                    //The x position get take into account the rotation of the GraphicalElement.
-                    xMax=elementJPanelMap.get(selectedGE.get(0)).getX()+elementJPanelMap.get(selectedGE.get(0)).getWidth();
+                int xMid = (xMax+xMin)/2;
+                for(GraphicalElement ge : selectedGE)
+                    ge.setX(compositionArea.overlayPointToDocumentPoint(new Point(xMid - elementJPanelMap.get(ge).getWidth()/2, 0)).x);
+                break;
+            case RIGHT:
+                //Obtain the maximum x position of all the CompositionJPanel from the CompositionArea
+                //The x position get take into account the rotation of the GraphicalElement.
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth() > xMax)
                             xMax = elementJPanelMap.get(ge).getX()+elementJPanelMap.get(ge).getWidth();
-                    //Takes into account the border width of the ConfigurationJPanel (2 pixels)
-                    xMax-=2;
-                    //Set all the GraphicalElement x position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
-                        ge.setX(compositionArea.screenPointToDocumentPoint(new Point (xMax-ge.getWidth()+(ge.getWidth()-(int)newWidth)/2, 0)).x);
-                    }
-                    break;
-                case TOP:
-                    //Obtain the minimum y position of all the CompositionJPanel from the CompositionArea
-                    //The y position get take into account the rotation of the GraphicalElement.
-                    yMin=elementJPanelMap.get(selectedGE.get(0)).getY();
+                //Takes into account the border width of the ConfigurationJPanel (2 pixels)
+                xMax-=2;
+                //Set all the GraphicalElement x position to the one get before
+                for(GraphicalElement ge : selectedGE) {
+                    //Convert the x position to the new one of the GraphicalElement taking into account its rotation angle.
+                    double rad = Math.toRadians(ge.getRotation());
+                    double newWidth = Math.ceil(Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth()));
+                    ge.setX(compositionArea.overlayPointToDocumentPoint(new Point(xMax - ge.getWidth() + (ge.getWidth() - (int) newWidth) / 2, 0)).x);
+                }
+                break;
+            case TOP:
+                //Obtain the minimum y position of all the CompositionJPanel from the CompositionArea
+                //The y position get take into account the rotation of the GraphicalElement.
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE)
                         if (ge.getY() < yMin)
                             yMin = elementJPanelMap.get(ge).getY();
-                    //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
-                        ge.setY(compositionArea.screenPointToDocumentPoint(new Point (0, yMin - (ge.getHeight() - (int) newHeight) / 2)).y);
-                    }
-                    break;
-                case MIDDLE:
-                    yMin=selectedGE.get(0).getY();
-                    yMax=selectedGE.get(0).getY()+selectedGE.get(0).getHeight();
+                //Set all the GraphicalElement y position to the one get before
+                for(GraphicalElement ge : selectedGE) {
+                    //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
+                    double rad = Math.toRadians(ge.getRotation());
+                    double newHeight = Math.floor(Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight()));
+                    ge.setY(compositionArea.overlayPointToDocumentPoint(new Point(0, yMin - (ge.getHeight() - (int) newHeight) / 2)).y);
+                }
+                break;
+            case MIDDLE:
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE) {
                         if (ge.getY() < yMin)
                             yMin = ge.getY();
                         if (ge.getY()+ge.getHeight() > yMax)
                             yMax = ge.getY()+ge.getHeight();
                     }
-                    int yMid = (yMax+yMin)/2;
-                    for(GraphicalElement ge : selectedGE)
-                        ge.setY(yMid-ge.getHeight()/2);
-                    break;
-                case BOTTOM:
-                    //Obtain the maximum y position of all the CompositionJPanel from the CompositionArea
-                    //The y position get take into account the rotation of the GraphicalElement.
-                    yMax=elementJPanelMap.get(selectedGE.get(0)).getY()+elementJPanelMap.get(selectedGE.get(0)).getHeight();
+                int yMid = (yMax+yMin)/2;
+                for(GraphicalElement ge : selectedGE)
+                    ge.setY(compositionArea.overlayPointToDocumentPoint(new Point (0, yMid - elementJPanelMap.get(ge).getHeight()/2)).y);
+                break;
+            case BOTTOM:
+                //Obtain the maximum y position of all the CompositionJPanel from the CompositionArea
+                //The y position get take into account the rotation of the GraphicalElement.
+                if(!alignWithDoc)
                     for (GraphicalElement ge : selectedGE)
                         if (elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight() > yMax)
                             yMax = elementJPanelMap.get(ge).getY()+elementJPanelMap.get(ge).getHeight();
-                    //Takes into account the border width ConfigurationJPanel (2 pixels)
-                    yMax-=2;
-                    //Set all the GraphicalElement y position to the one get before
-                    for(GraphicalElement ge : selectedGE) {
-                        //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
-                        double rad = Math.toRadians(ge.getRotation());
-                        double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
-                        ge.setY(compositionArea.screenPointToDocumentPoint(new Point (0, yMax - ge.getHeight() + (ge.getHeight()-(int)newHeight)/2)).y);
-                    }
-                    break;
-            }
-            mainController.getGEController().modifySelectedGE();
+                //Takes into account the border width ConfigurationJPanel (2 pixels)
+                yMax-=2;
+                //Set all the GraphicalElement y position to the one get before
+                for(GraphicalElement ge : selectedGE) {
+                    //Convert the y position to the new one of the GraphicalElement taking into account its rotation angle.
+                    double rad = Math.toRadians(ge.getRotation());
+                    double newHeight = Math.ceil(Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight()));
+                    ge.setY(compositionArea.overlayPointToDocumentPoint(new Point(0, yMax - ge.getHeight() + (ge.getHeight() - (int) newHeight) / 2)).y);
+                }
+                break;
         }
+        mainController.getGEController().modifySelectedGE();
     }
 
     /**

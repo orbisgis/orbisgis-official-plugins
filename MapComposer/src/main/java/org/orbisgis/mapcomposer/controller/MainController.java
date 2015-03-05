@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.controller;
 
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.controller.utils.UndoableEdit.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
@@ -32,6 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.sif.UIFactory;
+import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -82,6 +84,11 @@ public class MainController{
 
     /** Object for the translation*/
     private final static I18n i18n = I18nFactory.getI18n(MainController.class);
+    
+    /** ViewWorkspace of OrbisGIS */
+    private ViewWorkspace viewWorkspace;
+    /** DataManager of OrbisGIS */
+    private DataManager dataManager;
 
     /**
      * Main constructor.
@@ -90,19 +97,20 @@ public class MainController{
         //Initialize the different attributes
         caManager = new CAManager();
         geManager = new GEManager();
-        ioController = new IOController(this);
+        ioController = new IOController(geManager, caManager);
         uiController = new UIController(this);
         geController = new GEController(this);
         compositionAreaController = new CompositionAreaController(this);
-        mainWindow = new MainWindow(this);
-        mainWindow.setLocationRelativeTo(null);
-        compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
         undoManager = new UndoManager();
         undoManager.setLimit(50);
-        UIFactory.setMainFrame(mainWindow);
         undoingRedoing = false;
         mouseWheelChangedProp = null;
         waitEndWheelTimer = new Timer(waitEndWheelTime, EventHandler.create(ActionListener.class, this, "wheelEnd"));
+    }
+
+    public void setMainWindow(MainWindow mainWindow){
+        this.mainWindow = mainWindow;
+        compositionAreaController.setCompositionArea(mainWindow.getCompositionArea());
     }
 
     /**
@@ -339,6 +347,34 @@ public class MainController{
     }
 
     /**
+     * Saves the document (Save all the GE contained by the document).
+     */
+    public void saveDocument(){
+        ioController.saveDocument(geController.getGEList());
+    }
+
+    /**
+     * Loads the document save file.
+     */
+    public void loadDocument(){
+        List<GraphicalElement> list = ioController.loadDocument();
+        //Test if the file was successfully loaded.
+        if(list != null) {
+            removeAllGE();
+            //Add all the GE starting from the last one (to get the good z-index)
+            for (int i = 0; i < list.size(); i++)
+                addGE(list.get(i));
+        }
+    }
+
+    /**
+     * Export the actual document into PNG, PDF or HTML after refreshing all the GE
+     */
+    public void export(){
+        ioController.export(geController.getGEList(), mainWindow.getCompositionArea().getProgressionBar());
+    }
+
+    /**
      * Returns the GEManager.
      * @return The GEManager
      */
@@ -373,6 +409,22 @@ public class MainController{
      */
     public GEController getGEController(){
         return geController;
+    }
+
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    public void setViewWorkspace(ViewWorkspace viewWorkspace) {
+        this.viewWorkspace = viewWorkspace;
+    }
+
+    public DataManager getDataManager() {
+        return dataManager;
+    }
+
+    public ViewWorkspace getViewWorkspace() {
+        return viewWorkspace;
     }
 }
  

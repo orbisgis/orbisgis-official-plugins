@@ -24,9 +24,13 @@
 
 package org.orbisgis.mapcomposer.controller;
 
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPDFThread;
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPNGThread;
+import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
+import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
-import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
@@ -35,12 +39,13 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
-import javax.swing.*;
+import javax.swing.JProgressBar;
 import javax.xml.parsers.ParserConfigurationException;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -51,26 +56,35 @@ import java.util.List;
 
 public class IOController {
 
-    /** SaveAndLoadHandler */
+    /** SaveAndLoadHandler which manage saving as xml and loading the GraphicalElements*/
     private SaveAndLoadHandler saveNLoadHandler;
-
-    /** MainController to get access to the other controllers*/
-    private MainController mainController;
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(IOController.class);
 
-    public IOController(MainController mainController){
-        this.mainController = mainController;
-        saveNLoadHandler = new SaveAndLoadHandler(mainController.getGEManager(), mainController.getCAManager());
+    /** GEManager */
+    private GEManager geManager;
+
+    /** GEManager */
+    private CAManager caManager;
+
+    private final static int pngId = 111531;
+    private final static int htmlId = 3213613;
+    private final static int pdfId = 111220;
+
+    public IOController(GEManager geManager, CAManager caManager){
+        this.geManager = geManager;
+        this.caManager = caManager;
+        saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
     }
 
     /**
-     * Run saveProject function of the SaveHandler.
+     * Runs saveProject function of the SaveHandler.
+     * @param listGEToSave List of GraphicalElements to save.
      */
-    public void saveDocument(){
+    public void saveDocument(List<GraphicalElement> listGEToSave){
         try {
-            saveNLoadHandler.saveProject(mainController.getGEList());
+            saveNLoadHandler.saveProject(listGEToSave);
         } catch (NoSuchMethodException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
@@ -78,55 +92,48 @@ public class IOController {
 
     /**
      * Run loadProject function from the SaveHandler and draw loaded GE.
+     * @return The list of GraphicalElements just loaded.
      */
-    public void loadDocument(){
+    public List<GraphicalElement> loadDocument(){
         try {
-            List<GraphicalElement> list = saveNLoadHandler.loadProject();
-            //Test if the file was successfully loaded.
-            if(list != null) {
-                mainController.removeAllGE();
-                //Add all the GE starting from the last one (to get the good z-index)
-                for (int i = 0; i < list.size(); i++)
-                    mainController.addGE(list.get(i));
-            }
+            return saveNLoadHandler.loadProject();
         } catch (ParserConfigurationException |SAXException |IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+            return null;
         }
     }
 
     /**
-     * Exports to document into png file.
-     * First renders again all the GraphicalElement to make sure that the graphical representation are at their best quality.
-     * Then exports the CompositionArea.
+     * Exports the document into the format selected in the export dialog window (SaveFilePanel class)
+     * @param listGEToExport List of GraphicalElement to export.
+     * @param progressBar Progress bar where should be shown the progression. Can be null.
      */
-    public void export(){
-        //Render again all the GE. All the RenderWorkers are saved into a list and the export will be done only when all will be terminated.
-        RenderWorker lastRenderWorker = mainController.getCompositionAreaController().refreshAllGE();
-
-        //Add to the lastRenderWorker a listener to open a saveFilePanel just after the rendering is done
-        //If the lastRenderWorker is null it means that there is nothing to export, so skip the exportation
-        if(lastRenderWorker!=null) {
-            lastRenderWorker.addPropertyChangeListener(new PropertyChangeListener() {
-                @Override
-                public void propertyChange(PropertyChangeEvent propertyChangeEvent) {
-                    //Verify if the property state is at DONE
-                    if (propertyChangeEvent.getNewValue().equals(SwingWorker.StateValue.DONE)) {
-                        //Creates and sets the file chooser
-                        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
-                        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-                        saveFilePanel.loadState();
-                        if(UIFactory.showDialog(saveFilePanel)){
-                            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
-
-                            try{
-                                ImageIO.write(mainController.getCompositionAreaController().getCompositionAreaBufferedImage(), "png", new File(path));
-                            } catch (IOException ex) {
-                                LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
-                            }
-                        }
-                    }
-                }
-            });
+    public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
+        //Creates the export dialog window
+        SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
+        //Adds the file type filters
+        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
+        //saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
+        saveFilePanel.addFilter(new String[]{"pdf"}, "PDF files");
+        saveFilePanel.loadState();
+        //Wait the window answer and if the user validate
+        if(UIFactory.showDialog(saveFilePanel)){
+            String path = saveFilePanel.getSelectedFile().getAbsolutePath();
+            Thread threadExport = null;
+            //Create the good exporting thread according to the file type selected by the user
+            switch(saveFilePanel.getCurrentFilterId()){
+                case pngId:
+                    threadExport = new ExportPNGThread(listGEToExport, path, progressBar, geManager);
+                    break;
+                case htmlId:
+                    break;
+                case pdfId:
+                    threadExport = new ExportPDFThread(listGEToExport, path, progressBar, geManager);
+                    break;
+            }
+            //Run the export into another thread not to freeze the MapComposer
+            if(threadExport != null)
+                threadExport.start();
         }
     }
 }

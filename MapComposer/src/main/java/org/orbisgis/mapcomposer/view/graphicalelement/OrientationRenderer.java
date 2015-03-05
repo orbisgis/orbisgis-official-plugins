@@ -26,44 +26,60 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
-import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import javax.swing.ImageIcon;
+
+import static java.lang.Math.cos;
+import static java.lang.Math.sin;
 
 /**
  * Renderer associated to the Orientation GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public class OrientationRenderer extends SimpleGERenderer {
+public class OrientationRenderer implements RendererRaster {
 
     @Override
-    public BufferedImage createImageFromGE(GraphicalElement ge) {
-        // Draw in a BufferedImage the orientation icon.
-        File file = new File(((Orientation)ge).getIconPath());
+    public BufferedImage createGEImage(GraphicalElement ge) {
+
+        double rad = Math.toRadians(ge.getRotation());
+        double newHeight = Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight());
+        double newWidth = Math.abs(sin(rad) * ge.getHeight()) + Math.abs(cos(rad) * ge.getWidth());
+
+        //Gets the maximum size (bounding box) of the rotated GE
+        int maxWidth = Math.max((int) newWidth, ge.getWidth());
+        int maxHeight = Math.max((int) newHeight, ge.getHeight());
+
+        //Get the center of the graphical representation according to the GE dimension and rotation
+        int x = maxWidth / 2;
+        int y = maxHeight / 2;
+
+        BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics2D = bi.createGraphics();
+
+        //Get the image to draw
+        File file = new File(((Orientation) ge).getIconPath());
         ImageIcon icon;
-        if(file.exists() && file.isFile())
-            icon = new ImageIcon(((Orientation)ge).getIconPath());
+        if (file.exists() && file.isFile())
+            icon = new ImageIcon(((Orientation) ge).getIconPath());
         else
             icon = MapComposerIcon.getIcon("compass");
 
-        //Get the bufferedImage from the image
-        BufferedImage bi = new BufferedImage(icon.getIconWidth(),icon.getIconHeight(),BufferedImage.TYPE_INT_ARGB);
-        Graphics g = bi.createGraphics();
-        icon.paintIcon(null, g, 0,0);
-        g.dispose();
+        graphics2D.rotate(rad, x, y);
 
-        //Scale the bufferedImage to the GraphicalElement size
-        java.awt.Image image = bi.getScaledInstance(ge.getWidth(), ge.getHeight(), java.awt.Image.SCALE_SMOOTH);
-        BufferedImage resize = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        Graphics graph = resize.createGraphics();
-        graph.drawImage(image, 0, 0, null);
-        graph.dispose();
+        //Scale the icon to the GraphicalElement size
+        graphics2D.drawImage(icon.getImage(), x - ge.getWidth() / 2, y - ge.getHeight() / 2,
+                x + ge.getWidth() / 2, y + ge.getHeight() / 2,
+                0, 0,
+                icon.getIconWidth(), icon.getIconHeight(), null);
 
-        return applyRotationToBufferedImage(resize, ge);
+        graphics2D.dispose();
+
+        return bi;
     }
 }

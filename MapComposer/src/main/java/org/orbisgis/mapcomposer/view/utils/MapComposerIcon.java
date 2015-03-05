@@ -25,21 +25,20 @@
 package org.orbisgis.mapcomposer.view.utils;
 
 import org.orbisgis.sif.icons.BaseIcon;
-import org.orbisgis.view.icons.OrbisGISIcon;
+import org.slf4j.LoggerFactory;
 
 import javax.swing.*;
 import java.awt.*;
 
 /**
  * Class managing the access to the MapComposer icons.
- * Code get from the class org.orbisgis.view.icons.OrbisGISIcon.
- * @see org.orbisgis.view.icons.OrbisGISIcon
+ * Code get from the class OrbisGISIcon.
  *
  * @author Sylvain PALOMINOS
  */
 
 public class MapComposerIcon {
-    private static BaseIcon iconManager = new BaseIcon();
+    private static BaseIcon iconManager = new BaseIcon(LoggerFactory.getLogger(MapComposerIcon.class));
 
     public static Image getIconImage(String iconName) {
         return iconManager.getIconImage(MapComposerIcon.class, iconName);
