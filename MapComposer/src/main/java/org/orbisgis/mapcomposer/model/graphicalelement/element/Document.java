@@ -33,7 +33,10 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import java.awt.*;
+import java.awt.Dimension;
+import java.awt.Toolkit;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -238,16 +241,31 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         private final int h;
 
         /**DPI of the screen. As java don't detect well the dpi, it is set manually.*/
-        private final int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
+        private int dpi;
 
         /**
          * Main constructor.
          * @param w Width of the format.
          * @param h Height of the format.
          */
-        private Format(int w, int h){
-            this.w=w;
-            this.h=h;
+        private Format(int w, int h) {
+            this.w = w;
+            this.h = h;
+
+            //To be run on a server (no GUI), try to get the default Toolkit.
+            //If it is not possible use a default value for the screen resolution.
+            try {
+                Integer integer = 96;
+                //Get the method getDefaultToolkit
+                Method m = Class.forName("java.awt.Toolkit").getDeclaredMethod("getDefaultToolkit", null);
+                //Get the ToolKit return by the previous method
+                Object o = m.invoke(null, null);
+                //Get the screen resolution
+                integer = (Integer)o.getClass().getDeclaredMethod("getScreenResolution").invoke(o);
+                dpi = integer;
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException e) {
+                dpi = 96;
+            }
         }
 
         /**
