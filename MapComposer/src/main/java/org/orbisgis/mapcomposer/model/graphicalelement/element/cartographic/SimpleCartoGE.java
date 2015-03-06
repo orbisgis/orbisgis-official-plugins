@@ -44,7 +44,7 @@ import java.util.List;
 public abstract class SimpleCartoGE extends SimpleGE implements CartographicElement{
 
     /** OWS-Context source.*/
-    private OwsContextCA owsc;
+    protected OwsContextCA owsc;
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(SimpleCartoGE.class);

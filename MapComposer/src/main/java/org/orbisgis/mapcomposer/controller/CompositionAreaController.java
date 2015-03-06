@@ -249,21 +249,6 @@ public class CompositionAreaController {
     }
 
     /**
-     * Refreshes and redraws all the GraphicalElements displayed into the CompositionArea.
-     * @return The last RenderWorker that will be executed.
-     */
-    public RenderWorker refreshAllGE(){
-        RenderWorker lastRenderWorker = null;
-        executorService = Executors.newFixedThreadPool(1);
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
-            executorService.submit(rw);
-            lastRenderWorker = rw;
-        }
-        return lastRenderWorker;
-    }
-
-    /**
      * Like the RefreshAllGE method but without doing any rendering.
      */
     public void actuAllGE(){
