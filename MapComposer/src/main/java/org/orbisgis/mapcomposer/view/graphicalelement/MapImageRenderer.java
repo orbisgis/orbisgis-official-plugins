@@ -25,25 +25,31 @@
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
 import org.orbisgis.mapcomposer.controller.MainController;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.*;
+import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.view.utils.Graphics2DRenderer;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
 
-import javax.swing.*;
-import java.awt.*;
+import javax.swing.Box;
+import javax.swing.ImageIcon;
+import javax.swing.JComboBox;
+import javax.swing.JLabel;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.*;
+import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
 
 /**
- * Renderer associated to the Cartographic GraphicalElement.
+ * This renderer is used to get the vector and raster representation of a MapImage object and to get the configuration UIPanel associated.
  *
  * @author Sylvain PALOMINOS
  */
@@ -51,39 +57,67 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
 
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
+        //Get the MapImageObject
         MapImage mi = (MapImage)ge;
 
+        //Calculate the size of the GraphicalElement after rotation
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad) * ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad) * ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
 
-        graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
-
-        graphics2D.rotate(rad, ge.getWidth()/2, ge.getHeight()/2);
-
-        Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
-        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+        //If the MapImage object contain a valid OwsMapContext, render it with the Graphics2DRenderer
+        if(mi.getOwsPath() != null) {
+            //Translate the Graphics2D to draw the map at its center
+            graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
+            //Apply the rotation
+            graphics2D.rotate(rad, ge.getWidth() / 2, ge.getHeight() / 2);
+            //Render the map and draw it in the Graphics2D
+            Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
+            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+        }
+        //Else, draw the MapImage icon
+        else{
+            //Get the image to draw
+            ImageIcon icon = MapComposerIcon.getIcon("add_map");
+            //Draw it in the Graphics2D
+            graphics2D.drawImage(icon.getImage(), 0, 0, ge.getWidth(), ge.getHeight(), null);
+        }
     }
 
     @Override
     public BufferedImage createGEImage(GraphicalElement ge) {
+        //Calculate the size of the GraphicalElement after rotation
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
         double newWidth = Math.abs(sin(rad)*ge.getHeight())+Math.abs(cos(rad)*ge.getWidth());
-
+        //Calculate the bounding box of the GraphicalElement after rotation
         int maxWidth = Math.max((int) newWidth, ge.getWidth());
         int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
+        //Create the BufferedImage which will contain the GraphicalElement representation.
         BufferedImage bi = new BufferedImage(maxWidth, maxHeight, BufferedImage.TYPE_INT_ARGB);
         Graphics2D graphics2D = bi.createGraphics();
+
+        //Get the MapImageObject
         MapImage mi = (MapImage)ge;
 
-        graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
-
-        graphics2D.rotate(rad, ge.getWidth()/2, ge.getHeight()/2);
-
-        Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
-        renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+        //If the MapImage object contain a valid OwsMapContext, render it with the Graphics2DRenderer
+        if(mi.getOwsPath() != null) {
+            //Translate the Graphics2D to draw the map at its center
+            graphics2D.translate((newWidth - ge.getWidth()) / 2, (newHeight - ge.getHeight()) / 2);
+            //Apply the rotation
+            graphics2D.rotate(rad, ge.getWidth() / 2, ge.getHeight() / 2);
+            //Render the map and draw it in the Graphics2D
+            Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
+            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+        }
+        //Else, draw the MapImage icon
+        else{
+            //Get the image to draw
+            ImageIcon icon = MapComposerIcon.getIcon("add_map");
+            //Draw it in the Graphics2D
+            graphics2D.drawImage(icon.getImage(), 0, 0, ge.getWidth(), ge.getHeight(), null);
+        }
 
         return bi;
     }
