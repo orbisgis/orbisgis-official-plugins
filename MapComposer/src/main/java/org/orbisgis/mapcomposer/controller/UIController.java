@@ -39,9 +39,13 @@ import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.SIFDialog;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.UIPanel;
+import org.orbisgis.sif.multiInputPanel.MultiInputPanel;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowListener;
+import java.beans.EventHandler;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -67,7 +71,31 @@ public class UIController {
 
 
     public void createDocument(){
+        //If the document already contain GraphicalElement, as before removing them
+        if(!mainController.getGEList().isEmpty()){
+            MultiInputPanel panel = new MultiInputPanel(i18n.tr("New document"));
+            panel.addText(i18n.tr("Are you sure to create a new Document ?"));
+            panel.addText(i18n.tr("Unsaved changes will be lost."));
+            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
+            dialog.setVisible(true);
+            dialog.pack();
+            dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(mainController.getMainWindow());
+            dialog.addWindowListener(EventHandler.create(WindowListener.class, this, "instantiateDocument", "", "windowClosed"));
+        }
+        else{
+            instantiateDocument(null);
+        }
+    }
+
+    public void instantiateDocument(WindowEvent winEvent){
+        if(winEvent != null && winEvent.getSource() instanceof SIFDialog) {
+            if(!((SIFDialog)winEvent.getSource()).isAccepted()){
+                return;
+            }
+        }
         mainController.removeAllGE();
+        mainController.getMainWindow().repaint();
         mainController.getGEController().instantiateNewGE(Document.class);
     }
 
