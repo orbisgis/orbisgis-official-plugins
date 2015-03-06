@@ -34,15 +34,11 @@ import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
 
-import javax.swing.Box;
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
 import javax.swing.JLabel;
-import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.cos;
@@ -123,28 +119,22 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
     }
 
     @Override
-    public UIPanel createConfigurationPanel(java.util.List<ConfigurationAttribute> caList, MainController uic, boolean enableLock){
-        //Create the UIDialogProperties that will be returned
-        UIDialogProperties uid = new UIDialogProperties(uic);
+    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, MainController uic, boolean enableLock){
 
-        //Add the text configuration elements
+        //Create the UIDialogProperties that will be returned
+        UIDialogProperties uid = new UIDialogProperties(uic, enableLock);
+
         //Find the OwsContext ConfigurationAttribute
         OwsContextCA owscCA = null;
         for(ConfigurationAttribute ca : caList)
             if(ca.getName().equals(MapImage.sOWSC))
                 owscCA = (OwsContextCA)ca;
-        //Create the list of component composing the ConfigurationAttribute representation.
-        List<Component> owsc = new ArrayList<>();
+
         JLabel owscName = new JLabel(owscCA.getName());
-        owsc.add(owscName);
-        //Create a kind of tabulation to align elements from different ConfigurationAttribute
-        owsc.add(Box.createHorizontalStrut(150 - owscName.getFontMetrics(owscName.getFont()).stringWidth(owscName.getText())));
+        uid.addComponent(owscName, owscCA, 0, 0, 1, 1);
+
         JComboBox owscBox = (JComboBox)uic.getCAManager().getRenderer(owscCA).createJComponentFromCA(owscCA);
-        //Limits the size of the component
-        owscBox.setPreferredSize(new Dimension(200, (int) owscBox.getPreferredSize().getHeight()));
-        owsc.add(owscBox);
-        //Add the ConfigurationAttribute and its representation to the UIDialogProperties
-        uid.addComponent(owsc, owscCA, enableLock);
+        uid.addComponent(owscBox, owscCA, 1, 0, 2, 1);
 
         return uid;
     }
