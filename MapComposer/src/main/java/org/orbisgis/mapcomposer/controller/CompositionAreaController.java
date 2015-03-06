@@ -34,7 +34,6 @@ import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -87,8 +86,6 @@ public class CompositionAreaController {
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
-        executorService.submit(worker);
     }
 
     /**
