@@ -186,22 +186,23 @@ public class UIController {
             for(GraphicalElement ge : selectedGE)
                 if(ge.getClass()!=selectedGE.get(0).getClass())
                     hasSameClass=false;
-            //If the only one GraphicalElement is selected, the locking checkboxes are hidden
-            List<GraphicalElement> toBeSet = new ArrayList<>();
-            toBeSet.addAll(selectedGE);
-            mainController.getGEController().setToBeSetList(toBeSet);
-            //Create and show the properties dialog.
-            UIPanel panel;
-            if(hasSameClass && mainController.getGEManager().getRenderer(selectedGE.get(0).getClass()) instanceof CustomConfigurationPanel) {
-                //Try to create an equivalent GE with the common attributes
-                panel = ((CustomConfigurationPanel)mainController.getGEManager().getRenderer(selectedGE.get(0).getClass())).createConfigurationPanel(getCommonAttributes(toBeSet), mainController, true);
+            if(hasSameClass) {
+                //If the only one GraphicalElement is selected, the locking checkboxes are hidden
+                List<GraphicalElement> toBeSet = new ArrayList<>();
+                toBeSet.addAll(selectedGE);
+                mainController.getGEController().setToBeSetList(toBeSet);
+                //Create and show the properties dialog.
+                UIPanel panel;
+                if (mainController.getGEManager().getRenderer(selectedGE.get(0).getClass()) instanceof CustomConfigurationPanel) {
+                    //Try to create an equivalent GE with the common attributes
+                    panel = ((CustomConfigurationPanel) mainController.getGEManager().getRenderer(selectedGE.get(0).getClass())).createConfigurationPanel(getCommonAttributes(toBeSet), mainController, true);
+                } else
+                    panel = new UIDialogProperties(getCommonAttributes(toBeSet), mainController, true);
+                SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
+                dialog.setVisible(true);
+                dialog.pack();
+                dialog.setAlwaysOnTop(true);
             }
-            else
-                panel = new UIDialogProperties(getCommonAttributes(toBeSet), mainController, true);
-            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
-            dialog.setVisible(true);
-            dialog.pack();
-            dialog.setAlwaysOnTop(true);
         }
     }
 
