@@ -197,6 +197,8 @@ public class UIDialogProperties implements UIPanel {
             this.ca = ca;
             this.addItemListener(this);
             this.setSelected(ca.getReadOnly());
+            this.setIcon(MapComposerIcon.getIcon("lock_open"));
+            this.setSelectedIcon(MapComposerIcon.getIcon("lock_close"));
         }
 
         /**
