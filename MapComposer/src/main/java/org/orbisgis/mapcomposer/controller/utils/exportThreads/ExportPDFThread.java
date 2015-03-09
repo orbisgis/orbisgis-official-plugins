@@ -52,7 +52,9 @@ import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -74,20 +76,28 @@ public class ExportPDFThread extends Thread {
 
     private int width, height;
 
+    /**Map of GraphicalElement and boolean.
+     * The boolean tells if the vector rendering should be use or not (if not use the raster rendering)
+     **/
+    private Map<GraphicalElement, Boolean> geIsVectorMap;
+
     /** Translation*/
     private static final I18n i18n = I18nFactory.getI18n(ExportPDFThread.class);
 
     /**
      * Main constructor
-     * @param listGEToExport List of GraphicalElement to export.
+     * @param geIsVectorMap Map of GraphicalElement and boolean. The boolean tells if the vector rendering should be use or not (if not use the raster rendering).
      * @param path File path to export.
      * @param progressBar Progress bar where the progression is shown.
      */
-    public ExportPDFThread(List<GraphicalElement> listGEToExport, String path, JProgressBar progressBar, GEManager geManager){
+    public ExportPDFThread(Map<GraphicalElement, Boolean> geIsVectorMap, String path, JProgressBar progressBar, GEManager geManager){
         //As this class is a thread, the GE can be modified while being export, so they have to be cloned
+        this.geIsVectorMap = new HashMap<>();
         this.listGEToExport = new ArrayList<>();
-        for(GraphicalElement ge : listGEToExport){
-            this.listGEToExport.add(ge.deepCopy());
+        for(GraphicalElement ge : geIsVectorMap.keySet()){
+            GraphicalElement graphicalElement = ge.deepCopy();
+            this.listGEToExport.add(graphicalElement);
+            this.geIsVectorMap.put(graphicalElement, geIsVectorMap.get(ge));
         }
         this.path = path;
         this.geManager = geManager;
@@ -135,7 +145,7 @@ public class ExportPDFThread extends Thread {
                 int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-                if(geManager.getRenderer(ge.getClass()) instanceof RendererVector) {
+                if(geIsVectorMap.get(ge)) {
                     PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
                     Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
                     PdfLayer layer = new PdfLayer("layer", writer);
