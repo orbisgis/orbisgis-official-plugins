@@ -33,6 +33,7 @@ import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 
+import javax.swing.JComponent;
 import java.awt.*;
 import java.util.*;
 import java.util.List;
@@ -486,5 +487,14 @@ public class CompositionAreaController {
     public void unselectAllGE(){
         for(GraphicalElement ge : elementJPanelMap.keySet())
             elementJPanelMap.get(ge).unselect();
+    }
+
+    /**
+     * Retuns the CompositionJPanel corresponding to the given GraphicalElement
+     * @param ge
+     * @return
+     */
+    public JComponent getCompositionJPanel(GraphicalElement ge) {
+        return elementJPanelMap.get(ge);
     }
 }

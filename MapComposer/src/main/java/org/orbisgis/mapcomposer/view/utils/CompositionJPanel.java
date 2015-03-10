@@ -565,7 +565,15 @@ public class CompositionJPanel extends JPanel{
         //if the user just want to move the element
         if (moveDirection == CENTER) {
             //Move the panel to its new location
-            this.setLocation(this.getX() + p.x - startPoint.x, this.getY() + p.y - startPoint.y);
+            if(this.selected) {
+                for (GraphicalElement ge : mainController.getGEController().getSelectedGE()) {
+                    JComponent component = mainController.getCompositionAreaController().getCompositionJPanel(ge);
+                    component.setLocation(component.getX() + p.x - startPoint.x, component.getY() + p.y - startPoint.y);
+                }
+            }
+            else {
+                this.setLocation(this.getX() + p.x - startPoint.x, this.getY() + p.y - startPoint.y);
+            }
         }
         //If the user is resizing the element
         else{
