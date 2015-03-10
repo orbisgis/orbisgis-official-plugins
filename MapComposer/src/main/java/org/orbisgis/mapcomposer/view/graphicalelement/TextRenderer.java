@@ -68,7 +68,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
 
         TextElement te = ((TextElement)ge);
         //Drawing on a BufferedImage the text.
-        graphics2D.setColor(new Color(te.getColorBack().getRed(), te.getColorBack().getGreen(), te.getColorBack().getBlue(), te.getAlpha()));
+        graphics2D.setColor(new Color(te.getColorBack().getRed(), te.getColorBack().getGreen(), te.getColorBack().getBlue(), te.getAlpha()*255/100));
         graphics2D.fillRect(x - ge.getWidth()/2, y - ge.getHeight()/2, te.getWidth(), te.getHeight());
         //graph = bi.createGraphics();
 
