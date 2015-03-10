@@ -36,6 +36,7 @@
                     <instructions>
                         <Private-Package>org.orbisgis.mapcomposer.*</Private-Package>
                         <Bundle-Category>orbisgis</Bundle-Category>
+                        <Bundle-Icon>org/orbisgis/mapcomposer/view/utils/map_composer.png</Bundle-Icon>
                     </instructions>
                 </configuration>
             </plugin>
