@@ -124,7 +124,7 @@ public class CompositionJPanel extends JPanel{
             this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", "", "mouseClicked"));
             this.addMouseListener(EventHandler.create(MouseListener.class, this, "mousePressed", "", "mousePressed"));
             this.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseReleasedHub", null, "mouseReleased"));
-            this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "getLocationOnScreen", "mouseDragged"));
+            this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseDragged", "", "mouseDragged"));
             this.addMouseMotionListener(EventHandler.create(MouseMotionListener.class, this, "mouseMoved", "getPoint", "mouseMoved"));
             this.setToolTipText(i18n.tr("<html>Holding <strong>Alt Gr</strong> : resize the representation of the element.<br/>" +
                     "Holding <strong>Shift</strong> : resize the element and keeps the ratio width/height.</html>"));
@@ -552,9 +552,16 @@ public class CompositionJPanel extends JPanel{
 
     /**
      * Refresh the panel position when the mouse is dragged dragged.
-     * @param p Location of the mouse inside the panel.
+     * @param mouseEvent MouseEvent
      */
-    public void mouseDragged(Point p) {
+    public void mouseDragged(MouseEvent mouseEvent) {
+        Point p = mouseEvent.getLocationOnScreen();
+
+        if(mouseEvent.isShiftDown()) moveMode = MoveMode.SHIFT;
+        else if(mouseEvent.isAltGraphDown()) moveMode = MoveMode.ALTGRAPH;
+        else if(mouseEvent.isControlDown()) moveMode = MoveMode.CTRL;
+        else moveMode = MoveMode.NONE;
+
         //if the user just want to move the element
         if (moveDirection == CENTER) {
             //Move the panel to its new location
@@ -562,7 +569,7 @@ public class CompositionJPanel extends JPanel{
         }
         //If the user is resizing the element
         else{
-            Point end =/*mainController.getMainWindow().getCompositionArea().screenPointToOverlayPoint(*/p;
+            Point end =p;
             //If the user want to resize by saving the element width/height ratio
             if(moveMode==MoveMode.SHIFT){
                 float ratio = (float)this.getHeight()/this.getWidth();
