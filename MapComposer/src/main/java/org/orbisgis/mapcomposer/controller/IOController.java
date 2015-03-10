@@ -24,8 +24,7 @@
 
 package org.orbisgis.mapcomposer.controller;
 
-import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPDFThread;
-import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPNGThread;
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportThread;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
@@ -60,12 +59,8 @@ public class IOController {
     /** GEManager */
     private GEManager geManager;
 
-    /** GEManager */
-    private CAManager caManager;
-
     public IOController(GEManager geManager, CAManager caManager){
         this.geManager = geManager;
-        this.caManager = caManager;
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
     }
 
@@ -102,45 +97,29 @@ public class IOController {
     public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
         //Display the export configuration dialog
         UIDialogExportConfiguration uiDialogExportConfiguration = new UIDialogExportConfiguration(listGEToExport, geManager);
+        //If the export configuration dialog is closed without validating it, exit the export
         if(!UIFactory.showDialog(uiDialogExportConfiguration, true, true))
             return;
 
-        //Creates the export dialog window
+        //Get back from the export configuration dialog the exportThread and if it is null exit the export
+        ExportThread exportThread = uiDialogExportConfiguration.getExportThread();
+        if(exportThread == null)
+            return;
+
+        //Creates the export configuration dialog
         SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
         //Adds the file type filters
-        switch(uiDialogExportConfiguration.getExportType()){
-            case UIDialogExportConfiguration.EXPORT_PNG:
-                saveFilePanel.addFilter(new String[]{"png"}, i18n.tr("PNG files"));
-                break;
-            case UIDialogExportConfiguration.EXPORT_PDF:
-                saveFilePanel.addFilter(new String[]{"pdf"}, i18n.tr("PDF files"));
-                break;
-            case UIDialogExportConfiguration.EXPORT_WEB:
-                //saveFilePanel.addFilter(new String[]{"html"}, i18n.tr("HTML web page"));
-                break;
-
+        for(String extension : exportThread.getFileFilters().keySet()) {
+            saveFilePanel.addFilter(extension, exportThread.getFileFilters().get(extension));
         }
         saveFilePanel.loadState();
 
-        //Wait the window answer and if the user validate
+        //Wait the window answer and if the user validate set and run the export thread.
         if(UIFactory.showDialog(saveFilePanel)){
             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
-            Thread threadExport = null;
-            //Create the good exporting thread according to the file type selected by the user
-            switch(uiDialogExportConfiguration.getExportType()){
-                case UIDialogExportConfiguration.EXPORT_PNG:
-                    threadExport = new ExportPNGThread(uiDialogExportConfiguration.getExportData(), path, progressBar, geManager);
-                    break;
-                case UIDialogExportConfiguration.EXPORT_PDF:
-                    threadExport = new ExportPDFThread(uiDialogExportConfiguration.getExportData(), path, progressBar, geManager);
-                    break;
-                case UIDialogExportConfiguration.EXPORT_WEB:
-                    //threadExport = new ExportWEBThread(uiDialogExportConfiguration.getExportData(), path, progressBar, geManager);
-                    break;
-            }
-            //Run the export into another thread not to freeze the MapComposer
-            if(threadExport != null)
-                threadExport.start();
+            exportThread.setPath(path);
+            exportThread.setProgressBar(progressBar);
+            new Thread(exportThread).start();
         }
     }
 }
