@@ -130,11 +130,11 @@ public class PositionScale extends JComponent {
             if (orientation == HORIZONTAL) {
                 g.drawLine(i, SIZE - 1, i, SIZE - 20 - 1);
                 if(i>0)
-                    g.drawString(Integer.toString(positionValue), i, 21);
+                    g.drawString(Integer.toString(positionValue), i, SIZE/3);
             } else {
                 g.drawLine(SIZE - 1, i, SIZE - 20 - 1, i);
                 if(i>0)
-                    g.drawString(Integer.toString(positionValue), 9, i);
+                    g.drawString(Integer.toString(positionValue), SIZE/3, i);
             }
         }
 
@@ -178,6 +178,16 @@ public class PositionScale extends JComponent {
         else if(unit == CompositionArea.UNIT_MM){
             units = (int)((double) DPI / 2.54);
         }
+        this.repaint();
+    }
+
+    /**
+     * Sets the new Size of the scales.
+     * @param size New size of the scales.
+     */
+    public void setSize(int size){
+        SIZE = size;
+        this.setPreferredSize(new Dimension(size, size));
         this.repaint();
     }
 }

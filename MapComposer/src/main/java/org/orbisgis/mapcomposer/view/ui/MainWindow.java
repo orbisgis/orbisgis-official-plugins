@@ -34,7 +34,10 @@ import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import java.awt.*;
 import java.awt.event.*;
 import java.beans.EventHandler;
+import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
 import java.util.List;
 import javax.swing.*;
 import javax.swing.event.ChangeListener;
@@ -43,8 +46,13 @@ import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
+import org.osgi.service.cm.ConfigurationException;
+import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.*;
 import org.osgi.service.component.annotations.Component;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
@@ -55,7 +63,7 @@ import org.xnap.commons.i18n.I18nFactory;
  * @author Sylvain PALOMINOS
  */
 @Component
-public class MainWindow extends JFrame implements MainFrameAction {
+public class MainWindow extends JFrame implements MainFrameAction, ManagedService {
 
     //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
@@ -88,11 +96,6 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public static final String UNDO = "UNDO";
     public static final String REDO = "REDO";
 
-    /** ActionCommands for the buttons. */
-    private final ActionCommands actions = new ActionCommands();
-    /** JToolBar for the buttons. It's registered in the action ActionCommands. */
-    private final JToolBar iconToolBar = new JToolBar();
-
     /** JToolBar for the spinners.
      * The spinners are used to change the position, the size and the rotation of selected GraphicalElements. */
     private final JToolBar spinnerToolBar = new JToolBar();
@@ -114,6 +117,9 @@ public class MainWindow extends JFrame implements MainFrameAction {
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
+    /** ConfigurationAdmin instance */
+    private ConfigurationAdmin configurationAdmin;
+
     /** Public main constructor. */
     public MainWindow(){
         super("Map composer");
@@ -130,6 +136,8 @@ public class MainWindow extends JFrame implements MainFrameAction {
         //Creates the panel containing the two tool bars.
         JPanel toolBarPanel = new JPanel();
         toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.Y_AXIS));
+        /* JToolBar for the buttons. It's registered in the action ActionCommands. */
+        JToolBar iconToolBar = new JToolBar();
         toolBarPanel.add(iconToolBar);
         toolBarPanel.add(spinnerToolBar);
         this.add(toolBarPanel, BorderLayout.PAGE_START);
@@ -137,6 +145,8 @@ public class MainWindow extends JFrame implements MainFrameAction {
         //Sets the button tool bar.
         iconToolBar.setFloatable(false);
         spinnerToolBar.setFloatable(false);
+        /* ActionCommands for the buttons. */
+        ActionCommands actions = new ActionCommands();
         actions.registerContainer(iconToolBar);
 
         actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
@@ -146,7 +156,7 @@ public class MainWindow extends JFrame implements MainFrameAction {
         actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E")));
         addSeparatorTo(iconToolBar);
         actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
-        actions.addAction(createAction(ADD_TEXT,  "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
+        actions.addAction(createAction(ADD_TEXT, "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
         actions.addAction(createAction(ADD_LEGEND, "", i18n.tr("Add a legend element (Alt + L)"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
         actions.addAction(createAction(ADD_ORIENTATION, "", i18n.tr("Add an orientation element (Alt + O)"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
         actions.addAction(createAction(ADD_SCALE, "", i18n.tr("Add a scale element (Alt + S)"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
@@ -383,5 +393,39 @@ public class MainWindow extends JFrame implements MainFrameAction {
 
     protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
         this.mainController.setViewWorkspace(null);
+    }
+
+    @Reference
+    protected void setConfigurationAdmin(ConfigurationAdmin configurationAdmin){
+        this.configurationAdmin = configurationAdmin;
+    }
+
+    protected void unsetConfigurationAdmin(ConfigurationAdmin configurationAdmin){
+        this.configurationAdmin = null;
+    }
+
+    @Override
+    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
+        this.setBounds((Integer) properties.get("window_x"), (Integer) properties.get("window_y"), (Integer) properties.get("window_width"), (Integer) properties.get("window_height"));
+        compositionArea.configure((Integer) properties.get("unit"));
+    }
+
+    @Deactivate
+    public void close(){
+        try {
+            Configuration configuration = configurationAdmin.getConfiguration(MainWindow.class.getName());
+            Dictionary<String, Object> props = configuration.getProperties();
+            if (props == null) {
+                props = new Hashtable<>();
+            }
+            props.put("window_width", this.getWidth());
+            props.put("window_height", this.getHeight());
+            props.put("window_x", this.getX());
+            props.put("window_y", this.getY());
+            props.put("unit", compositionArea.getUnit());
+            configuration.update(props);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
+        }
     }
 }

@@ -32,7 +32,6 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
-import org.orbisgis.sif.UIFactory;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
