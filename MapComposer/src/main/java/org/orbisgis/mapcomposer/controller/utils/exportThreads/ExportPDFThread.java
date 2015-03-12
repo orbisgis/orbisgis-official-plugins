@@ -29,30 +29,41 @@ import com.itextpdf.text.DocumentException;
 import com.itextpdf.text.Image;
 import com.itextpdf.text.Rectangle;
 import com.itextpdf.text.pdf.PdfContentByte;
-import com.itextpdf.text.pdf.PdfGraphics2D;
 import com.itextpdf.text.pdf.PdfLayer;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
-import org.orbisgis.core_export.PdfRenderer;
+import net.miginfocom.swing.MigLayout;
 import org.orbisgis.mapcomposer.controller.MainController;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.graphicalelement.RendererRaster;
 import org.orbisgis.mapcomposer.view.graphicalelement.RendererVector;
+import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
+import org.orbisgis.sif.SIFDialog;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.BorderFactory;
+import javax.swing.ButtonGroup;
+import javax.swing.JCheckBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
+import javax.swing.JRadioButton;
 import java.awt.Graphics2D;
+import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
 import java.io.ByteArrayOutputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -62,9 +73,7 @@ import static java.lang.Math.sin;
  * @author Sylvain PALOMINOS
  */
 
-public class ExportPDFThread extends Thread {
-    /** List of GraphicalElements to export*/
-    private List<GraphicalElement> listGEToExport;
+public class ExportPDFThread implements ExportThread {
     /** Path of the export file */
     private String path;
     /** Progress bar where the progression is shown */
@@ -72,40 +81,47 @@ public class ExportPDFThread extends Thread {
     /** GeManager used to get the GraphicalElement rendering methods. */
     private GEManager geManager;
 
-    private int width, height;
+    private int height;
+
+    /**Map of GraphicalElement and boolean.
+     * The boolean tells if the vector rendering should be use or not (if not use the raster rendering)
+     **/
+    private Map<GraphicalElement, Boolean> geIsVectorMap;
 
     /** Translation*/
     private static final I18n i18n = I18nFactory.getI18n(ExportPDFThread.class);
 
+    /** List of radio buttons for the vector export */
+    private List<JRadioButton> listVectorRadio;
+    /** List of radio buttons for the raster export */
+    private List<JRadioButton> listRasterRadio;
+    /** List of GraphicalElements names */
+    private List<JLabel> names;
+    /** Main radio button for vector export. If selected all the GE will be rendered as vector image */
+    private JRadioButton mainVectorRadio;
+    /** Main radio button for raster export. If selected all the GE will be rendered as raster image */
+    private JRadioButton mainRasterRadio;
+    /** Button group containing the main radio button */
+    private ButtonGroup mainButtonGroup;
+    /** Button expanding the selection between vector or raster export*/
+    private JCheckBox expand;
+
     /**
      * Main constructor
-     * @param listGEToExport List of GraphicalElement to export.
-     * @param path File path to export.
-     * @param progressBar Progress bar where the progression is shown.
      */
-    public ExportPDFThread(List<GraphicalElement> listGEToExport, String path, JProgressBar progressBar, GEManager geManager){
-        //As this class is a thread, the GE can be modified while being export, so they have to be cloned
-        this.listGEToExport = new ArrayList<>();
-        for(GraphicalElement ge : listGEToExport){
-            this.listGEToExport.add(ge.deepCopy());
-        }
-        this.path = path;
-        this.geManager = geManager;
-        if(progressBar != null)
-            this.progressBar = progressBar;
-        else
-            this.progressBar = new JProgressBar();
+    public ExportPDFThread(){
+        this.geIsVectorMap = new HashMap<>();
     }
+
     @Override
     public void run() {
         try{
             Document pdfDocument = null;
             //Find the Document GE to create the BufferedImage where all the GE will be drawn
-            for(GraphicalElement ge : listGEToExport){
+            for(GraphicalElement ge : geIsVectorMap.keySet()){
                 if(ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document){
                     pdfDocument = new Document(new Rectangle(ge.getWidth(), ge.getHeight()));
                     height = ge.getHeight();
-                    width = ge.getWidth();
                 }
             }
             //If no Document was created, throw an exception
@@ -122,9 +138,9 @@ public class ExportPDFThread extends Thread {
             PdfContentByte cb = writer.getDirectContent();
 
             progressBar.setValue(0);
-
+            int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
-            for(GraphicalElement ge : listGEToExport){
+            for(GraphicalElement ge : geIsVectorMap.keySet()){
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
                     continue;
 
@@ -135,7 +151,7 @@ public class ExportPDFThread extends Thread {
                 int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
-                if(geManager.getRenderer(ge.getClass()) instanceof RendererVector) {
+                if(geIsVectorMap.get(ge)) {
                     PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
                     Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
                     PdfLayer layer = new PdfLayer("layer", writer);
@@ -155,8 +171,9 @@ public class ExportPDFThread extends Thread {
                     pdfDocument.add(image);
                 }
 
-                progressBar.setValue((listGEToExport.indexOf(ge) * 100) / listGEToExport.size());
+                progressBar.setValue((geCount * 100) / geIsVectorMap.keySet().size());
                 progressBar.revalidate();
+                geCount ++;
             }
 
             pdfDocument.close();
@@ -165,5 +182,228 @@ public class ExportPDFThread extends Thread {
         } catch (IllegalArgumentException|IOException|DocumentException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
+    }
+
+    @Override
+    public void addData(GraphicalElement ge, Boolean isVector) {
+        if(geIsVectorMap.containsKey(ge)) {
+            geIsVectorMap.remove(ge);
+        }
+        geIsVectorMap.put(ge, isVector);
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    @Override
+    public void setGEManager(GEManager geManager) {
+        this.geManager = geManager;
+    }
+
+    @Override
+    public void setProgressBar(JProgressBar progressBar) {
+        if(progressBar != null) {
+            this.progressBar = progressBar;
+        }
+        else {
+            this.progressBar = new JProgressBar();
+        }
+    }
+
+    @Override
+    public JComponent constructExportPanel(List<GraphicalElement> listGEToExport) {
+        listVectorRadio = new ArrayList<>();
+        listRasterRadio = new ArrayList<>();
+        names = new ArrayList<>();
+
+        for(GraphicalElement ge : listGEToExport){
+            addData(ge, false);
+        }
+
+        JPanel panelRasterVector = new JPanel(new MigLayout("hidemode 3"));
+        panelRasterVector.setBorder(BorderFactory.createTitledBorder("Vector/Raster"));
+        JPanel panelPDF = new JPanel(new MigLayout());
+        panelPDF.add(panelRasterVector);
+
+        //Construct the raster/vector panel
+        //Adds the expand button and the main radio button
+        mainVectorRadio = new JRadioButton();
+        JLabel vectorLabel = new JLabel(i18n.tr("vector"));
+        mainRasterRadio = new JRadioButton();
+        JLabel rasterLabel = new JLabel(i18n.tr("raster"));
+        expand = new JCheckBox();
+        expand.addActionListener(EventHandler.create(ActionListener.class, this, "hideShowRadio"));
+        expand.setSelectedIcon(MapComposerIcon.getIcon("go-down"));
+        expand.setIcon(MapComposerIcon.getIcon("go-next"));
+        panelRasterVector.add(expand, "cell 0 0 1 1");
+        panelRasterVector.add(mainVectorRadio, "cell 1 0 1 1");
+        panelRasterVector.add(vectorLabel, "cell 2 0 1 1");
+        panelRasterVector.add(mainRasterRadio, "cell 3 0 1 1");
+        panelRasterVector.add(rasterLabel, "cell 4 0 1 1");
+        mainButtonGroup = new ButtonGroup();
+        mainButtonGroup.add(mainVectorRadio);
+        mainButtonGroup.add(mainRasterRadio);
+        mainVectorRadio.addActionListener(EventHandler.create(ActionListener.class, this, "selectAll", "source"));
+        mainRasterRadio.addActionListener(EventHandler.create(ActionListener.class, this, "selectAll", "source"));
+
+        //Adds a line of radio button for each registered classes of GraphicalElement
+        int i=1;
+        for(Class geClass : geManager.getRegisteredGEClasses()){
+            JLabel geName = new JLabel(geClass.getSimpleName());
+            geName.setVisible(false);
+            JRadioButton vectorButton = new JRadioButton();
+            vectorButton.setVisible(false);
+            JRadioButton rasterButton = new JRadioButton();
+            rasterButton.setVisible(false);
+            panelRasterVector.add(geName, "cell 0 " + i + " 1 1");
+            if(geManager.getRenderer(geClass) instanceof RendererVector) {
+                panelRasterVector.add(vectorButton, "cell 1 " + i + " 1 1");
+            }
+            else{
+                vectorButton.setEnabled(false);
+                rasterButton.setEnabled(false);
+                rasterButton.setSelected(true);
+            }
+            if(geManager.getRenderer(geClass) instanceof RendererRaster) {
+                panelRasterVector.add(rasterButton, "cell 3 " + i + " 1 1");
+            }
+            else{
+                rasterButton.setEnabled(false);
+                vectorButton.setEnabled(false);
+                vectorButton.setSelected(true);
+            }
+            ButtonGroup buttonGroup = new ButtonGroup();
+            buttonGroup.add(vectorButton);
+            buttonGroup.add(rasterButton);
+            names.add(geName);
+            listVectorRadio.add(vectorButton);
+            listRasterRadio.add(rasterButton);
+            vectorButton.addActionListener(EventHandler.create(ActionListener.class, this, "updateMainRadio", "source"));
+            rasterButton.addActionListener(EventHandler.create(ActionListener.class, this, "updateMainRadio", "source"));
+            i++;
+        }
+
+        return panelPDF;
+    }
+
+    @Override
+    public String getName() {
+        return i18n.tr("PDF");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.tr("Export the document as a PDF file.");
+    }
+
+    /**
+     * Select all the radio button corresponding of the given main radio button in argument
+     * @param mainRadioButton Main radio button.
+     */
+    public void selectAll(Object mainRadioButton){
+        List<GraphicalElement> listGE = new ArrayList<>();
+        for(GraphicalElement ge : geIsVectorMap.keySet()){
+            listGE.add(ge);
+        }
+        if(mainRadioButton == mainVectorRadio){
+            for(JRadioButton button : listVectorRadio){
+                if(listRasterRadio.get(listVectorRadio.indexOf(button)).isEnabled()) {
+                    button.setSelected(true);
+                }
+            }
+            mainVectorRadio.setSelected(true);
+            for(GraphicalElement ge : listGE){
+                this.addData(ge, true);
+            }
+        }
+        if(mainRadioButton == mainRasterRadio){
+            for(JRadioButton button : listRasterRadio){
+                if(listVectorRadio.get(listRasterRadio.indexOf(button)).isEnabled()) {
+                    button.setSelected(true);
+                }
+            }
+            mainRasterRadio.setSelected(true);
+            for(GraphicalElement ge : listGE){
+                this.addData(ge, false);
+            }
+        }
+    }
+
+    /**
+     * Updates the main radio button according to the state of all the others radio button.
+     * @param object Radio button.
+     */
+    public void updateMainRadio(Object object){
+        JRadioButton radioButton = (JRadioButton)object;
+        List<GraphicalElement> listGE = new ArrayList<>();
+        for(GraphicalElement ge : geIsVectorMap.keySet()){
+            listGE.add(ge);
+        }
+        boolean rasterOnly = true;
+        boolean vectorOnly = true;
+        if(listVectorRadio.contains(radioButton)){
+            rasterOnly = false;
+            for(JRadioButton button : listVectorRadio) {
+                if(!button.isSelected() && button.isEnabled()) {
+                    vectorOnly = false;
+                }
+            }
+            Class geClass = geManager.getRegisteredGEClasses().get(listVectorRadio.indexOf(radioButton));
+            for(GraphicalElement ge : listGE){
+                if(geClass.isInstance(ge)){
+                    this.addData(ge, radioButton.isSelected());
+                }
+            }
+        }
+        else if(listRasterRadio.contains(radioButton)){
+            vectorOnly = false;
+            for(JRadioButton button : listRasterRadio) {
+                if(!button.isSelected() && button.isEnabled()) {
+                    rasterOnly = false;
+                }
+            }
+            Class geClass = geManager.getRegisteredGEClasses().get(listRasterRadio.indexOf(radioButton));
+            for(GraphicalElement ge : listGE){
+                if(geClass.isInstance(ge)){
+                    this.addData(ge, !radioButton.isSelected());
+                }
+            }
+        }
+
+        if(rasterOnly){
+            mainRasterRadio.setSelected(true);
+        }
+        else if(vectorOnly){
+            mainVectorRadio.setSelected(true);
+        }
+        else {
+            mainButtonGroup.clearSelection();
+        }
+    }
+
+    /**
+     * Hides or shows the radio button for each GraphicalElement.
+     */
+    public void hideShowRadio(){
+        boolean show = expand.isSelected();
+        for(JComponent c : listRasterRadio){
+            c.setVisible(show);
+        }
+        for(JComponent c : listVectorRadio){
+            c.setVisible(show);
+        }
+        for(JComponent c : names){
+            c.setVisible(show);
+        }
+        ((SIFDialog)expand.getTopLevelAncestor()).pack();
+    }
+
+    @Override
+    public Map<String, String> getFileFilters() {
+        Map<String, String> ret = new HashMap<>();
+        ret.put("pdf", i18n.tr("PDF file"));
+        return ret;
     }
 }

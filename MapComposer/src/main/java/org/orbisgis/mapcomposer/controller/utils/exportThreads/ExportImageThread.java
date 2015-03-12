@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.controller.utils.exportThreads;
 
+import net.miginfocom.swing.MigLayout;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
@@ -34,13 +35,18 @@ import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.imageio.ImageIO;
+import javax.swing.JComboBox;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JProgressBar;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -50,9 +56,7 @@ import static java.lang.Math.sin;
  * @author Sylvain PALOMINOS
  */
 
-public class ExportPNGThread extends Thread {
-    /** List of GraphicalElements to export*/
-    private List<GraphicalElement> listGEToExport;
+public class ExportImageThread implements ExportThread {
     /** Path of the export file */
     private String path;
     /** Progress bar where the progression is shown */
@@ -61,27 +65,21 @@ public class ExportPNGThread extends Thread {
     private GEManager geManager;
 
     /** Translation*/
-    private static final I18n i18n = I18nFactory.getI18n(ExportPNGThread.class);
+    private static final I18n i18n = I18nFactory.getI18n(ExportImageThread.class);
+
+    /**Map of GraphicalElement and boolean.
+     * The boolean tells if the vector rendering should be use or not (if not use the raster rendering)
+     **/
+    private Map<GraphicalElement, Boolean> geIsVectorMap;
+
+    /** JComboBox component containing the selected image type */
+    private JComboBox<String> imageType;
 
     /**
      * Main constructor
-     * @param listGEToExport List of GraphicalElement to export.
-     * @param path File path to export.
-     * @param progressBar Progress bar where the progression is shown.
      */
-    public ExportPNGThread(List<GraphicalElement> listGEToExport, String path, JProgressBar progressBar, GEManager geManager){
-        //As this class is a thread, the GE can be modified while being export, so they have to be cloned
-        this.listGEToExport = new ArrayList<>();
-        for(GraphicalElement ge : listGEToExport){
-            this.listGEToExport.add(ge.deepCopy());
-        }
-        this.path = path;
-        this.geManager = geManager;
-        //If the ProgressBar is null, instantiate one
-        if(progressBar != null)
-            this.progressBar = progressBar;
-        else
-            this.progressBar = new JProgressBar();
+    public ExportImageThread(){
+        this.geIsVectorMap = new HashMap<>();
     }
 
     @Override
@@ -89,7 +87,7 @@ public class ExportPNGThread extends Thread {
         try{
             BufferedImage bi = null;
             //Find the Document GE to create the BufferedImage where all the GE will be drawn
-            for(GraphicalElement ge : listGEToExport){
+            for(GraphicalElement ge : geIsVectorMap.keySet()){
                 if(ge instanceof Document){
                     bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
                 }
@@ -100,10 +98,10 @@ public class ExportPNGThread extends Thread {
             }
 
             progressBar.setValue(0);
-
+            int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
             Graphics2D graphics2D = bi.createGraphics();
-            for(GraphicalElement ge : listGEToExport){
+            for(GraphicalElement ge : geIsVectorMap.keySet()){
                 double rad = Math.toRadians(ge.getRotation());
                 //Width and Height of the rectangle containing the rotated bufferedImage
                 final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
@@ -114,17 +112,75 @@ public class ExportPNGThread extends Thread {
                 BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
                 graphics2D.drawImage(bufferedImage, ge.getX() + (ge.getWidth() - maxWidth) / 2, ge.getY() + (ge.getHeight() - maxHeight) / 2, null);
                 //Set the progress bar value
-                progressBar.setValue((listGEToExport.indexOf(ge) * 100) / listGEToExport.size());
+                progressBar.setValue((geCount * 100) / geIsVectorMap.keySet().size());
                 progressBar.revalidate();
+                geCount ++;
             }
             graphics2D.dispose();
             //Write the BufferedImage
-            ImageIO.write(bi, "png", new File(path));
+            ImageIO.write(bi, (String)imageType.getSelectedItem(), new File(path));
 
             progressBar.setValue(progressBar.getMaximum());
 
         } catch (IllegalArgumentException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
+    }
+
+    @Override
+    public void addData(GraphicalElement ge, Boolean isVector) {
+        if(geIsVectorMap.containsKey(ge)) {
+            geIsVectorMap.remove(ge);
+        }
+        geIsVectorMap.put(ge, isVector);
+    }
+
+    @Override
+    public void setPath(String path) {
+        this.path = path;
+    }
+
+    @Override
+    public void setGEManager(GEManager geManager) {
+        this.geManager = geManager;
+    }
+
+    @Override
+    public void setProgressBar(JProgressBar progressBar) {
+        if(progressBar != null) {
+            this.progressBar = progressBar;
+        }
+        else {
+            this.progressBar = new JProgressBar();
+        }
+    }
+
+    @Override
+    public JComponent constructExportPanel(List<GraphicalElement> listGEToExport) {
+        JPanel panelPNG = new JPanel(new MigLayout());
+        panelPNG.add(new JLabel("Image type : "));
+        imageType = new JComboBox<>();
+        imageType.addItem(I18n.marktr("png"));
+        imageType.addItem(I18n.marktr("jpg"));
+        imageType.addItem(I18n.marktr("gif"));
+        panelPNG.add(imageType, "wrap");
+        return panelPNG;
+    }
+
+    @Override
+    public String getName() {
+        return i18n.tr("Image");
+    }
+
+    @Override
+    public String getDescription() {
+        return i18n.tr("Export the document ad an image.");
+    }
+
+    @Override
+    public Map<String, String> getFileFilters() {
+        Map<String, String> ret = new HashMap<>();
+        ret.put((String)imageType.getSelectedItem(), i18n.tr(imageType.getSelectedItem() + " image file"));
+        return ret;
     }
 }

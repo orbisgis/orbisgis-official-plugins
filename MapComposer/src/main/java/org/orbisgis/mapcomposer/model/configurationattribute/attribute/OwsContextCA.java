@@ -105,26 +105,22 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
         //Refresh of the selected file
         if(omc==null)
             omc = new OwsMapContext(dataManager);
-        try {
-            reloadSelectedOMC();
-        } catch (FileNotFoundException ex) {
-            LoggerFactory.getLogger(OwsContextCA.class).error(ex.getMessage());
-        }
+        reloadSelectedOMC();
     }
     
     /**
      * Reload the OWS-Context corresponding to the value of ConfigurationAttribute. 
      * @throws FileNotFoundException 
      */
-    private void reloadSelectedOMC() throws FileNotFoundException{
-        if(index!=-1){
+    public void reloadSelectedOMC(){
+        if (index != -1) {
             try {
-                if(omc.isOpen())
+                if (omc.isOpen())
                     omc.close(new NullProgressMonitor());
                 File f = new File(getSelected());
                 omc.read(new FileInputStream(new File(getSelected())));
                 omc.open(new NullProgressMonitor());
-            } catch (LayerException ex) {
+            } catch (LayerException|FileNotFoundException ex) {
                 LoggerFactory.getLogger(OwsContextCA.class).error(ex.getMessage());
             }
         }

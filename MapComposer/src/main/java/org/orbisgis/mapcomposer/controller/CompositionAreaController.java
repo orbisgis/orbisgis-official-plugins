@@ -33,8 +33,8 @@ import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.RenderWorker;
 
+import javax.swing.JComponent;
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.*;
 import java.util.List;
 import java.util.concurrent.ExecutorService;
@@ -87,8 +87,6 @@ public class CompositionAreaController {
         if(ge instanceof GERefresh){
             ((GERefresh)ge).refresh();
         }
-        RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
-        executorService.submit(worker);
     }
 
     /**
@@ -249,21 +247,6 @@ public class CompositionAreaController {
         elementJPanelMap.get(ge).refresh(null);
         if(ge instanceof Document)
             setDocumentDimension((Document) ge);
-    }
-
-    /**
-     * Refreshes and redraws all the GraphicalElements displayed into the CompositionArea.
-     * @return The last RenderWorker that will be executed.
-     */
-    public RenderWorker refreshAllGE(){
-        RenderWorker lastRenderWorker = null;
-        executorService = Executors.newFixedThreadPool(1);
-        for(GraphicalElement ge : elementJPanelMap.keySet()){
-            RenderWorker rw = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
-            executorService.submit(rw);
-            lastRenderWorker = rw;
-        }
-        return lastRenderWorker;
     }
 
     /**
@@ -504,5 +487,14 @@ public class CompositionAreaController {
     public void unselectAllGE(){
         for(GraphicalElement ge : elementJPanelMap.keySet())
             elementJPanelMap.get(ge).unselect();
+    }
+
+    /**
+     * Retuns the CompositionJPanel corresponding to the given GraphicalElement
+     * @param ge
+     * @return
+     */
+    public JComponent getCompositionJPanel(GraphicalElement ge) {
+        return elementJPanelMap.get(ge);
     }
 }

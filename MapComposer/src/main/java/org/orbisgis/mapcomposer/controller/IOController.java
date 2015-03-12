@@ -24,13 +24,12 @@
 
 package org.orbisgis.mapcomposer.controller;
 
-import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPDFThread;
-import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportPNGThread;
+import org.orbisgis.mapcomposer.controller.utils.exportThreads.ExportThread;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.utils.SaveAndLoadHandler;
+import org.orbisgis.mapcomposer.view.utils.UIDialogExportConfiguration;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.SaveFilePanel;
 import org.slf4j.LoggerFactory;
@@ -38,14 +37,9 @@ import org.xml.sax.SAXException;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import javax.imageio.ImageIO;
 import javax.swing.JProgressBar;
 import javax.xml.parsers.ParserConfigurationException;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
-import java.io.File;
 import java.io.IOException;
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -65,16 +59,8 @@ public class IOController {
     /** GEManager */
     private GEManager geManager;
 
-    /** GEManager */
-    private CAManager caManager;
-
-    private final static int pngId = 111531;
-    private final static int htmlId = 3213613;
-    private final static int pdfId = 111220;
-
     public IOController(GEManager geManager, CAManager caManager){
         this.geManager = geManager;
-        this.caManager = caManager;
         saveNLoadHandler = new SaveAndLoadHandler(geManager, caManager);
     }
 
@@ -109,31 +95,31 @@ public class IOController {
      * @param progressBar Progress bar where should be shown the progression. Can be null.
      */
     public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
-        //Creates the export dialog window
+        //Display the export configuration dialog
+        UIDialogExportConfiguration uiDialogExportConfiguration = new UIDialogExportConfiguration(listGEToExport, geManager);
+        //If the export configuration dialog is closed without validating it, exit the export
+        if(!UIFactory.showDialog(uiDialogExportConfiguration, true, true))
+            return;
+
+        //Get back from the export configuration dialog the exportThread and if it is null exit the export
+        ExportThread exportThread = uiDialogExportConfiguration.getExportThread();
+        if(exportThread == null)
+            return;
+
+        //Creates the export configuration dialog
         SaveFilePanel saveFilePanel = new SaveFilePanel("UIController.Export", i18n.tr("Export document"));
         //Adds the file type filters
-        saveFilePanel.addFilter(new String[]{"png"}, "PNG files");
-        //saveFilePanel.addFilter(new String[]{"html"}, "HTML web page");
-        saveFilePanel.addFilter(new String[]{"pdf"}, "PDF files");
+        for(String extension : exportThread.getFileFilters().keySet()) {
+            saveFilePanel.addFilter(extension, exportThread.getFileFilters().get(extension));
+        }
         saveFilePanel.loadState();
-        //Wait the window answer and if the user validate
+
+        //Wait the window answer and if the user validate set and run the export thread.
         if(UIFactory.showDialog(saveFilePanel)){
             String path = saveFilePanel.getSelectedFile().getAbsolutePath();
-            Thread threadExport = null;
-            //Create the good exporting thread according to the file type selected by the user
-            switch(saveFilePanel.getCurrentFilterId()){
-                case pngId:
-                    threadExport = new ExportPNGThread(listGEToExport, path, progressBar, geManager);
-                    break;
-                case htmlId:
-                    break;
-                case pdfId:
-                    threadExport = new ExportPDFThread(listGEToExport, path, progressBar, geManager);
-                    break;
-            }
-            //Run the export into another thread not to freeze the MapComposer
-            if(threadExport != null)
-                threadExport.start();
+            exportThread.setPath(path);
+            exportThread.setProgressBar(progressBar);
+            new Thread(exportThread).start();
         }
     }
 }

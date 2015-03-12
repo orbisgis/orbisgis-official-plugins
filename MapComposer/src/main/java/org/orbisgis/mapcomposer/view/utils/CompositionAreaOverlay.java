@@ -82,6 +82,9 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
      */
     private float ratio;
 
+    /** Tells if the ratio should be respected */
+    private boolean respectRatio;
+
     /**
      * Main constructor.
      * @param mainController
@@ -93,6 +96,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
         messageFont = new JLabel().getFont().deriveFont(Font.BOLD);
         messagePresence = MESSAGE_PRESENCE_MAX;
         timer = new Timer(MESSAGE_TIMEOUT, null);
+        this.respectRatio = false;
     }
 
     /**
@@ -145,7 +149,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                 int x, y;
                 float width, height;
                 //If the ratio in negative, there is no need to respect it
-                if(ratio<=0) {
+                if(ratio<=0 || !respectRatio) {
                     x = (end.x < start.x) ? end.x : start.x;
                     y = (end.y < start.y) ? end.y : start.y;
                     width = Math.abs(end.x - start.x);
@@ -222,6 +226,9 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
         if(mode == Mode.NONE)
             super.processMouseMotionEvent(e, l);
         else if(mode == Mode.NEW_GE) {
+
+            respectRatio = e.isShiftDown();
+
             if (e.getID() == MouseEvent.MOUSE_DRAGGED) {
                 end = new Point(e.getLocationOnScreen().x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
                                 e.getLocationOnScreen().y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
@@ -241,18 +248,19 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
         if(mode == Mode.NONE)
             super.processMouseEvent(e, l);
         else if(mode == Mode.NEW_GE) {
+
+            respectRatio = e.isShiftDown();
+
             if (e.getID() == MouseEvent.MOUSE_PRESSED) {
                 //Get the click location on the screen an save the location in the compositionArea
                 start = new Point(  e.getLocationOnScreen().x - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().x,
                                     e.getLocationOnScreen().y - mainController.getMainWindow().getCompositionArea().getLocationOnScreen().y);
-                if(!e.isShiftDown())
-                    ratio=-1;
             }
             if (e.getID() == MouseEvent.MOUSE_RELEASED) {
                 int x, y;
                 float width, height;
                 //If the ratio in negative, there is no need to respect it
-                if(ratio<=0) {
+                if(ratio<=0 || !respectRatio) {
                     x = (end.x < start.x) ? end.x : start.x;
                     y = (end.y < start.y) ? end.y : start.y;
                     width = Math.abs(end.x - start.x);
