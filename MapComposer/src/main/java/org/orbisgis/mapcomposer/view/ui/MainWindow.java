@@ -24,24 +24,23 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
+import bibliothek.gui.dock.ExpandableToolbarItemStrategy;
+import bibliothek.gui.dock.ToolbarDockStation;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.toolbar.CToolbarContentArea;
+import bibliothek.gui.dock.toolbar.CToolbarItem;
+import bibliothek.gui.dock.toolbar.expand.DefaultExpandableToolbarItemStrategy;
+import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.EventHandler;
-import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
@@ -50,11 +49,37 @@ import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
 import org.osgi.service.cm.ConfigurationException;
 import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.annotations.*;
 import org.osgi.service.component.annotations.Component;
+import org.osgi.service.component.annotations.Deactivate;
+import org.osgi.service.component.annotations.Reference;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+
+import javax.swing.Action;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JSeparator;
+import javax.swing.JSpinner;
+import javax.swing.JToolBar;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.SwingConstants;
+import javax.swing.event.ChangeListener;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.beans.EventHandler;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Dictionary;
+import java.util.Hashtable;
+import java.util.List;
 
 /**
  * Main window of the map composer. It contains several tool bar and the CompositionArea.
@@ -76,7 +101,7 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
     public static final String ADD_TEXT = "ADD_TEXT";
     public static final String ADD_LEGEND = "ADD_LEGEND";
     public static final String ADD_ORIENTATION = "ADD_ORIENTATION";
-    public static final String ADD_SCALE = "ADD_ORIENTATION";
+    public static final String ADD_SCALE = "ADD_SCALE";
     public static final String ADD_PICTURE = "ADD_PICTURE";
     public static final String DRAW_CIRCLE = "DRAW_CIRCLE";
     public static final String DRAW_POLYGON = "DRAW_POLYGON";
@@ -120,6 +145,8 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
     /** ConfigurationAdmin instance */
     private ConfigurationAdmin configurationAdmin;
 
+    private CControl control;
+
     /** Public main constructor. */
     public MainWindow(){
         super("Map composer");
@@ -140,7 +167,7 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         JToolBar iconToolBar = new JToolBar();
         toolBarPanel.add(iconToolBar);
         toolBarPanel.add(spinnerToolBar);
-        this.add(toolBarPanel, BorderLayout.PAGE_START);
+        //this.add(toolBarPanel, BorderLayout.PAGE_START);
 
         //Sets the button tool bar.
         iconToolBar.setFloatable(false);
@@ -148,42 +175,6 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         /* ActionCommands for the buttons. */
         ActionCommands actions = new ActionCommands();
         actions.registerContainer(iconToolBar);
-
-        actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
-        actions.addAction(createAction(CONFIGURATION, "", i18n.tr("Show the document configuration dialog (Ctrl + D)"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
-        actions.addAction(createAction(ADD_TEXT, "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
-        actions.addAction(createAction(ADD_LEGEND, "", i18n.tr("Add a legend element (Alt + L)"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
-        actions.addAction(createAction(ADD_ORIENTATION, "", i18n.tr("Add an orientation element (Alt + O)"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
-        actions.addAction(createAction(ADD_SCALE, "", i18n.tr("Add a scale element (Alt + S)"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
-        actions.addAction(createAction(ADD_PICTURE, "", i18n.tr("Add a picture element (Alt + I)"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", i18n.tr("Add a circle element (Alt + C)"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
-        actions.addAction(createAction(DRAW_POLYGON, "", i18n.tr("Add a polygon element (Alt + Y)"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(MOVE_BACK, "", i18n.tr("Move to the back (Alt + PageDown)"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
-        actions.addAction(createAction(MOVE_DOWN, "", i18n.tr("Move down (Alt + Down)"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
-        actions.addAction(createAction(MOVE_ON, "", i18n.tr("Move on (Alt + Up)"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
-        actions.addAction(createAction(MOVE_FRONT, "", i18n.tr("Move to the front (Alt + PageUp)"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", i18n.tr("Align to the left (Alt + numpad 4)"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
-        actions.addAction(createAction(ALIGN_TO_CENTER, "", i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", i18n.tr("Align to the right (Alt + numpad 6)"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", i18n.tr("Align to the bottom (Alt + numpad 2)"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
-        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", i18n.tr("Align to the top (Alt + numpad 8)"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(PROPERTIES, "", i18n.tr("Show selected elements properties (Ctrl + P)"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
-        actions.addAction(createAction(DELETE, "", i18n.tr("Delete selected elements (DELETE)"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
-        actions.addAction(createAction(REFRESH, "", i18n.tr("Redraw selected elements (Ctrl + R)"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
-        actions.addAction(createAction(UNDO, "", i18n.tr("Undo the last action (Ctrl + Z)"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
-        actions.addAction(createAction(REDO, "", i18n.tr("Redo the last action (Ctrl + Shift + Z)"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
-
-        iconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
         //Sets the spinners tool bar.
         spinnerX = createSpinner("X", " X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
@@ -194,10 +185,9 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         spinnerR = createSpinner("ROTATION", "", 0, -360, 360);
         spinnerToolBar.add(new JSeparator(SwingConstants.VERTICAL));
 
-        //Adds the composition area.
-        this.add(compositionArea, BorderLayout.CENTER);
-
         actions.setAccelerators(rootPane, JComponent.WHEN_IN_FOCUSED_WINDOW);
+
+
     }
 
     /**
@@ -301,28 +291,6 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
     }
 
     /**
-     * Create a DefaultAction with the given value.
-     * @param actionID Action identifier
-     * @param actionLabel Short label
-     * @param actionToolTip Tool tip text
-     * @param actionIconName Name of the icon file
-     * @param target Target of the action listener
-     * @param ActionFunctionName Function of the target
-     * @param keyStroke Shortcut for the action
-     * @return Configured DefaultAction
-     */
-    private DefaultAction createAction(String actionID, String actionLabel, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke){
-        return new DefaultAction(
-                            actionID,
-                            actionLabel,
-                            actionToolTip,
-                            MapComposerIcon.getIcon(actionIconName),
-                            EventHandler.create(ActionListener.class, target, ActionFunctionName),
-                            keyStroke
-                        );
-    }
-
-    /**
      * Configure a JSpinner of the tool bar.
      * It enable or not the spinner and set its value.
      * @param b Enable the spinner if true, disable otherwise
@@ -363,7 +331,79 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         return actions;
     }
 
-    public void showMapComposer(){this.setVisible(true);}
+    public void showMapComposer(){
+        control = new CControl(this);
+        control.putProperty(ExpandableToolbarItemStrategy.STRATEGY, new DefaultExpandableToolbarItemStrategy());
+
+        control.putProperty(ToolbarDockStation.SIDE_GAP, 2);
+        control.putProperty(ToolbarDockStation.GAP, 2);
+
+        CToolbarContentArea area = new CToolbarContentArea(control, "base");
+        area.getNorthArea().setBorder(BorderFactory.createRaisedBevelBorder());
+        area.getNorthArea().setVisible(false);
+        control.addStationContainer(area);
+        this.add(area);
+
+        addCToolbarItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N"), area.getNorthToolbar().getStationLocation(), 0, 0, 0, 0);
+        addCToolbarItem(CONFIGURATION, i18n.tr("Show the document configuration dialog"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D"), area.getNorthToolbar().getStationLocation(), 0, 0, 0, 1);
+        addCToolbarItem(SAVE, i18n.tr("Save the document"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S"), area.getNorthToolbar().getStationLocation(), 0, 0, 0, 2);
+        addCToolbarItem(LOAD, i18n.tr("Open a document"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O"), area.getNorthToolbar().getStationLocation(), 0, 0, 0, 3);
+        addCToolbarItem(EXPORT_COMPOSER, i18n.tr("Export the document"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E"), area.getNorthToolbar().getStationLocation(), 0, 0, 0, 4);
+        addCToolbarItem(ADD_MAP, i18n.tr("Add a map element"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 0);
+        addCToolbarItem(ADD_TEXT, i18n.tr("Add a text element"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 1);
+        addCToolbarItem(ADD_LEGEND, i18n.tr("Add a legend element"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 2);
+        addCToolbarItem(ADD_ORIENTATION, i18n.tr("Add an orientation element"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 3);
+        addCToolbarItem(ADD_SCALE, i18n.tr("Add a scale element"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 4);
+        addCToolbarItem(ADD_PICTURE, i18n.tr("Add a picture element"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I"), area.getNorthToolbar().getStationLocation(), 0, 0, 1, 5);
+        addCToolbarItem(DRAW_CIRCLE, i18n.tr("Add a circle element"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C"), area.getNorthToolbar().getStationLocation(), 0, 0, 2, 0);
+        addCToolbarItem(DRAW_POLYGON, i18n.tr("Add a polygon element"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y"), area.getNorthToolbar().getStationLocation(), 0, 0, 2, 1);
+        addCToolbarItem(MOVE_BACK, i18n.tr("Move to the back"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN"), area.getNorthToolbar().getStationLocation(), 0, 0, 3, 0);
+        addCToolbarItem(MOVE_DOWN, i18n.tr("Move down"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN"), area.getNorthToolbar().getStationLocation(), 0, 0, 3, 1);
+        addCToolbarItem(MOVE_ON, i18n.tr("Move on"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP"), area.getNorthToolbar().getStationLocation(), 0, 0, 3, 2);
+        addCToolbarItem(MOVE_FRONT, i18n.tr("Move to the front"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP"), area.getNorthToolbar().getStationLocation(), 0, 0, 3, 3);
+        addCToolbarItem(ALIGN_TO_LEFT, i18n.tr("Align to the left"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4"), area.getNorthToolbar().getStationLocation(), 0, 0, 4, 0);
+        addCToolbarItem(ALIGN_TO_CENTER, i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null, area.getNorthToolbar().getStationLocation(), 0, 0, 4, 1);
+        addCToolbarItem(ALIGN_TO_RIGHT, i18n.tr("Align to the right"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6"), area.getNorthToolbar().getStationLocation(), 0, 0, 4, 2);
+        addCToolbarItem(ALIGN_TO_BOTTOM, i18n.tr("Align to the bottom"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2"), area.getNorthToolbar().getStationLocation(), 0, 0, 4, 3);
+        addCToolbarItem(ALIGN_TO_MIDDLE, i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null, area.getNorthToolbar().getStationLocation(), 0, 0, 4, 4);
+        addCToolbarItem(ALIGN_TO_TOP, i18n.tr("Align to the top"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), area.getNorthToolbar().getStationLocation(), 0, 0, 4, 5);
+        addCToolbarItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), area.getNorthToolbar().getStationLocation(), 0, 0, 5, 0);
+        addCToolbarItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), area.getNorthToolbar().getStationLocation(), 0, 0, 5, 1);
+        addCToolbarItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), area.getNorthToolbar().getStationLocation(), 0, 0, 5, 2);
+        addCToolbarItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z"), area.getNorthToolbar().getStationLocation(), 0, 0, 5, 3);
+        addCToolbarItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z"), area.getNorthToolbar().getStationLocation(), 0, 0, 5, 4);
+
+
+        DefaultSingleCDockable dockable = new DefaultSingleCDockable("composition_area", "composition area");
+        dockable.setCloseable(false);
+        dockable.setResizeLocked(true);
+        dockable.setLocation(CLocation.base().normal());
+        dockable.setTitleShown(false);
+        dockable.setMaximizable(false);
+        dockable.setMinimizable(false);
+        dockable.add(compositionArea);
+
+        CGrid grid = new CGrid(control);
+        grid.add(0, 1, 1, 1, dockable);
+        area.deploy( grid );
+
+
+        this.setVisible(true);
+    }
+
+    private void addCToolbarItem(String actionId, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
+        CButton button = new CButton(actionId, MapComposerIcon.getIcon(actionIconName));
+        button.setTooltip(actionToolTip);
+        button.addActionListener(EventHandler.create(ActionListener.class, target, ActionFunctionName));
+        button.setAccelerator(keyStroke);
+
+
+        CToolbarItem cItem = new CToolbarItem(actionId);
+        cItem.setItem(button);
+        cItem.setLocation(stationLocation.group(group).toolbar(column, line).item(item));
+        control.addDockable(cItem);
+        cItem.setVisible(true);
+    }
 
     @Override
     public void disposeActions(org.orbisgis.mainframe.api.MainWindow  target, List<Action> actions) {
@@ -427,5 +467,12 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         } catch (IOException e) {
             LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
         }
+        System.out.println("destroy");
+        control.destroy();
+    }
+
+    public static void main(String[] args){
+        MainWindow mainWindow = new MainWindow();
+        mainWindow.showMapComposer();
     }
 }
