@@ -35,26 +35,16 @@ import bibliothek.gui.dock.toolbar.CToolbarContentArea;
 import bibliothek.gui.dock.toolbar.CToolbarItem;
 import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
 import org.orbisgis.corejdbc.DataManager;
-import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.sif.UIFactory;
-import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
-import org.osgi.service.cm.Configuration;
-import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
-import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Deactivate;
-import org.osgi.service.component.annotations.Reference;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
-import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
@@ -74,10 +64,6 @@ import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Dictionary;
-import java.util.Hashtable;
-import java.util.List;
 
 /**
  * Main window of the map composer. It contains several tool bar and the CompositionArea.
@@ -85,8 +71,8 @@ import java.util.List;
  *
  * @author Sylvain PALOMINOS
  */
-@Component
-public class MainWindow extends JFrame implements MainFrameAction, ManagedService {
+
+public class MainWindow extends JFrame {
 
     //String used to define the toolbars actions
     public static final String MENU_MAPCOMPOSER = "MapComposer";
@@ -136,10 +122,9 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
-    /** ConfigurationAdmin instance */
-    private ConfigurationAdmin configurationAdmin;
-
     private CControl control;
+
+    private CToolbarContentArea area;
 
     /** Public main constructor. */
     public MainWindow(){
@@ -252,18 +237,18 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         }
     }
 
-    @Override
-    public List<Action> createActions(org.orbisgis.mainframe.api.MainWindow  target) {
-        List<Action> actions = new ArrayList<>();
-        actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
-                MapComposerIcon.getIcon("map_composer"),
-                EventHandler.create(ActionListener.class, this, "showMapComposer")).setParent(MENU_TOOLS));
-        return actions;
+    public void configure(byte[] layoutByteArray) {
+        if (layoutByteArray != null) {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(layoutByteArray);
+            try {
+                control.read(new DataInputStream(byteArrayInputStream));
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
+            }
+        }
     }
 
-    private CToolbarContentArea area;
-
-    public void showMapComposer() {
+    public void constructUI(){
         control.putProperty(ToolbarDockStation.SIDE_GAP, 2);
         control.putProperty(ToolbarDockStation.GAP, 2);
         control.getController().getThemeManager().setBorderModifier("dock.border.displayer.basic.base", new BorderModifier() {
@@ -279,27 +264,6 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         control.addStationContainer(area);
         this.add(area);
 
-        constructUI();
-
-        if(configurationAdmin != null){
-            try {
-                Dictionary dictionary = configurationAdmin.getConfiguration(MainWindow.class.getName()).getProperties();
-                if(dictionary!=null) {
-                    byte[] byteArray = (byte[])dictionary.get("layout");
-                    if (byteArray != null) {
-                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
-                        control.read(new DataInputStream(byteArrayInputStream));
-                    }
-                }
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        }
-
-        this.setVisible(true);
-    }
-
-    private void constructUI(){
         CToolbarAreaLocation stationLocation = area.getNorthToolbar().getStationLocation();
 
         addCToolbarCItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N"), stationLocation, 0, 0, 0, 0);
@@ -410,78 +374,29 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         return spin;
     }
 
-    @Override
-    public void disposeActions(org.orbisgis.mainframe.api.MainWindow  target, List<Action> actions) {
-        this.dispose();
-    }
-
-    protected DataManager getDataManager(){
-        return mainController.getDataManager();
-    }
-    protected ViewWorkspace getViewWorkspace(){
-        return mainController.getViewWorkspace();
-    }
-
-    @Reference
-    protected void setDataManager(DataManager dataManager) {
+    public void setDataManager(DataManager dataManager) {
         this.mainController.setDataManager(dataManager);
     }
 
-    @Reference
-    protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
+    public void setViewWorkspace(ViewWorkspace viewWorkspace) {
         this.mainController.setViewWorkspace(viewWorkspace);
     }
 
-    protected void unsetDataManager(DataManager dataManager) {
-        this.mainController.setDataManager(null);
-    }
-
-    protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
-        this.mainController.setViewWorkspace(null);
-    }
-
-    @Reference
-    protected void setConfigurationAdmin(ConfigurationAdmin configurationAdmin){
-        this.configurationAdmin = configurationAdmin;
-    }
-
-    protected void unsetConfigurationAdmin(ConfigurationAdmin configurationAdmin){
-        this.configurationAdmin = null;
-    }
-
-    @Override
-    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-        this.setBounds((Integer) properties.get("window_x"), (Integer) properties.get("window_y"), (Integer) properties.get("window_width"), (Integer) properties.get("window_height"));
-        compositionArea.configure((Integer) properties.get("unit"));
-    }
-
-    @Deactivate
     public void close(){
-        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        if(control != null){
+            control.destroy();
+        }
+        this.dispose();
+    }
+
+    public void writeLayoutInByteArrayOutputStream(ByteArrayOutputStream stream){
         if(control!=null) {
             control.save("layout");
             try {
-                control.write(new DataOutputStream(byteArrayOutputStream));
+                control.write(new DataOutputStream(stream));
             } catch (IOException e) {
                 LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
             }
-            control.destroy();
-        }
-        try {
-            Configuration configuration = configurationAdmin.getConfiguration(MainWindow.class.getName());
-            Dictionary<String, Object> props = configuration.getProperties();
-            if (props == null) {
-                props = new Hashtable<>();
-            }
-            props.put("window_width", this.getWidth());
-            props.put("window_height", this.getHeight());
-            props.put("window_x", this.getX());
-            props.put("window_y", this.getY());
-            props.put("unit", compositionArea.getUnit());
-            props.put("layout", byteArrayOutputStream.toByteArray());
-            configuration.update(props);
-        } catch (IOException e) {
-            LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
         }
     }
 }
