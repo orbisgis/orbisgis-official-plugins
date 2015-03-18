@@ -29,15 +29,11 @@ import bibliothek.gui.dock.common.CControl;
 import bibliothek.gui.dock.common.CGrid;
 import bibliothek.gui.dock.common.CLocation;
 import bibliothek.gui.dock.common.DefaultSingleCDockable;
-import bibliothek.gui.dock.common.SingleCDockable;
 import bibliothek.gui.dock.common.action.CButton;
 import bibliothek.gui.dock.themes.border.BorderModifier;
 import bibliothek.gui.dock.toolbar.CToolbarContentArea;
 import bibliothek.gui.dock.toolbar.CToolbarItem;
 import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
-import bibliothek.util.xml.XElement;
-import bibliothek.util.xml.XIO;
-import com.sun.imageio.plugins.common.I18N;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
@@ -46,8 +42,6 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.actions.DefaultAction;
-import org.orbisgis.sif.docking.DockingPanel;
-import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -75,11 +69,10 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
 import java.beans.EventHandler;
-import java.io.BufferedInputStream;
-import java.io.BufferedOutputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileOutputStream;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Dictionary;
@@ -286,6 +279,27 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         control.addStationContainer(area);
         this.add(area);
 
+        constructUI();
+
+        if(configurationAdmin != null){
+            try {
+                Dictionary dictionary = configurationAdmin.getConfiguration(MainWindow.class.getName()).getProperties();
+                if(dictionary!=null) {
+                    byte[] byteArray = (byte[])dictionary.get("layout");
+                    if (byteArray != null) {
+                        ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(byteArray);
+                        control.read(new DataInputStream(byteArrayInputStream));
+                    }
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
+        }
+
+        this.setVisible(true);
+    }
+
+    private void constructUI(){
         CToolbarAreaLocation stationLocation = area.getNorthToolbar().getStationLocation();
 
         addCToolbarCItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N"), stationLocation, 0, 0, 0, 0);
@@ -350,14 +364,6 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
         CGrid grid = new CGrid(control);
         grid.add(0, 0, 1, 1, dockable);
         area.deploy(grid);
-
-        try {
-            control.readXML(new File("layout.xml"));
-        } catch (IOException e) {
-            LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
-        }
-
-        this.setVisible(true);
     }
 
     private void addCToolbarCItem(String actionId, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
@@ -451,10 +457,11 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
 
     @Deactivate
     public void close(){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
         if(control!=null) {
             control.save("layout");
             try {
-                control.writeXML(new File("layout.xml"));
+                control.write(new DataOutputStream(byteArrayOutputStream));
             } catch (IOException e) {
                 LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
             }
@@ -471,6 +478,7 @@ public class MainWindow extends JFrame implements MainFrameAction, ManagedServic
             props.put("window_x", this.getX());
             props.put("window_y", this.getY());
             props.put("unit", compositionArea.getUnit());
+            props.put("layout", byteArrayOutputStream.toByteArray());
             configuration.update(props);
         } catch (IOException e) {
             LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
