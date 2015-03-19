@@ -27,10 +27,12 @@ package org.orbisgis.mapcomposer.controller;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.controller.utils.UndoableEdit.*;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
+import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
@@ -361,8 +363,18 @@ public class MainController{
         if(list != null) {
             removeAllGE();
             //Add all the GE starting from the last one (to get the good z-index)
-            for (int i = 0; i < list.size(); i++)
-                addGE(list.get(i));
+            for (GraphicalElement ge : list) {
+                if(ge instanceof GERefresh){
+                    ((GERefresh)ge).refresh();
+                    for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                        if(ca instanceof RefreshCA){
+                            ((RefreshCA)ca).refresh(this);
+                        }
+                    }
+                }
+                addGE(ge);
+                compositionAreaController.refreshGE(ge);
+            }
         }
     }
 
