@@ -75,7 +75,6 @@ import java.io.IOException;
 public class MainWindow extends JFrame {
 
     //String used to define the toolbars actions
-    public static final String MENU_MAPCOMPOSER = "MapComposer";
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
     public static final String CONFIGURATION = "CONFIGURATION";
     public static final String SAVE = "SAVE";
@@ -177,7 +176,7 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Action done when the mouse wheel is used in a JComboBox of the toolbar.
+     * Action done when the mouse wheel is used in a JSpinner of the toolbar.
      * @param mwe MouseWheelEvent
      */
     public void mouseWheel(MouseWheelEvent mwe){
@@ -237,6 +236,10 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Configure the main window.
+     * @param layoutByteArray DockingFrames layout converted into byte array.
+     */
     public void configure(byte[] layoutByteArray) {
         if (layoutByteArray != null) {
             ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(layoutByteArray);
@@ -248,6 +251,9 @@ public class MainWindow extends JFrame {
         }
     }
 
+    /**
+     * Build the UI.
+     */
     public void constructUI(){
         control.putProperty(ToolbarDockStation.SIDE_GAP, 2);
         control.putProperty(ToolbarDockStation.GAP, 2);
@@ -330,10 +336,24 @@ public class MainWindow extends JFrame {
         area.deploy(grid);
     }
 
-    private void addCToolbarCItem(String actionId, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
+    /**
+     * Adds a CItem to the toolbar.
+     * @param actionId Unique id of the item.
+     * @param actionToolTip The component to add.
+     * @param actionIconName Name of the icon to use.
+     * @param target Target to use for the ActionListener creation.
+     * @param actionFunctionName Name of the method to call with the action listener.
+     * @param keyStroke KeyStroke to use.
+     * @param stationLocation The CToolbarAreaLocation where the item will be added.
+     * @param group Group of toolbar where the item will be added.
+     * @param column Column of toolbar where the item will be added.
+     * @param line Line of toolbar where the item will be added.
+     * @param item Item number of toolbar where the item will be added.
+     */
+    private void addCToolbarCItem(String actionId, String actionToolTip, String actionIconName, Object target, String actionFunctionName, KeyStroke keyStroke, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
         CButton button = new CButton(actionId, MapComposerIcon.getIcon(actionIconName));
         button.setTooltip(actionToolTip);
-        button.addActionListener(EventHandler.create(ActionListener.class, target, ActionFunctionName));
+        button.addActionListener(EventHandler.create(ActionListener.class, target, actionFunctionName));
 
         CToolbarItem cItem = new CToolbarItem(actionId);
         cItem.setItem(button);
@@ -341,9 +361,19 @@ public class MainWindow extends JFrame {
         control.addDockable(cItem);
         cItem.setVisible(true);
 
-        area.registerKeyboardAction(EventHandler.create(ActionListener.class, target, ActionFunctionName), actionId, keyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
+        area.registerKeyboardAction(EventHandler.create(ActionListener.class, target, actionFunctionName), actionId, keyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
+    /**
+     * Adds a JComponent to the toolbar.
+     * @param id Unique id of the JComponent.
+     * @param component The component to add.
+     * @param stationLocation The CToolbarAreaLocation where the component will be added.
+     * @param group Group of toolbar where the component will be added.
+     * @param column Column of toolbar where the component will be added.
+     * @param line Line of toolbar where the component will be added.
+     * @param item Item number of toolbar where the component will be added.
+     */
     private void addToolbarComponent(String id, JComponent component, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
         CToolbarItem cItem = new CToolbarItem(id);
         cItem.setItem(component);
@@ -353,8 +383,8 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Creates and adds to the spinnerToolBar a spinner and its label.
-     * The spinner and its label are set with the given function argument.
+     * Creates a spinner.
+     * The spinner is set with the given function argument.
      * The function return the spinner reference to permit to listen to their modification.
      * @param name Name of the spinner.
      * @param value Actual value of the spinner.
@@ -389,6 +419,10 @@ public class MainWindow extends JFrame {
         this.dispose();
     }
 
+    /**
+     * Write the DockingFrames layout into a ByteArrayOutputStream.
+     * @param stream ByteArrayOutputStream where the layout will be written.
+     */
     public void writeLayoutInByteArrayOutputStream(ByteArrayOutputStream stream){
         if(control!=null) {
             control.save("layout");

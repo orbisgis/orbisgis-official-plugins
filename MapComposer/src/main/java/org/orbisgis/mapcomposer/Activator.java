@@ -38,11 +38,8 @@ import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
 import org.slf4j.LoggerFactory;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import javax.swing.Action;
-import javax.swing.KeyStroke;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.io.ByteArrayOutputStream;
@@ -61,10 +58,8 @@ public class Activator implements MainFrameAction, ManagedService {
 
     public static final String MENU_MAPCOMPOSER = "MapComposer";
 
+    /** Main frame of the MapComposer*/
     private MainWindow mainWindow;
-
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(Activator.class);
 
     /** ConfigurationAdmin instance */
     private ConfigurationAdmin configurationAdmin;
