@@ -203,7 +203,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
 
         if(UIFactory.showDialog(loadFilePanel))
             return load(loadFilePanel.getSelectedFile().getAbsolutePath());
-        return listGE;
+        return null;
     }
 
     /**

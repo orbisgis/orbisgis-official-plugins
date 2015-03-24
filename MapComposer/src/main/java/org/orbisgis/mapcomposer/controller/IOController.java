@@ -90,6 +90,9 @@ public class IOController {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
             return null;
         }
+        if(listGE == null){
+            return null;
+        }
         List<GraphicalElement> listGEOrdered = new ArrayList<>();
         //first get the minimum z-index of the loaded GraphicalElement list
         int miniZ = -1;
