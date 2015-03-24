@@ -420,7 +420,7 @@ public class CompositionAreaController {
         zIndexStack = new Stack<>();
         zIndexStack.addAll(listGE);
         for(GraphicalElement ge : listGE){
-            ge.setZ(listGE.indexOf(ge));
+            ge.setZ(elementJPanelMap.size() + 1 - listGE.indexOf(ge));
             compositionArea.setZIndex(elementJPanelMap.get(ge), listGE.indexOf(ge));
         }
     }

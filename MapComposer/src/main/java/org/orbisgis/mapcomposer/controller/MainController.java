@@ -359,6 +359,9 @@ public class MainController{
      */
     public void loadDocument(){
         List<GraphicalElement> list = ioController.loadDocument();
+        for(GraphicalElement ge : list){
+            System.out.println(ge.getZ());
+        }
         //Test if the file was successfully loaded.
         if(list != null) {
             removeAllGE();

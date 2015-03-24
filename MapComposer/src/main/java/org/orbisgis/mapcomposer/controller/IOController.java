@@ -40,6 +40,7 @@ import org.xnap.commons.i18n.I18nFactory;
 import javax.swing.JProgressBar;
 import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -70,6 +71,7 @@ public class IOController {
      */
     public void saveDocument(List<GraphicalElement> listGEToSave){
         try {
+            System.out.println(listGEToSave.size());
             saveNLoadHandler.saveProject(listGEToSave);
         } catch (NoSuchMethodException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
@@ -81,12 +83,30 @@ public class IOController {
      * @return The list of GraphicalElements just loaded.
      */
     public List<GraphicalElement> loadDocument(){
+        List<GraphicalElement> listGE;
         try {
-            return saveNLoadHandler.loadProject();
+            listGE =  saveNLoadHandler.loadProject();
         } catch (ParserConfigurationException |SAXException |IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
             return null;
         }
+        List<GraphicalElement> listGEOrdered = new ArrayList<>();
+        //first get the minimum z-index of the loaded GraphicalElement list
+        int miniZ = -1;
+        for (GraphicalElement ge : listGE) {
+            if(miniZ == -1 || ge.getZ() < miniZ) {
+                miniZ = ge.getZ();
+            }
+        }
+        //Then add all the GraphicalElement in the good order (minimal z-index first)
+        for(int i=miniZ; i<listGE.size() + miniZ; i++) {
+            for (GraphicalElement ge : listGE) {
+                if(ge.getZ()==i){
+                    listGEOrdered.add(ge);
+                }
+            }
+        }
+        return listGEOrdered;
     }
 
     /**
