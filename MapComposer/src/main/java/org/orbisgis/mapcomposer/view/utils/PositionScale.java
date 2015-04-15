@@ -56,6 +56,7 @@ public class PositionScale extends JComponent {
     private Point mousePosition;
     /** Position of the origin point of the document. Used to know where the 0 should be placed.*/
     private int documentOriginPosition;
+    private int documentSize;
     /** Among of pixel scrolled by the user */
     private int scrollValue;
 
@@ -83,10 +84,54 @@ public class PositionScale extends JComponent {
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        //Fill the scale area with grey color
-        g.setColor(Color.LIGHT_GRAY);
-        g.fillRect(this.getX(), this.getY(), this.getWidth(), this.getHeight());
+    protected void paintComponent(Graphics graphics) {
+        Graphics2D g = (Graphics2D)graphics;
+        //Gets the position od the document start and end on the scale
+        int startDocumentPos = (documentOriginPosition-scrollValue);
+        int endDocumentPos = (documentOriginPosition+documentSize-scrollValue);
+
+        //Gets the scale start position, length and width
+        int xRect = this.getX();
+        int yRect = this.getY();
+        int wRect = this.getWidth();
+        int hRect = this.getHeight();
+
+        //Then draw the background of the scale : gray until the document start point, white until the document end
+        // point and gray until the end of the scale.
+        if (orientation == HORIZONTAL) {
+            yRect += 5;
+            hRect -= 10;
+
+            g.setColor(Color.GRAY);
+            g.fillRect(xRect, yRect-1, startDocumentPos, hRect+2);
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(xRect, yRect, startDocumentPos-1, hRect);
+
+            g.setColor(Color.WHITE);
+            g.fillRect(startDocumentPos, yRect-1, endDocumentPos, hRect+2);
+
+            g.setColor(Color.GRAY);
+            g.fillRect(endDocumentPos, yRect-1, wRect, hRect+2);
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(endDocumentPos+1, yRect, wRect, hRect);
+        }
+        else{
+            xRect += 5;
+            wRect -= 10;
+
+            g.setColor(Color.GRAY);
+            g.fillRect(xRect-1, yRect, wRect+2, startDocumentPos);
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(xRect, yRect, wRect, startDocumentPos-1);
+
+            g.setColor(Color.WHITE);
+            g.fillRect(xRect-1, startDocumentPos, wRect+2, endDocumentPos);
+
+            g.setColor(Color.GRAY);
+            g.fillRect(xRect-1, endDocumentPos, wRect+2, hRect);
+            g.setColor(Color.LIGHT_GRAY);
+            g.fillRect(xRect, endDocumentPos+1, wRect, hRect);
+        }
 
         //Sets the font and text color
         g.setFont(new Font("SansSerif", Font.PLAIN, 10));
@@ -95,64 +140,71 @@ public class PositionScale extends JComponent {
         //Get the length of the Scale
         int length;
         if (orientation == HORIZONTAL)
-            length = this.getWidth();
+            length = wRect;
         else
-            length = this.getHeight();
+            length = hRect;
 
-        //Get the start position of the document (the 0 inch/cm)
-        int startPos = (documentOriginPosition-scrollValue)%units;
-        int endPos = length;
-        //Get the 1/10 graduation
-        float deciUnits = (float)units/10;
+        //Get the position of the first big graduation (graduation with a number)
+        int firstGradPosition = (documentOriginPosition-scrollValue)%units;
+        //Get the half unit
+        float halfUnit = (float)units/2;
 
-        //Draw the little graduation from the scale start to the first big graduation
-        for(float j=startPos; j>0; j-=deciUnits){
-            if (orientation == HORIZONTAL)
-                g.drawLine((int)j, SIZE - 1, (int)j, SIZE - 10 - 1);
-            else
-                g.drawLine(SIZE - 1, (int)j, SIZE - 10 - 1, (int)j);
+        //Draw the little graduation before the first big graduation of necessary
+        for(float i=firstGradPosition; i>0; i-=halfUnit){
+        if(firstGradPosition-halfUnit*5>0)
+            if (orientation == HORIZONTAL) {
+                g.drawLine((int)(firstGradPosition-halfUnit*5), yRect + hRect / 2 - 3, (int)(firstGradPosition-halfUnit*5), yRect +
+                        hRect /  2 + 3);
+            } else {
+                g.drawLine(xRect + wRect / 2 - 3, (int)(firstGradPosition-halfUnit*5), xRect + wRect / 2 + 3, (int)
+                        (firstGradPosition-halfUnit*5));
+            }
         }
 
         //For each big graduation
-        for(int i=startPos; i<endPos; i+=units){
+        for(int i=firstGradPosition; i<length; i+=units){
             //Between each big graduations draw the little one
-            for(float j=i; j<i+units-deciUnits+1; j+=deciUnits){
-                if (orientation == HORIZONTAL)
-                    g.drawLine((int)j, SIZE - 1, (int)j, SIZE - 10 - 1);
-                else
-                    g.drawLine(SIZE - 1, (int)j, SIZE - 10 - 1, (int)j);
+            if (orientation == HORIZONTAL) {
+                g.drawLine((int)(i+halfUnit*5), yRect + hRect / 2 - 3, (int)(i+halfUnit*5), yRect + hRect /  2 + 3);
+            } else {
+                g.drawLine(xRect + wRect / 2 - 3, (int)(i+halfUnit*5), xRect + wRect / 2 + 3, (int)(i+halfUnit*5));
             }
             //Get the value of the big graduation
             int positionValue = (i+scrollValue+units-1-documentOriginPosition)/units;
             if(i<documentOriginPosition)
                 positionValue--;
             //Draw the big graduation and its value
+            String positionStr = Integer.toString(positionValue);
+            int positionStrWidth = (int)g.getFont().getStringBounds(positionStr, g.getFontRenderContext()).getWidth();
+            int positionStrHeight = (int)g.getFont().getStringBounds(positionStr, g.getFontRenderContext()).getHeight();
             if (orientation == HORIZONTAL) {
-                g.drawLine(i, SIZE - 1, i, SIZE - 20 - 1);
+                g.drawLine(i, yRect, i, yRect + 2);
+                g.drawLine(i, yRect + hRect, i, yRect + hRect - 2);
                 if(i>0)
-                    g.drawString(Integer.toString(positionValue), i, SIZE/3);
+                    g.drawString(positionStr, i - positionStrWidth/2, yRect + hRect/2 + positionStrHeight/2 - 1);
             } else {
-                g.drawLine(SIZE - 1, i, SIZE - 20 - 1, i);
+                g.drawLine(xRect, i, xRect + 2, i);
+                g.drawLine(xRect + wRect, i, xRect + wRect - 2, i);
                 if(i>0)
-                    g.drawString(Integer.toString(positionValue), SIZE/3, i);
+                    g.drawString(positionStr, xRect + wRect/2 - positionStrWidth/2, i + positionStrHeight/2 - 1);
             }
         }
 
         //Draw the mouse position cursor
-        Graphics2D graph = (Graphics2D)g;
-        graph.setStroke(new BasicStroke(5));
+        g.setStroke(new BasicStroke(3));
         if (orientation == HORIZONTAL)
-            graph.drawLine(mousePosition.x, 10, mousePosition.x, SIZE-10);
+            g.drawLine(mousePosition.x-1, 10, mousePosition.x-1, SIZE-10);
         else
-            graph.drawLine(10, mousePosition.y, SIZE-10, mousePosition.y);
+            g.drawLine(10, mousePosition.y-1, SIZE-10, mousePosition.y-1);
     }
 
     /**
      * Sets the position of the 0 of the scale according to the document position.
      * @param documentOriginPosition Position of the origin of the document.
      */
-    public void setDocumentOriginPosition(int documentOriginPosition) {
+    public void setDocumentOriginPosition(int documentOriginPosition, int documentSize) {
         this.documentOriginPosition = documentOriginPosition;
+        this.documentSize = documentSize;
         this.repaint();
     }
 
