@@ -257,8 +257,10 @@ public class CompositionArea extends JPanel {
         if(document != null) {
             document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
             mainController.getCompositionAreaController().actuAllGE();
-            horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2);
-            verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2);
+            horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2,
+                    document.getWidth());
+            verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2,
+                    document.getHeight());
         }
     }
 
