@@ -97,7 +97,7 @@ public class ExportImageThread implements ExportThread {
                 throw new IllegalArgumentException(i18n.tr("Error on export : The list of GraphicalElement to export does not contain any Document GE."));
             }
 
-            progressBar.setValue(0);
+            progressBar.setIndeterminate(true);
             int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
             Graphics2D graphics2D = bi.createGraphics();
@@ -112,6 +112,7 @@ public class ExportImageThread implements ExportThread {
                 BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
                 graphics2D.drawImage(bufferedImage, ge.getX() + (ge.getWidth() - maxWidth) / 2, ge.getY() + (ge.getHeight() - maxHeight) / 2, null);
                 //Set the progress bar value
+                progressBar.setIndeterminate(false);
                 progressBar.setValue((geCount * 100) / geIsVectorMap.keySet().size());
                 progressBar.revalidate();
                 geCount ++;
@@ -121,6 +122,12 @@ public class ExportImageThread implements ExportThread {
             ImageIO.write(bi, (String)imageType.getSelectedItem(), new File(path));
 
             progressBar.setValue(progressBar.getMaximum());
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            progressBar.setValue(0);
 
         } catch (IllegalArgumentException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());

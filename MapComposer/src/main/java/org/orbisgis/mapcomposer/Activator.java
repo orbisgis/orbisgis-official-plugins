@@ -64,10 +64,12 @@ public class Activator implements MainFrameAction, ManagedService {
     /** ConfigurationAdmin instance */
     private ConfigurationAdmin configurationAdmin;
 
+    private boolean isUIConstructed;
+
 
     public Activator(){
         mainWindow = new MainWindow();
-        mainWindow.constructUI();
+        isUIConstructed = false;
     }
 
     @Override
@@ -144,5 +146,9 @@ public class Activator implements MainFrameAction, ManagedService {
 
     public void showMapComposer(){
         mainWindow.setVisible(true);
+        if(!isUIConstructed) {
+            mainWindow.constructUI();
+            isUIConstructed = true;
+        }
     }
 }
