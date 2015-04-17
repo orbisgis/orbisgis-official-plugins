@@ -90,6 +90,8 @@ public class PositionScale extends JComponent {
         int startDocumentPos = (documentOriginPosition-scrollValue);
         int endDocumentPos = (documentOriginPosition+documentSize-scrollValue);
 
+        int unitPosition = startDocumentPos%units;
+
         //Gets the scale start position, length and width
         int xRect = this.getX();
         int yRect = this.getY();
@@ -144,52 +146,66 @@ public class PositionScale extends JComponent {
         else
             length = hRect;
 
-        //Get the position of the first big graduation (graduation with a number)
-        int firstGradPosition = (documentOriginPosition-scrollValue)%units;
-        //Get the half unit
+        //Get the half and deci unit
         float halfUnit = (float)units/2;
+        float deciUnit = (float)units/10;
 
-        //Draw the little graduation before the first big graduation of necessary
-        for(float i=firstGradPosition; i>0; i-=halfUnit){
-        if(firstGradPosition-halfUnit>0)
+        //Draw the graduations for one unit from the start of the scale to the end
+        for(;unitPosition<length; unitPosition+=units) {
+
+            //Draw the half graduation before the unit graduation
             if (orientation == HORIZONTAL) {
-                g.drawLine((int)(firstGradPosition-halfUnit), yRect + hRect / 2 - 3, (int)(firstGradPosition-halfUnit), yRect +
-                        hRect /  2 + 3);
+                g.drawLine((int) (unitPosition - halfUnit), yRect + hRect / 2 - 3, (int) (unitPosition - halfUnit), yRect
+
+                        + hRect / 2 + 3);
             } else {
-                g.drawLine(xRect + wRect / 2 - 3, (int)(firstGradPosition-halfUnit), xRect + wRect / 2 + 3, (int)
-                        (firstGradPosition-halfUnit));
+                g.drawLine(xRect + wRect / 2 - 3, (int) (unitPosition - halfUnit), xRect + wRect / 2 + 3, (int)
+                        (unitPosition - halfUnit));
+            }
+
+            //Draw the deci graduation before and after the unit graduation
+            String unitStr = Integer.toString((unitPosition-startDocumentPos)/units);
+
+            int unitStrWidth = (int) g.getFont().getStringBounds(unitStr, g.getFontRenderContext()).getWidth();
+            int unitStrHeight = (int) g.getFont().getStringBounds(unitStr, g.getFontRenderContext()).getHeight();
+
+            int nbrDeciGrad = (int) ((halfUnit - unitStrWidth) / deciUnit);
+
+            if (orientation == HORIZONTAL) {
+                //Draw the little graduation before the first big graduation of necessary
+                for (float i = unitPosition - halfUnit; i < unitPosition - unitStrWidth / 2 - 1; i += deciUnit) {
+                    g.drawLine((int) i, yRect + hRect / 2 - 1, (int) i, yRect + hRect / 2 + 1);
+                }
+                //Draw the little graduation before the first big graduation of necessary
+                for (float i = unitPosition + halfUnit; i > unitPosition + unitStrWidth / 2 + 1; i -= deciUnit) {
+                    g.drawLine((int) i, yRect + hRect / 2 - 1, (int) i, yRect + hRect / 2 + 1);
+                }
+            }
+            else {
+                //Draw the little graduation before the first big graduation of necessary
+                for (float i = unitPosition - halfUnit; i < unitPosition - unitStrWidth / 2 - 1; i += deciUnit) {
+                    g.drawLine(xRect + wRect / 2 - 1, (int) i, xRect + wRect / 2 + 1, (int) i);
+                }
+                //Draw the little graduation before the first big graduation of necessary
+                for (float i = unitPosition + halfUnit; i > unitPosition + unitStrWidth / 2 + 1; i -= deciUnit) {
+                    g.drawLine(xRect + wRect / 2 - 1, (int) i, xRect + wRect / 2 + 1, (int) i);
+                }
+            }
+
+            //Draw the unit graduation
+            if (orientation == HORIZONTAL) {
+                g.drawLine(unitPosition, yRect, unitPosition, yRect + 2);
+                g.drawLine(unitPosition, yRect + hRect, unitPosition, yRect + hRect - 2);
+                if (unitPosition > 0)
+                    g.drawString(unitStr, unitPosition - unitStrWidth / 2, yRect + hRect / 2 + unitStrHeight / 2 - 1);
+            } else {
+                g.drawLine(xRect, unitPosition, xRect + 2, unitPosition);
+                g.drawLine(xRect + wRect, unitPosition, xRect + wRect - 2, unitPosition);
+                if (unitPosition > 0)
+                    g.drawString(unitStr, xRect + wRect / 2 - unitStrWidth / 2, unitPosition + unitStrHeight / 2 - 1);
             }
         }
-
-        //For each big graduation
-        for(int i=firstGradPosition; i<length; i+=units){
-            //Between each big graduations draw the little one
-            if (orientation == HORIZONTAL) {
-                g.drawLine((int)(i+halfUnit), yRect + hRect / 2 - 3, (int)(i+halfUnit), yRect + hRect /  2 + 3);
-            } else {
-                g.drawLine(xRect + wRect / 2 - 3, (int)(i+halfUnit), xRect + wRect / 2 + 3, (int)(i+halfUnit));
-            }
-            //Get the value of the big graduation
-            int positionValue = (i+scrollValue+units-1-documentOriginPosition)/units;
-            if(i<documentOriginPosition)
-                positionValue--;
-            //Draw the big graduation and its value
-            String positionStr = Integer.toString(positionValue);
-            int positionStrWidth = (int)g.getFont().getStringBounds(positionStr, g.getFontRenderContext()).getWidth();
-            int positionStrHeight = (int)g.getFont().getStringBounds(positionStr, g.getFontRenderContext()).getHeight();
-            if (orientation == HORIZONTAL) {
-                g.drawLine(i, yRect, i, yRect + 2);
-                g.drawLine(i, yRect + hRect, i, yRect + hRect - 2);
-                if(i>0)
-                    g.drawString(positionStr, i - positionStrWidth/2, yRect + hRect/2 + positionStrHeight/2 - 1);
-            } else {
-                g.drawLine(xRect, i, xRect + 2, i);
-                g.drawLine(xRect + wRect, i, xRect + wRect - 2, i);
-                if(i>0)
-                    g.drawString(positionStr, xRect + wRect/2 - positionStrWidth/2, i + positionStrHeight/2 - 1);
-            }
-        }
-
+        
         //Draw the mouse position cursor
         g.setStroke(new BasicStroke(3));
         if (orientation == HORIZONTAL)
