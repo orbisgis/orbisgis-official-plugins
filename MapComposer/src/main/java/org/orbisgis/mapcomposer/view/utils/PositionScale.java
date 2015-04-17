@@ -205,7 +205,7 @@ public class PositionScale extends JComponent {
                     g.drawString(unitStr, xRect + wRect / 2 - unitStrWidth / 2, unitPosition + unitStrHeight / 2 - 1);
             }
         }
-        
+
         //Draw the mouse position cursor
         g.setStroke(new BasicStroke(3));
         if (orientation == HORIZONTAL)

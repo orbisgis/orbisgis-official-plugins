@@ -49,12 +49,14 @@ import javax.swing.BorderFactory;
 import javax.swing.JComponent;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.JSpinner;
 import javax.swing.KeyStroke;
 import javax.swing.SpinnerNumberModel;
 import javax.swing.border.Border;
 import javax.swing.event.ChangeListener;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
@@ -302,25 +304,21 @@ public class MainWindow extends JFrame {
         addCToolbarCItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 4);
 
         //Sets the spinners tool bar.
-        addToolbarComponent("spinnerXLabel", new JLabel(" X :"), stationLocation, 0, 1, 0, 0);
         spinnerX = createSpinner("X", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarComponent("spinnerX", spinnerX, stationLocation, 0, 1, 0, 1);
+        addToolbarSpinner("spinnerX", new JLabel("X"), spinnerX, stationLocation, 0, 1, 0, 1);
 
-        addToolbarComponent("spinnerYLabel", new JLabel(" Y :"), stationLocation, 0, 1, 0, 2);
         spinnerY = createSpinner("Y", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarComponent("spinnerY", spinnerY, stationLocation, 0, 1, 0, 3);
+        addToolbarSpinner("spinnerY", new JLabel("Y"), spinnerY, stationLocation, 0, 1, 0, 2);
 
-        addToolbarComponent("spinnerWidthLabel", new JLabel(" WIDTH :"), stationLocation, 0, 1, 0, 4);
         spinnerW = createSpinner("WIDTH", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarComponent("spinnerWidth", spinnerW, stationLocation, 0, 1, 0, 5);
+        addToolbarSpinner("spinnerWidth", new JLabel("WIDTH"), spinnerW, stationLocation, 0, 1, 0, 3);
 
-        addToolbarComponent("spinnerHeightLabel", new JLabel(" HEIGHT :"), stationLocation, 0, 1, 0, 6);
         spinnerH = createSpinner("HEIGHT", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarComponent("spinnerHeight", spinnerH, stationLocation, 0, 1, 0, 7);
+        addToolbarSpinner("spinnerHeight", new JLabel("HEIGHT"), spinnerH, stationLocation, 0, 1, 0, 4);
 
-        addToolbarComponent("spinnerRotationIcon", new JLabel(MapComposerIcon.getIcon("rotation")), stationLocation, 0, 1, 0, 8);
         spinnerR = createSpinner("ROTATION", 0, -360, 360);
-        addToolbarComponent("spinnerRotation", spinnerR, stationLocation, 0, 1, 0, 9);
+        addToolbarSpinner("spinnerRotation", new JLabel(MapComposerIcon.getIcon("rotation")), spinnerR,
+                stationLocation, 0, 1, 0, 5);
 
         DefaultSingleCDockable dockable = new DefaultSingleCDockable("composition_area", "composition area");
         dockable.setCloseable(false);
@@ -365,18 +363,24 @@ public class MainWindow extends JFrame {
     }
 
     /**
-     * Adds a JComponent to the toolbar.
+     * Adds a JComponent to the toolbar made with a JSpinner and a JLabel.
      * @param id Unique id of the JComponent.
-     * @param component The component to add.
+     * @param label The spinner label (can be a text or an icon).
+     * @param component The spinner to add.
      * @param stationLocation The CToolbarAreaLocation where the component will be added.
      * @param group Group of toolbar where the component will be added.
      * @param column Column of toolbar where the component will be added.
      * @param line Line of toolbar where the component will be added.
      * @param item Item number of toolbar where the component will be added.
      */
-    private void addToolbarComponent(String id, JComponent component, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
+    private void addToolbarSpinner(String id, JComponent label, JComponent component, CToolbarAreaLocation
+            stationLocation, int group, int column, int line, int item){
+        JComponent panel = new JPanel(new FlowLayout());
+        panel.add(label);
+        panel.add(component);
+
         CToolbarItem cItem = new CToolbarItem(id);
-        cItem.setItem(component);
+        cItem.setItem(panel);
         cItem.setLocation(stationLocation.group(group).toolbar(column, line).item(item));
         control.addDockable(cItem);
         cItem.setVisible(true);
