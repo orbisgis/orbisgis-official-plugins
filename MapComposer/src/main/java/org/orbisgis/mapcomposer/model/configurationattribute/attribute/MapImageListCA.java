@@ -45,8 +45,8 @@ import java.util.Map;
  */
 public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
 
-    /** Index of the value selected.*/
-    private int index;
+    /** MapImageId of the value selected.*/
+    private String mapImageId;
 
     /** Property itself. */
     private List<MapImage> list;
@@ -66,7 +66,7 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
      */
     public MapImageListCA(String name, boolean readOnly){
         super(name, readOnly);
-        index = -1;
+        mapImageId = "";
         list = new ArrayList<>();
     }
         
@@ -85,13 +85,22 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
     @Override public void       add(MapImage value)       {list.add(value);}
     @Override public boolean    remove(MapImage value)    {return this.list.remove(value);}
 
-    @Override public void       select(MapImage choice)   {index=list.indexOf(choice);}
+    @Override public void       select(MapImage choice)   {
+        if(choice == null) {
+            mapImageId = "";
+        }
+        else {
+            mapImageId = choice.getIdentifier();
+        }
+    }
     @Override public MapImage getSelected(){
-        //Verify if the index is correct. If not, return null.
-        if(index>=0 && index<list.size())
-            return list.get(index);
-        else
-            return null;
+        //Verify if the mapImageId is correct. If not, return null.
+        for(MapImage mi : list){
+            if(mapImageId == mi.getIdentifier()){
+                return mi;
+            }
+        }
+        return null;
     }
 
     /**
@@ -100,45 +109,30 @@ public class MapImageListCA extends BaseListCA<MapImage> implements RefreshCA{
      */
     @Override
     public void refresh(MainController uic) {
-        //For each MapImage in the list, test if it still present in the UIController.
-        //If not, it's removed
-        for(MapImage mi : list){
-            boolean flag=false;
-            for(GraphicalElement ge : uic.getGEList())
-                if(ge.equals(mi))
-                    flag = true;
-            if(!flag)
-                this.remove(mi);
-        }
-        
+        list = new ArrayList<>();
+        MapImage choice = null;
         for(GraphicalElement ge : uic.getGEList()){
             if(ge instanceof MapImage){
-                if(!list.contains(ge)){
-                    this.add((MapImage)ge);
+                this.add((MapImage)ge);
+                if(((MapImage)ge).getIdentifier().equals(mapImageId)) {
+                    choice = (MapImage) ge;
                 }
             }
         }
-        
+        this.select(choice);
     }
 
     @Override
     public void setField(String name, String value) {
         super.setField(name, value);
-        if(name.equals("list"))
-            //list= Arrays.asList(value.split(","));
-        if(name.equals("index"))
-            index=Integer.parseInt(value);
+        if(name.equals("mapImageId"))
+            mapImageId = value;
     }
 
     @Override
     public Map<String, Object> getAllFields() {
         Map ret = super.getAllFields();
-        ret.put("index", index);
-        /*String s="";
-        for(String str : list)
-            s+=str+",";
-        if(list.size()>0)s=s.substring(0, s.length()-1);
-        ret.put("list", s);*/
+        ret.put("mapImageId", mapImageId);
         return ret;
     }
 

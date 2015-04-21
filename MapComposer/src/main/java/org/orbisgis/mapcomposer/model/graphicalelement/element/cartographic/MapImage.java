@@ -25,6 +25,7 @@
 package org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic;
 
 import org.orbisgis.commons.progress.NullProgressMonitor;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEIdentifier;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.map.MapTransform;
@@ -39,12 +40,17 @@ import java.awt.image.BufferedImage;
  *
  * @author Sylvain PALOMINOS
  */
-public class MapImage extends SimpleCartoGE implements GERefresh {
+public class MapImage extends SimpleCartoGE implements GERefresh, GEIdentifier {
 
     /** MapTransform used to generate the map image.
      * This class come from OrbisGIS
      */
     private MapTransform mapTransform;
+
+    /**
+     * Unique id of the MapImage
+     */
+    private String id;
     
     /**
      * Main constructor.
@@ -52,6 +58,7 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     public MapImage(){
         super();
         mapTransform = new MapTransform();
+        id = this.toString();
     }
     
     @Override
@@ -79,7 +86,18 @@ public class MapImage extends SimpleCartoGE implements GERefresh {
     @Override
     public GraphicalElement deepCopy() {
         MapImage mapImage = (MapImage)super.deepCopy();
+        mapImage.id = this.id;
         mapImage.refresh();
         return mapImage;
+    }
+
+    @Override
+    public void setIdentifier(String id) {
+        this.id = id;
+    }
+
+    @Override
+    public String getIdentifier() {
+        return id;
     }
 }

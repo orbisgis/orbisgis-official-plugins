@@ -54,17 +54,23 @@ public class MapImageListRenderer implements CARenderer{
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
         final MapImageListCA milka = (MapImageListCA)ca;
 
-        //Display the MapImageListCA into a JComboBox
+        //Create a MapImage list
         List<ContainerItem<MapImage>> listContainer = new ArrayList<>();
         for(MapImage mapImage : milka.getValue()){
-            listContainer.add(new ContainerItem<>(mapImage, mapImage.getOwsMapContext().getTitle()));
+            if(mapImage != null) {
+                listContainer.add(new ContainerItem<>(mapImage, mapImage.getOwsMapContext().getTitle()));
+            }
         }
+        //Adds a null MapImage
+        listContainer.add(new ContainerItem<MapImage>(null, "<none>"));
+
+        //Display the MapImage list into a JComboBox
         JComboBox<ContainerItem<MapImage>> jcb = new JComboBox<ContainerItem<MapImage>>(listContainer.toArray(new ContainerItem[0]));
         jcb.putClientProperty("ca", milka);
         if(milka.getSelected()!=null)
             jcb.setSelectedItem(listContainer.get(milka.getValue().indexOf(milka.getSelected())));
         else
-            jcb.setSelectedIndex(0);
+            jcb.setSelectedIndex(jcb.getItemCount() - 1);
         //Adds a listener to set the ConfigurationAttribute represented to the JComboBox selected value.
         jcb.addActionListener(EventHandler.create(ActionListener.class, this, "setCA", ""));
 

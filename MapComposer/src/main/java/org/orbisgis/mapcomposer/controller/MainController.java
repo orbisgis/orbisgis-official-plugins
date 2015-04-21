@@ -32,7 +32,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
-import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
@@ -241,7 +240,7 @@ public class MainController{
 
     /**
      * Removes a GraphicalElement
-     * @param ge
+     * @param ge GraphicalElement to remove.
      */
     public void removeGE(GraphicalElement ge) {
         if(!undoingRedoing) {
@@ -359,20 +358,25 @@ public class MainController{
      */
     public void loadDocument(){
         List<GraphicalElement> list = ioController.loadDocument();
-        //Test if the file was successfully loaded.
+        //Test if the file was successfully loaded (i.e. if the list of GraphicalElement is not null).
         if(list != null) {
             removeAllGE();
-            //Add all the GE starting from the last one (to get the good z-index)
+            //Adds all the GraphicalElements loaded
+            for (GraphicalElement ge : list) {
+                addGE(ge);
+            }
+
+            //Then refresh the GraphicalElements and their ConfigurationAttributes
             for (GraphicalElement ge : list) {
                 if(ge instanceof GERefresh){
                     ((GERefresh)ge).refresh();
-                    for(ConfigurationAttribute ca : ge.getAllAttributes()){
-                        if(ca instanceof RefreshCA){
-                            ((RefreshCA)ca).refresh(this);
-                        }
+                }
+                for(ConfigurationAttribute ca : ge.getAllAttributes()){
+                    if(ca instanceof RefreshCA){
+                        ((RefreshCA)ca).refresh(this);
                     }
                 }
-                addGE(ge);
+                //To finish redraw the GraphicalElements
                 compositionAreaController.refreshGE(ge);
             }
         }
