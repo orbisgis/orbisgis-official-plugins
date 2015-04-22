@@ -32,8 +32,6 @@ import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
-import org.osgi.service.cm.ConfigurationException;
-import org.osgi.service.cm.ManagedService;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Deactivate;
 import org.osgi.service.component.annotations.Reference;
@@ -54,7 +52,7 @@ import java.util.List;
  */
 
 @Component
-public class Activator implements MainFrameAction, ManagedService {
+public class Activator implements MainFrameAction {
 
     public static final String MENU_MAPCOMPOSER = "MapComposer";
 
@@ -64,13 +62,10 @@ public class Activator implements MainFrameAction, ManagedService {
     /** ConfigurationAdmin instance */
     private ConfigurationAdmin configurationAdmin;
 
-    private boolean isUIConstructed;
+    private DataManager dataManager;
+    private ViewWorkspace viewWorkspace;
 
-
-    public Activator(){
-        mainWindow = new MainWindow();
-        isUIConstructed = false;
-    }
+    private Dictionary<String, Object> properties;
 
     @Override
     public List<Action> createActions(org.orbisgis.mainframe.api.MainWindow target) {
@@ -89,12 +84,22 @@ public class Activator implements MainFrameAction, ManagedService {
 
     @Reference
     protected void setDataManager(DataManager dataManager) {
-        this.mainWindow.setDataManager(dataManager);
+        this.dataManager = dataManager;
+    }
+
+    @Reference
+    protected void setConfigurationAdmin(ConfigurationAdmin configurationAdmin){
+        this.configurationAdmin = configurationAdmin;
+        try {
+            properties = configurationAdmin.getConfiguration(Activator.class.getName()).getProperties();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
     }
 
     @Reference
     protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
-        this.mainWindow.setViewWorkspace(viewWorkspace);
+        this.viewWorkspace = viewWorkspace;
     }
 
     protected void unsetDataManager(DataManager dataManager) {
@@ -105,20 +110,8 @@ public class Activator implements MainFrameAction, ManagedService {
         this.mainWindow.setViewWorkspace(null);
     }
 
-    @Reference
-    protected void setConfigurationAdmin(ConfigurationAdmin configurationAdmin){
-        this.configurationAdmin = configurationAdmin;
-    }
-
     protected void unsetConfigurationAdmin(ConfigurationAdmin configurationAdmin){
-        this.configurationAdmin = null;
-    }
-
-    @Override
-    public void updated(Dictionary<String, ?> properties) throws ConfigurationException {
-        mainWindow.setBounds((Integer) properties.get("window_x"), (Integer) properties.get("window_y"), (Integer) properties.get("window_width"), (Integer) properties.get("window_height"));
-        mainWindow.getCompositionArea().configure((Integer) properties.get("unit"));
-        mainWindow.configure((byte[])properties.get("layout"));
+        this.mainWindow.setConfigurationAdmin(null);
     }
 
     @Deactivate
@@ -145,10 +138,20 @@ public class Activator implements MainFrameAction, ManagedService {
     }
 
     public void showMapComposer(){
-        mainWindow.setVisible(true);
-        if(!isUIConstructed) {
+        //If the mainWindow hasn't been instantiate, do it and configure it.
+        if(mainWindow == null){
+            mainWindow = new MainWindow();
+            mainWindow.setDataManager(this.dataManager);
+            mainWindow.setViewWorkspace(this.viewWorkspace);
+            mainWindow.setConfigurationAdmin(this.configurationAdmin);
             mainWindow.constructUI();
-            isUIConstructed = true;
+        }
+        mainWindow.setVisible(true);
+        //Load the DockingFrames configuration
+        if(properties != null) {
+            mainWindow.setBounds((Integer) properties.get("window_x"), (Integer) properties.get("window_y"), (Integer) properties.get("window_width"), (Integer) properties.get("window_height"));
+            mainWindow.getCompositionArea().configure((Integer) properties.get("unit"));
+            mainWindow.configure((byte[]) properties.get("layout"));
         }
     }
 }

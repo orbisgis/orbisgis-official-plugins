@@ -28,7 +28,7 @@ package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
  * This interface for GraphicalElement adds an identifier which is used on saving.
  * For example the MapImageListCA need to keep a link with the selected MapImage which is done with the MapImage
  * identifier.
- * 
+ *
  * @author Sylvain PALOMINOS
  */
 

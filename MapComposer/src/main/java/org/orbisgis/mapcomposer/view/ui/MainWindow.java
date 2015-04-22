@@ -35,12 +35,15 @@ import bibliothek.gui.dock.toolbar.CToolbarContentArea;
 import bibliothek.gui.dock.toolbar.CToolbarItem;
 import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
 import org.orbisgis.corejdbc.DataManager;
+import org.orbisgis.mapcomposer.Activator;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.wkguiapi.ViewWorkspace;
+import org.osgi.service.cm.Configuration;
+import org.osgi.service.cm.ConfigurationAdmin;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -60,12 +63,16 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.beans.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.util.Dictionary;
+import java.util.Hashtable;
 
 /**
  * Main window of the map composer. It contains several tool bar and the CompositionArea.
@@ -126,6 +133,7 @@ public class MainWindow extends JFrame {
     private CControl control;
 
     private CToolbarContentArea area;
+    private ConfigurationAdmin configurationAdmin;
 
     /** Public main constructor. */
     public MainWindow(){
@@ -140,6 +148,12 @@ public class MainWindow extends JFrame {
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
         this.control = new CControl(this);
+        this.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosing(WindowEvent we) {
+                //onCloseWindow();
+            }
+        });
     }
 
     /**
@@ -436,5 +450,30 @@ public class MainWindow extends JFrame {
                 LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
             }
         }
+    }
+
+    public void onCloseWindow(){
+        ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
+        this.writeLayoutInByteArrayOutputStream(byteArrayOutputStream);
+        try {
+            Configuration configuration = configurationAdmin.getConfiguration(Activator.class.getName());
+            Dictionary<String, Object> props = configuration.getProperties();
+            if (props == null) {
+                props = new Hashtable<>();
+            }
+            props.put("window_width", this.getWidth());
+            props.put("window_height", this.getHeight());
+            props.put("window_x", this.getX());
+            props.put("window_y", this.getY());
+            props.put("unit", this.getCompositionArea().getUnit());
+            props.put("layout", byteArrayOutputStream.toByteArray());
+            configuration.update(props);
+        } catch (IOException e) {
+            LoggerFactory.getLogger(Activator.class).error(e.getMessage());
+        }
+    }
+
+    public void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
+        this.configurationAdmin = configurationAdmin;
     }
 }
