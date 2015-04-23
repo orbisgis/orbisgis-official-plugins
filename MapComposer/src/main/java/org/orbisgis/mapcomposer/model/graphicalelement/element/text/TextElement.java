@@ -68,21 +68,21 @@ public class TextElement extends SimpleGE implements GEProperties{
     private static final I18n i18n = I18nFactory.getI18n(TextElement.class);
 
     /** Displayed name of the text*/
-    public static final String sText = i18n.tr("Text");
+    public static final String sText = I18n.marktr("Text");
     /** Displayed name of the text color*/
-    public static final String sTextColor = i18n.tr("Text color");
+    public static final String sTextColor = I18n.marktr("Text color");
     /** Displayed name of the background color*/
-    public static final String sBackColor = i18n.tr("Background color");
+    public static final String sBackColor = I18n.marktr("Background color");
     /** Displayed name of the alignment*/
-    public static final String sAlignment = i18n.tr("Alignment");
+    public static final String sAlignment = I18n.marktr("Alignment");
     /** Displayed name of the style*/
-    public static final String sStyle = i18n.tr("Style");
+    public static final String sStyle = I18n.marktr("Style");
     /** Displayed name of the alpha*/
-    public static final String sAlpha = i18n.tr("Alpha");
+    public static final String sAlpha = I18n.marktr("Alpha");
     /** Displayed name of the font*/
-    public static final String sFont = i18n.tr("Font");
+    public static final String sFont = I18n.marktr("Font");
     /** Displayed name of the font size*/
-    public static final String sFontSize = i18n.tr("Font size");
+    public static final String sFontSize = I18n.marktr("Font size");
 
     /**
      * Public main constructor.

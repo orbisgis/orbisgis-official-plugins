@@ -319,16 +319,16 @@ public class MainWindow extends JFrame {
 
         //Sets the spinners tool bar.
         spinnerX = createSpinner("X", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerX", new JLabel("X"), spinnerX, stationLocation, 0, 1, 0, 1);
+        addToolbarSpinner("spinnerX", new JLabel(I18n.marktr("X")), spinnerX, stationLocation, 0, 1, 0, 1);
 
         spinnerY = createSpinner("Y", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerY", new JLabel("Y"), spinnerY, stationLocation, 0, 1, 0, 2);
+        addToolbarSpinner("spinnerY", new JLabel(I18n.marktr("Y")), spinnerY, stationLocation, 0, 1, 0, 2);
 
         spinnerW = createSpinner("WIDTH", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerWidth", new JLabel("WIDTH"), spinnerW, stationLocation, 0, 1, 0, 3);
+        addToolbarSpinner("spinnerWidth", new JLabel(I18n.marktr("WIDTH")), spinnerW, stationLocation, 0, 1, 0, 3);
 
         spinnerH = createSpinner("HEIGHT", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerHeight", new JLabel("HEIGHT"), spinnerH, stationLocation, 0, 1, 0, 4);
+        addToolbarSpinner("spinnerHeight", new JLabel(I18n.marktr("HEIGHT")), spinnerH, stationLocation, 0, 1, 0, 4);
 
         spinnerR = createSpinner("ROTATION", 0, -360, 360);
         addToolbarSpinner("spinnerRotation", new JLabel(MapComposerIcon.getIcon("rotation")), spinnerR,

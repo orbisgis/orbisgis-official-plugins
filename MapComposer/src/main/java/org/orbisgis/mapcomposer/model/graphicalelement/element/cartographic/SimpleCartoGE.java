@@ -46,11 +46,8 @@ public abstract class SimpleCartoGE extends SimpleGE implements CartographicElem
     /** OWS-Context source.*/
     protected OwsContextCA owsc;
 
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(SimpleCartoGE.class);
-
     /** Displayed name of the Ows-Context*/
-    public static final String sOWSC = i18n.tr("OWS-Context path");
+    public static final String sOWSC = I18n.marktr("OWS-Context path");
     
     /**Main constructor.*/
     public SimpleCartoGE(){

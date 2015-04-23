@@ -46,11 +46,8 @@ public abstract class SimpleIllustrationGE extends SimpleGE implements Illustrat
     /** Path to the data source of the element.*/;
     private SourceCA path;
 
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(SimpleIllustrationGE.class);
-
     /** Displayed name of the path to the illustration*/
-    private static final String sPath = i18n.tr("Path");
+    private static final String sPath = I18n.marktr("Path");
     
     /**Main constructor.*/
     public SimpleIllustrationGE(){

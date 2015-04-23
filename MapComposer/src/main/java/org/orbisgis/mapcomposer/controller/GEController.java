@@ -252,13 +252,15 @@ public class GEController {
             newGE = newGEClass.newInstance();
             //Test if the newGE doesn't implement GEProperties and if there isn't a Document GE
             if( !(newGE instanceof GEProperties) && !mainController.isDocumentCreated()) {
-                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document or open an existing project."));
+                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document " +
+                        "or open an existing one."));
                 return;
             }
 
             //Test if the newGE implements GEProperties and if it needs a Document GE and if there isn't a Document GE
             if( newGE instanceof GEProperties && ((GEProperties)newGE).isDocumentNeeded() && !mainController.isDocumentCreated()) {
-                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document or open an existing project."));
+                mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("First create a new document " +
+                        "or open an existing one."));
                 return;
             }
 
@@ -306,7 +308,6 @@ public class GEController {
 
                 List<GraphicalElement> list = new ArrayList<>();
                 list.add(newGE);
-                //undoManager.addEdit(new UndoableEdit(UndoableEdit.EditType.ADD_GE, list, this));
             }
             else{
                 newGE=null;

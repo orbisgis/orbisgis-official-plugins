@@ -57,20 +57,17 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     /**Name of the document*/
     private StringCA name;
 
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(Document.class);
-
     /** Displayed name of the orientation*/
-    private static final String sOrientation = i18n.tr("Orientation");
+    private static final String sOrientation = I18n.marktr("Orientation");
 
     /** Displayed name of the format*/
-    private static final String sFormat = i18n.tr("Format");
+    private static final String sFormat = I18n.marktr("Format");
 
     /**Displayed name of the name*/
-    private static final String sName = i18n.tr("Name");
+    private static final String sName = I18n.marktr("Name");
 
     /**Displayed name of the title*/
-    private static final String sDefaultName = i18n.tr("Document title");
+    private static final String sDefaultName = I18n.marktr("Document title");
 
     @Override
     public boolean isDocumentNeeded() {

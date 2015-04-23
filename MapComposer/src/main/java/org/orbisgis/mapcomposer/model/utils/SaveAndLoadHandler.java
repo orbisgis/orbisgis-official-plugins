@@ -186,7 +186,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
                 if (stringBuffer.toString().equals(COMPATIBLE_VERSIONS[i]))
                     flag = true;
             if (!flag) {
-                String message = i18n.tr("File version {0} isn't compatible with the MapComposer version. Should be {1}", stringBuffer.toString(), "");
+                String message = i18n.tr("File version {0} isn't compatible with the MapComposer version. Should be " +
+                        "{1}.", stringBuffer.toString(), "");
                 for (String s : COMPATIBLE_VERSIONS)
                     message += s + ", ";
                 throw new SAXException(message);
@@ -208,8 +209,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws SAXException
      */
     public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
-        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document project"));
-        loadFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document"));
+        loadFilePanel.addFilter(new String[]{"xml"}, "i18n.tr(XML save files");
         loadFilePanel.loadState();
 
         if(UIFactory.showDialog(loadFilePanel))
@@ -218,7 +219,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
     }
 
     /**
-     * Loads and returns the project save file corresponding to the given path.
+     * Loads and returns the document save file corresponding to the given path.
      * @param path Path of the file to load
      * @return The list of GraphicalElement saved
      * @throws ParserConfigurationException
@@ -238,8 +239,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws NoSuchMethodException
      */
     public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
-        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document project"));
-        saveFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document"));
+        saveFilePanel.addFilter(new String[]{"xml"}, i18n.tr("XML save files"));
         saveFilePanel.loadState();
 
         if(UIFactory.showDialog(saveFilePanel)){

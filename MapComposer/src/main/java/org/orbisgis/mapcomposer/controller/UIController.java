@@ -112,7 +112,7 @@ public class UIController {
     }
 
     public void createLegend(){
-        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet."));
     }
 
     public void createOrientation(){
@@ -135,11 +135,11 @@ public class UIController {
     }
 
     public void createCircle(){
-        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet."));
     }
 
     public void createPolygon(){
-        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet"));
+        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet."));
     }
 
     public void alignToLeft(){

@@ -56,23 +56,20 @@ public abstract class SimpleGE implements GraphicalElement{
     /** Z index of the GE.*/
     private IntegerCA z;
 
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(SimpleGE.class);
-
     /**Displayed name of the x position*/
-    private static final String sX = i18n.tr("x");
+    private static final String sX = I18n.marktr("x");
 
     /**Displayed name of the y position*/
-    private static final String sY = i18n.tr("y");
+    private static final String sY = I18n.marktr("y");
 
     /**Displayed name of the rotation*/
-    private static final String sRotation = i18n.tr("Rotation");
+    private static final String sRotation = I18n.marktr("Rotation");
 
     /**Displayed name of the height*/
-    private static final String sHeight = i18n.tr("Height");
+    private static final String sHeight = I18n.marktr("Height");
 
     /**Displayed name of the width*/
-    private static final String sWidth = i18n.tr("Width");
+    private static final String sWidth = I18n.marktr("Width");
     
     /**
      * Main constructor.
@@ -81,7 +78,7 @@ public abstract class SimpleGE implements GraphicalElement{
         //ConfigurationAttribute instantiation
         x= new IntegerCA(sX, false, 0);
         y= new IntegerCA(sY, false, 0);
-        z= new IntegerCA("z", false, 0);
+        z= new IntegerCA(I18n.marktr("z"), false, 0);
         rotation= new IntegerCA(sRotation, false, 0, true, -360, 360);
         height= new IntegerCA(sHeight, false, 50, true, 1, Integer.MAX_VALUE);
         width= new IntegerCA(sWidth, false, 50, true, 1, Integer.MAX_VALUE);
