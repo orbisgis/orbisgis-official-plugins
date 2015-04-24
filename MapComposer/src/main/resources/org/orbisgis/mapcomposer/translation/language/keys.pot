@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-23 14:25+0200\n"
+"POT-Creation-Date: 2015-04-24 13:03+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,12 +51,12 @@ msgid ""
 "the ratio width/height.</html>"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/view/utils/UIDialogProperties.java:171
+#: org/orbisgis/mapcomposer/view/utils/UIDialogProperties.java:175
 msgid "Configuration"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/view/utils/ColorChooser.java:54
-msgid "Ok"
+#: org/orbisgis/mapcomposer/view/utils/ColorChooser.java:66
+msgid "Color chooser"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/view/configurationattribute/SourceRenderer.java:88

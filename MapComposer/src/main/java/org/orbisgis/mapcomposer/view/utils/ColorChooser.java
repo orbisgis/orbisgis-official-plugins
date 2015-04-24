@@ -42,7 +42,6 @@ import javax.swing.*;
  */
 public class ColorChooser implements UIPanel{
     private JComponent label;
-    private JButton button;
     private JColorChooser jcc;
     private JComponent mainPanel;
 
