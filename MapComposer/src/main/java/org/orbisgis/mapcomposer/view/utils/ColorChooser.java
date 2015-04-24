@@ -24,12 +24,15 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
+import org.orbisgis.sif.UIPanel;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.event.MouseListener;
 import java.beans.EventHandler;
+import java.net.URL;
 import javax.swing.*;
 
 /**
@@ -37,32 +40,41 @@ import javax.swing.*;
  *
  * @author Sylvain PALOMINOS
  */
-public class ColorChooser extends JFrame{
-    private final JComponent label;
-    private final JButton button;
-    final JColorChooser jcc;
+public class ColorChooser implements UIPanel{
+    private JComponent label;
+    private JButton button;
+    private JColorChooser jcc;
+    private JComponent mainPanel;
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(ColorChooser.class);
     
     public ColorChooser(JComponent label){
+        super();
+        this.mainPanel = new JPanel();
         this.label = label;
         jcc = new JColorChooser(Color.yellow);
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(jcc);
-        this.button = new JButton(i18n.tr("Ok"));
-        this.button.addMouseListener(EventHandler.create(MouseListener.class, this, "mouseClicked", "source", "mouseClicked"));
-        this.button.setSize(40, 20);
-        panel.add(button);
-        this.add(panel);
-        this.pack();
+        mainPanel.add(jcc);
     }
 
-   public void mouseClicked(Object o) {
-        if(o==button){
-            label.setBackground(jcc.getColor());
-            this.setVisible(false);
-        }
+    @Override
+    public URL getIconURL() {
+        return null;
+    }
+
+    @Override
+    public String getTitle() {
+        return i18n.tr("Color chooser");
+    }
+
+    @Override
+    public String validateInput() {
+        label.setBackground(jcc.getColor());
+        return null;
+    }
+
+    @Override
+    public Component getComponent() {
+        return mainPanel;
     }
 }

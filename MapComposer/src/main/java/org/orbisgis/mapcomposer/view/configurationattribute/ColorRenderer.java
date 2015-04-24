@@ -27,7 +27,8 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.view.utils.ColorChooser;
-import java.awt.FlowLayout;
+import org.orbisgis.sif.UIFactory;
+
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
@@ -66,8 +67,8 @@ public class ColorRenderer implements CARenderer{
      * @param component The chosen color will be saved in the background of the component
      */
     public void open(JComponent component){
-        ColorChooser cc = new ColorChooser(component);
-        cc.setVisible(true);
+        ColorChooser colorChooser = new ColorChooser(component);
+        UIFactory.showDialog(colorChooser, true, true);
     }
-    
+
 }
