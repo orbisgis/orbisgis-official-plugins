@@ -127,7 +127,7 @@ public class GEController {
                         BufferedImage bi = ImageIO.read(new File(((SimpleIllustrationGE) newGE).getPath()));
                         mainController.getCompositionAreaController().setOverlayRatio((float) bi.getWidth() / bi.getHeight());
                     } catch (IOException e) {
-                        LoggerFactory.getLogger(MainController.class).error(e.getMessage());
+                        LoggerFactory.getLogger(GEController.class).error(e.getMessage());
                     }
                 }
             }
@@ -301,7 +301,7 @@ public class GEController {
                         }
                     }
                     mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-                    mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Now you can draw the GraphicalElement."));
+                    mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Now you can draw the GraphicalElement. Hold SHIFT to keep the width/height ratio"));
                 }
 
                 List<GraphicalElement> list = new ArrayList<>();

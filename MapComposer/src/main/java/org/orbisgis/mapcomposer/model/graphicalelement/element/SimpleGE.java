@@ -54,7 +54,7 @@ public abstract class SimpleGE implements GraphicalElement{
     /** Width of the GE.*/
     private IntegerCA width;
     /** Z index of the GE.*/
-    private int z;
+    private IntegerCA z;
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(SimpleGE.class);
@@ -81,6 +81,7 @@ public abstract class SimpleGE implements GraphicalElement{
         //ConfigurationAttribute instantiation
         x= new IntegerCA(sX, false, 0);
         y= new IntegerCA(sY, false, 0);
+        z= new IntegerCA("z", false, 0);
         rotation= new IntegerCA(sRotation, false, 0, true, -360, 360);
         height= new IntegerCA(sHeight, false, 50, true, 1, Integer.MAX_VALUE);
         width= new IntegerCA(sWidth, false, 50, true, 1, Integer.MAX_VALUE);
@@ -89,14 +90,14 @@ public abstract class SimpleGE implements GraphicalElement{
 //Setters
     @Override public void setX(int x)   {this.x.setValue(x);}
     @Override public void setY(int y)   {this.y.setValue(y);}
-    @Override public void setZ(int z)   {this.z=z; }
+    @Override public void setZ(int z)   {this.z.setValue(z); }
     @Override public void setRotation(int rotation) {this.rotation.setValue(rotation);}
     @Override public void setHeight(int height)     {this.height.setValue(height);}
     @Override public void setWidth(int width)       {this.width.setValue(width);}
 //Getters
     @Override public int getX() {return this.x.getValue();}
     @Override public int getY() {return this.y.getValue();}
-    @Override public int getZ() {return z;}
+    @Override public int getZ() {return this.z.getValue();}
     @Override public int getRotation()  {return this.rotation.getValue();}
     @Override public int getHeight()    {return this.height.getValue();}
     @Override public int getWidth()     {return this.width.getValue();}
@@ -107,6 +108,8 @@ public abstract class SimpleGE implements GraphicalElement{
             x=(IntegerCA)ca;
         if(ca.getName().equals(y.getName()))
             y=(IntegerCA)ca;
+        if(ca.getName().equals(z.getName()))
+            z=(IntegerCA)ca;
         if(ca.getName().equals(rotation.getName()))
             rotation=(IntegerCA)ca;
         if(ca.getName().equals(height.getName()))
@@ -120,6 +123,7 @@ public abstract class SimpleGE implements GraphicalElement{
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(x);
         list.add(y);
+        list.add(z);
         list.add(width);
         list.add(height);
         list.add(rotation);
@@ -136,7 +140,7 @@ public abstract class SimpleGE implements GraphicalElement{
         }
         copy.x = (IntegerCA) this.x.deepCopy();
         copy.y = (IntegerCA) this.y.deepCopy();
-        copy.z = this.z;
+        copy.z = (IntegerCA) this.z.deepCopy();
         copy.rotation = (IntegerCA) this.rotation.deepCopy();
         copy.width = (IntegerCA) this.width.deepCopy();
         copy.height = (IntegerCA) this.height.deepCopy();

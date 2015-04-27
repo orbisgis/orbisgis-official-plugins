@@ -37,6 +37,12 @@
                         <Private-Package>org.orbisgis.mapcomposer.*</Private-Package>
                         <Bundle-Category>orbisgis</Bundle-Category>
                         <Bundle-Icon>org/orbisgis/mapcomposer/view/utils/map_composer.png</Bundle-Icon>
+                        <Embed-Dependency>docking-frames-ext-toolbar-common;scope=compile;inline=true,
+                            docking-frames-ext-toolbar;scope=compile;inline=true,
+                            docking-frames-common;scope=compile;inline=true,
+                            docking-frames-core;scope=compile;inline=true
+                        </Embed-Dependency>
+                        <Embed-Transitive>true</Embed-Transitive>
                     </instructions>
                 </configuration>
             </plugin>
@@ -98,6 +104,11 @@
             <artifactId>org.apache.felix.scr.ds-annotations</artifactId>
             <version>1.2.4</version>
             <scope>compile</scope>
+        </dependency>
+        <dependency>
+            <groupId>org.dockingframes</groupId>
+            <artifactId>docking-frames-ext-toolbar-common</artifactId>
+            <version>1.1.2-P5</version>
         </dependency>
     </dependencies>
     <properties>

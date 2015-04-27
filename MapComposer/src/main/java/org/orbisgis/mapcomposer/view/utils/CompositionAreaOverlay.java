@@ -50,20 +50,21 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     /** MainController */
     private MainController mainController;
 
+    /** Enumeration containing all the mode of drawing
+     * NEW_GE : The user is drawing a new GraphicalElement.
+     * RESIZE_GE : The user is resizing a GraphicalElement.
+     * NONE : the user isn't interacting with the overlay.
+     */
     public enum Mode{NEW_GE, RESIZE_GE, NONE}
     /** Drawing mode of the Overlay */
     private Mode mode;
 
     /** Stop the overlay if the message has not change during this time */
-    private static final int MESSAGE_TIMEOUT = 3000;
+    private static final int MESSAGE_TIMEOUT = 5000;
     /** Size of the arc value for drawing the round rectangle **/
     private static final int MESSAGE_ARC = 15;
     /** Space between the window border and the message box border **/
     private static final int MESSAGE_MARGIN = 10;
-    /** Maximum value of the presence of the message **/
-    private static final int MESSAGE_PRESENCE_MAX = 100;
-    /** Value of the timer delay to the message box velocity **/
-    private static final int MESSAGE_TIME_GROWING = 5;
     /** Alpha value applied to the message box.**/
     private static final float MESSAGE_ALPHA = 0.7f;
     /** Border in pixels, on top and bottom of text message */
@@ -73,17 +74,17 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     private String message;
     /** Font of the message */
     private Font messageFont;
-    /** Timer for cleaning of the message */
-    private Timer timer;
-    private int messagePresence;
+    /** Timer of the mesage */
+    private Timer messageTimer;
 
-    /** This value is the ratio between width and height of the new GraphicalElement (width/height).
-     * If it's negative, it means that there is not ratio to respect.
-     */
+    /** This value is the ratio between width and height of the new GraphicalElement (width/height) */
     private float ratio;
 
     /** Tells if the ratio should be respected */
     private boolean respectRatio;
+
+    /** Tells if the message needs to be drawn */
+    private boolean isMessageDrawn;
 
     /**
      * Main constructor.
@@ -94,8 +95,6 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
         ratio = -1;
         mode = null;
         messageFont = new JLabel().getFont().deriveFont(Font.BOLD);
-        messagePresence = MESSAGE_PRESENCE_MAX;
-        timer = new Timer(MESSAGE_TIMEOUT, null);
         this.respectRatio = false;
     }
 
@@ -133,7 +132,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
 
     @Override
     public void applyPropertyChange(PropertyChangeEvent pce, JLayer l) {
-        if ("messageOpacity".equals(pce.getPropertyName())) {
+        if ("isMessageDrawn".equals(pce.getPropertyName())) {
             l.repaint();
         }
     }
@@ -141,24 +140,24 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
     @Override
     public void paint (Graphics g, JComponent c) {
         super.paint(g, c);
-        if (mode == Mode.NEW_GE){
+        //Test if the user is doing a modification on a GraphicalElement
+        if (mode == Mode.NEW_GE || mode == Mode.RESIZE_GE){
+            //Verify that the extreme points of the draw are defined
             if (start != null && end != null) {
                 Graphics2D g2 = (Graphics2D) g.create();
                 float[] dash = {10.0f};
                 g2.setStroke(new BasicStroke(1.0f,BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER,10.0f,dash,0.0f));
                 int x, y;
                 float width, height;
+                x = (end.x < start.x) ? end.x : start.x;
+                y = (end.y < start.y) ? end.y : start.y;
                 //If the ratio in negative, there is no need to respect it
-                if(ratio<=0 || !respectRatio) {
-                    x = (end.x < start.x) ? end.x : start.x;
-                    y = (end.y < start.y) ? end.y : start.y;
+                if(!respectRatio) {
                     width = Math.abs(end.x - start.x);
                     height = Math.abs(end.y - start.y);
                 }
                 //if the ratio is positive, the new GE bounding box have to respect it.
                 else{
-                    x = (end.x < start.x) ? end.x : start.x;
-                    y = (end.y < start.y) ? end.y : start.y;
                     width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
                     height = width/ratio;
 
@@ -167,33 +166,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
                 g2.dispose();
             }
         }
-        if (mode == Mode.RESIZE_GE){
-            if (start != null && end != null) {
-                Graphics2D g2 = (Graphics2D) g.create();
-                float[] dash = {10.0f};
-                g2.setStroke(new BasicStroke(1.0f, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f));
-                int x, y;
-                float width, height;
-                //If the ratio in negative, there is no need to respect it
-                if(ratio<=0) {
-                    x = (end.x < start.x) ? end.x : start.x;
-                    y = (end.y < start.y) ? end.y : start.y;
-                    width = Math.abs(end.x - start.x);
-                    height = Math.abs(end.y - start.y);
-                }
-                //if the ratio is positive, the new GE bounding box have to respect it.
-                else{
-                    x = (end.x < start.x) ? end.x : start.x;
-                    y = (end.y < start.y) ? end.y : start.y;
-                    width = (Math.abs(end.x - start.x)>(Math.abs(end.y - start.y)*ratio))?Math.abs(end.x - start.x):Math.abs(end.y - start.y)*ratio;
-                    height = width/ratio;
-
-                }
-                g2.drawRect(x, y, (int)width, (int)height);
-                g2.dispose();
-            }
-        }
-        if(timer.isRunning()) {
+        if(isMessageDrawn) {
             int x = MESSAGE_MARGIN / 2;
             int w = c.getWidth() - MESSAGE_MARGIN;
 
@@ -204,7 +177,7 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
             Composite urComposite = g2.getComposite();
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, MESSAGE_ALPHA));
 
-            int overlayHeight = (int) (Math.ceil((textSize.getHeight() + OVERLAY_INNER_BORDER * 2)) * (messagePresence / 100.0f));
+            int overlayHeight = (int) (Math.ceil(textSize.getHeight() + OVERLAY_INNER_BORDER * 2));
             int y = c.getHeight() - overlayHeight;
             int h = (overlayHeight) + MESSAGE_ARC;
 
@@ -299,49 +272,20 @@ public class CompositionAreaOverlay extends LayerUI<JComponent>{
      */
     public void writeMessage(String message){
         this.message = message;
-        this.messagePresence = 0;
-        timer.stop();
-        timer = new Timer(MESSAGE_TIME_GROWING, EventHandler.create(ActionListener.class, this, "growIn"));
-        timer.setRepeats(true);
-        timer.start();
-        this.firePropertyChange("messageOpacity", null, messagePresence);
+        isMessageDrawn =true;
+        messageTimer = new Timer(MESSAGE_TIMEOUT, EventHandler.create(ActionListener.class, this, "clearMessage"));
+        messageTimer.setRepeats(true);
+        messageTimer.start();
+        this.firePropertyChange("isMessageDrawn", null, null);
     }
 
     /**
      * Makes the message box appear from the bottom of the window.
      */
-    public void growIn(){
-        messagePresence++;
-        this.firePropertyChange("messageOpacity", null, messagePresence);
-        //Stop the growing
-        if(messagePresence==MESSAGE_PRESENCE_MAX){
-            timer.stop();
-            timer = new Timer(MESSAGE_TIMEOUT, EventHandler.create(ActionListener.class, this, "startGrowOut"));
-            timer.start();
-            messagePresence = MESSAGE_PRESENCE_MAX;
-        }
-    }
-
-    /**
-     * Start the disappearing of the message box.
-     */
-    public void startGrowOut(){
-        timer.stop();
-        timer = new Timer(MESSAGE_TIME_GROWING, EventHandler.create(ActionListener.class, this, "growOut"));
-        timer.setRepeats(true);
-        timer.start();
-    }
-
-    /**
-     * Makes the message box disappear.
-     */
-    public void growOut(){
-        messagePresence--;
-        this.firePropertyChange("messageOpacity", null, messagePresence);
-        if(messagePresence<=0){
-            timer.stop();
-            messagePresence = MESSAGE_PRESENCE_MAX;
-        }
+    public void clearMessage(){
+        isMessageDrawn =false;
+        messageTimer.stop();
+        this.firePropertyChange("isMessageDrawn", null, null);
     }
 
     @Override

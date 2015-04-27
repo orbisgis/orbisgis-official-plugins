@@ -33,7 +33,6 @@ import org.orbisgis.mapcomposer.view.utils.PositionScale;
 
 import java.awt.*;
 import java.awt.event.*;
-import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import java.text.DecimalFormat;
 import javax.swing.*;
@@ -76,8 +75,7 @@ public class CompositionArea extends JPanel {
     private JLabel positionJLabel;
 
     /** Fixed size of the PositionScale used as header view in the JScrollPane */
-    private final static int POSITIONSCALE_DIMENSION = 50;
-
+    private final static int POSITIONSCALE_DIMENSION = 30;
     /** The vertical PositionScale */
     private PositionScale verticalPositionScale;
 
@@ -119,14 +117,15 @@ public class CompositionArea extends JPanel {
         verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
         horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
         inchOrCm = new JButton("in");
+        inchOrCm.setMargin(new Insets(0, 0, 0, 0));
         inchOrCm.setFont(new Font("Arial", Font.PLAIN, 8));
         inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
-        scrollPane.getViewport().getViewPosition();
         scrollPane.getHorizontalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, horizontalPositionScale, "setScrollValue", ""));
         scrollPane.getVerticalScrollBar().addAdjustmentListener(EventHandler.create(AdjustmentListener.class, verticalPositionScale, "setScrollValue", ""));
         scrollPane.setCorner(JScrollPane.UPPER_LEFT_CORNER, inchOrCm);
+
         //Creates the layer for the whole compositionArea
         this.layerUI = new CompositionAreaOverlay(mainController);
         JLayer compositionAreaJLayer = new JLayer<>(scrollPane, this.layerUI);
@@ -145,6 +144,7 @@ public class CompositionArea extends JPanel {
         componentPosition.add(positionJLabel);
         componentPosition.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
 
+        /*
         //Sets the zoom spinner
         JSpinner spinnerZoom = new JSpinner(new SpinnerNumberModel(100, 10, 1000, 1));
         spinnerZoom.setPreferredSize(new Dimension(80, (int) spinnerZoom.getPreferredSize().getHeight()));
@@ -153,6 +153,7 @@ public class CompositionArea extends JPanel {
         component.add(new JLabel("Zoom : "));
         component.add(spinnerZoom);
         component.setBorder(BorderFactory.createLineBorder(Color.LIGHT_GRAY));
+        */
 
         //Sets the progress bar
         progressBar = new JProgressBar();
@@ -161,7 +162,7 @@ public class CompositionArea extends JPanel {
         //Adds the two components
         bottomJToolBar.add(componentPosition, BorderLayout.LINE_START);
         bottomJToolBar.add(progressBar, BorderLayout.CENTER);
-        bottomJToolBar.add(component, BorderLayout.LINE_END);
+        //bottomJToolBar.add(component, BorderLayout.LINE_END);
         bottomJToolBar.setFloatable(false);
 
         //Adds the JToolBar
@@ -176,11 +177,7 @@ public class CompositionArea extends JPanel {
      * @param value New value of the JProgressBar.
      */
     public void setProgressBarValue(int value){
-        progressBar.setString("Running");
         progressBar.setValue(value);
-        if(value == progressBar.getMaximum()){
-            progressBar.setString("Done");
-        }
     }
 
     /**
@@ -262,8 +259,10 @@ public class CompositionArea extends JPanel {
         if(document != null) {
             document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
             mainController.getCompositionAreaController().actuAllGE();
-            horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2);
-            verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2);
+            horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2,
+                    document.getWidth());
+            verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2,
+                    document.getHeight());
         }
     }
 
@@ -441,5 +440,27 @@ public class CompositionArea extends JPanel {
      */
     public Rectangle getDocumentBounds(){
         return document.getBounds();
+    }
+
+    /**
+     * Configure the CompositionArea.
+     * @param unit The unit to use.
+     */
+    public void configure(int unit){
+        this.unit = unit;
+        if(unit == UNIT_MM)
+            inchOrCm.setText("mm");
+        else
+            inchOrCm.setText("in");
+        verticalPositionScale.setUnit(unit);
+        horizontalPositionScale.setUnit(unit);
+    }
+
+    /**
+     * Returns the actual unit used.
+     * @return The actual unit used.
+     */
+    public int getUnit(){
+        return unit;
     }
 }

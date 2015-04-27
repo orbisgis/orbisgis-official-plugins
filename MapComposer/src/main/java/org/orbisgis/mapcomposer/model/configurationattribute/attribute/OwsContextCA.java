@@ -117,7 +117,6 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
             try {
                 if (omc.isOpen())
                     omc.close(new NullProgressMonitor());
-                File f = new File(getSelected());
                 omc.read(new FileInputStream(new File(getSelected())));
                 omc.open(new NullProgressMonitor());
             } catch (LayerException|FileNotFoundException ex) {

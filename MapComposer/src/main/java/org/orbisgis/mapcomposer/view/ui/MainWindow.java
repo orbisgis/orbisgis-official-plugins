@@ -24,29 +24,46 @@
 
 package org.orbisgis.mapcomposer.view.ui;
 
+import bibliothek.gui.dock.ToolbarDockStation;
+import bibliothek.gui.dock.common.CControl;
+import bibliothek.gui.dock.common.CGrid;
+import bibliothek.gui.dock.common.CLocation;
+import bibliothek.gui.dock.common.DefaultSingleCDockable;
+import bibliothek.gui.dock.common.action.CButton;
+import bibliothek.gui.dock.themes.border.BorderModifier;
+import bibliothek.gui.dock.toolbar.CToolbarContentArea;
+import bibliothek.gui.dock.toolbar.CToolbarItem;
+import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
 import org.orbisgis.corejdbc.DataManager;
-import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
-
-import java.awt.*;
-import java.awt.event.*;
-import java.beans.EventHandler;
-import java.util.ArrayList;
-import java.util.List;
-import javax.swing.*;
-import javax.swing.event.ChangeListener;
-
 import org.orbisgis.sif.UIFactory;
-import org.orbisgis.sif.components.actions.ActionCommands;
-import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
-import org.osgi.service.component.annotations.*;
-import org.osgi.service.component.annotations.Component;
+import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+
+import javax.swing.BorderFactory;
+import javax.swing.JComponent;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JSpinner;
+import javax.swing.KeyStroke;
+import javax.swing.SpinnerNumberModel;
+import javax.swing.border.Border;
+import javax.swing.event.ChangeListener;
+import java.awt.Dimension;
+import java.awt.event.ActionListener;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
+import java.beans.EventHandler;
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
+import java.io.DataInputStream;
+import java.io.DataOutputStream;
+import java.io.IOException;
 
 /**
  * Main window of the map composer. It contains several tool bar and the CompositionArea.
@@ -54,11 +71,10 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Sylvain PALOMINOS
  */
-@Component
-public class MainWindow extends JFrame implements MainFrameAction {
+
+public class MainWindow extends JFrame {
 
     //String used to define the toolbars actions
-    public static final String MENU_MAPCOMPOSER = "MapComposer";
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
     public static final String CONFIGURATION = "CONFIGURATION";
     public static final String SAVE = "SAVE";
@@ -68,7 +84,7 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public static final String ADD_TEXT = "ADD_TEXT";
     public static final String ADD_LEGEND = "ADD_LEGEND";
     public static final String ADD_ORIENTATION = "ADD_ORIENTATION";
-    public static final String ADD_SCALE = "ADD_ORIENTATION";
+    public static final String ADD_SCALE = "ADD_SCALE";
     public static final String ADD_PICTURE = "ADD_PICTURE";
     public static final String DRAW_CIRCLE = "DRAW_CIRCLE";
     public static final String DRAW_POLYGON = "DRAW_POLYGON";
@@ -88,15 +104,6 @@ public class MainWindow extends JFrame implements MainFrameAction {
     public static final String UNDO = "UNDO";
     public static final String REDO = "REDO";
 
-    /** ActionCommands for the buttons. */
-    private final ActionCommands actions = new ActionCommands();
-    /** JToolBar for the buttons. It's registered in the action ActionCommands. */
-    private final JToolBar iconToolBar = new JToolBar();
-
-    /** JToolBar for the spinners.
-     * The spinners are used to change the position, the size and the rotation of selected GraphicalElements. */
-    private final JToolBar spinnerToolBar = new JToolBar();
-
     /** Spinner for the x position. */
     private JSpinner spinnerX =null;
     /** Spinner for the y position. */
@@ -114,6 +121,10 @@ public class MainWindow extends JFrame implements MainFrameAction {
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
+    private CControl control;
+
+    private CToolbarContentArea area;
+
     /** Public main constructor. */
     public MainWindow(){
         super("Map composer");
@@ -122,82 +133,11 @@ public class MainWindow extends JFrame implements MainFrameAction {
         this.mainController = new MainController();
         this.mainController.setMainWindow(this);
         this.compositionArea = new CompositionArea(mainController);
-        mainController.getCompositionAreaController().setCompositionArea(compositionArea);
+        this.mainController.getCompositionAreaController().setCompositionArea(compositionArea);
         //Sets the default size to the window
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
-
-        //Creates the panel containing the two tool bars.
-        JPanel toolBarPanel = new JPanel();
-        toolBarPanel.setLayout(new BoxLayout(toolBarPanel, BoxLayout.Y_AXIS));
-        toolBarPanel.add(iconToolBar);
-        toolBarPanel.add(spinnerToolBar);
-        this.add(toolBarPanel, BorderLayout.PAGE_START);
-
-        //Sets the button tool bar.
-        iconToolBar.setFloatable(false);
-        spinnerToolBar.setFloatable(false);
-        actions.registerContainer(iconToolBar);
-
-        actions.addAction(createAction(NEW_COMPOSER, "", i18n.tr("Create a new document (Ctrl + N)"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N")));
-        actions.addAction(createAction(CONFIGURATION, "", i18n.tr("Show the document configuration dialog (Ctrl + D)"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D")));
-        actions.addAction(createAction(SAVE, "", i18n.tr("Save the document (Ctrl + S)"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S")));
-        actions.addAction(createAction(LOAD, "", i18n.tr("Open a document (Ctrl + L)"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O")));
-        actions.addAction(createAction(EXPORT_COMPOSER, "", i18n.tr("Export the document (Ctrl + E)"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ADD_MAP, "", i18n.tr("Add a map element (Alt + M)"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M")));
-        actions.addAction(createAction(ADD_TEXT,  "", i18n.tr("Add a text element (Alt + T)"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T")));
-        actions.addAction(createAction(ADD_LEGEND, "", i18n.tr("Add a legend element (Alt + L)"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L")));
-        actions.addAction(createAction(ADD_ORIENTATION, "", i18n.tr("Add an orientation element (Alt + O)"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O")));
-        actions.addAction(createAction(ADD_SCALE, "", i18n.tr("Add a scale element (Alt + S)"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S")));
-        actions.addAction(createAction(ADD_PICTURE, "", i18n.tr("Add a picture element (Alt + I)"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(DRAW_CIRCLE, "", i18n.tr("Add a circle element (Alt + C)"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C")));
-        actions.addAction(createAction(DRAW_POLYGON, "", i18n.tr("Add a polygon element (Alt + Y)"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(MOVE_BACK, "", i18n.tr("Move to the back (Alt + PageDown)"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN")));
-        actions.addAction(createAction(MOVE_DOWN, "", i18n.tr("Move down (Alt + Down)"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN")));
-        actions.addAction(createAction(MOVE_ON, "", i18n.tr("Move on (Alt + Up)"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP")));
-        actions.addAction(createAction(MOVE_FRONT, "", i18n.tr("Move to the front (Alt + PageUp)"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(ALIGN_TO_LEFT, "", i18n.tr("Align to the left (Alt + numpad 4)"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4")));
-        actions.addAction(createAction(ALIGN_TO_CENTER, "", i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null));
-        actions.addAction(createAction(ALIGN_TO_RIGHT, "", i18n.tr("Align to the right (Alt + numpad 6)"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6")));
-        actions.addAction(createAction(ALIGN_TO_BOTTOM, "", i18n.tr("Align to the bottom (Alt + numpad 2)"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2")));
-        actions.addAction(createAction(ALIGN_TO_MIDDLE, "", i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null));
-        actions.addAction(createAction(ALIGN_TO_TOP, "", i18n.tr("Align to the top (Alt + numpad 8)"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8")));
-        addSeparatorTo(iconToolBar);
-        actions.addAction(createAction(PROPERTIES, "", i18n.tr("Show selected elements properties (Ctrl + P)"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P")));
-        actions.addAction(createAction(DELETE, "", i18n.tr("Delete selected elements (DELETE)"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE")));
-        actions.addAction(createAction(REFRESH, "", i18n.tr("Redraw selected elements (Ctrl + R)"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R")));
-        actions.addAction(createAction(UNDO, "", i18n.tr("Undo the last action (Ctrl + Z)"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z")));
-        actions.addAction(createAction(REDO, "", i18n.tr("Redo the last action (Ctrl + Shift + Z)"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z")));
-
-        iconToolBar.add(new JSeparator(SwingConstants.VERTICAL));
-
-        //Sets the spinners tool bar.
-        spinnerX = createSpinner("X", " X : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerY = createSpinner("Y", " Y : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerW = createSpinner("WIDTH", " W : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerH = createSpinner("HEIGHT", " H : ", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        spinnerToolBar.add(new JLabel(MapComposerIcon.getIcon("rotation")));
-        spinnerR = createSpinner("ROTATION", "", 0, -360, 360);
-        spinnerToolBar.add(new JSeparator(SwingConstants.VERTICAL));
-
-        //Adds the composition area.
-        this.add(compositionArea, BorderLayout.CENTER);
-
-        actions.setAccelerators(rootPane, JComponent.WHEN_IN_FOCUSED_WINDOW);
-    }
-
-    /**
-     * Adds a well sized separator to a tool bar.
-     * @param toolBar Tool bar needing a separator.
-     */
-    private void addSeparatorTo(JToolBar toolBar){
-        JSeparator sep = new JSeparator(SwingConstants.VERTICAL);
-        sep.setMaximumSize(new Dimension(8, 32));
-        toolBar.add(sep);
+        this.control = new CControl(this);
     }
 
     /**
@@ -205,32 +145,6 @@ public class MainWindow extends JFrame implements MainFrameAction {
      * @return The CompositionArea
      */
     public CompositionArea getCompositionArea(){return compositionArea;}
-
-    /**
-     * Creates and adds to the spinnerToolBar a spinner and its label.
-     * The spinner and its label are set with the given function argument.
-     * The function return the spinner reference to permit to listen to their modification.
-     * @param name Name of the spinner.
-     * @param label Text display in the tool bar.
-     * @param value Actual value of the spinner.
-     * @param minValue Minimum value of the spinner.
-     * @param maxValue Maximum value of the spinner.
-     * @return The reference to the created spinner.
-     */
-    private JSpinner createSpinner(String name, String label, int value, int minValue, int maxValue){
-        spinnerToolBar.add(new JLabel(label));
-        JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
-        spin.setName(name);
-        spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
-        spin.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
-        spin.setMaximumSize(new Dimension(64, 32));
-        spin.setMinimumSize(new Dimension(32, 32));
-        spin.setPreferredSize(new Dimension(64, 32));
-        spin.setEnabled(false);
-        spinnerToolBar.add(spin);
-        spinnerToolBar.addSeparator();
-        return spin;
-    }
 
     /**
      * Apply a change in a JSpinner of the tool bar into the selected GraphicalElements via the UIController
@@ -262,7 +176,7 @@ public class MainWindow extends JFrame implements MainFrameAction {
     }
 
     /**
-     * Action done when the mouse wheel is used in a JComboBox of the toolbar.
+     * Action done when the mouse wheel is used in a JSpinner of the toolbar.
      * @param mwe MouseWheelEvent
      */
     public void mouseWheel(MouseWheelEvent mwe){
@@ -288,28 +202,6 @@ public class MainWindow extends JFrame implements MainFrameAction {
                 }
             }
         }
-    }
-
-    /**
-     * Create a DefaultAction with the given value.
-     * @param actionID Action identifier
-     * @param actionLabel Short label
-     * @param actionToolTip Tool tip text
-     * @param actionIconName Name of the icon file
-     * @param target Target of the action listener
-     * @param ActionFunctionName Function of the target
-     * @param keyStroke Shortcut for the action
-     * @return Configured DefaultAction
-     */
-    private DefaultAction createAction(String actionID, String actionLabel, String actionToolTip, String actionIconName, Object target, String ActionFunctionName, KeyStroke keyStroke){
-        return new DefaultAction(
-                            actionID,
-                            actionLabel,
-                            actionToolTip,
-                            MapComposerIcon.getIcon(actionIconName),
-                            EventHandler.create(ActionListener.class, target, ActionFunctionName),
-                            keyStroke
-                        );
     }
 
     /**
@@ -344,44 +236,201 @@ public class MainWindow extends JFrame implements MainFrameAction {
         }
     }
 
-    @Override
-    public List<Action> createActions(org.orbisgis.mainframe.api.MainWindow  target) {
-        List<Action> actions = new ArrayList<>();
-        actions.add(new DefaultAction(MENU_MAPCOMPOSER, "Map Composer",
-                MapComposerIcon.getIcon("map_composer"),
-                EventHandler.create(ActionListener.class, this, "showMapComposer")).setParent(MENU_TOOLS));
-        return actions;
+    /**
+     * Configure the main window.
+     * @param layoutByteArray DockingFrames layout converted into byte array.
+     */
+    public void configure(byte[] layoutByteArray) {
+        if (layoutByteArray != null) {
+            ByteArrayInputStream byteArrayInputStream = new ByteArrayInputStream(layoutByteArray);
+            try {
+                control.read(new DataInputStream(byteArrayInputStream));
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
+            }
+        }
     }
 
-    public void showMapComposer(){this.setVisible(true);}
+    /**
+     * Build the UI.
+     */
+    public void constructUI(){
+        control.putProperty(ToolbarDockStation.SIDE_GAP, 2);
+        control.putProperty(ToolbarDockStation.GAP, 2);
+        control.getController().getThemeManager().setBorderModifier("dock.border.displayer.basic.base", new BorderModifier() {
+            @Override
+            public Border modify(Border border) {
+                return null;
+            }
+        });
 
-    @Override
-    public void disposeActions(org.orbisgis.mainframe.api.MainWindow  target, List<Action> actions) {
-        this.dispose();
+        area = new CToolbarContentArea(control, "base");
+        area.getNorthArea().setBorder(BorderFactory.createRaisedBevelBorder());
+        area.getNorthArea().setVisible(false);
+        control.addStationContainer(area);
+        this.add(area);
+
+        CToolbarAreaLocation stationLocation = area.getNorthToolbar().getStationLocation();
+
+        addCToolbarCItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N"), stationLocation, 0, 0, 0, 0);
+        addCToolbarCItem(CONFIGURATION, i18n.tr("Show the document configuration dialog"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D"), stationLocation, 0, 0, 0, 1);
+        addCToolbarCItem(SAVE, i18n.tr("Save the document"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S"), stationLocation, 0, 0, 0, 2);
+        addCToolbarCItem(LOAD, i18n.tr("Open a document"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O"), stationLocation, 0, 0, 0, 3);
+        addCToolbarCItem(EXPORT_COMPOSER, i18n.tr("Export the document"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E"), stationLocation, 0, 0, 0, 4);
+        addCToolbarCItem(ADD_MAP, i18n.tr("Add a map element"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M"), stationLocation, 0, 0, 1, 0);
+        addCToolbarCItem(ADD_TEXT, i18n.tr("Add a text element"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T"), stationLocation, 0, 0, 1, 1);
+        addCToolbarCItem(ADD_LEGEND, i18n.tr("Add a legend element"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L"), stationLocation, 0, 0, 1, 2);
+        addCToolbarCItem(ADD_ORIENTATION, i18n.tr("Add an orientation element"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O"), stationLocation, 0, 0, 1, 3);
+        addCToolbarCItem(ADD_SCALE, i18n.tr("Add a scale element"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S"), stationLocation, 0, 0, 1, 4);
+        addCToolbarCItem(ADD_PICTURE, i18n.tr("Add a picture element"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I"), stationLocation, 0, 0, 1, 5);
+        addCToolbarCItem(DRAW_CIRCLE, i18n.tr("Add a circle element"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C"), stationLocation, 0, 0, 2, 0);
+        addCToolbarCItem(DRAW_POLYGON, i18n.tr("Add a polygon element"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y"), stationLocation, 0, 0, 2, 1);
+        addCToolbarCItem(MOVE_BACK, i18n.tr("Move to the back"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN"), stationLocation, 0, 0, 3, 0);
+        addCToolbarCItem(MOVE_DOWN, i18n.tr("Move down"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN"), stationLocation, 0, 0, 3, 1);
+        addCToolbarCItem(MOVE_ON, i18n.tr("Move on"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP"), stationLocation, 0, 0, 3, 2);
+        addCToolbarCItem(MOVE_FRONT, i18n.tr("Move to the front"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP"), stationLocation, 0, 0, 3, 3);
+        addCToolbarCItem(ALIGN_TO_LEFT, i18n.tr("Align to the left"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4"), stationLocation, 0, 0, 4, 0);
+        addCToolbarCItem(ALIGN_TO_CENTER, i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null, stationLocation, 0, 0, 4, 1);
+        addCToolbarCItem(ALIGN_TO_RIGHT, i18n.tr("Align to the right"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6"), stationLocation, 0, 0, 4, 2);
+        addCToolbarCItem(ALIGN_TO_BOTTOM, i18n.tr("Align to the bottom"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2"), stationLocation, 0, 0, 4, 3);
+        addCToolbarCItem(ALIGN_TO_MIDDLE, i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null, stationLocation, 0, 0, 4, 4);
+        addCToolbarCItem(ALIGN_TO_TOP, i18n.tr("Align to the top"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), stationLocation, 0, 0, 4, 5);
+        addCToolbarCItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), stationLocation, 0, 0, 5, 0);
+        addCToolbarCItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), stationLocation, 0, 0, 5, 1);
+        addCToolbarCItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), stationLocation, 0, 0, 5, 2);
+        addCToolbarCItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z"), stationLocation, 0, 0, 5, 3);
+        addCToolbarCItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 4);
+
+        //Sets the spinners tool bar.
+        addToolbarComponent("spinnerXLabel", new JLabel(" X :"), stationLocation, 0, 1, 0, 0);
+        spinnerX = createSpinner("X", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        addToolbarComponent("spinnerX", spinnerX, stationLocation, 0, 1, 0, 1);
+
+        addToolbarComponent("spinnerYLabel", new JLabel(" Y :"), stationLocation, 0, 1, 0, 2);
+        spinnerY = createSpinner("Y", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        addToolbarComponent("spinnerY", spinnerY, stationLocation, 0, 1, 0, 3);
+
+        addToolbarComponent("spinnerWidthLabel", new JLabel(" WIDTH :"), stationLocation, 0, 1, 0, 4);
+        spinnerW = createSpinner("WIDTH", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        addToolbarComponent("spinnerWidth", spinnerW, stationLocation, 0, 1, 0, 5);
+
+        addToolbarComponent("spinnerHeightLabel", new JLabel(" HEIGHT :"), stationLocation, 0, 1, 0, 6);
+        spinnerH = createSpinner("HEIGHT", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
+        addToolbarComponent("spinnerHeight", spinnerH, stationLocation, 0, 1, 0, 7);
+
+        addToolbarComponent("spinnerRotationIcon", new JLabel(MapComposerIcon.getIcon("rotation")), stationLocation, 0, 1, 0, 8);
+        spinnerR = createSpinner("ROTATION", 0, -360, 360);
+        addToolbarComponent("spinnerRotation", spinnerR, stationLocation, 0, 1, 0, 9);
+
+        DefaultSingleCDockable dockable = new DefaultSingleCDockable("composition_area", "composition area");
+        dockable.setCloseable(false);
+        dockable.setResizeLocked(true);
+        dockable.setLocation(CLocation.base().normal());
+        dockable.setTitleShown(false);
+        dockable.setMaximizable(false);
+        dockable.setMinimizable(false);
+        dockable.add(compositionArea);
+
+        CGrid grid = new CGrid(control);
+        grid.add(0, 0, 1, 1, dockable);
+        area.deploy(grid);
     }
 
-    protected DataManager getDataManager(){
-        return mainController.getDataManager();
-    }
-    protected ViewWorkspace getViewWorkspace(){
-        return mainController.getViewWorkspace();
+    /**
+     * Adds a CItem to the toolbar.
+     * @param actionId Unique id of the item.
+     * @param actionToolTip The component to add.
+     * @param actionIconName Name of the icon to use.
+     * @param target Target to use for the ActionListener creation.
+     * @param actionFunctionName Name of the method to call with the action listener.
+     * @param keyStroke KeyStroke to use.
+     * @param stationLocation The CToolbarAreaLocation where the item will be added.
+     * @param group Group of toolbar where the item will be added.
+     * @param column Column of toolbar where the item will be added.
+     * @param line Line of toolbar where the item will be added.
+     * @param item Item number of toolbar where the item will be added.
+     */
+    private void addCToolbarCItem(String actionId, String actionToolTip, String actionIconName, Object target, String actionFunctionName, KeyStroke keyStroke, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
+        CButton button = new CButton(actionId, MapComposerIcon.getIcon(actionIconName));
+        button.setTooltip(actionToolTip);
+        button.addActionListener(EventHandler.create(ActionListener.class, target, actionFunctionName));
+
+        CToolbarItem cItem = new CToolbarItem(actionId);
+        cItem.setItem(button);
+        cItem.setLocation(stationLocation.group(group).toolbar(column, line).item(item));
+        control.addDockable(cItem);
+        cItem.setVisible(true);
+
+        area.registerKeyboardAction(EventHandler.create(ActionListener.class, target, actionFunctionName), actionId, keyStroke, JComponent.WHEN_IN_FOCUSED_WINDOW);
     }
 
-    @Reference
-    protected void setDataManager(DataManager dataManager) {
+    /**
+     * Adds a JComponent to the toolbar.
+     * @param id Unique id of the JComponent.
+     * @param component The component to add.
+     * @param stationLocation The CToolbarAreaLocation where the component will be added.
+     * @param group Group of toolbar where the component will be added.
+     * @param column Column of toolbar where the component will be added.
+     * @param line Line of toolbar where the component will be added.
+     * @param item Item number of toolbar where the component will be added.
+     */
+    private void addToolbarComponent(String id, JComponent component, CToolbarAreaLocation stationLocation, int group, int column, int line, int item){
+        CToolbarItem cItem = new CToolbarItem(id);
+        cItem.setItem(component);
+        cItem.setLocation(stationLocation.group(group).toolbar(column, line).item(item));
+        control.addDockable(cItem);
+        cItem.setVisible(true);
+    }
+
+    /**
+     * Creates a spinner.
+     * The spinner is set with the given function argument.
+     * The function return the spinner reference to permit to listen to their modification.
+     * @param name Name of the spinner.
+     * @param value Actual value of the spinner.
+     * @param minValue Minimum value of the spinner.
+     * @param maxValue Maximum value of the spinner.
+     * @return The reference to the created spinner.
+     */
+    private JSpinner createSpinner(String name, int value, int minValue, int maxValue){
+        JSpinner spin = new JSpinner(new SpinnerNumberModel(value, minValue, maxValue, 1));
+        spin.setName(name);
+        spin.addChangeListener(EventHandler.create(ChangeListener.class, this, "spinChange", "source"));
+        spin.addMouseWheelListener(EventHandler.create(MouseWheelListener.class, this, "mouseWheel", ""));
+        spin.setMaximumSize(new Dimension(64, 32));
+        spin.setMinimumSize(new Dimension(32, 32));
+        spin.setPreferredSize(new Dimension(64, 32));
+        spin.setEnabled(false);
+        return spin;
+    }
+
+    public void setDataManager(DataManager dataManager) {
         this.mainController.setDataManager(dataManager);
     }
 
-    @Reference
-    protected void setViewWorkspace(ViewWorkspace viewWorkspace) {
+    public void setViewWorkspace(ViewWorkspace viewWorkspace) {
         this.mainController.setViewWorkspace(viewWorkspace);
     }
 
-    protected void unsetDataManager(DataManager dataManager) {
-        this.mainController.setDataManager(null);
+    public void close(){
+        if(control != null){
+            control.destroy();
+        }
+        this.dispose();
     }
 
-    protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
-        this.mainController.setViewWorkspace(null);
+    /**
+     * Write the DockingFrames layout into a ByteArrayOutputStream.
+     * @param stream ByteArrayOutputStream where the layout will be written.
+     */
+    public void writeLayoutInByteArrayOutputStream(ByteArrayOutputStream stream){
+        if(control!=null) {
+            control.save("layout");
+            try {
+                control.write(new DataOutputStream(stream));
+            } catch (IOException e) {
+                LoggerFactory.getLogger(MainWindow.class).error(e.getMessage());
+            }
+        }
     }
 }
