@@ -83,6 +83,7 @@ public class AddGEUndoableEdit implements UndoableEdit {
     public void redo() throws CannotRedoException {
         for(GraphicalElement ge : listGE)
             mainController.addGE(ge);
+        mainController.getCompositionAreaController().refreshGE(listGE);
     }
 
     @Override
