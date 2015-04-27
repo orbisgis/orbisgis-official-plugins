@@ -376,6 +376,8 @@ public class MainController{
                         ((RefreshCA)ca).refresh(this);
                     }
                 }
+            }
+            for (GraphicalElement ge : list) {
                 //To finish redraw the GraphicalElements
                 compositionAreaController.refreshGE(ge);
             }

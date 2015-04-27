@@ -210,7 +210,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
      */
     public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
         OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document"));
-        loadFilePanel.addFilter(new String[]{"xml"}, "i18n.tr(XML save files");
+        loadFilePanel.addFilter(new String[]{"xml"}, i18n.tr("XML save files"));
         loadFilePanel.loadState();
 
         if(UIFactory.showDialog(loadFilePanel))
