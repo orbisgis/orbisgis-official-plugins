@@ -74,6 +74,8 @@ public class CompositionArea extends JPanel {
     /** JLabel displaying the mouse position */
     private JLabel positionJLabel;
 
+    /** Fixed size of the PositionScale used as header view in the JScrollPane */
+    private final static int POSITIONSCALE_DIMENSION = 30;
     /** The vertical PositionScale */
     private PositionScale verticalPositionScale;
 
@@ -112,8 +114,8 @@ public class CompositionArea extends JPanel {
 
         //Sets the ScrollPane that will contain the layeredPane and sets its header view.
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, 30);
-        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, 30);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
         inchOrCm = new JButton("in");
         inchOrCm.setMargin(new Insets(0, 0, 0, 0));
         inchOrCm.setFont(new Font("Arial", Font.PLAIN, 8));
