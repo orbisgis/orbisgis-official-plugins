@@ -83,28 +83,52 @@ public class ScaleRenderer implements RendererRaster, RendererVector {
         int width = ge.getWidth();
         while(width>=resolution){
             if(updown){
-                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2, resolution, ge.getHeight()/2-1);
-                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-1, resolution, ge.getHeight()/2+2);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                        y-ge.getHeight()/2,
+                        resolution,
+                        ge.getHeight()/2-1);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                        y-1,
+                        resolution,
+                        ge.getHeight()/2+2);
             }
             else{
-                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2, resolution, ge.getHeight()/2-1);
-                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-1, resolution, ge.getHeight()/2+1);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                        y-ge.getHeight()/2,
+                        resolution,
+                        ge.getHeight()/2-1);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                        y-1,
+                        resolution,
+                        ge.getHeight()/2+1);
             }
             updown=!updown;
             width-=resolution;
             i++;
         }
         if(updown){
-            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2, width - 1, ge.getHeight()/2-1);
-            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-1, width, ge.getHeight()/2+2);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                    y-ge.getHeight()/2,
+                    width - 1,
+                    ge.getHeight()/2-1);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                    y-1,
+                    width,
+                    ge.getHeight()/2+2);
         }
         else{
-            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2, width, ge.getHeight()/2-1);
-            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-1, width, ge.getHeight()/2+1);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                    y-ge.getHeight()/2,
+                    width,
+                    ge.getHeight()/2-1);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                    y-1,
+                    width,
+                    ge.getHeight()/2+1);
         }
 
         graphics2D.setFont(graphics2D.getFont().deriveFont(Font.PLAIN, ge.getHeight() / 5 - 1));
-        graphics2D.drawString("1:" + ((int) mapScalemmR/(i+1)), 0, ge.getHeight()/2+ge.getHeight()/4);
+        graphics2D.drawString("1:" + ((int) mapScalemmR/(i+1)), x-ge.getWidth()/2, y+ge.getHeight() /4);
         graphics2D.dispose();
     }
 

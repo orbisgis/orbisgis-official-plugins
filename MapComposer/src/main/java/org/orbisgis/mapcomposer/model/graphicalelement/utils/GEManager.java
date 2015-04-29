@@ -29,6 +29,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapI
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.shape.OvalGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.shape.RectangleGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.graphicalelement.*;
@@ -50,7 +52,7 @@ public class GEManager {
     
     /** Main constructor.*/
     public GEManager(){
-        mapRenderer = new HashMap();
+        mapRenderer = new HashMap<>();
         //Adding the original GE and their Renderer
         mapRenderer.put(MapImage.class, new MapImageRenderer());
         mapRenderer.put(Orientation.class, new OrientationRenderer());
@@ -58,6 +60,8 @@ public class GEManager {
         mapRenderer.put(Image.class, new ImageRenderer());
         mapRenderer.put(TextElement.class, new TextRenderer());
         mapRenderer.put(Document.class, new DocumentRenderer());
+        mapRenderer.put(RectangleGE.class, new RectangleRenderer());
+        mapRenderer.put(OvalGE.class, new CircleRenderer());
     }
     
     /**
@@ -84,9 +88,8 @@ public class GEManager {
      */
     public List<Class<? extends GraphicalElement>> getRegisteredGEClasses(){
         List<Class<? extends GraphicalElement>> list = new ArrayList<>();
-        Iterator<Map.Entry<Class<? extends GraphicalElement>, GERenderer>> it = mapRenderer.entrySet().iterator();
-        while(it.hasNext())
-            list.add(it.next().getKey());
+        for (Map.Entry<Class<? extends GraphicalElement>, GERenderer> classGERendererEntry : mapRenderer.entrySet())
+            list.add(classGERendererEntry.getKey());
         return list;
     }
 }

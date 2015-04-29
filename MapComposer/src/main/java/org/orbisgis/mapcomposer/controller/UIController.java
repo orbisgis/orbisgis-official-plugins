@@ -31,6 +31,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapI
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Scale;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.Image;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.shape.OvalGE;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.shape.RectangleGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.graphicalelement.CustomConfigurationPanel;
@@ -135,11 +137,15 @@ public class UIController {
     }
 
     public void createCircle(){
-        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet."));
+        mainController.getCompositionAreaController().setOverlayRatio(1);
+        mainController.getGEController().instantiateNewGE(OvalGE.class);
+        mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     public void createPolygon(){
-        mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Action not supported yet."));
+        mainController.getCompositionAreaController().setOverlayRatio(1);
+        mainController.getGEController().instantiateNewGE(RectangleGE.class);
+        mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
     }
 
     public void alignToLeft(){
