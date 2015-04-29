@@ -92,6 +92,8 @@ public class CompositionArea extends JPanel {
     /** Corner button of the ScrollPane to change the dimension unit */
     private JButton inchOrCm;
 
+    private static int SCALE_SIZE = 30;
+
     /**
      * Main constructor.
      */
@@ -112,11 +114,11 @@ public class CompositionArea extends JPanel {
 
         //Sets the ScrollPane that will contain the layeredPane and sets its header view.
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, 30);
-        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, 30);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, SCALE_SIZE);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, SCALE_SIZE);
         inchOrCm = new JButton("in");
         inchOrCm.setMargin(new Insets(0, 0, 0, 0));
-        inchOrCm.setFont(new Font("Arial", Font.PLAIN, 8));
+        inchOrCm.setFont(new Font("Arial", Font.PLAIN, SCALE_SIZE/4));
         inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);

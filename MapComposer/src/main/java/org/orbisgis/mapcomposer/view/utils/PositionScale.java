@@ -46,6 +46,8 @@ public class PositionScale extends JComponent {
     public static final int VERTICAL = 1;
     /** Size of the PositionScale (width if it is vertical, height if it is horizontal).*/
     public static int SIZE;
+    /** Size of the cursor of the scale.*/
+    private static int CURSOR_SIZE = 3;
 
     /** Orientation of the PositionScale.*/
     public int orientation;
@@ -136,7 +138,7 @@ public class PositionScale extends JComponent {
         }
 
         //Sets the font and text color
-        g.setFont(new Font("SansSerif", Font.PLAIN, 10));
+        g.setFont(new Font("SansSerif", Font.PLAIN, SIZE/3));
         g.setColor(Color.black);
 
         //Get the length of the Scale
@@ -155,12 +157,15 @@ public class PositionScale extends JComponent {
 
             //Draw the half graduation before the unit graduation
             if (orientation == HORIZONTAL) {
-                g.drawLine((int) (unitPosition - halfUnit), yRect + hRect / 2 - 3, (int) (unitPosition - halfUnit), yRect
-
-                        + hRect / 2 + 3);
+                g.drawLine((int) (unitPosition - halfUnit),
+                        yRect + hRect / 2 - SIZE/10,
+                        (int) (unitPosition - halfUnit),
+                        yRect + hRect / 2 + SIZE/10);
             } else {
-                g.drawLine(xRect + wRect / 2 - 3, (int) (unitPosition - halfUnit), xRect + wRect / 2 + 3, (int)
-                        (unitPosition - halfUnit));
+                g.drawLine(xRect + wRect / 2 - SIZE/10,
+                        (int) (unitPosition - halfUnit),
+                        xRect + wRect / 2 + SIZE/10,
+                        (int) (unitPosition - halfUnit));
             }
 
             //Draw the deci graduation before and after the unit graduation
@@ -207,7 +212,7 @@ public class PositionScale extends JComponent {
         }
 
         //Draw the mouse position cursor
-        g.setStroke(new BasicStroke(3));
+        g.setStroke(new BasicStroke(CURSOR_SIZE));
         if (orientation == HORIZONTAL)
             g.drawLine(mousePosition.x-1, 10, mousePosition.x-1, SIZE-10);
         else
