@@ -63,7 +63,7 @@
                     <poDirectory>${project.build.sourceDirectory}/../resources/org/orbisgis/mapcomposer/translation/language/
                     </poDirectory>
                     <targetBundle>org.orbisgis.mapcomposer.Messages</targetBundle>
-                    <keywords>-ktr</keywords>
+                    <keywords>-ktr -kmarktr</keywords>
                     <outputFormat>properties</outputFormat>
                 </configuration>
             </plugin>

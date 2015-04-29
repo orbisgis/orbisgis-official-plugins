@@ -31,10 +31,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.Dimension;
-import java.awt.Toolkit;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.ArrayList;
@@ -58,13 +56,13 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     private StringCA name;
 
     /** Displayed name of the orientation*/
-    private static final String sOrientation = I18n.marktr("Orientation");
+    public static final String sOrientation = I18n.marktr("Orientation");
 
     /** Displayed name of the format*/
-    private static final String sFormat = I18n.marktr("Format");
+    public static final String sFormat = I18n.marktr("Format");
 
     /**Displayed name of the name*/
-    private static final String sName = I18n.marktr("Name");
+    public static final String sName = I18n.marktr("Name");
 
     /**Displayed name of the title*/
     private static final String sDefaultName = I18n.marktr("Document title");
@@ -103,7 +101,29 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     }
 
     /** Enumeration of the orientation possibilities : portrait or landscape.*/
-    public enum Orientation{PORTRAIT, LANDSCAPE}
+    public enum Orientation{
+        PORTRAIT(I18n.marktr("Portrait")),
+        LANDSCAPE(I18n.marktr("Landscape"));
+
+        /** Orientation name */
+        private String name;
+
+        /**
+         * Main constructor.
+         * @param name Name of the orientation.
+         */
+        private Orientation(String name){
+            this.name = name;
+        }
+
+        /**
+         * Returns the name of the orientation.
+         * @return The name of the orientation.
+         */
+        public String getName(){
+            return name;
+        }
+    }
     
     /**
      * Main constructor.
@@ -114,13 +134,13 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         format= new SourceListCA(sFormat, false);
         name= new StringCA(sName, false, sDefaultName);
         //Sets the orientation CA
-        orientation.add(Orientation.LANDSCAPE.name());
-        orientation.add(Orientation.PORTRAIT.name());
-        orientation.select(Orientation.LANDSCAPE.name());
+        orientation.add(Orientation.LANDSCAPE.getName());
+        orientation.add(Orientation.PORTRAIT.getName());
+        orientation.select(Orientation.LANDSCAPE.getName());
         //Sets the format CA
-        format.add(Format.A3.name());
-        format.add(Format.A4.name());
-        format.add(Format.CUSTOM.name());
+        format.add(Format.A3.getName());
+        format.add(Format.A4.getName());
+        format.add(Format.CUSTOM.getName());
         setFormat(Format.A4);
     }
     
@@ -141,7 +161,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * @param f New format of the document.
      */
     public void setFormat(Format f){
-        format.select(f.name());
+        format.select(f.getName());
         this.setWidth(Format.valueOf(format.getSelected()).getPixelWidth());
         this.setHeight(Format.valueOf(format.getSelected()).getPixelHeight());
     }
@@ -156,7 +176,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * Sets the orientation of the document.
      * @param o New document orientation.
      */
-    public void setOrientation(Orientation o){orientation.select(o.name());}
+    public void setOrientation(Orientation o){orientation.select(o.getName());}
 
     /**
      * Return the dimension of the document according to the format and to the orientation of the document.
@@ -164,7 +184,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      */
     public Dimension getDimension(){
         Dimension dim;
-        if(orientation.getSelected().equals(Orientation.PORTRAIT.name()))
+        if(orientation.getSelected().equals(Orientation.PORTRAIT.getName()))
             dim = new Dimension(Format.valueOf(format.getSelected()).getPixelWidth(), Format.valueOf(format.getSelected()).getPixelHeight());
         else
             dim = new Dimension(Format.valueOf(format.getSelected()).getPixelHeight(), Format.valueOf(format.getSelected()).getPixelWidth());
@@ -174,12 +194,12 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     @Override
     public void refresh() {
         //If the document format isn't CUSTOM, the set the specified width and height. (If the format is CUSTOM keep the set height and width)
-        if(!getFormat().name().equals(Format.CUSTOM.name())){
+        if(!getFormat().name().equals(Format.CUSTOM.getName())){
             this.setWidth(getFormat().getPixelWidth());
             this.setHeight(getFormat().getPixelHeight());
         }
         //If the orientation is landscape, invert the height and width.
-        if(orientation.getSelected().equals(Orientation.LANDSCAPE.name())){
+        if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
             this.setHeight(Format.valueOf(format.getSelected()).getPixelWidth());
             this.setWidth(Format.valueOf(format.getSelected()).getPixelHeight());
         }
@@ -229,13 +249,15 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * To each format the corresponding dimensions are associated.
      */
     public static enum Format{
-        A4(210, 297),
-        A3(297, 420),
-        CUSTOM(0, 0);
+        A4(210, 297, I18n.marktr("A4")),
+        A3(297, 420, I18n.marktr("A3")),
+        CUSTOM(0, 0, I18n.marktr("Custom"));
         /**Width of the format*/
-        private final int w;
+        private int w;
         /**Height of the format*/
-        private final int h;
+        private int h;
+        /**Name of the format*/
+        private String name;
 
         /**DPI of the screen. As java don't detect well the dpi, it is set manually.*/
         private int dpi;
@@ -245,21 +267,20 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
          * @param w Width of the format.
          * @param h Height of the format.
          */
-        private Format(int w, int h) {
+        private Format(int w, int h, String name) {
             this.w = w;
             this.h = h;
+            this.name = name;
 
             //To be run on a server (no GUI), try to get the default Toolkit.
             //If it is not possible use a default value for the screen resolution.
             try {
-                Integer integer = 96;
                 //Get the method getDefaultToolkit
                 Method m = Class.forName("java.awt.Toolkit").getDeclaredMethod("getDefaultToolkit", null);
                 //Get the ToolKit return by the previous method
                 Object o = m.invoke(null, null);
                 //Get the screen resolution
-                integer = (Integer)o.getClass().getDeclaredMethod("getScreenResolution").invoke(o);
-                dpi = integer;
+                dpi = (Integer)o.getClass().getDeclaredMethod("getScreenResolution").invoke(o);
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException e) {
                 dpi = 96;
             }
@@ -278,6 +299,34 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
          */
         public int getPixelWidth(){
             return (int)(dpi*w/25.4);
+        }
+
+        public void setMMWidth(int width){
+            if(this.equals(Format.CUSTOM)){
+                w = width;
+            }
+        }
+        public void setINWidth(int width){
+            if(this.equals(Format.CUSTOM)){
+                w = (int) (width*25.4);
+            }
+        }
+        public void setMMHeight(int height){
+            if(this.equals(Format.CUSTOM)){
+                h = height;
+            }
+        }
+        public void setINHeight(int height){
+            if(this.equals(Format.CUSTOM)){
+                h = (int) (height*25.4);
+            }
+        }
+        /**
+         * Returns the name of the format.
+         * @return The name of the format.
+         */
+        public String getName(){
+            return this.name;
         }
     }
 

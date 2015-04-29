@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-24 13:03+0200\n"
+"POT-Creation-Date: 2015-04-29 15:27+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,8 +17,113 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:59
+msgid "Orientation"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:62
+msgid "Format"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:65
+msgid "Name"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:68
+msgid "Document title"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:105
+msgid "Portrait"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:106
+msgid "Landscape"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:252
+msgid "A4"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:253
+msgid "A3"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:254
+msgid "Custom"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/SimpleIllustrationGE.java:50
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Orientation.java:48
+msgid "Path"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:60
+msgid "x"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:63
+msgid "y"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:66
+msgid "Rotation"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:69
+msgid "Height"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:72
+msgid "Width"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:81
+msgid "z"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:71
+msgid "Text"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:73
+msgid "Text color"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:75
+msgid "Background color"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:77
+msgid "Alignment"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:79
+msgid "Style"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:81
+msgid "Alpha"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:83
+msgid "Font"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:85
+msgid "Font size"
+msgstr ""
+
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:98
 msgid "Some text"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Scale.java:46
+msgid "Link to MapImage"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/SimpleCartoGE.java:50
+msgid "OWS-Context path"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:189
@@ -32,12 +137,13 @@ msgstr ""
 msgid "Load document"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:242
-msgid "Save document"
-msgstr ""
-
+#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:213
 #: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:243
 msgid "XML save files"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:242
+msgid "Save document"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/view/utils/UIDialogExportConfiguration.java:110
@@ -176,6 +282,22 @@ msgstr ""
 msgid "Redo the last action"
 msgstr ""
 
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:322
+msgid "X"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:325
+msgid "Y"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:328
+msgid "WIDTH"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:331
+msgid "HEIGHT"
+msgstr ""
+
 #: org/orbisgis/mapcomposer/controller/GEController.java:255
 #: org/orbisgis/mapcomposer/controller/GEController.java:262
 msgid "First create a new document or open an existing one."
@@ -222,6 +344,18 @@ msgstr ""
 msgid "PDF file"
 msgstr ""
 
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:170
+msgid "png"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:171
+msgid "jpg"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:172
+msgid "gif"
+msgstr ""
+
 #: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:179
 msgid "Image"
 msgstr ""
@@ -234,21 +368,19 @@ msgstr ""
 msgid " image file"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/UIController.java:76
+#: org/orbisgis/mapcomposer/controller/UIController.java:78
 msgid "New document"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/UIController.java:77
+#: org/orbisgis/mapcomposer/controller/UIController.java:79
 msgid "Are you sure to create a new Document ?"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/UIController.java:78
+#: org/orbisgis/mapcomposer/controller/UIController.java:80
 msgid "Unsaved changes will be lost."
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/UIController.java:115
-#: org/orbisgis/mapcomposer/controller/UIController.java:138
-#: org/orbisgis/mapcomposer/controller/UIController.java:142
+#: org/orbisgis/mapcomposer/controller/UIController.java:117
 msgid "Action not supported yet."
 msgstr ""
 
