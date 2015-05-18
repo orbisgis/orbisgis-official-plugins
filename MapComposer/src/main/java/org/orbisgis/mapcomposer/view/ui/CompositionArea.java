@@ -206,6 +206,16 @@ public class CompositionArea extends JPanel {
         }
         positionJLabel.revalidate();
     }
+
+    /**
+     * Sets the unit used for the scales according to the given on.
+     * @param unit The new unit of the scales
+     */
+    public void setInchOrCom(Document.Unit unit){
+        if((this.unit == UNIT_INCH && unit!= Document.Unit.IN) || (this.unit == UNIT_MM && unit!= Document.Unit.MM)){
+            this.toggleInchOrCm();
+        }
+    }
     
     /**
      * Adds a CompositionPanel. Should be call only once for each GraphicalElement.
@@ -250,6 +260,11 @@ public class CompositionArea extends JPanel {
         this.dimension =dimension;
         this.layeredPane.setPreferredSize(this.dimension);
         document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
+
+        horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2,
+                document.getWidth());
+        verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2,
+                document.getHeight());
     }
 
     /**

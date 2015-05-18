@@ -44,32 +44,32 @@ import java.util.List;
  */
 public abstract class SimpleGE implements GraphicalElement{
     /** x position of the GE.*/
-    private IntegerCA x;
+    protected IntegerCA x;
     /** y position of the GE.*/
-    private IntegerCA y;
+    protected IntegerCA y;
     /** Inclination of the GE.*/
-    private IntegerCA rotation;
+    protected IntegerCA rotation;
     /** Height of the GE.*/
-    private IntegerCA height;
+    protected IntegerCA height;
     /** Width of the GE.*/
-    private IntegerCA width;
+    protected IntegerCA width;
     /** Z index of the GE.*/
-    private IntegerCA z;
+    protected IntegerCA z;
 
     /**Displayed name of the x position*/
-    private static final String sX = I18n.marktr("x");
+    public static final String sX = I18n.marktr("x");
 
     /**Displayed name of the y position*/
-    private static final String sY = I18n.marktr("y");
+    public static final String sY = I18n.marktr("y");
 
     /**Displayed name of the rotation*/
-    private static final String sRotation = I18n.marktr("Rotation");
+    public static final String sRotation = I18n.marktr("Rotation");
 
     /**Displayed name of the height*/
-    private static final String sHeight = I18n.marktr("Height");
+    public static final String sHeight = I18n.marktr("Height");
 
     /**Displayed name of the width*/
-    private static final String sWidth = I18n.marktr("Width");
+    public static final String sWidth = I18n.marktr("Width");
     
     /**
      * Main constructor.

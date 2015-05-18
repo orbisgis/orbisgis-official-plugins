@@ -281,8 +281,10 @@ public class CompositionAreaController {
             ((GERefresh)ge).refresh();
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
         executorService.submit(worker);
-        if(ge instanceof Document)
+        if(ge instanceof Document) {
             compositionArea.setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+            compositionArea.setInchOrCom(((Document)ge).getUnit());
+        }
     }
 
     /**

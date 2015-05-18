@@ -26,6 +26,7 @@ package org.orbisgis.mapcomposer.controller;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.illustration.SimpleIllustrationGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
@@ -283,6 +284,9 @@ public class GEController {
         if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
+                if(newGE instanceof Document){
+                    ((Document)newGE).refresh();
+                }
                 //If the newGE is a Document GE, then draw it immediately
                 if(newGE instanceof GEProperties && !((GEProperties)newGE).isDrawnByUser()){
                     mainController.addGE(newGE);
@@ -303,7 +307,8 @@ public class GEController {
                         }
                     }
                     mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NEW_GE);
-                    mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Now you can draw the GraphicalElement. Hold SHIFT to keep the width/height ratio"));
+                    mainController.getCompositionAreaController().setOverlayMessage(i18n.tr("Now you can draw the " +
+                            "GraphicalElement. Hold SHIFT to keep the width/height ratio"));
                 }
 
                 List<GraphicalElement> list = new ArrayList<>();

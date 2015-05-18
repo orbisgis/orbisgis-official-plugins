@@ -28,7 +28,6 @@ import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceLis
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.xnap.commons.i18n.I18n;
 
@@ -44,13 +43,16 @@ import java.util.List;
  *
  * @author Sylvain PALOMINOS
  */
-public class Document extends SimpleGE implements GERefresh, GEProperties {
+public class Document extends SimpleGE implements GEProperties {
 
     /**Document orientation (portrait or landscape)*/
     private SourceListCA orientation;
 
     /**Size of the document*/
     private SourceListCA format;
+
+    /**Unit (millimeters or inch) of the document*/
+    private SourceListCA unit;
 
     /**Name of the document*/
     private StringCA name;
@@ -60,6 +62,9 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
 
     /** Displayed name of the format*/
     public static final String sFormat = I18n.marktr("Format");
+
+    /** Displayed name of the unit*/
+    public static final String sUnit = I18n.marktr("Unit");
 
     /**Displayed name of the name*/
     public static final String sName = I18n.marktr("Name");
@@ -132,6 +137,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         //ConfigurationAttribute instantiation
         orientation= new SourceListCA(sOrientation, false);
         format= new SourceListCA(sFormat, false);
+        unit= new SourceListCA(sUnit, false);
         name= new StringCA(sName, false, sDefaultName);
         //Sets the orientation CA
         orientation.add(Orientation.LANDSCAPE.getName());
@@ -142,6 +148,11 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         format.add(Format.A4.getName());
         format.add(Format.CUSTOM.getName());
         setFormat(Format.A4);
+        //Sets the unit CA
+        unit.add(Unit.MM.name());
+        unit.add(Unit.IN.name());
+        unit.add(Unit.PIXEL.name());
+        unit.select(Unit.MM.name());
     }
     
     /**
@@ -162,15 +173,25 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      */
     public void setFormat(Format f){
         format.select(f.getName());
-        this.setWidth(Format.valueOf(format.getSelected()).getPixelWidth());
-        this.setHeight(Format.valueOf(format.getSelected()).getPixelHeight());
+        this.setWidth(f.getPixelWidth());
+        this.setHeight(f.getPixelHeight());
     }
-    
+
     /**
      * Return the format of the document.
      * @return Format of the document.
      */
-    public Format getFormat(){return Format.valueOf(format.getSelected());}
+    public Format getFormat(){
+        return Format.valueOf(format.getSelected().toUpperCase());
+    }
+
+    /**
+     * Return the unit of the document.
+     * @return Unit of the document.
+     */
+    public Unit getUnit(){
+        return Unit.valueOf(unit.getSelected());
+    }
     
     /**
      * Sets the orientation of the document.
@@ -183,31 +204,27 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
      * @return The dimension of the document.
      */
     public Dimension getDimension(){
-        Dimension dim;
-        if(orientation.getSelected().equals(Orientation.PORTRAIT.getName()))
-            dim = new Dimension(Format.valueOf(format.getSelected()).getPixelWidth(), Format.valueOf(format.getSelected()).getPixelHeight());
-        else
-            dim = new Dimension(Format.valueOf(format.getSelected()).getPixelHeight(), Format.valueOf(format.getSelected()).getPixelWidth());
-        return dim;
+        return new Dimension(this.getWidth(), this.getHeight());
     }
 
-    @Override
     public void refresh() {
-        //If the document format isn't CUSTOM, the set the specified width and height. (If the format is CUSTOM keep the set height and width)
-        if(!getFormat().name().equals(Format.CUSTOM.getName())){
-            this.setWidth(getFormat().getPixelWidth());
-            this.setHeight(getFormat().getPixelHeight());
+        if(this.format.getSelected().equals(Format.CUSTOM.getName())) {
+            this.width.setValue((int) (this.width.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
+            this.height.setValue((int) (this.height.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
         }
-        //If the orientation is landscape, invert the height and width.
         if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
-            this.setHeight(Format.valueOf(format.getSelected()).getPixelWidth());
-            this.setWidth(Format.valueOf(format.getSelected()).getPixelHeight());
+            int width = this.getWidth();
+            this.setWidth(this.getHeight());
+            this.setHeight(width);
         }
     }
 
     @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
+        list.add(width);
+        list.add(height);
+        list.add(unit);
         list.add(format);
         list.add(orientation);
         list.add(name);
@@ -218,6 +235,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
     public List<ConfigurationAttribute> getSavableAttributes() {
         List<ConfigurationAttribute> list = super.getSavableAttributes();
         list.add(format);
+        list.add(unit);
         list.add(orientation);
         list.add(name);
         return list;
@@ -229,6 +247,7 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         copy.orientation = (SourceListCA) this.orientation.deepCopy();
         copy.format = (SourceListCA) this.format.deepCopy();
         copy.name = (StringCA) this.name.deepCopy();
+        copy.unit = (SourceListCA) this.unit.deepCopy();
 
         return copy;
     }
@@ -240,6 +259,8 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
             orientation=(SourceListCA)ca;
         if(ca.getName().equals(format.getName()))
             format=(SourceListCA)ca;
+        if(ca.getName().equals(unit.getName()))
+            unit=(SourceListCA)ca;
         if(ca.getName().equals(name.getName()))
             name=(StringCA)ca;
     }
@@ -301,26 +322,6 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
             return (int)(dpi*w/25.4);
         }
 
-        public void setMMWidth(int width){
-            if(this.equals(Format.CUSTOM)){
-                w = width;
-            }
-        }
-        public void setINWidth(int width){
-            if(this.equals(Format.CUSTOM)){
-                w = (int) (width*25.4);
-            }
-        }
-        public void setMMHeight(int height){
-            if(this.equals(Format.CUSTOM)){
-                h = height;
-            }
-        }
-        public void setINHeight(int height){
-            if(this.equals(Format.CUSTOM)){
-                h = (int) (height*25.4);
-            }
-        }
         /**
          * Returns the name of the format.
          * @return The name of the format.
@@ -330,4 +331,45 @@ public class Document extends SimpleGE implements GERefresh, GEProperties {
         }
     }
 
+    public static enum Unit {
+        MM((double)1/25.4, I18n.marktr("mm")),
+        IN((double)1, I18n.marktr("in")),
+        PIXEL(1, I18n.marktr("pixel"));
+        /**
+         * Width of the format
+         */
+        private double conv;
+
+        /**
+         * DPI of the screen. As java don't detect well the dpi, it is set manually.
+         */
+        private double dpi;
+
+        /**
+         * Main constructor.
+         */
+        private Unit(double conv, String name) {
+            //To be run on a server (no GUI), try to get the default Toolkit.
+            //If it is not possible use a default value for the screen resolution.
+            try {
+                //Get the method getDefaultToolkit
+                Method m = Class.forName("java.awt.Toolkit").getDeclaredMethod("getDefaultToolkit", null);
+                //Get the ToolKit return by the previous method
+                Object o = m.invoke(null, null);
+                //Get the screen resolution
+                dpi = (double) (Integer) o.getClass().getDeclaredMethod("getScreenResolution").invoke(o);
+            } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException e) {
+                dpi = 96;
+            }
+            if (!name.equals("pixel")) {
+                this.conv = conv * dpi;
+            } else {
+                this.conv = conv;
+            }
+        }
+
+        public double getConv(){
+            return conv;
+        }
+    }
 }
