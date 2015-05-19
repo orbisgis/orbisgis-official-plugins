@@ -173,8 +173,10 @@ public class Document extends SimpleGE implements GEProperties {
      */
     public void setFormat(Format f){
         format.select(f.getName());
-        this.setWidth(f.getPixelWidth());
-        this.setHeight(f.getPixelHeight());
+        if(!f.equals(Format.CUSTOM)) {
+            this.setWidth(f.getPixelWidth());
+            this.setHeight(f.getPixelHeight());
+        }
     }
 
     /**
@@ -208,10 +210,10 @@ public class Document extends SimpleGE implements GEProperties {
     }
 
     public void refresh() {
-        if(this.format.getSelected().equals(Format.CUSTOM.getName())) {
+        /*if(this.format.getSelected().equals(Format.CUSTOM.getName())) {
             this.width.setValue((int) (this.width.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
             this.height.setValue((int) (this.height.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
-        }
+        }*/
         if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
             int width = this.getWidth();
             this.setWidth(this.getHeight());

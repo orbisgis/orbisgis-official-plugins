@@ -26,13 +26,11 @@ package org.orbisgis.mapcomposer.view.graphicalelement;
 
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
@@ -44,10 +42,10 @@ import javax.swing.JLabel;
 import javax.swing.JSpinner;
 import javax.swing.JTextArea;
 import javax.swing.SpinnerNumberModel;
+import javax.swing.event.ChangeListener;
 import java.awt.Color;
 import java.awt.Graphics2D;
 import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
 import java.beans.EventHandler;
 import java.util.List;
@@ -82,6 +80,16 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         //Create the UIDialogProperties that will be returned
         UIDialogProperties uid = new UIDialogProperties(mainController, enableLock);
 
+        //Get the ConfigurationAttribute of the unit and its JComponent
+        SourceListCA unitCA = null;
+        for(ConfigurationAttribute ca : caList)
+            if(ca.getName().equals(Document.sUnit))
+                unitCA = (SourceListCA)ca;
+
+        JComboBox unitBox = (JComboBox)mainController.getCAManager().getRenderer(unitCA).createJComponentFromCA(unitCA);
+        unitBox.addActionListener(EventHandler.create(ActionListener.class, this, "onUnitChange", "source"));
+        unitBox.putClientProperty("last", unitBox.getSelectedItem());
+
         //Get the ConfigurationAttribute of the width and its JComponent
         IntegerCA widthCA = null;
         for(ConfigurationAttribute ca : caList)
@@ -89,10 +97,18 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
                 widthCA = (IntegerCA)ca;
 
         JLabel widthLabel = new JLabel(i18n.tr("width"));
-        JSpinner widthSpinner = (JSpinner)mainController.getCAManager().getRenderer(widthCA).createJComponentFromCA(widthCA);
+        /*JSpinner widthPixelSpinner = (JSpinner)mainController.getCAManager().getRenderer(widthCA)
+                .createJComponentFromCA
+                (widthCA);*/
+        JSpinner widthUnitSpinner = new JSpinner(new SpinnerNumberModel((int)widthCA.getValue(), 1, Integer.MAX_VALUE, 1));
+        widthUnitSpinner.putClientProperty("unit", unitBox);
+        //widthUnitSpinner.putClientProperty("spinner", widthPixelSpinner);
+        widthUnitSpinner.putClientProperty("ca", widthCA);
+        widthUnitSpinner.addChangeListener(EventHandler.create(ChangeListener.class, this, "onValueChange", "source"));
 
         widthLabel.setEnabled(false);
-        widthSpinner.setEnabled(false);
+        widthUnitSpinner.setEnabled(false);
+        //widthPixelSpinner.setVisible(false);
 
         //Get the ConfigurationAttribute of the height and its JComponent
         IntegerCA heightCA = null;
@@ -101,18 +117,20 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
                 heightCA = (IntegerCA)ca;
 
         JLabel heightLabel = new JLabel(i18n.tr("height"));
-        JSpinner heightSpinner = (JSpinner)mainController.getCAManager().getRenderer(widthCA).createJComponentFromCA(heightCA);
+        /*JSpinner heightPixelSpinner = (JSpinner)mainController.getCAManager().getRenderer(widthCA)
+                .createJComponentFromCA(heightCA);*/
+        JSpinner heightUnitSpinner = new JSpinner(new SpinnerNumberModel((int)heightCA.getValue(), 1, Integer.MAX_VALUE, 1));
+        heightUnitSpinner.putClientProperty("unit", unitBox);
+        //heightUnitSpinner.putClientProperty("spinner", heightPixelSpinner);
+        heightUnitSpinner.putClientProperty("ca", heightCA);
+        heightUnitSpinner.addChangeListener(EventHandler.create(ChangeListener.class, this, "onValueChange", "source"));
 
         heightLabel.setEnabled(false);
-        heightSpinner.setEnabled(false);
+        heightUnitSpinner.setEnabled(false);
+        //heightPixelSpinner.setVisible(false);
 
-        //Get the ConfigurationAttribute of the unit and its JComponent
-        SourceListCA unitCA = null;
-        for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals(Document.sUnit))
-                unitCA = (SourceListCA)ca;
-
-        JComboBox unitBox = (JComboBox)mainController.getCAManager().getRenderer(unitCA).createJComponentFromCA(unitCA);
+        unitBox.putClientProperty("widthUnitSpinner", widthUnitSpinner);
+        unitBox.putClientProperty("heightUnitSpinner", heightUnitSpinner);
 
         //Get the ConfigurationAttribute of the format and its JComponent
         SourceListCA formatCA = null;
@@ -126,10 +144,10 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         //Adds an action listener to enable or disable the width and height spinner if the CUSTOM format is selected
         JComboBox formatBox = (JComboBox)mainController.getCAManager().getRenderer(formatCA).createJComponentFromCA(formatCA);
         formatBox.putClientProperty("widthLabel", widthLabel);
-        formatBox.putClientProperty("widthSpinner", widthSpinner);
+        formatBox.putClientProperty("widthUnitSpinner", widthUnitSpinner);
         formatBox.putClientProperty("heightLabel", heightLabel);
-        formatBox.putClientProperty("heightSpinner", heightSpinner);
-        formatBox.putClientProperty("mainController", mainController);
+        formatBox.putClientProperty("heightUnitSpinner", heightUnitSpinner);
+        formatBox.putClientProperty("unitBox", unitBox);
         formatBox.putClientProperty("formatCA", formatCA);
         formatBox.addActionListener(EventHandler.create(ActionListener.class, this, "selectItem", "source"));
 
@@ -138,10 +156,12 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         uid.addComponent(unitBox, unitCA, 0, 1, 2, 1);
 
         uid.addComponent(widthLabel, widthCA, 1, 1, 1, 1);
-        uid.addComponent(widthSpinner, widthCA, 2, 1, 1, 1);
+        uid.addComponent(widthUnitSpinner, widthCA, 2, 1, 1, 1);
+        //uid.addComponent(widthPixelSpinner, widthCA, 3, 1, 1, 1);
 
         uid.addComponent(heightLabel, heightCA, 1, 2, 1, 1);
-        uid.addComponent(heightSpinner, heightCA, 2, 2, 1, 1);
+        uid.addComponent(heightUnitSpinner, heightCA, 2, 2, 1, 1);
+        //uid.addComponent(heightPixelSpinner, heightCA, 3, 2, 1, 1);
 
         //Find the OwsContext ConfigurationAttribute
         SourceListCA orientationCA = null;
@@ -172,31 +192,106 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
 
     public void selectItem(Object item){
         JComboBox formatBox = (JComboBox) item;
+
+        JComboBox unitBox = (JComboBox) ((JComboBox) item).getClientProperty("unitBox");
+        Document.Unit unit = Document.Unit.valueOf((String)unitBox.getSelectedItem());
+
         if(formatBox.getSelectedItem().equals(Document.Format.CUSTOM.getName())) {
             JLabel widthLabel = (JLabel) formatBox.getClientProperty("widthLabel");
             widthLabel.setEnabled(true);
-            JSpinner widthSpinner = (JSpinner) formatBox.getClientProperty("widthSpinner");
+            JSpinner widthSpinner = (JSpinner) formatBox.getClientProperty("widthUnitSpinner");
             widthSpinner.setEnabled(true);
             JLabel heightLabel = (JLabel) formatBox.getClientProperty("heightLabel");
             heightLabel.setEnabled(true);
-            JSpinner heightSpinner = (JSpinner) formatBox.getClientProperty("heightSpinner");
+            JSpinner heightSpinner = (JSpinner) formatBox.getClientProperty("heightUnitSpinner");
             heightSpinner.setEnabled(true);
-
-            widthSpinner.setValue(50);
-            heightSpinner.setValue(50);
         }
         else{
             JLabel widthLabel = (JLabel) formatBox.getClientProperty("widthLabel");
             widthLabel.setEnabled(false);
-            JSpinner widthSpinner = (JSpinner) formatBox.getClientProperty("widthSpinner");
+            JSpinner widthSpinner = (JSpinner) formatBox.getClientProperty("widthUnitSpinner");
             widthSpinner.setEnabled(false);
             JLabel heightLabel = (JLabel) formatBox.getClientProperty("heightLabel");
             heightLabel.setEnabled(false);
-            JSpinner heightSpinner = (JSpinner) formatBox.getClientProperty("heightSpinner");
+            JSpinner heightSpinner = (JSpinner) formatBox.getClientProperty("heightUnitSpinner");
             heightSpinner.setEnabled(false);
 
-            widthSpinner.setValue(Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelWidth());
-            heightSpinner.setValue(Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelHeight());
+            widthSpinner.setValue((int)(Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelWidth()
+                    /unit.getConv()));
+            heightSpinner.setValue((int)(Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelHeight()
+                    /unit.getConv()));
         }
+    }
+
+    public void onUnitChange(Object item){
+        JComboBox unitBox = (JComboBox) item;
+        Document.Unit before = Document.Unit.valueOf((String) unitBox.getClientProperty("last"));
+
+        JSpinner widthSpinner = (JSpinner) unitBox.getClientProperty("widthUnitSpinner");
+        JSpinner heightSpinner = (JSpinner) unitBox.getClientProperty("heightUnitSpinner");
+
+        double width = 1;
+        if(widthSpinner.getValue() instanceof Double){
+            width = (double)widthSpinner.getValue();
+        }
+        if(widthSpinner.getValue() instanceof Integer){
+            width = (int)widthSpinner.getValue();
+        }
+        double height = 1;
+        if(heightSpinner.getValue() instanceof Double){
+            height = (double)heightSpinner.getValue();
+        }
+        if(heightSpinner.getValue() instanceof Integer){
+            height = (int)heightSpinner.getValue();
+        }
+
+        //convert values to the inch one
+        if(before.equals(Document.Unit.IN)){
+            width *=1;
+            height *=1;
+        }
+
+        //convert values to the inch one
+        if(before.equals(Document.Unit.MM)){
+            width *=1D/25.4;
+            height *=1D/25.4;
+        }
+
+        //convert values to the inch one
+        if(Document.Unit.valueOf((String)unitBox.getSelectedItem()).equals(Document.Unit.IN)){
+            width *=1;
+            height *=1;
+        }
+
+        //convert values to the inch one
+        if(Document.Unit.valueOf((String)unitBox.getSelectedItem()).equals(Document.Unit.MM)){
+            width *=25.4;
+            height *=25.4;
+        }
+
+        if(unitBox.getSelectedItem().equals(Document.Unit.MM.name())) {
+            widthSpinner.setModel(new SpinnerNumberModel(width, 1, Integer.MAX_VALUE, 1));
+            heightSpinner.setModel(new SpinnerNumberModel(height, 1, Integer.MAX_VALUE, 1));
+            unitBox.putClientProperty("last", Document.Unit.MM.name());
+        }
+        if(unitBox.getSelectedItem().equals(Document.Unit.IN.name())) {
+            widthSpinner.setModel(new SpinnerNumberModel(width, 1, Integer.MAX_VALUE, 0.1));
+            heightSpinner.setModel(new SpinnerNumberModel(height, 1, Integer.MAX_VALUE, 0.1));
+            unitBox.putClientProperty("last", Document.Unit.IN.name());
+        }
+    }
+
+    public void onValueChange(Object item){
+        JSpinner unitSpinner = (JSpinner) item;
+        String unit = (String) ((JComboBox) unitSpinner.getClientProperty("unit")).getSelectedItem();
+        double value = 1;
+        if(unitSpinner.getValue() instanceof Double){
+            value = (double)unitSpinner.getValue();
+        }
+        if(unitSpinner.getValue() instanceof Integer){
+            value = (int)unitSpinner.getValue();
+        }
+        IntegerCA ca = (IntegerCA) unitSpinner.getClientProperty("ca");
+        ca.setValue((int)(value * Document.Unit.valueOf(unit).getConv()));
     }
 }

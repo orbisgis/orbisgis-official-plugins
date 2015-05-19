@@ -102,6 +102,7 @@ public class IntegerCA extends BaseCA<Integer> {
     @Override public void setValue(Integer value) {
         if(min<=value && value<=max || !limits)
             this.value=value;
+        System.out.println("" + this + value);
     }
 
     @Override public Integer getValue() {return value;}
