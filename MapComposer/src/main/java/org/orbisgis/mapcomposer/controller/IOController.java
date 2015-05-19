@@ -71,7 +71,6 @@ public class IOController {
      */
     public void saveDocument(List<GraphicalElement> listGEToSave){
         try {
-            System.out.println(listGEToSave.size());
             saveNLoadHandler.saveProject(listGEToSave);
         } catch (NoSuchMethodException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
