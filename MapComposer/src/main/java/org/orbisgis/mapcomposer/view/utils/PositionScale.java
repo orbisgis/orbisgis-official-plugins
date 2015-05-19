@@ -91,9 +91,7 @@ public class PositionScale extends JComponent {
         //Gets the position od the document start and end on the scale
         int startDocumentPos = (documentOriginPosition-scrollValue);
         int endDocumentPos = (documentOriginPosition+documentSize-scrollValue);
-
         int unitPosition = startDocumentPos%units;
-
         //Gets the scale start position, length and width
         int xRect = this.getX();
         int yRect = this.getY();

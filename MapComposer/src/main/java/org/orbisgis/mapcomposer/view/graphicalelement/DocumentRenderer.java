@@ -24,32 +24,18 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
-import org.orbisgis.mapcomposer.controller.MainController;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
-import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
-import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
-import org.orbisgis.sif.UIPanel;
 
-import javax.swing.JComboBox;
-import javax.swing.JLabel;
 import java.awt.Color;
 import java.awt.Graphics2D;
-import java.awt.event.ActionListener;
-import java.awt.event.ItemListener;
 import java.awt.image.BufferedImage;
-import java.beans.EventHandler;
-import java.util.List;
 
 /**
  * Renderer associated to the Document GraphicalElement.
  *
  * @author Sylvain PALOMINOS
  */
-public class DocumentRenderer implements RendererRaster, RendererVector, CustomConfigurationPanel {
+public class DocumentRenderer implements RendererRaster, RendererVector {
 
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
@@ -63,48 +49,5 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
         drawGE(bi.createGraphics(), ge);
         return bi;
-    }
-
-    @Override
-    public UIPanel createConfigurationPanel(List<ConfigurationAttribute> caList, MainController uic, boolean enableLock){
-
-        //Create the UIDialogProperties that will be returned
-        UIDialogProperties uid = new UIDialogProperties(uic, enableLock);
-
-        //Find the OwsContext ConfigurationAttribute
-        SourceListCA formatCA = null;
-        for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals(Document.sOrientation))
-                formatCA = (SourceListCA)ca;
-
-        JLabel formatName = new JLabel(formatCA.getName());
-        uid.addComponent(formatName, formatCA, 0, 1, 1, 1);
-
-        JComboBox formatBox = (JComboBox)uic.getCAManager().getRenderer(formatCA).createJComponentFromCA(formatCA);
-        uid.addComponent(formatBox, formatCA, 1, 1, 2, 1);
-
-        //Find the OwsContext ConfigurationAttribute
-        SourceListCA orientationCA = null;
-        for(ConfigurationAttribute ca : caList)
-            if(ca.getName().equals(Document.sOrientation))
-                orientationCA = (SourceListCA)ca;
-
-        JLabel orientationName = new JLabel(orientationCA.getName());
-        uid.addComponent(orientationName, orientationCA, 0, 1, 1, 1);
-
-        JComboBox orientationBox = (JComboBox)uic.getCAManager().getRenderer(orientationCA).createJComponentFromCA(orientationCA);
-        uid.addComponent(orientationBox, orientationCA, 1, 1, 2, 1);
-        orientationBox.addActionListener(EventHandler.create(ActionListener.class, this, "selectItem", "source" +
-                ".selectedItem"));
-
-        return uid;
-    }
-
-    public void selectItem(Object item){
-        if(item.equals(Document.Format.CUSTOM.getName())){
-            unitBox.isVisible(true);
-            widthBox.isVisible(true);
-            heightBox.isVisible(true);
-        }
     }
 }

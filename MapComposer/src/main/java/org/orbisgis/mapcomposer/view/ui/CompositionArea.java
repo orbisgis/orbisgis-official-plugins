@@ -74,6 +74,8 @@ public class CompositionArea extends JPanel {
     /** JLabel displaying the mouse position */
     private JLabel positionJLabel;
 
+    /** Fixed size of the PositionScale used as header view in the JScrollPane */
+    private final static int POSITIONSCALE_DIMENSION = 30;
     /** The vertical PositionScale */
     private PositionScale verticalPositionScale;
 
@@ -91,8 +93,6 @@ public class CompositionArea extends JPanel {
 
     /** Corner button of the ScrollPane to change the dimension unit */
     private JButton inchOrCm;
-
-    private static int SCALE_SIZE = 30;
 
     /**
      * Main constructor.
@@ -114,11 +114,11 @@ public class CompositionArea extends JPanel {
 
         //Sets the ScrollPane that will contain the layeredPane and sets its header view.
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
-        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, SCALE_SIZE);
-        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, SCALE_SIZE);
+        verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
+        horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
         inchOrCm = new JButton("in");
         inchOrCm.setMargin(new Insets(0, 0, 0, 0));
-        inchOrCm.setFont(new Font("Arial", Font.PLAIN, SCALE_SIZE/4));
+        inchOrCm.setFont(new Font("Arial", Font.PLAIN, POSITIONSCALE_DIMENSION/4));
         inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
@@ -249,7 +249,8 @@ public class CompositionArea extends JPanel {
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.layeredPane.setPreferredSize(this.dimension);
-        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
+        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension
+                .height) / 2, dimension.width, dimension.height);
     }
 
     /**
