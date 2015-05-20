@@ -173,10 +173,10 @@ public class Document extends SimpleGE implements GEProperties {
      */
     public void setFormat(Format f){
         format.select(f.getName());
-        if(!f.equals(Format.CUSTOM)) {
+        /*if(!f.equals(Format.CUSTOM)) {
             this.setWidth(f.getPixelWidth());
             this.setHeight(f.getPixelHeight());
-        }
+        }*/
     }
 
     /**
@@ -214,11 +214,11 @@ public class Document extends SimpleGE implements GEProperties {
             this.width.setValue((int) (this.width.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
             this.height.setValue((int) (this.height.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
         }*/
-        if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
+        /*if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
             int width = this.getWidth();
             this.setWidth(this.getHeight());
             this.setHeight(width);
-        }
+        }*/
     }
 
     @Override
@@ -274,7 +274,7 @@ public class Document extends SimpleGE implements GEProperties {
     public static enum Format{
         A4(210, 297, I18n.marktr("A4")),
         A3(297, 420, I18n.marktr("A3")),
-        CUSTOM(0, 0, I18n.marktr("Custom"));
+        CUSTOM(0, 0, I18n.marktr("CUSTOM"));
         /**Width of the format*/
         private int w;
         /**Height of the format*/
