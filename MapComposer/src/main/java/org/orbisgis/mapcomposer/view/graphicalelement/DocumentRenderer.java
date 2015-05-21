@@ -206,7 +206,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         JComboBox formatBox = (JComboBox) formatSpinner;
 
         JComboBox unitBox = (JComboBox) ((JComboBox) formatSpinner).getClientProperty("unitBox");
-        Document.Unit unit = Document.Unit.valueOf((String)unitBox.getSelectedItem());
+        Document.Unit unit = Document.Unit.getUnitFromName((String) unitBox.getSelectedItem());
         JComboBox orientationBox = (JComboBox) ((JComboBox) formatSpinner).getClientProperty("orientationBox");
         JLabel widthLabel = (JLabel) formatBox.getClientProperty("widthLabel");
         JSpinner widthSpinner = (JSpinner) formatBox.getClientProperty("widthSpinner");
@@ -231,12 +231,16 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         }
         else {
             if (orientationBox.getSelectedItem().equals(Document.Orientation.PORTRAIT.getName())){
-                width = Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
-                height = Document.Format.valueOf((String)formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
+                width = Document.Format.getUnitFromName(
+                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
+                height = Document.Format.getUnitFromName(
+                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
             }
             else{
-                height = Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
-                width = Document.Format.valueOf((String) formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
+                height = Document.Format.getUnitFromName(
+                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
+                width = Document.Format.getUnitFromName(
+                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
             }
         }
 
@@ -277,8 +281,8 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
      */
     public void onUnitChange(Object unitSpinner){
         JComboBox unitBox = (JComboBox) unitSpinner;
-        Document.Unit unitBefore = Document.Unit.valueOf((String) unitBox.getClientProperty("last"));
-        Document.Unit unitNow = Document.Unit.valueOf((String) unitBox.getSelectedItem());
+        Document.Unit unitBefore = Document.Unit.getUnitFromName((String) unitBox.getClientProperty("last"));
+        Document.Unit unitNow = Document.Unit.getUnitFromName((String) unitBox.getSelectedItem());
 
         JSpinner widthSpinner = (JSpinner) unitBox.getClientProperty("widthSpinner");
         JSpinner heightSpinner = (JSpinner) unitBox.getClientProperty("heightSpinner");
@@ -314,21 +318,21 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
                 height = (int)Math.round(height);
                 widthSpinner.setModel(new SpinnerNumberModel(width, 1, Integer.MAX_VALUE, 1));
                 heightSpinner.setModel(new SpinnerNumberModel(height, 1, Integer.MAX_VALUE, 1));
-                unitBox.putClientProperty("last", Document.Unit.PIXEL.name());
+                unitBox.putClientProperty("last", Document.Unit.PIXEL.getName());
                 break;
             case MM:
                 width = (int)Math.round(width);
                 height = (int)Math.round(height);
                 widthSpinner.setModel(new SpinnerNumberModel(width, 1, Integer.MAX_VALUE, 1));
                 heightSpinner.setModel(new SpinnerNumberModel(height, 1, Integer.MAX_VALUE, 1));
-                unitBox.putClientProperty("last", Document.Unit.MM.name());
+                unitBox.putClientProperty("last", Document.Unit.MM.getName());
                 break;
             case IN:
                 width = ((double) ((int)(width*100)) )/100;
                 height = ((double) ((int)(height * 100))) / 100;
                 widthSpinner.setModel(new SpinnerNumberModel(width, 1, Integer.MAX_VALUE, 0.1));
                 heightSpinner.setModel(new SpinnerNumberModel(height, 1, Integer.MAX_VALUE, 0.1));
-                unitBox.putClientProperty("last", Document.Unit.IN.name());
+                unitBox.putClientProperty("last", Document.Unit.IN.getName());
                 break;
         }
     }
@@ -349,6 +353,6 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             value = (int)unitSpinner.getValue();
         }
         IntegerCA ca = (IntegerCA) unitSpinner.getClientProperty("ca");
-        ca.setValue((int)(value * Document.Unit.valueOf(unit).getConv()));
+        ca.setValue((int)(value * Document.Unit.getUnitFromName(unit).getConv()));
     }
 }

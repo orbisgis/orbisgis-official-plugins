@@ -104,31 +104,6 @@ public class Document extends SimpleGE implements GEProperties {
     public boolean isEditedByMouse() {
         return false;
     }
-
-    /** Enumeration of the orientation possibilities : portrait or landscape.*/
-    public enum Orientation{
-        PORTRAIT(I18n.marktr("Portrait")),
-        LANDSCAPE(I18n.marktr("Landscape"));
-
-        /** Orientation name */
-        private String name;
-
-        /**
-         * Main constructor.
-         * @param name Name of the orientation.
-         */
-        private Orientation(String name){
-            this.name = name;
-        }
-
-        /**
-         * Returns the name of the orientation.
-         * @return The name of the orientation.
-         */
-        public String getName(){
-            return name;
-        }
-    }
     
     /**
      * Main constructor.
@@ -149,10 +124,10 @@ public class Document extends SimpleGE implements GEProperties {
         format.add(Format.CUSTOM.getName());
         setFormat(Format.A4);
         //Sets the unit CA
-        unit.add(Unit.MM.name());
-        unit.add(Unit.IN.name());
-        unit.add(Unit.PIXEL.name());
-        unit.select(Unit.MM.name());
+        unit.add(Unit.MM.getName());
+        unit.add(Unit.IN.getName());
+        unit.add(Unit.PIXEL.getName());
+        unit.select(Unit.MM.getName());
     }
     
     /**
@@ -173,10 +148,6 @@ public class Document extends SimpleGE implements GEProperties {
      */
     public void setFormat(Format f){
         format.select(f.getName());
-        /*if(!f.equals(Format.CUSTOM)) {
-            this.setWidth(f.getPixelWidth());
-            this.setHeight(f.getPixelHeight());
-        }*/
     }
 
     /**
@@ -207,18 +178,6 @@ public class Document extends SimpleGE implements GEProperties {
      */
     public Dimension getDimension(){
         return new Dimension(this.getWidth(), this.getHeight());
-    }
-
-    public void refresh() {
-        /*if(this.format.getSelected().equals(Format.CUSTOM.getName())) {
-            this.width.setValue((int) (this.width.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
-            this.height.setValue((int) (this.height.getValue() * Unit.valueOf(unit.getSelected()).getConv()));
-        }*/
-        /*if(orientation.getSelected().equals(Orientation.LANDSCAPE.getName())){
-            int width = this.getWidth();
-            this.setWidth(this.getHeight());
-            this.setHeight(width);
-        }*/
     }
 
     @Override
@@ -331,12 +290,22 @@ public class Document extends SimpleGE implements GEProperties {
         public String getName(){
             return this.name;
         }
+
+        public static Format getUnitFromName(String name){
+            return valueOf(name.toUpperCase());
+        }
     }
 
+    /**
+     * Enumeration of the units that can be used
+     */
     public static enum Unit {
         MM((double)1/25.4, I18n.marktr("mm")),
         IN((double)1, I18n.marktr("in")),
         PIXEL(1, I18n.marktr("pixel"));
+
+        /** Human readable name of the unit.**/
+        private String name;
         /**
          * Width of the format
          */
@@ -368,10 +337,46 @@ public class Document extends SimpleGE implements GEProperties {
             } else {
                 this.conv = conv;
             }
+            this.name = name;
         }
 
         public double getConv(){
             return conv;
+        }
+
+        public String getName(){
+            return name;
+        }
+
+        public static Unit getUnitFromName(String name){
+            return valueOf(name.toUpperCase());
+        }
+    }
+
+    /**
+     * Enumeration of the orientation possibilities : portrait or landscape.
+     */
+    public enum Orientation{
+        PORTRAIT(I18n.marktr("Portrait")),
+        LANDSCAPE(I18n.marktr("Landscape"));
+
+        /** Orientation name */
+        private String name;
+
+        /**
+         * Main constructor.
+         * @param name Name of the orientation.
+         */
+        private Orientation(String name){
+            this.name = name;
+        }
+
+        /**
+         * Returns the name of the orientation.
+         * @return The name of the orientation.
+         */
+        public String getName(){
+            return name;
         }
     }
 }

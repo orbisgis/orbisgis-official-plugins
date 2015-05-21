@@ -284,9 +284,6 @@ public class GEController {
         if(winEvent.getSource() instanceof SIFDialog && newGE != null) {
             SIFDialog sifDialog = (SIFDialog) winEvent.getSource();
             if(sifDialog.isAccepted()) {
-                if(newGE instanceof Document){
-                    ((Document)newGE).refresh();
-                }
                 //If the newGE is a Document GE, then draw it immediately
                 if(newGE instanceof GEProperties && !((GEProperties)newGE).isDrawnByUser()){
                     mainController.addGE(newGE);

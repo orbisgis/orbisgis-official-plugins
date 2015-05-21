@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-04-29 15:27+0200\n"
+"POT-Creation-Date: 2015-05-21 09:26+0200\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -17,40 +17,56 @@ msgstr ""
 "Content-Type: text/plain; charset=CHARSET\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:59
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:61
 msgid "Orientation"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:62
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:64
 msgid "Format"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:65
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:67
+msgid "Unit"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:70
 msgid "Name"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:68
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:73
 msgid "Document title"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:105
-msgid "Portrait"
-msgstr ""
-
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:106
-msgid "Landscape"
-msgstr ""
-
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:252
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:238
 msgid "A4"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:253
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:239
 msgid "A3"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:254
-msgid "Custom"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:240
+msgid "CUSTOM"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:307
+msgid "mm"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:308
+msgid "in"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:309
+msgid "pixel"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:364
+msgid "Portrait"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:365
+msgid "Landscape"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/SimpleIllustrationGE.java:50
@@ -144,6 +160,14 @@ msgstr ""
 
 #: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:242
 msgid "Save document"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:100
+msgid "width"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:116
+msgid "height"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/view/utils/UIDialogExportConfiguration.java:110
@@ -298,12 +322,12 @@ msgstr ""
 msgid "HEIGHT"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/GEController.java:255
-#: org/orbisgis/mapcomposer/controller/GEController.java:262
+#: org/orbisgis/mapcomposer/controller/GEController.java:256
+#: org/orbisgis/mapcomposer/controller/GEController.java:263
 msgid "First create a new document or open an existing one."
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/GEController.java:306
+#: org/orbisgis/mapcomposer/controller/GEController.java:310
 msgid ""
 "Now you can draw the GraphicalElement. Hold SHIFT to keep the width/height "
 "ratio"
@@ -384,6 +408,6 @@ msgstr ""
 msgid "Action not supported yet."
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/IOController.java:133
+#: org/orbisgis/mapcomposer/controller/IOController.java:132
 msgid "Export document"
 msgstr ""
