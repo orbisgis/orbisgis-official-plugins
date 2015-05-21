@@ -40,6 +40,7 @@ import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
@@ -148,12 +149,6 @@ public class MainWindow extends JFrame {
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
         this.control = new CControl(this);
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent we) {
-                //onCloseWindow();
-            }
-        });
     }
 
     /**
@@ -428,6 +423,10 @@ public class MainWindow extends JFrame {
 
     public void setViewWorkspace(ViewWorkspace viewWorkspace) {
         this.mainController.setViewWorkspace(viewWorkspace);
+    }
+
+    public void setMapEditorExtension(MapEditorExtension mapEditorExtension) {
+        this.mainController.setMapEditorExtension(mapEditorExtension);
     }
 
     public void close(){

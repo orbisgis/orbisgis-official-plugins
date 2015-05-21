@@ -40,6 +40,7 @@ import java.util.Map;
 
 import org.orbisgis.coremap.layerModel.LayerException;
 import org.orbisgis.coremap.layerModel.OwsMapContext;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.slf4j.LoggerFactory;
 
@@ -63,6 +64,7 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
 
     private DataManager dataManager;
     private ViewWorkspace viewWorkspace;
+    private MapEditorExtension mapEditorExtension;
 
     /**
      * Empty constructor used in the SaveHandler, on loading a project save.
@@ -101,8 +103,10 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
                 dataManager = mainController.getDataManager();
             if (viewWorkspace == null)
                 viewWorkspace = mainController.getViewWorkspace();
+            if (mapEditorExtension == null)
+                mapEditorExtension = mainController.getMapEditorExtension();
         }
-        if(dataManager == null || viewWorkspace == null)
+        if(dataManager == null || viewWorkspace == null || mapEditorExtension == null)
             return;
         //Refresh of the file list
         loadListFiles();
@@ -133,17 +137,36 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
      * Go to the workspace and add to the list all the .ows files.
      */
     private void loadListFiles(){
-        File f = new File(viewWorkspace.getCoreWorkspace().getWorkspaceFolder()+"/maps/");
+        File workspace = new File(viewWorkspace.getCoreWorkspace().getWorkspaceFolder()+"/maps/");
         //save the selected path
         String s = getSelected();
         list=new ArrayList<>();
         //add all the files in the maps folder of the workspace
-        for(File file : f.listFiles()){
-            if(file.getAbsolutePath().toLowerCase().contains(".ows"))
-                list.add(file.getAbsolutePath());
+        list.addAll(getOwsInFolder(workspace));
+        //add all the map contains in the MapsManager folders
+        for(String path : mapEditorExtension.getMapsManagerData().getMapCatalogFolderList()){
+            list.addAll(getOwsInFolder(new File(path)));
         }
         //try to reselect the path saved
         select(s);
+    }
+
+    public List<String> getOwsInFolder(File folder){
+        List<String> listOws = new ArrayList<>();
+        //Test if the folder is not null and if it exists
+        if(folder == null || !folder.exists())
+            return listOws;
+        for(File f : folder.listFiles()){
+            if(f.isDirectory()){
+                listOws.addAll(getOwsInFolder(f));
+            }
+            if(f.isFile()){
+                if(f.getName().toLowerCase().endsWith(".ows")){
+                    listOws.add(f.getAbsolutePath());
+                }
+            }
+        }
+        return listOws;
     }
 
     @Override

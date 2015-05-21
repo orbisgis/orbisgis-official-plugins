@@ -163,7 +163,7 @@ public class Document extends SimpleGE implements GEProperties {
      * @return Unit of the document.
      */
     public Unit getUnit(){
-        return Unit.valueOf(unit.getSelected());
+        return Unit.getUnitFromName(unit.getSelected());
     }
     
     /**

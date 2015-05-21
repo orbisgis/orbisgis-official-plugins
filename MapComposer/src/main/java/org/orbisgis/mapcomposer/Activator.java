@@ -28,6 +28,8 @@ import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
+import org.orbisgis.mapeditor.map.MapEditor;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
@@ -64,6 +66,7 @@ public class Activator implements MainFrameAction {
 
     private DataManager dataManager;
     private ViewWorkspace viewWorkspace;
+    private MapEditorExtension mapEditorExtension;
 
     private Dictionary<String, Object> properties;
 
@@ -102,8 +105,13 @@ public class Activator implements MainFrameAction {
         this.viewWorkspace = viewWorkspace;
     }
 
+    @Reference
+    protected void setMapEditorExtension(MapEditorExtension mapEditorExtension){
+        this.mapEditorExtension = mapEditorExtension;
+    }
+
     protected void unsetDataManager(DataManager dataManager) {
-        this.mainWindow.setDataManager(null);
+        this.dataManager = null;
     }
 
     protected void unsetViewWorkspace(ViewWorkspace viewWorkspace) {
@@ -112,6 +120,10 @@ public class Activator implements MainFrameAction {
 
     protected void unsetConfigurationAdmin(ConfigurationAdmin configurationAdmin){
         this.mainWindow.setConfigurationAdmin(null);
+    }
+
+    protected void unsetMapEditorExtension(MapEditorExtension mapEditorExtension){
+        this.mapEditorExtension = null;
     }
 
     @Deactivate
@@ -144,6 +156,7 @@ public class Activator implements MainFrameAction {
             mainWindow.setDataManager(this.dataManager);
             mainWindow.setViewWorkspace(this.viewWorkspace);
             mainWindow.setConfigurationAdmin(this.configurationAdmin);
+            mainWindow.setMapEditorExtension(this.mapEditorExtension);
             mainWindow.constructUI();
         }
         mainWindow.setVisible(true);

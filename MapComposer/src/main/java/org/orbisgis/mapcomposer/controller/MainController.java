@@ -33,6 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -89,6 +90,8 @@ public class MainController{
     private ViewWorkspace viewWorkspace;
     /** DataManager of OrbisGIS */
     private DataManager dataManager;
+    /** MapEditorExtension comming from OrbisGIS */
+    private MapEditorExtension mapEditorExtension;
 
     /**
      * Main constructor.
@@ -442,6 +445,14 @@ public class MainController{
 
     public ViewWorkspace getViewWorkspace() {
         return viewWorkspace;
+    }
+
+    public MapEditorExtension getMapEditorExtension() {
+        return mapEditorExtension;
+    }
+
+    public void setMapEditorExtension(MapEditorExtension mapEditorExtension) {
+        this.mapEditorExtension = mapEditorExtension;
     }
 }
  
