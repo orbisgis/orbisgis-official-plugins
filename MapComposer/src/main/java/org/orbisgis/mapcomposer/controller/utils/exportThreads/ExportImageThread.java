@@ -165,6 +165,10 @@ public class ExportImageThread implements ExportThread {
 
     @Override
     public JComponent constructExportPanel(List<GraphicalElement> listGEToExport) {
+        for(GraphicalElement ge : listGEToExport){
+            addData(ge, true);
+        }
+
         JPanel panelPNG = new JPanel(new MigLayout());
         panelPNG.add(new JLabel("Image type : "));
         imageType = new JComboBox<>();
