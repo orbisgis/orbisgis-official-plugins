@@ -126,7 +126,7 @@ public class MainController{
             uiController.refreshSpin();
         }
         else
-            compositionAreaController.setOverlayMessage(i18n.tr("Can't undo..;"));
+            compositionAreaController.setOverlayMessage(i18n.tr("Can't undo."));
     }
 
     /**

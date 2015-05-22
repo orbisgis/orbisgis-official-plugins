@@ -182,16 +182,17 @@ public class ExportPDFThread implements ExportThread {
             }
 
             pdfDocument.close();
+            //Wait a bit before erasing the progress bar
             progressBar.setValue(progressBar.getMaximum());
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger(ExportPDFThread.class).error(e.getMessage());
             }
             progressBar.setValue(0);
 
         } catch (IllegalArgumentException|IOException|DocumentException ex) {
-            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+            LoggerFactory.getLogger(ExportPDFThread.class).error(ex.getMessage());
         }
     }
 
