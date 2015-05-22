@@ -74,10 +74,10 @@ public class CircleRenderer implements GERenderer, RendererRaster, RendererVecto
         //First draw the shape
         Color c = rectangle.getShapeColor();
         graphics2D.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), rectangle.getShapeAlpha()*255/100));
-        graphics2D.fillOval(x - ge.getWidth()/2 + rectangle.getBorderWidth()/2,
-                y - ge.getHeight()/2 + rectangle.getBorderWidth()/2,
-                ge.getWidth() - rectangle.getBorderWidth(),
-                ge.getHeight() - rectangle.getBorderWidth());
+        graphics2D.fillOval(x - ge.getWidth()/2,
+                y - ge.getHeight()/2,
+                ge.getWidth(),
+                ge.getHeight());
 
         //Then if there is a border, draw it.
         if(rectangle.getBorderStyle().equals(OvalGE.EmptyBorder))
