@@ -141,7 +141,7 @@
 			</value>
 		</org.orbisgis.mapcomposer.model.configurationattribute.attribute.StringCA>
 	</org.orbisgis.mapcomposer.model.graphicalelement.element.Document>
-	<org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage>
+	<org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage id="org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage@48aa8a97" >
 		<org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA>
 			<limits>
 				false
@@ -731,9 +731,9 @@
 			</list>
 		</org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA>
 		<org.orbisgis.mapcomposer.model.configurationattribute.attribute.MapImageListCA>
-			<index>
-				-1
-			</index>
+            <mapImageId>
+                org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.MapImage@48aa8a97
+            </mapImageId>
 			<readOnly>
 				false
 			</readOnly>

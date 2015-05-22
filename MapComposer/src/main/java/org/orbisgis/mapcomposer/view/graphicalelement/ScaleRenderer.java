@@ -39,8 +39,6 @@ import static java.lang.Math.sin;
  * @author Sylvain PALOMINOS
  */
 public class ScaleRenderer implements RendererRaster, RendererVector {
-    /**Dot per millimeter screen resolution. */
-    private double dpmm;
 
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
@@ -54,15 +52,16 @@ public class ScaleRenderer implements RendererRaster, RendererVector {
         graphics2D.rotate(rad, x, y);
 
         int dpi = Toolkit.getDefaultToolkit().getScreenResolution();
-        this.dpmm = (((double)dpi)/25.4);
-        
+        /*Dot per millimeter screen resolution. */
+        double dpmm = (((double) dpi) / 25.4);
+
         int resolution=-1;
-        
+
         //Get the map scale
         double mapScalemmR = ((Scale)ge).getMapScale();
         //Calculate the real distance in milimeter that the Scale panel width represent.
-        double panelWidthmmR = (ge.getWidth()/dpmm)*mapScalemmR;
-        
+        double panelWidthmmR = (ge.getWidth()/ dpmm)*mapScalemmR;
+
         //Scale resolution. It gives the better size for black and white rectangles of the scale
         for(int i=0; resolution==-1; i++){
             if(panelWidthmmR/Math.pow(10, i)<10){
@@ -74,36 +73,62 @@ public class ScaleRenderer implements RendererRaster, RendererVector {
         }
         //Convert the resolution from millimeters per rectangles to pixel per block
         resolution/=mapScalemmR;
-        resolution*=dpmm;
-        
+        resolution*= dpmm;
         //Draw the BufferedImage
         graphics2D.setBackground(Color.black);
         graphics2D.setColor(Color.black);
-        
+
         boolean updown = false;
         int i=0;
         int width = ge.getWidth();
         while(width>=resolution){
             if(updown){
-                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, resolution, ge.getHeight()/2-1);
-                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+ge.getHeight() / 2, resolution, ge.getHeight() -ge.getHeight()/2);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                        y-ge.getHeight()/2,
+                        resolution,
+                        ge.getHeight()/2-1);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                        y-1,
+                        resolution,
+                        ge.getHeight()/2+2);
             }
             else{
-                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, resolution, ge.getHeight()/2-1);
-                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+(ge.getHeight() - 1) / 2, resolution, ge.getHeight() -ge.getHeight()/2);
+                graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                        y-ge.getHeight()/2,
+                        resolution,
+                        ge.getHeight()/2-1);
+                graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                        y-1,
+                        resolution,
+                        ge.getHeight()/2+1);
             }
             updown=!updown;
             width-=resolution;
             i++;
         }
         if(updown){
-            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, width - 1, ge.getHeight()/2-1);
-            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+ge.getHeight() / 2, width, ge.getHeight() -ge.getHeight()/2);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                    y-ge.getHeight()/2,
+                    width - 1,
+                    ge.getHeight()/2-1);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                    y-1,
+                    width,
+                    ge.getHeight()/2+2);
         }
         else{
-            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+0, width, ge.getHeight()/2-1);
-            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution, y-ge.getHeight()/2+(ge.getHeight() - 1) / 2, width - 1, ge.getHeight() -ge.getHeight()/2);
+            graphics2D.fillRect(x-ge.getWidth()/2+i * resolution,
+                    y-ge.getHeight()/2,
+                    width,
+                    ge.getHeight()/2-1);
+            graphics2D.drawRect(x-ge.getWidth()/2+i * resolution,
+                    y-1,
+                    width,
+                    ge.getHeight()/2+1);
         }
+
+        graphics2D.setFont(graphics2D.getFont().deriveFont(Font.PLAIN, ge.getHeight() / 5 - 1));
+        graphics2D.drawString("1:" + ((int) mapScalemmR/(i+1)), x-ge.getWidth()/2, y+ge.getHeight() /4);
         graphics2D.dispose();
     }
 

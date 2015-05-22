@@ -118,7 +118,7 @@ public class CompositionArea extends JPanel {
         horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
         inchOrCm = new JButton("in");
         inchOrCm.setMargin(new Insets(0, 0, 0, 0));
-        inchOrCm.setFont(new Font("Arial", Font.PLAIN, 8));
+        inchOrCm.setFont(new Font("Arial", Font.PLAIN, POSITIONSCALE_DIMENSION/4));
         inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
         scrollPane.setRowHeaderView(verticalPositionScale);
         scrollPane.setColumnHeaderView(horizontalPositionScale);
@@ -249,7 +249,8 @@ public class CompositionArea extends JPanel {
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.layeredPane.setPreferredSize(this.dimension);
-        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
+        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension
+                .height) / 2, dimension.width, dimension.height);
     }
 
     /**

@@ -42,11 +42,8 @@ public class Scale extends SimpleCartoGE{
     /**Link to the MapImage*/
     private MapImageListCA milka;
 
-    /** Object for the translation*/
-    private static final I18n i18n = I18nFactory.getI18n(Scale.class);
-
     /**Displayed name of the MapImageList ConfigurationAttribute*/
-    private static final String sMILKA = i18n.tr("Link to MapImage");
+    private static final String sMILKA = I18n.marktr("Link to MapImage");
 
     /**
      * Main constructor.

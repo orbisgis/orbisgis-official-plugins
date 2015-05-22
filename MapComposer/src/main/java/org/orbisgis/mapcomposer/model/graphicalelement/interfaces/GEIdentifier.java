@@ -22,32 +22,26 @@
 * A PARTICULAR PURPOSE. See the GNU General Public License for more details <http://www.gnu.org/licenses/>.
 */
 
-package org.orbisgis.mapcomposer.view.graphicalelement;
-
-import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
-
-import java.awt.Color;
-import java.awt.Graphics2D;
-import java.awt.image.BufferedImage;
+package org.orbisgis.mapcomposer.model.graphicalelement.interfaces;
 
 /**
- * Renderer associated to the Document GraphicalElement.
+ * This interface for GraphicalElement adds an identifier which is used on saving.
+ * For example the MapImageListCA need to keep a link with the selected MapImage which is done with the MapImage
+ * identifier.
  *
  * @author Sylvain PALOMINOS
  */
-public class DocumentRenderer implements RendererRaster, RendererVector {
 
-    @Override
-    public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
-        //Returns a white rectangle without applying any rotation
-        graphics2D.setPaint(new Color(255, 255, 255));
-        graphics2D.fillRect(0, 0, ge.getWidth(), ge.getHeight());
-    }
+public interface GEIdentifier {
+    /**
+     * Sets the identifier.
+     * @param id New identifier.
+     */
+    public void setIdentifier(String id);
 
-    @Override
-    public BufferedImage createGEImage(GraphicalElement ge) {
-        BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
-        drawGE(bi.createGraphics(), ge);
-        return bi;
-    }
+    /**
+     * Returns the identifier.
+     * @return The identifier.
+     */
+    public String getIdentifier();
 }

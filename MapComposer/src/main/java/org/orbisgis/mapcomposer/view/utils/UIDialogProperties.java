@@ -27,6 +27,8 @@ package org.orbisgis.mapcomposer.view.utils;
 import net.miginfocom.swing.MigLayout;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
+import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.RefreshCA;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GERefresh;
 import org.orbisgis.sif.UIPanel;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -94,6 +96,8 @@ public class UIDialogProperties implements UIPanel {
         panel.setLayout(new MigLayout());
 
         for(int i=0; i<caList.size(); i++){
+            if(caList.get(i) instanceof RefreshCA)
+                ((RefreshCA)caList.get(i)).refresh(mainController);
             JLabel name = new JLabel(caList.get(i).getName());
             JComponent component = mainController.getCAManager().getRenderer(caList.get(i)).createJComponentFromCA(caList.get(i));
             if(enableLock) {

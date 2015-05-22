@@ -96,10 +96,14 @@ public class OwsContextCA extends BaseListCA<String> implements RefreshCA{
 
     @Override
     public void refresh(MainController mainController) {
-        if(dataManager == null)
-            dataManager = mainController.getDataManager();
-        if(viewWorkspace == null)
-            viewWorkspace = mainController.getViewWorkspace();
+        if(mainController!= null) {
+            if (dataManager == null)
+                dataManager = mainController.getDataManager();
+            if (viewWorkspace == null)
+                viewWorkspace = mainController.getViewWorkspace();
+        }
+        if(dataManager == null || viewWorkspace == null)
+            return;
         //Refresh of the file list
         loadListFiles();
         //Refresh of the selected file

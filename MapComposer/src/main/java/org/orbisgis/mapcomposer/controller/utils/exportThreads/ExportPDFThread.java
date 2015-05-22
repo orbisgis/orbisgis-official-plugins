@@ -105,12 +105,16 @@ public class ExportPDFThread implements ExportThread {
     private ButtonGroup mainButtonGroup;
     /** Button expanding the selection between vector or raster export*/
     private JCheckBox expand;
+    private List<Class<? extends GraphicalElement>> listGEOnlyRaster;
+    private List<Class<? extends GraphicalElement>> listGEOnlyVector;
 
     /**
      * Main constructor
      */
     public ExportPDFThread(){
         this.geIsVectorMap = new HashMap<>();
+        this.listGEOnlyRaster = new ArrayList<>();
+        this.listGEOnlyVector = new ArrayList<>();
     }
 
     @Override
@@ -137,7 +141,7 @@ public class ExportPDFThread implements ExportThread {
 
             PdfContentByte cb = writer.getDirectContent();
 
-            progressBar.setValue(0);
+            progressBar.setIndeterminate(true);
             int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
             for(GraphicalElement ge : geIsVectorMap.keySet()){
@@ -171,16 +175,24 @@ public class ExportPDFThread implements ExportThread {
                     pdfDocument.add(image);
                 }
 
+                progressBar.setIndeterminate(false);
                 progressBar.setValue((geCount * 100) / geIsVectorMap.keySet().size());
                 progressBar.revalidate();
                 geCount ++;
             }
 
             pdfDocument.close();
+            //Wait a bit before erasing the progress bar
             progressBar.setValue(progressBar.getMaximum());
+            try {
+                Thread.sleep(1500);
+            } catch (InterruptedException e) {
+                LoggerFactory.getLogger(ExportPDFThread.class).error(e.getMessage());
+            }
+            progressBar.setValue(0);
 
         } catch (IllegalArgumentException|IOException|DocumentException ex) {
-            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+            LoggerFactory.getLogger(ExportPDFThread.class).error(ex.getMessage());
         }
     }
 
@@ -265,6 +277,10 @@ public class ExportPDFThread implements ExportThread {
                 vectorButton.setEnabled(false);
                 rasterButton.setEnabled(false);
                 rasterButton.setSelected(true);
+
+                if(!listGEOnlyRaster.contains(geClass)){
+                    listGEOnlyRaster.add(geClass);
+                }
             }
             if(geManager.getRenderer(geClass) instanceof RendererRaster) {
                 panelRasterVector.add(rasterButton, "cell 3 " + i + " 1 1");
@@ -273,6 +289,10 @@ public class ExportPDFThread implements ExportThread {
                 rasterButton.setEnabled(false);
                 vectorButton.setEnabled(false);
                 vectorButton.setSelected(true);
+
+                if(!listGEOnlyVector.contains(geClass)){
+                    listGEOnlyVector.add(geClass);
+                }
             }
             ButtonGroup buttonGroup = new ButtonGroup();
             buttonGroup.add(vectorButton);
@@ -315,7 +335,9 @@ public class ExportPDFThread implements ExportThread {
             }
             mainVectorRadio.setSelected(true);
             for(GraphicalElement ge : listGE){
-                this.addData(ge, true);
+                if(!listGEOnlyRaster.contains(ge.getClass())) {
+                    this.addData(ge, true);
+                }
             }
         }
         if(mainRadioButton == mainRasterRadio){
@@ -326,7 +348,9 @@ public class ExportPDFThread implements ExportThread {
             }
             mainRasterRadio.setSelected(true);
             for(GraphicalElement ge : listGE){
-                this.addData(ge, false);
+                if(!listGEOnlyVector.contains(ge.getClass())) {
+                    this.addData(ge, false);
+                }
             }
         }
     }

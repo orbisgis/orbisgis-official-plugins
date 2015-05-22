@@ -26,6 +26,7 @@ package org.orbisgis.mapcomposer.model.utils;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.utils.CAManager;
+import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEIdentifier;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
@@ -87,6 +88,12 @@ public class SaveAndLoadHandler extends DefaultHandler {
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(SaveAndLoadHandler.class);
 
+    /**
+     * SaveAndLoadHandler constructor.
+     * It needs the GEManager and the CAManager to ge the list of GE and CA class registered.
+     * @param geManager GEManager
+     * @param caManager CAManager
+     */
     public SaveAndLoadHandler(GEManager geManager, CAManager caManager){
         // Gets the list of GraphicalElement and Configuration Attributes class
         listClassGE = geManager.getRegisteredGEClasses();
@@ -140,6 +147,10 @@ public class SaveAndLoadHandler extends DefaultHandler {
                         try {
                             graphicalElement = c.newInstance();
                             insideGE = true;
+                            //If the GraphicalElement implements GEIdentifier, set its ID
+                            if(graphicalElement instanceof GEIdentifier){
+                                ((GEIdentifier)graphicalElement).setIdentifier(attributes.getValue("id"));
+                            }
                         } catch (InstantiationException|IllegalAccessException e) {
                             throw new SAXException(e);
                         }
@@ -175,7 +186,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
                 if (stringBuffer.toString().equals(COMPATIBLE_VERSIONS[i]))
                     flag = true;
             if (!flag) {
-                String message = i18n.tr("File version {0} isn't compatible with the MapComposer version. Should be {1}", stringBuffer.toString(), "");
+                String message = i18n.tr("File version {0} isn't compatible with the MapComposer version. Should be " +
+                        "{1}.", stringBuffer.toString(), "");
                 for (String s : COMPATIBLE_VERSIONS)
                     message += s + ", ";
                 throw new SAXException(message);
@@ -197,8 +209,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws SAXException
      */
     public List<GraphicalElement> loadProject() throws IOException, ParserConfigurationException, SAXException {
-        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document project"));
-        loadFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        OpenFilePanel loadFilePanel = new OpenFilePanel("SaveAndLoadHandler", i18n.tr("Load document"));
+        loadFilePanel.addFilter(new String[]{"xml"}, i18n.tr("XML save files"));
         loadFilePanel.loadState();
 
         if(UIFactory.showDialog(loadFilePanel))
@@ -207,7 +219,7 @@ public class SaveAndLoadHandler extends DefaultHandler {
     }
 
     /**
-     * Loads and returns the project save file corresponding to the given path.
+     * Loads and returns the document save file corresponding to the given path.
      * @param path Path of the file to load
      * @return The list of GraphicalElement saved
      * @throws ParserConfigurationException
@@ -227,8 +239,8 @@ public class SaveAndLoadHandler extends DefaultHandler {
      * @throws NoSuchMethodException
      */
     public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
-        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document project"));
-        saveFilePanel.addFilter(new String[]{"xml"}, "XML save files");
+        SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document"));
+        saveFilePanel.addFilter(new String[]{"xml"}, i18n.tr("XML save files"));
         saveFilePanel.loadState();
 
         if(UIFactory.showDialog(saveFilePanel)){
@@ -271,8 +283,12 @@ public class SaveAndLoadHandler extends DefaultHandler {
         fw.write("<synchronized>\n\t<version>" + STRING_VERSION + "</version>\n");
         //Write all the GraphicalElement from the list argument
         for (GraphicalElement ge : list) {
-            //Write the GraphicalElement start xml tag
-            fw.write("\t<" + ge.getClass().getName() + ">\n");
+            //Write the GraphicalElement start xml tag and its identifier if there is one
+            fw.write("\t<" + ge.getClass().getName());
+            if(ge instanceof GEIdentifier){
+                fw.write(" id=\""+((GEIdentifier)ge).getIdentifier()+"\" ");
+            }
+            fw.write(">\n");
             //Write all the ConfigurationAttribute get from the GraphicalElement graphicalElement
             for(ConfigurationAttribute ca : ge.getSavableAttributes()){
                 //Write the ConfigurationAttribute start xml tag
