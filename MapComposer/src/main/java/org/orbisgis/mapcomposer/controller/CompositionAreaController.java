@@ -499,4 +499,16 @@ public class CompositionAreaController {
     public JComponent getCompositionJPanel(GraphicalElement ge) {
         return elementJPanelMap.get(ge);
     }
+
+    /**
+     * Returns the list of GraphicalElement ordered by z-index (useful for exporting).
+     * @return The list of GraphicalElement ordered by z-index.
+     */
+    public Stack<GraphicalElement> getOrderedByZindexGeList(){
+        Stack<GraphicalElement> geStack = new Stack<>();
+        for(int i=zIndexStack.size()-1; i>=0; i--) {
+            geStack.add(zIndexStack.get(i));
+        }
+        return geStack;
+    }
 }

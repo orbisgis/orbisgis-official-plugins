@@ -42,6 +42,7 @@ import javax.xml.parsers.ParserConfigurationException;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * This controller manage the save, load and export actions.
@@ -115,12 +116,12 @@ public class IOController {
 
     /**
      * Exports the document into the format selected in the export dialog window (SaveFilePanel class)
-     * @param listGEToExport List of GraphicalElement to export.
+     * @param stackGEToExport Stack of GraphicalElement to export.
      * @param progressBar Progress bar where should be shown the progression. Can be null.
      */
-    public void export(List<GraphicalElement> listGEToExport, JProgressBar progressBar){
+    public void export(Stack<GraphicalElement> stackGEToExport, JProgressBar progressBar){
         //Display the export configuration dialog
-        UIDialogExportConfiguration uiDialogExportConfiguration = new UIDialogExportConfiguration(listGEToExport, geManager);
+        UIDialogExportConfiguration uiDialogExportConfiguration = new UIDialogExportConfiguration(stackGEToExport, geManager);
         //If the export configuration dialog is closed without validating it, exit the export
         if(!UIFactory.showDialog(uiDialogExportConfiguration, true, true))
             return;

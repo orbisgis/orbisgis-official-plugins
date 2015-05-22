@@ -39,6 +39,7 @@ import java.awt.Component;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Stack;
 
 /**
  * This class is the UIPanel of the export configuration dialog.
@@ -67,19 +68,19 @@ public class UIDialogExportConfiguration implements UIPanel {
     /** GEManager containing all the rendering methods */
     private GEManager geManager;
 
-    /** List of GraphicalElements to export */
-    private List<GraphicalElement> listGEToExport;
+    /** Stack of GraphicalElements to export */
+    private Stack<GraphicalElement> stackGEToExport;
 
     /**
      * Main constructor
-     * @param listGEToExport List of GraphicalElement to export.
+     * @param stackGEToExport Stack of GraphicalElement to export.
      * @param geManager GeManager containing the rendering methods.
      */
-    public UIDialogExportConfiguration(List<GraphicalElement> listGEToExport, GEManager geManager) {
+    public UIDialogExportConfiguration(Stack<GraphicalElement> stackGEToExport, GEManager geManager) {
         this.panel = new JPanel();
         this.exportThreadList = new ArrayList<>();
         this.geManager = geManager;
-        this.listGEToExport = listGEToExport;
+        this.stackGEToExport = stackGEToExport;
 
         //Sets and add the JTabbedPane
         tabbedPane = new JTabbedPane();
@@ -97,7 +98,7 @@ public class UIDialogExportConfiguration implements UIPanel {
     public void addExportThread(ExportThread exportThread){
         exportThreadList.add(exportThread);
         exportThread.setGEManager(geManager);
-        tabbedPane.addTab(exportThread.getName(), null, exportThread.constructExportPanel(listGEToExport), exportThread.getDescription());
+        tabbedPane.addTab(exportThread.getName(), null, exportThread.constructExportPanel(stackGEToExport), exportThread.getDescription());
     }
 
     @Override

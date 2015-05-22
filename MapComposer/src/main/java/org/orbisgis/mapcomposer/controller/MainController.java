@@ -395,7 +395,7 @@ public class MainController{
      * Export the actual document into PNG, PDF or HTML after refreshing all the GE
      */
     public void export(){
-        ioController.export(geController.getGEList(), mainWindow.getCompositionArea().getProgressionBar());
+        ioController.export(compositionAreaController.getOrderedByZindexGeList(), mainWindow.getCompositionArea().getProgressionBar());
     }
 
     /**
