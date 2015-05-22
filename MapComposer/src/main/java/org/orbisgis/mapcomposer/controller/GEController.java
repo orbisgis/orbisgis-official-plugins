@@ -86,6 +86,7 @@ public class GEController {
     public void modifySelectedGE(){
         for(GraphicalElement ge : selectedGE)
             modifyGE(ge);
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -99,6 +100,7 @@ public class GEController {
             ((GERefresh)ge).refresh();
         mainController.getCompositionAreaController().modifyCompositionJPanel(ge);
         mainController.getUIController().refreshSpin();
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -134,6 +136,7 @@ public class GEController {
             }
         }
         toBeSet = new ArrayList<>();
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -165,6 +168,7 @@ public class GEController {
     public void removeSelectedGE(){
         listGE.removeAll(selectedGE);
         selectedGE=new ArrayList<>();
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -181,6 +185,7 @@ public class GEController {
     public void removeAllGE() {
         selectedGE = new ArrayList<>();
         listGE = new ArrayList<>();
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -190,6 +195,7 @@ public class GEController {
     public void removeGE(GraphicalElement ge) {
         selectedGE.remove(ge);
         listGE.remove(ge);
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -204,6 +210,7 @@ public class GEController {
         selectedGE.add(ge);
         mainController.getCompositionAreaController().changeZIndex(CompositionAreaController.ZIndex.TO_FRONT);
         selectedGE = temp;
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -233,6 +240,7 @@ public class GEController {
             }
         }
         modifySelectedGE();
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -274,6 +282,7 @@ public class GEController {
         } catch (InstantiationException | IllegalAccessException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
+        mainController.getMainWindow().setModified(true);
     }
 
     /**
@@ -332,6 +341,7 @@ public class GEController {
         }
         mainController.getCompositionAreaController().setOverlayMode(CompositionAreaOverlay.Mode.NONE);
         newGE=null;
+        mainController.getMainWindow().setModified(true);
     }
 
     /**

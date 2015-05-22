@@ -127,6 +127,7 @@ public class MainController{
             //Enable the registering of edit actions
             undoingRedoing = false;
             uiController.refreshSpin();
+            mainWindow.setModified(true);
         }
         else
             compositionAreaController.setOverlayMessage(i18n.tr("Can't undo..;"));
@@ -143,6 +144,7 @@ public class MainController{
             //Enable the registering of edit actions
             undoingRedoing = false;
             uiController.refreshSpin();
+            mainWindow.setModified(true);
         }
         else
             compositionAreaController.setOverlayMessage(i18n.tr("Can't redo."));
@@ -353,7 +355,9 @@ public class MainController{
      * Saves the document (Save all the GE contained by the document).
      */
     public void saveDocument(){
-        ioController.saveDocument(geController.getGEList());
+        if(ioController.saveDocument(geController.getGEList())){
+            mainWindow.setModified(false);
+        }
     }
 
     /**

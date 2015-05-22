@@ -34,14 +34,19 @@ import bibliothek.gui.dock.themes.border.BorderModifier;
 import bibliothek.gui.dock.toolbar.CToolbarContentArea;
 import bibliothek.gui.dock.toolbar.CToolbarItem;
 import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
+
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.Activator;
 import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditableElementException;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -64,8 +69,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.beans.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -82,7 +85,7 @@ import java.util.Hashtable;
  * @author Sylvain PALOMINOS
  */
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements EditableElement {
 
     //String used to define the toolbars actions
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
@@ -130,6 +133,9 @@ public class MainWindow extends JFrame {
 
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
+
+    /** True if the document has been modified and not saved, false otherwise */
+    private boolean modified;
 
     private CControl control;
 
@@ -474,5 +480,60 @@ public class MainWindow extends JFrame {
 
     public void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = configurationAdmin;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public boolean isModified() {
+        return modified;
+    }
+
+    @Override
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return this.isVisible();
+    }
+
+    @Override
+    public String getTypeId() {
+        return null;
+    }
+
+    @Override
+    public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
+        mainController.loadDocument();
+    }
+
+    @Override
+    public void save() throws UnsupportedOperationException, EditableElementException {
+        mainController.saveDocument();
+    }
+
+    @Override
+    public void close(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
+    }
+
+    @Override
+    public Object getObject() throws UnsupportedOperationException {
+        return null;
+    }
+
+    @Override
+    public String toString(){
+        String documentName = "";
+        for(GraphicalElement ge : mainController.getGEList()){
+            if(ge instanceof Document){
+                documentName = ((Document)ge).getName();
+            }
+        }
+        return "MapComposer document - "+documentName;
     }
 }

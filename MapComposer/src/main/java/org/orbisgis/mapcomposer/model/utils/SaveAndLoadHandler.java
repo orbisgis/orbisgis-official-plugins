@@ -235,17 +235,20 @@ public class SaveAndLoadHandler extends DefaultHandler {
     /**
      * Open a file chooser window and save the given list of GraphicalElement in the selected file.
      * @param list List of GraphicalElement to save
+     * @return True if the document is saved, false otherwise.
      * @throws IOException
      * @throws NoSuchMethodException
      */
-    public void saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
+    public boolean saveProject(List<GraphicalElement> list) throws IOException, NoSuchMethodException {
         SaveFilePanel saveFilePanel = new SaveFilePanel("SaveAndLoadHandler", i18n.tr("Save document"));
         saveFilePanel.addFilter(new String[]{"xml"}, i18n.tr("XML save files"));
         saveFilePanel.loadState();
 
         if(UIFactory.showDialog(saveFilePanel)){
             save(list, saveFilePanel.getSelectedFile().getAbsolutePath());
+            return true;
         }
+        return false;
     }
 
     /**

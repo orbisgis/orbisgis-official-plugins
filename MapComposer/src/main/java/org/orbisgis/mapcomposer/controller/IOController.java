@@ -68,13 +68,15 @@ public class IOController {
     /**
      * Runs saveProject function of the SaveHandler.
      * @param listGEToSave List of GraphicalElements to save.
+     * @return True if the document is successfully saved, false otherwise.
      */
-    public void saveDocument(List<GraphicalElement> listGEToSave){
+    public boolean saveDocument(List<GraphicalElement> listGEToSave){
         try {
-            saveNLoadHandler.saveProject(listGEToSave);
+            return saveNLoadHandler.saveProject(listGEToSave);
         } catch (NoSuchMethodException|IOException ex) {
             LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
         }
+        return false;
     }
 
     /**

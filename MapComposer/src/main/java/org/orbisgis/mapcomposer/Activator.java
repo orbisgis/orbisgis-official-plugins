@@ -28,9 +28,10 @@ import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mainframe.api.MainFrameAction;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
-import org.orbisgis.mapeditor.map.MapEditor;
 import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.sif.components.actions.DefaultAction;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.Editor;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -54,7 +55,7 @@ import java.util.List;
  */
 
 @Component
-public class Activator implements MainFrameAction {
+public class Activator implements MainFrameAction, Editor {
 
     public static final String MENU_MAPCOMPOSER = "MapComposer";
 
@@ -166,5 +167,20 @@ public class Activator implements MainFrameAction {
             mainWindow.getCompositionArea().configure((Integer) properties.get("unit"));
             mainWindow.configure((byte[]) properties.get("layout"));
         }
+    }
+
+    @Override
+    public boolean match(EditableElement editableElement) {
+        return false;
+    }
+
+    @Override
+    public EditableElement getEditableElement() {
+        return mainWindow;
+    }
+
+    @Override
+    public void setEditableElement(EditableElement editableElement) {
+
     }
 }
