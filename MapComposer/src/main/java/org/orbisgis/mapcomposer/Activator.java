@@ -97,7 +97,7 @@ public class Activator implements MainFrameAction, Editor {
         try {
             properties = configurationAdmin.getConfiguration(Activator.class.getName()).getProperties();
         } catch (IOException e) {
-            e.printStackTrace();
+            LoggerFactory.getLogger(Activator.class).error(e.getMessage());
         }
     }
 

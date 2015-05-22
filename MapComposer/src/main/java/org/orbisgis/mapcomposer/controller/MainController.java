@@ -130,7 +130,7 @@ public class MainController{
             mainWindow.setModified(true);
         }
         else
-            compositionAreaController.setOverlayMessage(i18n.tr("Can't undo..;"));
+            compositionAreaController.setOverlayMessage(i18n.tr("Can't undo."));
     }
 
     /**

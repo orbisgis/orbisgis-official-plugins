@@ -122,15 +122,16 @@ public class ExportImageThread implements ExportThread {
             ImageIO.write(bi, (String)imageType.getSelectedItem(), new File(path));
 
             progressBar.setValue(progressBar.getMaximum());
+            //Wait a bit before erasing the progress bar
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
-                e.printStackTrace();
+                LoggerFactory.getLogger(ExportImageThread.class).error(e.getMessage());
             }
             progressBar.setValue(0);
 
         } catch (IllegalArgumentException|IOException ex) {
-            LoggerFactory.getLogger(MainController.class).error(ex.getMessage());
+            LoggerFactory.getLogger(ExportImageThread.class).error(ex.getMessage());
         }
     }
 

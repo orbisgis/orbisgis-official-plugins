@@ -1,0 +1,277 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# 
+# Translators:
+msgid ""
+msgstr ""
+"Project-Id-Version: OrbisGIS\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2015-02-05 16:35+0100\n"
+"PO-Revision-Date: 2015-02-20 14:00+0000\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: Russian (Russia) (http://www.transifex.com/projects/p/orbisgis/language/ru_RU/)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Language: ru_RU\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:61
+msgid "Orientation"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:64
+msgid "Format"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:67
+msgid "Name"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:70
+msgid "Document title"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/SimpleIllustrationGE.java:53
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Orientation.java:51
+msgid "Path"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:63
+msgid "x"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:66
+msgid "y"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:69
+msgid "Rotation"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:72
+msgid "Height"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/SimpleGE.java:75
+msgid "Width"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:71
+msgid "Text"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:73
+msgid "Text color"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:75
+msgid "Background color"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:77
+msgid "Alignment"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:79
+msgid "Style"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:81
+msgid "Alpha"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:83
+msgid "Font"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:85
+msgid "Font size"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:98
+msgid "Some text"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Scale.java:49
+msgid "Link to MapImage"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/SimpleCartoGE.java:53
+msgid "OWS-Context path"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:178
+#, java-format
+msgid ""
+"File version {0} isn't compatible with the MapComposer version. Should be "
+"{1}"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:200
+msgid "Load document project"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:230
+msgid "Save document project"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/utils/CompositionJPanel.java:118
+msgid ""
+"<html>Holding <strong>Alt Gr</strong> : resize the representation of the "
+"element.<br/>Holding <strong>Shift</strong> : resire the element and keeps "
+"the ratio width/height.</html>"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/utils/UIDialogProperties.java:122
+msgid "Configuration"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/utils/ColorChooser.java:54
+msgid "Ok"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/configurationattribute/SourceRenderer.java:88
+#: org/orbisgis/mapcomposer/view/configurationattribute/SourceRenderer.java:112
+msgid "Select source"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:132
+msgid "Create a new document (Ctrl + N)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:133
+msgid "Show the document configuration dialog (Ctrl + D)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:134
+msgid "Save the document (Ctrl + S)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:135
+msgid "Open a document (Ctrl + L)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:136
+msgid "Export the document (Ctrl + E)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:138
+msgid "Add a map element (Alt + M)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:139
+msgid "Add a text element (Alt + T)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:140
+msgid "Add a legend element (Alt + L)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:141
+msgid "Add an orientation element (Alt + O)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:142
+msgid "Add a scale element (Alt + S)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:143
+msgid "Add a picture element (Alt + I)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:145
+msgid "Add a circle element (Alt + C)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:146
+msgid "Add a polygon element (Alt + Y)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:148
+msgid "Move to the back (Alt + PageDown)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:149
+msgid "Move down (Alt + Down)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:150
+msgid "Move on (Alt + Up)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:151
+msgid "Move to the front (Alt + PageUp)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:153
+msgid "Align to the left (Alt + numpad 4)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:154
+msgid "Align to the center"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:155
+msgid "Align to the right (Alt + numpad 6)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:156
+msgid "Align to the bottom (Alt + numpad 2)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:157
+msgid "Align to the middle"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:158
+msgid "Align to the top (Alt + numpad 8)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:160
+msgid "Show selected elements properties (Ctrl + P)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:161
+msgid "Delete selected elements (DELETE)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:162
+msgid "Redraw selected elements (Ctrl + R)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:163
+msgid "Undo the last action (Ctrl + Z)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/MainWindow.java:164
+msgid "Redo the last action (Ctrl + Shift + Z)"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/GEController.java:252
+#: org/orbisgis/mapcomposer/controller/GEController.java:258
+msgid "First create a new document or open an existing project."
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/GEController.java:301
+msgid "Now you can draw the GraphicalElement."
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/MainController.java:121
+msgid "Can't undo"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/MainController.java:137
+msgid "Can't redo"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/UIController.java:86
+#: org/orbisgis/mapcomposer/controller/UIController.java:109
+#: org/orbisgis/mapcomposer/controller/UIController.java:113
+msgid "Action not supported yet"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/controller/IOController.java:115
+msgid "Export document"
+msgstr ""
