@@ -57,8 +57,10 @@ public class MapImageListRenderer implements CARenderer{
         //Create a MapImage list
         List<ContainerItem<MapImage>> listContainer = new ArrayList<>();
         for(MapImage mapImage : milka.getValue()){
-            if(mapImage != null) {
-                listContainer.add(new ContainerItem<>(mapImage, mapImage.getOwsMapContext().getTitle()));
+            if(mapImage != null && mapImage.getOwsMapContext() != null) {
+                if(mapImage.getOwsMapContext().getTitle() != null) {
+                    listContainer.add(new ContainerItem<>(mapImage, mapImage.getOwsMapContext().getTitle()));
+                }
             }
         }
         //Adds a null MapImage
