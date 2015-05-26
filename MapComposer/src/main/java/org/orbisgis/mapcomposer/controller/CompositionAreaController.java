@@ -281,8 +281,10 @@ public class CompositionAreaController {
             ((GERefresh)ge).refresh();
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
         executorService.submit(worker);
-        if(ge instanceof Document)
+        if(ge instanceof Document) {
             compositionArea.setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
+            compositionArea.setInchOrCom(((Document)ge).getUnit());
+        }
     }
 
     /**
@@ -496,5 +498,17 @@ public class CompositionAreaController {
      */
     public JComponent getCompositionJPanel(GraphicalElement ge) {
         return elementJPanelMap.get(ge);
+    }
+
+    /**
+     * Returns the list of GraphicalElement ordered by z-index (useful for exporting).
+     * @return The list of GraphicalElement ordered by z-index.
+     */
+    public Stack<GraphicalElement> getOrderedByZindexGeList(){
+        Stack<GraphicalElement> geStack = new Stack<>();
+        for(int i=zIndexStack.size()-1; i>=0; i--) {
+            geStack.add(zIndexStack.get(i));
+        }
+        return geStack;
     }
 }

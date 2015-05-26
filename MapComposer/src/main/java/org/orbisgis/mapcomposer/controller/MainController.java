@@ -33,6 +33,7 @@ import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.*;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.ui.MainWindow;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
@@ -89,6 +90,8 @@ public class MainController{
     private ViewWorkspace viewWorkspace;
     /** DataManager of OrbisGIS */
     private DataManager dataManager;
+    /** MapEditorExtension comming from OrbisGIS */
+    private MapEditorExtension mapEditorExtension;
 
     /**
      * Main constructor.
@@ -124,6 +127,7 @@ public class MainController{
             //Enable the registering of edit actions
             undoingRedoing = false;
             uiController.refreshSpin();
+            mainWindow.setModified(true);
         }
         else
             compositionAreaController.setOverlayMessage(i18n.tr("Can't undo."));
@@ -140,6 +144,7 @@ public class MainController{
             //Enable the registering of edit actions
             undoingRedoing = false;
             uiController.refreshSpin();
+            mainWindow.setModified(true);
         }
         else
             compositionAreaController.setOverlayMessage(i18n.tr("Can't redo."));
@@ -350,7 +355,9 @@ public class MainController{
      * Saves the document (Save all the GE contained by the document).
      */
     public void saveDocument(){
-        ioController.saveDocument(geController.getGEList());
+        if(ioController.saveDocument(geController.getGEList())){
+            mainWindow.setModified(false);
+        }
     }
 
     /**
@@ -388,7 +395,7 @@ public class MainController{
      * Export the actual document into PNG, PDF or HTML after refreshing all the GE
      */
     public void export(){
-        ioController.export(geController.getGEList(), mainWindow.getCompositionArea().getProgressionBar());
+        ioController.export(compositionAreaController.getOrderedByZindexGeList(), mainWindow.getCompositionArea().getProgressionBar());
     }
 
     /**
@@ -442,6 +449,14 @@ public class MainController{
 
     public ViewWorkspace getViewWorkspace() {
         return viewWorkspace;
+    }
+
+    public MapEditorExtension getMapEditorExtension() {
+        return mapEditorExtension;
+    }
+
+    public void setMapEditorExtension(MapEditorExtension mapEditorExtension) {
+        this.mapEditorExtension = mapEditorExtension;
     }
 }
  

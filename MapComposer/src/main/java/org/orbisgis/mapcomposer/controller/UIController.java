@@ -73,32 +73,30 @@ public class UIController {
 
 
     public void createDocument(){
-        //If the document already contain GraphicalElement, as before removing them
-        if(!mainController.getGEList().isEmpty()){
+        //If the document already contain GraphicalElement, ask before removing them
+        if(!mainController.getGEList().isEmpty() &&
+                mainController.getMainWindow().isModified()){
             MultiInputPanel panel = new MultiInputPanel(i18n.tr("New document"));
             panel.addText(i18n.tr("Are you sure to create a new Document ?"));
             panel.addText(i18n.tr("Unsaved changes will be lost."));
-            SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
-            dialog.setVisible(true);
-            dialog.pack();
-            dialog.setAlwaysOnTop(true);
-            dialog.setLocationRelativeTo(mainController.getMainWindow());
-            dialog.addWindowListener(EventHandler.create(WindowListener.class, this, "instantiateDocument", "", "windowClosed"));
-        }
-        else{
-            instantiateDocument(null);
-        }
-    }
-
-    public void instantiateDocument(WindowEvent winEvent){
-        if(winEvent != null && winEvent.getSource() instanceof SIFDialog) {
-            if(!((SIFDialog)winEvent.getSource()).isAccepted()){
+            if(!UIFactory.showDialog(panel))
                 return;
-            }
         }
         mainController.removeAllGE();
         mainController.getMainWindow().repaint();
         mainController.getGEController().instantiateNewGE(Document.class);
+    }
+
+    public void openDocument(){
+        //If the document already contain GraphicalElement, ask before removing them
+        if(mainController.getMainWindow().isModified()){
+            MultiInputPanel panel = new MultiInputPanel(i18n.tr("Open document"));
+            panel.addText(i18n.tr("Are you sure to open an existing Document ?"));
+            panel.addText(i18n.tr("Unsaved changes will be lost."));
+            if(!UIFactory.showDialog(panel))
+                return;
+        }
+        mainController.loadDocument();
     }
 
     public void createMap(){
@@ -250,11 +248,12 @@ public class UIController {
             toBeSet.add(doc);
             mainController.getGEController().setToBeSetList(toBeSet);
             //Create and show the properties dialog.
-            UIPanel panel = new UIDialogProperties(getCommonAttributes(toBeSet), mainController, false);
+            UIPanel panel = ((CustomConfigurationPanel)mainController.getGEManager().getRenderer(doc.getClass())).createConfigurationPanel(doc.deepCopy().getAllAttributes(), mainController, false);
             SIFDialog dialog = UIFactory.getSimpleDialog(panel, mainController.getMainWindow(), true);
             dialog.setVisible(true);
             dialog.pack();
             dialog.setAlwaysOnTop(true);
+            dialog.setLocationRelativeTo(mainController.getMainWindow());
         }
     }
 

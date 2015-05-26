@@ -30,6 +30,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.view.utils.CompositionAreaOverlay;
 import org.orbisgis.mapcomposer.view.utils.CompositionJPanel;
 import org.orbisgis.mapcomposer.view.utils.PositionScale;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.*;
 import java.awt.event.*;
@@ -94,6 +96,9 @@ public class CompositionArea extends JPanel {
     /** Corner button of the ScrollPane to change the dimension unit */
     private JButton inchOrCm;
 
+    /** Translation*/
+    private static final I18n i18n = I18nFactory.getI18n(CompositionArea.class);
+
     /**
      * Main constructor.
      */
@@ -116,7 +121,7 @@ public class CompositionArea extends JPanel {
         scrollPane = new JScrollPane(body, JScrollPane.VERTICAL_SCROLLBAR_ALWAYS, JScrollPane.HORIZONTAL_SCROLLBAR_ALWAYS);
         verticalPositionScale = new PositionScale(PositionScale.VERTICAL, POSITIONSCALE_DIMENSION);
         horizontalPositionScale = new PositionScale(PositionScale.HORIZONTAL, POSITIONSCALE_DIMENSION);
-        inchOrCm = new JButton("in");
+        inchOrCm = new JButton(i18n.tr("in"));
         inchOrCm.setMargin(new Insets(0, 0, 0, 0));
         inchOrCm.setFont(new Font("Arial", Font.PLAIN, POSITIONSCALE_DIMENSION/4));
         inchOrCm.addActionListener(EventHandler.create(ActionListener.class, this, "toggleInchOrCm"));
@@ -194,17 +199,27 @@ public class CompositionArea extends JPanel {
     public void toggleInchOrCm(){
         if(unit == UNIT_INCH){
             unit = UNIT_MM;
-            inchOrCm.setText("mm");
+            inchOrCm.setText(i18n.tr("mm"));
             verticalPositionScale.setUnit(UNIT_MM);
             horizontalPositionScale.setUnit(UNIT_MM);
         }
         else if(unit == UNIT_MM){
             unit = UNIT_INCH;
-            inchOrCm.setText("in");
+            inchOrCm.setText(i18n.tr("in"));
             verticalPositionScale.setUnit(UNIT_INCH);
             horizontalPositionScale.setUnit(UNIT_INCH);
         }
         positionJLabel.revalidate();
+    }
+
+    /**
+     * Sets the unit used for the scales according to the given on.
+     * @param unit The new unit of the scales
+     */
+    public void setInchOrCom(Document.Unit unit){
+        if((this.unit == UNIT_INCH && unit!= Document.Unit.IN) || (this.unit == UNIT_MM && unit!= Document.Unit.MM)){
+            this.toggleInchOrCm();
+        }
     }
     
     /**
@@ -249,8 +264,12 @@ public class CompositionArea extends JPanel {
     public void setDocumentDimension(Dimension dimension){
         this.dimension =dimension;
         this.layeredPane.setPreferredSize(this.dimension);
-        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension
-                .height) / 2, dimension.width, dimension.height);
+        document.setBounds((layeredPane.getWidth() - dimension.width) / 2, (layeredPane.getHeight() - dimension.height) / 2, dimension.width, dimension.height);
+
+        horizontalPositionScale.setDocumentOriginPosition((layeredPane.getWidth() - dimension.width) / 2,
+                document.getWidth());
+        verticalPositionScale.setDocumentOriginPosition((layeredPane.getHeight() - dimension.height) / 2,
+                document.getHeight());
     }
 
     /**
@@ -387,19 +406,19 @@ public class CompositionArea extends JPanel {
             //Calculate the position in inch or mm of the mouse for the positionLabel
             float x = (float)(position.x-document.getLocationOnScreen().x) / PositionScale.DPI;
             float y = (float)(position.y-document.getLocationOnScreen().y) / PositionScale.DPI;
-            String unitName = "px";
+            String unitName = i18n.tr("px");
             DecimalFormat df = new DecimalFormat();
             if(unit == UNIT_INCH) {
                 df.setMaximumFractionDigits(2);
-                unitName = "in";
+                unitName = i18n.tr("in");
             }
             else if(unit == UNIT_MM) {
                 df.setMaximumFractionDigits(0);
                 x *= 25.4;
                 y *= 25.4;
-                unitName = "mm";
+                unitName = i18n.tr("mm");
             }
-            positionJLabel.setText("x : " + df.format(x) + unitName + " , y : " + df.format(y) + unitName);
+            positionJLabel.setText(i18n.tr("x : " + df.format(x) + unitName + " , y : " + df.format(y) + unitName));
         }
     }
 
@@ -450,9 +469,9 @@ public class CompositionArea extends JPanel {
     public void configure(int unit){
         this.unit = unit;
         if(unit == UNIT_MM)
-            inchOrCm.setText("mm");
+            inchOrCm.setText(i18n.tr("mm"));
         else
-            inchOrCm.setText("in");
+            inchOrCm.setText(i18n.tr("in"));
         verticalPositionScale.setUnit(unit);
         horizontalPositionScale.setUnit(unit);
     }

@@ -29,8 +29,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 
 import javax.swing.JComponent;
 import javax.swing.JProgressBar;
-import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 /**
  * Interface to define thread exports. The export should be executed in the override method run()
@@ -76,10 +76,10 @@ public interface ExportThread extends Runnable {
      * This methods should construct an user interface to allow him to configure the different aspects of the export.
      * This interface should also uses addData() method to update the data to export.
      * Be careful, the GraphicalElement should be copied (deep copy) before registered to avoid concurrent modification during the export
-     * @param listGEToExport List of GraphicalElements to export.
+     * @param stackGEToExport Stack of GraphicalElements to export.
      * @return A JComponent containing all the swing component to allows the export configuration.
      */
-    public JComponent constructExportPanel(List<GraphicalElement> listGEToExport);
+    public JComponent constructExportPanel(Stack<GraphicalElement> stackGEToExport);
 
     /**
      * Returns the short name of the export. It will be displayed in the tab of the export configuration panel.

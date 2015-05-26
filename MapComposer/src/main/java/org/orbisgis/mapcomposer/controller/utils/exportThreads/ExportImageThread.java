@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -72,6 +73,9 @@ public class ExportImageThread implements ExportThread {
      **/
     private Map<GraphicalElement, Boolean> geIsVectorMap;
 
+    /** Stack of the GraphicalElement ordered by z index */
+    private Stack<GraphicalElement> geStack;
+
     /** JComboBox component containing the selected image type */
     private JComboBox<String> imageType;
 
@@ -80,6 +84,7 @@ public class ExportImageThread implements ExportThread {
      */
     public ExportImageThread(){
         this.geIsVectorMap = new HashMap<>();
+        this.geStack = new Stack<>();
     }
 
     @Override
@@ -101,7 +106,7 @@ public class ExportImageThread implements ExportThread {
             int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
             Graphics2D graphics2D = bi.createGraphics();
-            for(GraphicalElement ge : geIsVectorMap.keySet()){
+            for(GraphicalElement ge : geStack){
                 double rad = Math.toRadians(ge.getRotation());
                 //Width and Height of the rectangle containing the rotated bufferedImage
                 final double newWidth = Math.abs(cos(rad)*ge.getWidth())+Math.abs(sin(rad)*ge.getHeight());
@@ -164,13 +169,18 @@ public class ExportImageThread implements ExportThread {
     }
 
     @Override
-    public JComponent constructExportPanel(List<GraphicalElement> listGEToExport) {
+    public JComponent constructExportPanel(Stack<GraphicalElement> stackGEToExport) {
+        for(GraphicalElement ge : stackGEToExport){
+            addData(ge, true);
+        }
+        geStack = stackGEToExport;
+
         JPanel panelPNG = new JPanel(new MigLayout());
-        panelPNG.add(new JLabel("Image type : "));
+        panelPNG.add(new JLabel(i18n.tr("Image type : ")));
         imageType = new JComboBox<>();
-        imageType.addItem(I18n.marktr("png"));
-        imageType.addItem(I18n.marktr("jpg"));
-        imageType.addItem(I18n.marktr("gif"));
+        imageType.addItem(i18n.tr("png"));
+        imageType.addItem(i18n.tr("jpg"));
+        imageType.addItem(i18n.tr("gif"));
         panelPNG.add(imageType, "wrap");
         return panelPNG;
     }

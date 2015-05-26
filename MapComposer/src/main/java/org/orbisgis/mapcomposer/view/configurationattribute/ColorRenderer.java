@@ -28,6 +28,8 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.ColorCA;
 import org.orbisgis.mapcomposer.view.utils.ColorChooser;
 import org.orbisgis.sif.UIFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -48,11 +50,14 @@ import javax.swing.*;
  */
 public class ColorRenderer implements CARenderer{
 
+    /** Translation*/
+    private static final I18n i18n = I18nFactory.getI18n(ColorRenderer.class);
+
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
         final ColorCA colorCA = (ColorCA)ca;
 
-        JButton button = new JButton("Text demo");
+        JButton button = new JButton(i18n.tr("Text demo"));
         //Display the color in the button background
         button.setBackground(colorCA.getValue());
         //On clicking on the button, open a color chooser

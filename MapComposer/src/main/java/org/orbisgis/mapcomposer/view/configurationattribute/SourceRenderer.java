@@ -85,15 +85,17 @@ public class SourceRenderer implements CARenderer{
             jtf.setText(new File(sourceCA.getValue()).getName());
         else {
             //Load the last path use in a sourceCA
-            OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr("Select source"));
-            openFilePanel.addFilter(new String[]{"*"}, "All files");
+            OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr
+                    ("Select " +
+                    "source"));
+            openFilePanel.addFilter(new String[]{"*"}, i18n.tr("All files"));
             openFilePanel.loadState();
             jtf.setText(openFilePanel.getCurrentDirectory().getAbsolutePath());
         }
 
         component.add(jtf);
         //Create the button Browse
-        JButton button = new JButton("Browse");
+        JButton button = new JButton(i18n.tr("Browse"));
         //"Save" the sourceCA and the JTextField in the button
         button.putClientProperty("SourceCA", sourceCA);
         button.putClientProperty("JTextField", jtf);
@@ -109,8 +111,9 @@ public class SourceRenderer implements CARenderer{
      * @param event
      */
     public void openLoadPanel(ActionEvent event){
-        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr("Select source"));
-        openFilePanel.addFilter(new String[]{"*"}, "All files");
+        OpenFilePanel openFilePanel = new OpenFilePanel("ConfigurationAttribute.SourceCA", i18n.tr("Select " +
+                "source"));
+        openFilePanel.addFilter(new String[]{"*"}, i18n.tr("All files"));
         openFilePanel.loadState();
         if (UIFactory.showDialog(openFilePanel, true, true)) {
             JButton source = (JButton)event.getSource();

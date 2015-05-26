@@ -33,7 +33,6 @@ import com.itextpdf.text.pdf.PdfLayer;
 import com.itextpdf.text.pdf.PdfTemplate;
 import com.itextpdf.text.pdf.PdfWriter;
 import net.miginfocom.swing.MigLayout;
-import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.utils.GEManager;
 import org.orbisgis.mapcomposer.view.graphicalelement.RendererRaster;
@@ -64,6 +63,7 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Stack;
 
 import static java.lang.Math.cos;
 import static java.lang.Math.sin;
@@ -87,6 +87,9 @@ public class ExportPDFThread implements ExportThread {
      * The boolean tells if the vector rendering should be use or not (if not use the raster rendering)
      **/
     private Map<GraphicalElement, Boolean> geIsVectorMap;
+
+    /** Stack of the GraphicalElement ordered by z index */
+    private Stack<GraphicalElement> geStack;
 
     /** Translation*/
     private static final I18n i18n = I18nFactory.getI18n(ExportPDFThread.class);
@@ -113,6 +116,7 @@ public class ExportPDFThread implements ExportThread {
      */
     public ExportPDFThread(){
         this.geIsVectorMap = new HashMap<>();
+        this.geStack = new Stack<>();
         this.listGEOnlyRaster = new ArrayList<>();
         this.listGEOnlyVector = new ArrayList<>();
     }
@@ -144,7 +148,7 @@ public class ExportPDFThread implements ExportThread {
             progressBar.setIndeterminate(true);
             int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
-            for(GraphicalElement ge : geIsVectorMap.keySet()){
+            for(GraphicalElement ge : geStack){
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
                     continue;
 
@@ -172,7 +176,15 @@ public class ExportPDFThread implements ExportThread {
                     ImageIO.write(bi, "png", baos);
                     Image image = Image.getInstance(baos.toByteArray());
                     image.setAbsolutePosition(ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
-                    pdfDocument.add(image);
+
+                    PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
+                    Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
+                    PdfLayer layer = new PdfLayer("layer", writer);
+                    cb.beginLayer(layer);
+                    g2dTemplate.drawImage(bi, 0, 0, null);
+                    cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
+                    g2dTemplate.dispose();
+                    cb.endLayer();
                 }
 
                 progressBar.setIndeterminate(false);
@@ -225,14 +237,15 @@ public class ExportPDFThread implements ExportThread {
     }
 
     @Override
-    public JComponent constructExportPanel(List<GraphicalElement> listGEToExport) {
+    public JComponent constructExportPanel(Stack<GraphicalElement> StackGEToExport) {
         listVectorRadio = new ArrayList<>();
         listRasterRadio = new ArrayList<>();
         names = new ArrayList<>();
 
-        for(GraphicalElement ge : listGEToExport){
+        for(GraphicalElement ge : StackGEToExport){
             addData(ge, false);
         }
+        geStack = StackGEToExport;
 
         JPanel panelRasterVector = new JPanel(new MigLayout("hidemode 3"));
         panelRasterVector.setBorder(BorderFactory.createTitledBorder("Vector/Raster"));

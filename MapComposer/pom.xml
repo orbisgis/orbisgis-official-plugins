@@ -4,7 +4,7 @@
     <groupId>org.orbisgis</groupId>
     <artifactId>map-composer</artifactId>
     <name>Map Composer</name>
-    <version>1.0.4-SNAPSHOT</version>
+    <version>1.0.4</version>
     <packaging>bundle</packaging>
     <description>OrbisGIS plugin for the composition of cartographic documents.</description>
     <parent>
@@ -88,12 +88,6 @@
             <type>jar</type>
         </dependency>
         <dependency>
-            <groupId>org.orbisgis</groupId>
-            <artifactId>mapeditor</artifactId>
-            <version>5.1.0-SNAPSHOT</version>
-            <type>jar</type>
-        </dependency>
-        <dependency>
             <groupId>junit</groupId>
             <artifactId>junit</artifactId>
             <version>4.10</version>
@@ -109,6 +103,26 @@
             <groupId>org.dockingframes</groupId>
             <artifactId>docking-frames-ext-toolbar-common</artifactId>
             <version>1.1.2-P5</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>orbisgis-sif</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>map-editor-api</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>wkgui-api</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
+        </dependency>
+        <dependency>
+            <groupId>org.orbisgis</groupId>
+            <artifactId>mainframe</artifactId>
+            <version>5.1.0-SNAPSHOT</version>
         </dependency>
     </dependencies>
     <properties>

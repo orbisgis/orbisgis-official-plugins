@@ -34,13 +34,19 @@ import bibliothek.gui.dock.themes.border.BorderModifier;
 import bibliothek.gui.dock.toolbar.CToolbarContentArea;
 import bibliothek.gui.dock.toolbar.CToolbarItem;
 import bibliothek.gui.dock.toolbar.location.CToolbarAreaLocation;
+
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.mapcomposer.Activator;
 import org.orbisgis.mapcomposer.controller.MainController;
+import org.orbisgis.mapcomposer.model.graphicalelement.element.Document;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement.Property;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
+import org.orbisgis.mapeditorapi.MapEditorExtension;
 import org.orbisgis.sif.UIFactory;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditableElementException;
 import org.orbisgis.wkguiapi.ViewWorkspace;
 import org.osgi.service.cm.Configuration;
 import org.osgi.service.cm.ConfigurationAdmin;
@@ -63,8 +69,6 @@ import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseWheelEvent;
 import java.awt.event.MouseWheelListener;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.beans.EventHandler;
 import java.io.ByteArrayInputStream;
 import java.io.ByteArrayOutputStream;
@@ -81,7 +85,7 @@ import java.util.Hashtable;
  * @author Sylvain PALOMINOS
  */
 
-public class MainWindow extends JFrame {
+public class MainWindow extends JFrame implements EditableElement {
 
     //String used to define the toolbars actions
     public static final String NEW_COMPOSER = "NEW_COMPOSER";
@@ -130,6 +134,9 @@ public class MainWindow extends JFrame {
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MainWindow.class);
 
+    /** True if the document has been modified and not saved, false otherwise */
+    private boolean modified;
+
     private CControl control;
 
     private CToolbarContentArea area;
@@ -148,12 +155,6 @@ public class MainWindow extends JFrame {
         this.setSize(1024, 768);
         this.setIconImage(MapComposerIcon.getIcon("map_composer").getImage());
         this.control = new CControl(this);
-        this.addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(WindowEvent we) {
-                //onCloseWindow();
-            }
-        });
     }
 
     /**
@@ -288,47 +289,75 @@ public class MainWindow extends JFrame {
 
         CToolbarAreaLocation stationLocation = area.getNorthToolbar().getStationLocation();
 
-        addCToolbarCItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(), "createDocument", KeyStroke.getKeyStroke("control N"), stationLocation, 0, 0, 0, 0);
-        addCToolbarCItem(CONFIGURATION, i18n.tr("Show the document configuration dialog"), "configuration", mainController.getUIController(), "showDocProperties", KeyStroke.getKeyStroke("control D"), stationLocation, 0, 0, 0, 1);
-        addCToolbarCItem(SAVE, i18n.tr("Save the document"), "save", mainController, "saveDocument", KeyStroke.getKeyStroke("control S"), stationLocation, 0, 0, 0, 2);
-        addCToolbarCItem(LOAD, i18n.tr("Open a document"), "open", mainController, "loadDocument", KeyStroke.getKeyStroke("control O"), stationLocation, 0, 0, 0, 3);
-        addCToolbarCItem(EXPORT_COMPOSER, i18n.tr("Export the document"), "export_composer", mainController, "export", KeyStroke.getKeyStroke("control E"), stationLocation, 0, 0, 0, 4);
-        addCToolbarCItem(ADD_MAP, i18n.tr("Add a map element"), "add_map", mainController.getUIController(), "createMap", KeyStroke.getKeyStroke("alt M"), stationLocation, 0, 0, 1, 0);
-        addCToolbarCItem(ADD_TEXT, i18n.tr("Add a text element"), "add_text", mainController.getUIController(), "createText", KeyStroke.getKeyStroke("alt T"), stationLocation, 0, 0, 1, 1);
-        addCToolbarCItem(ADD_LEGEND, i18n.tr("Add a legend element"), "add_legend", mainController.getUIController(), "createLegend", KeyStroke.getKeyStroke("alt L"), stationLocation, 0, 0, 1, 2);
-        addCToolbarCItem(ADD_ORIENTATION, i18n.tr("Add an orientation element"), "compass", mainController.getUIController(), "createOrientation", KeyStroke.getKeyStroke("alt O"), stationLocation, 0, 0, 1, 3);
-        addCToolbarCItem(ADD_SCALE, i18n.tr("Add a scale element"), "add_scale", mainController.getUIController(), "createScale", KeyStroke.getKeyStroke("alt S"), stationLocation, 0, 0, 1, 4);
-        addCToolbarCItem(ADD_PICTURE, i18n.tr("Add a picture element"), "add_picture", mainController.getUIController(), "createPicture", KeyStroke.getKeyStroke("alt I"), stationLocation, 0, 0, 1, 5);
-        addCToolbarCItem(DRAW_CIRCLE, i18n.tr("Add a circle element"), "draw_circle", mainController.getUIController(), "createCircle", KeyStroke.getKeyStroke("alt C"), stationLocation, 0, 0, 2, 0);
-        addCToolbarCItem(DRAW_POLYGON, i18n.tr("Add a polygon element"), "draw_polygon", mainController.getUIController(), "createPolygon", KeyStroke.getKeyStroke("alt Y"), stationLocation, 0, 0, 2, 1);
-        addCToolbarCItem(MOVE_BACK, i18n.tr("Move to the back"), "move_back", mainController.getUIController(), "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN"), stationLocation, 0, 0, 3, 0);
-        addCToolbarCItem(MOVE_DOWN, i18n.tr("Move down"), "move_down", mainController.getUIController(), "moveDown", KeyStroke.getKeyStroke("alt DOWN"), stationLocation, 0, 0, 3, 1);
-        addCToolbarCItem(MOVE_ON, i18n.tr("Move on"), "move_on", mainController.getUIController(), "moveOn", KeyStroke.getKeyStroke("alt UP"), stationLocation, 0, 0, 3, 2);
-        addCToolbarCItem(MOVE_FRONT, i18n.tr("Move to the front"), "move_front", mainController.getUIController(), "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP"), stationLocation, 0, 0, 3, 3);
-        addCToolbarCItem(ALIGN_TO_LEFT, i18n.tr("Align to the left"), "align_to_left", mainController.getUIController(), "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4"), stationLocation, 0, 0, 4, 0);
-        addCToolbarCItem(ALIGN_TO_CENTER, i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(), "alignToCenter", null, stationLocation, 0, 0, 4, 1);
-        addCToolbarCItem(ALIGN_TO_RIGHT, i18n.tr("Align to the right"), "align_to_right", mainController.getUIController(), "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6"), stationLocation, 0, 0, 4, 2);
-        addCToolbarCItem(ALIGN_TO_BOTTOM, i18n.tr("Align to the bottom"), "align_to_bottom", mainController.getUIController(), "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2"), stationLocation, 0, 0, 4, 3);
-        addCToolbarCItem(ALIGN_TO_MIDDLE, i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(), "alignToMiddle", null, stationLocation, 0, 0, 4, 4);
-        addCToolbarCItem(ALIGN_TO_TOP, i18n.tr("Align to the top"), "align_to_top", mainController.getUIController(), "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), stationLocation, 0, 0, 4, 5);
-        addCToolbarCItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(), "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), stationLocation, 0, 0, 5, 0);
-        addCToolbarCItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController, "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), stationLocation, 0, 0, 5, 1);
-        addCToolbarCItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(), "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), stationLocation, 0, 0, 5, 2);
-        addCToolbarCItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController, "undo", KeyStroke.getKeyStroke("control Z"), stationLocation, 0, 0, 5, 3);
-        addCToolbarCItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController, "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 4);
+        addCToolbarCItem(NEW_COMPOSER, i18n.tr("Create a new document"), "new_composer", mainController.getUIController(),
+                "createDocument", KeyStroke.getKeyStroke("control N"), stationLocation, 0, 0, 0, 0);
+        addCToolbarCItem(CONFIGURATION, i18n.tr("Show the document configuration dialog"), "configuration", mainController.getUIController(),
+                "showDocProperties", KeyStroke.getKeyStroke("control D"), stationLocation, 0, 0, 0, 1);
+        addCToolbarCItem(SAVE, i18n.tr("Save the document"), "save", mainController,
+                "saveDocument", KeyStroke.getKeyStroke("control S"), stationLocation, 0, 0, 0, 2);
+        addCToolbarCItem(LOAD, i18n.tr("Open a document"), "open", mainController.getUIController(),
+                "openDocument", KeyStroke.getKeyStroke("control O"), stationLocation, 0, 0, 0, 3);
+        addCToolbarCItem(EXPORT_COMPOSER, i18n.tr("Export the document"), "export_composer", mainController,
+                "export", KeyStroke.getKeyStroke("control E"), stationLocation, 0, 0, 0, 4);
+        addCToolbarCItem(ADD_MAP, i18n.tr("Add a map element"), "add_map", mainController.getUIController(),
+                "createMap", KeyStroke.getKeyStroke("alt M"), stationLocation, 0, 0, 1, 0);
+        addCToolbarCItem(ADD_TEXT, i18n.tr("Add a text element"), "add_text", mainController.getUIController(),
+                "createText", KeyStroke.getKeyStroke("alt T"), stationLocation, 0, 0, 1, 1);
+        addCToolbarCItem(ADD_LEGEND, i18n.tr("Add a legend element"), "add_legend", mainController.getUIController(),
+                "createLegend", KeyStroke.getKeyStroke("alt L"), stationLocation, 0, 0, 1, 2);
+        addCToolbarCItem(ADD_ORIENTATION, i18n.tr("Add an orientation element"), "compass", mainController.getUIController(),
+                "createOrientation", KeyStroke.getKeyStroke("alt O"), stationLocation, 0, 0, 1, 3);
+        addCToolbarCItem(ADD_SCALE, i18n.tr("Add a scale element"), "add_scale", mainController.getUIController(),
+                "createScale", KeyStroke.getKeyStroke("alt S"), stationLocation, 0, 0, 1, 4);
+        addCToolbarCItem(ADD_PICTURE, i18n.tr("Add a picture element"), "add_picture", mainController.getUIController(),
+                "createPicture", KeyStroke.getKeyStroke("alt I"), stationLocation, 0, 0, 1, 5);
+        addCToolbarCItem(DRAW_CIRCLE, i18n.tr("Add a circle element"), "draw_circle", mainController.getUIController(),
+                "createCircle", KeyStroke.getKeyStroke("alt C"), stationLocation, 0, 0, 2, 0);
+        addCToolbarCItem(DRAW_POLYGON, i18n.tr("Add a polygon element"), "draw_polygon", mainController.getUIController(),
+                "createPolygon", KeyStroke.getKeyStroke("alt Y"), stationLocation, 0, 0, 2, 1);
+        addCToolbarCItem(MOVE_BACK, i18n.tr("Move to the back"), "move_back", mainController.getUIController(),
+                "moveBack", KeyStroke.getKeyStroke("alt PAGE_DOWN"), stationLocation, 0, 0, 3, 0);
+        addCToolbarCItem(MOVE_DOWN, i18n.tr("Move down"), "move_down", mainController.getUIController(),
+                "moveDown", KeyStroke.getKeyStroke("alt DOWN"), stationLocation, 0, 0, 3, 1);
+        addCToolbarCItem(MOVE_ON, i18n.tr("Move on"), "move_on", mainController.getUIController(),
+                "moveOn", KeyStroke.getKeyStroke("alt UP"), stationLocation, 0, 0, 3, 2);
+        addCToolbarCItem(MOVE_FRONT, i18n.tr("Move to the front"), "move_front", mainController.getUIController(),
+                "moveFront", KeyStroke.getKeyStroke("alt PAGE_UP"), stationLocation, 0, 0, 3, 3);
+        addCToolbarCItem(ALIGN_TO_LEFT, i18n.tr("Align to the left"), "align_to_left", mainController.getUIController(),
+                "alignToLeft", KeyStroke.getKeyStroke("alt NUMPAD4"), stationLocation, 0, 0, 4, 0);
+        addCToolbarCItem(ALIGN_TO_CENTER, i18n.tr("Align to the center"), "align_to_center", mainController.getUIController(),
+                "alignToCenter", null, stationLocation, 0, 0, 4, 1);
+        addCToolbarCItem(ALIGN_TO_RIGHT, i18n.tr("Align to the right"), "align_to_right", mainController.getUIController(),
+                "alignToRight", KeyStroke.getKeyStroke("alt NUMPAD6"), stationLocation, 0, 0, 4, 2);
+        addCToolbarCItem(ALIGN_TO_BOTTOM, i18n.tr("Align to the bottom"), "align_to_bottom", mainController.getUIController(),
+                "alignToBottom", KeyStroke.getKeyStroke("alt NUMPAD2"), stationLocation, 0, 0, 4, 3);
+        addCToolbarCItem(ALIGN_TO_MIDDLE, i18n.tr("Align to the middle"), "align_to_middle", mainController.getUIController(),
+                "alignToMiddle", null, stationLocation, 0, 0, 4, 4);
+        addCToolbarCItem(ALIGN_TO_TOP, i18n.tr("Align to the top"), "align_to_top", mainController.getUIController(),
+                "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), stationLocation, 0, 0, 4, 5);
+        addCToolbarCItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(),
+                "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), stationLocation, 0, 0, 5, 0);
+        addCToolbarCItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController,
+                "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), stationLocation, 0, 0, 5, 1);
+        addCToolbarCItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(),
+                "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), stationLocation, 0, 0, 5, 2);
+        addCToolbarCItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController,
+                "undo", KeyStroke.getKeyStroke("control Z"), stationLocation, 0, 0, 5, 3);
+        addCToolbarCItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController,
+                "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 4);
 
         //Sets the spinners tool bar.
         spinnerX = createSpinner("X", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerX", new JLabel(I18n.marktr("X")), spinnerX, stationLocation, 0, 1, 0, 1);
+        addToolbarSpinner("spinnerX", new JLabel(i18n.tr("X")), spinnerX, stationLocation, 0, 1, 0, 1);
 
         spinnerY = createSpinner("Y", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerY", new JLabel(I18n.marktr("Y")), spinnerY, stationLocation, 0, 1, 0, 2);
+        addToolbarSpinner("spinnerY", new JLabel(i18n.tr("Y")), spinnerY, stationLocation, 0, 1, 0, 2);
 
         spinnerW = createSpinner("WIDTH", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerWidth", new JLabel(I18n.marktr("WIDTH")), spinnerW, stationLocation, 0, 1, 0, 3);
+        addToolbarSpinner("spinnerWidth", new JLabel(i18n.tr("WIDTH")), spinnerW, stationLocation, 0, 1, 0, 3);
 
         spinnerH = createSpinner("HEIGHT", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
-        addToolbarSpinner("spinnerHeight", new JLabel(I18n.marktr("HEIGHT")), spinnerH, stationLocation, 0, 1, 0, 4);
+        addToolbarSpinner("spinnerHeight", new JLabel(i18n.tr("HEIGHT")), spinnerH, stationLocation, 0, 1, 0, 4);
 
         spinnerR = createSpinner("ROTATION", 0, -360, 360);
         addToolbarSpinner("spinnerRotation", new JLabel(MapComposerIcon.getIcon("rotation")), spinnerR,
@@ -430,6 +459,10 @@ public class MainWindow extends JFrame {
         this.mainController.setViewWorkspace(viewWorkspace);
     }
 
+    public void setMapEditorExtension(MapEditorExtension mapEditorExtension) {
+        this.mainController.setMapEditorExtension(mapEditorExtension);
+    }
+
     public void close(){
         if(control != null){
             control.destroy();
@@ -475,5 +508,60 @@ public class MainWindow extends JFrame {
 
     public void setConfigurationAdmin(ConfigurationAdmin configurationAdmin) {
         this.configurationAdmin = configurationAdmin;
+    }
+
+    @Override
+    public String getId() {
+        return null;
+    }
+
+    @Override
+    public boolean isModified() {
+        return modified;
+    }
+
+    @Override
+    public void setModified(boolean modified) {
+        this.modified = modified;
+    }
+
+    @Override
+    public boolean isOpen() {
+        return this.isVisible();
+    }
+
+    @Override
+    public String getTypeId() {
+        return null;
+    }
+
+    @Override
+    public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
+        mainController.loadDocument();
+    }
+
+    @Override
+    public void save() throws UnsupportedOperationException, EditableElementException {
+        mainController.saveDocument();
+    }
+
+    @Override
+    public void close(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
+    }
+
+    @Override
+    public Object getObject() throws UnsupportedOperationException {
+        return null;
+    }
+
+    @Override
+    public String toString(){
+        String documentName = "";
+        for(GraphicalElement ge : mainController.getGEList()){
+            if(ge instanceof Document){
+                documentName = ((Document)ge).getName();
+            }
+        }
+        return i18n.tr("MapComposer document - "+documentName);
     }
 }

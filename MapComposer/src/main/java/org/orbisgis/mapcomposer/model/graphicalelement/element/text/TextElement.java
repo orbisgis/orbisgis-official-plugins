@@ -84,6 +84,7 @@ public class TextElement extends SimpleGE implements GEProperties{
     /** Displayed name of the font size*/
     public static final String sFontSize = I18n.marktr("Font size");
 
+
     /**
      * Public main constructor.
      */
@@ -110,6 +111,16 @@ public class TextElement extends SimpleGE implements GEProperties{
         this.style.add(Style.ITALIC.name());
         this.style.add(Style.BOLD.name());
         this.style.select(Style.PLAIN.name());
+
+
+        /** Mark for translation Font style strings **/
+        I18n.marktr("PLAIN");
+        I18n.marktr("ITALIC");
+        I18n.marktr("BOLD");
+        /** Mark for translation Text alignment strings **/
+        I18n.marktr("LEFT");
+        I18n.marktr("CENTER");
+        I18n.marktr("RIGHT");
     }
 
     @Override
@@ -311,7 +322,7 @@ public class TextElement extends SimpleGE implements GEProperties{
     /**
      * Enumeration for the text alignment.
      */
-    public static enum Alignment{ LEFT, CENTER, RIGHT; }
+    public static enum Alignment{ LEFT, CENTER, RIGHT }
     
     /**
      * Enumeration for the text font style.

@@ -26,6 +26,9 @@ package org.orbisgis.mapcomposer.view.configurationattribute;
 
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 import java.awt.FlowLayout;
 import java.awt.event.ActionListener;
 import java.beans.EventHandler;
@@ -44,11 +47,17 @@ import javax.swing.*;
  */
 public class SourceListRenderer implements CARenderer{
 
+    /** Translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SourceListRenderer.class);
+
     @Override
     public JComponent createJComponentFromCA(ConfigurationAttribute ca) {
         SourceListCA sourceListCA = (SourceListCA)ca;
 
-        JComboBox<String> jcb = new JComboBox(sourceListCA.getValue().toArray(new String[0]));
+        JComboBox<String> jcb = new JComboBox();
+        for(Object o : sourceListCA.getValue()){
+            jcb.addItem(i18n.tr(o.toString()));
+        }
         jcb.addActionListener(EventHandler.create(ActionListener.class, sourceListCA, "select", "source.selectedItem"));
         //Display the SourceListCA into a JComboBox
         jcb.setSelectedItem(sourceListCA.getSelected());
