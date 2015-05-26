@@ -86,12 +86,10 @@ public class RectangleRenderer implements GERenderer, RendererRaster, RendererVe
         c = rectangle.getBorderColor();
         graphics2D.setColor(new Color(c.getRed(), c.getGreen(), c.getBlue(), rectangle.getBorderAlpha()*255/100));
         Stroke stroke = null;
-        switch(rectangle.getBorderStyle()){
-            case RectangleGE.LineBorder:
-                 stroke = new BasicStroke(rectangle.getBorderWidth(),
-                         BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
-                         1.0f, null, 0f);
-                break;
+        if(rectangle.getBorderStyle().equals(RectangleGE.LineBorder)){
+             stroke = new BasicStroke(rectangle.getBorderWidth(),
+                     BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER,
+                     1.0f, null, 0f);
         }
         graphics2D.setStroke(stroke);
         graphics2D.drawRect(x - ge.getWidth()/2 + rectangle.getBorderWidth()/2,

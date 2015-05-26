@@ -10,11 +10,11 @@ msgstr ""
 "POT-Creation-Date: 2015-05-26 13:26+0200\n"
 "PO-Revision-Date: 2015-05-26 11:28+0000\n"
 "Last-Translator: Sylvain Palominos <SPalominos@users.noreply.github.com>\n"
-"Language-Team: Greek (http://www.transifex.com/projects/p/orbisgis/language/el/)\n"
+"Language-Team: Finnish (Finland) (http://www.transifex.com/projects/p/orbisgis/language/fi_FI/)\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Language: el\n"
+"Language: fi_FI\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:65

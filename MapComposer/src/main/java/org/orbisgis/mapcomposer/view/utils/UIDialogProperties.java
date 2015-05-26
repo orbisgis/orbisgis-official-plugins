@@ -98,7 +98,7 @@ public class UIDialogProperties implements UIPanel {
         for(int i=0; i<caList.size(); i++){
             if(caList.get(i) instanceof RefreshCA)
                 ((RefreshCA)caList.get(i)).refresh(mainController);
-            JLabel name = new JLabel(caList.get(i).getName());
+            JLabel name = new JLabel(i18n.tr(caList.get(i).getName()));
             JComponent component = mainController.getCAManager().getRenderer(caList.get(i)).createJComponentFromCA(caList.get(i));
             if(enableLock) {
                 EnableCheckBox checkBox = new EnableCheckBox(caList.get(i));

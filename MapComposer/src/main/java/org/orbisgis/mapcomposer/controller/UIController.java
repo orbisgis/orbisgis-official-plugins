@@ -74,7 +74,8 @@ public class UIController {
 
     public void createDocument(){
         //If the document already contain GraphicalElement, ask before removing them
-        if(mainController.getMainWindow().isModified()){
+        if(!mainController.getGEList().isEmpty() &&
+                mainController.getMainWindow().isModified()){
             MultiInputPanel panel = new MultiInputPanel(i18n.tr("New document"));
             panel.addText(i18n.tr("Are you sure to create a new Document ?"));
             panel.addText(i18n.tr("Unsaved changes will be lost."));

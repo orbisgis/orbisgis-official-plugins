@@ -56,6 +56,9 @@ public abstract class SimpleGE implements GraphicalElement{
     /** Z index of the GE.*/
     protected IntegerCA z;
 
+    /** Translation*/
+    private static final I18n i18n = I18nFactory.getI18n(SimpleGE.class);
+
     /**Displayed name of the x position*/
     public static final String sX = I18n.marktr("x");
 

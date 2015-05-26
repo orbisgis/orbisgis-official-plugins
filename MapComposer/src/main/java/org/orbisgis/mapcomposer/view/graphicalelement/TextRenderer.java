@@ -34,6 +34,8 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.swing.*;
 import java.awt.*;
@@ -54,6 +56,9 @@ import static java.lang.Math.sin;
  * @author Sylvain PALOMINOS
  */
 public class TextRenderer implements RendererRaster, RendererVector, CustomConfigurationPanel {
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(TextRenderer.class);
 
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge){
@@ -141,7 +146,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sText))
                 textCA = (StringCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(textCA.getName());
+        name = new JLabel(i18n.tr(textCA.getName()));
         uid.addComponent(name, textCA, 0, 0, 1, 1);
 
         component = new JScrollPane(uic.getCAManager().getRenderer(textCA).createJComponentFromCA(textCA));
@@ -153,7 +158,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sFont))
                 fontCA = (SourceListCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(fontCA.getName());
+        name = new JLabel(i18n.tr(fontCA.getName()));
         uid.addComponent(name, fontCA, 0, 4, 1, 1);
 
         component = uic.getCAManager().getRenderer(fontCA).createJComponentFromCA(fontCA);
@@ -165,7 +170,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sFontSize))
                 fontSizeCA = (IntegerCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(fontSizeCA.getName());
+        name = new JLabel(i18n.tr(fontSizeCA.getName()));
         uid.addComponent(name, fontSizeCA, 0, 5, 2, 1);
 
         component = uic.getCAManager().getRenderer(fontSizeCA).createJComponentFromCA(fontSizeCA);
@@ -177,7 +182,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sStyle))
                 styleCA = (SourceListCA) ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(styleCA.getName());
+        name = new JLabel(i18n.tr(styleCA.getName()));
         uid.addComponent(name, styleCA, 0, 6, 2, 1);
 
         component = uic.getCAManager().getRenderer(styleCA).createJComponentFromCA(styleCA);
@@ -190,7 +195,7 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sAlignment))
                 alignmentCA = (SourceListCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(alignmentCA.getName());
+        name = new JLabel(i18n.tr(alignmentCA.getName()));
         uid.addComponent(name, alignmentCA, 0, 7, 2, 1);
 
         component = uic.getCAManager().getRenderer(alignmentCA).createJComponentFromCA(alignmentCA);
@@ -202,11 +207,11 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sTextColor))
                 textColorCA = (ColorCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(textColorCA.getName());
+        name = new JLabel(i18n.tr(textColorCA.getName()));
         uid.addComponent(name, textColorCA, 0, 8, 3, 1);
 
         component = uic.getCAManager().getRenderer(textColorCA).createJComponentFromCA(textColorCA);
-        uid.addComponent(component, textColorCA, 3, 8, 1, 1);
+        uid.addComponent(component, textColorCA, 2, 8, 1, 1);
 
         //Find the Font ConfigurationAttribute
         ColorCA backgroundColorCA = null;
@@ -214,11 +219,11 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sBackColor))
                 backgroundColorCA = (ColorCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(backgroundColorCA.getName());
+        name = new JLabel(i18n.tr(backgroundColorCA.getName()));
         uid.addComponent(name, backgroundColorCA, 0, 9, 3, 1);
 
         component = uic.getCAManager().getRenderer(backgroundColorCA).createJComponentFromCA(backgroundColorCA);
-        uid.addComponent(component, backgroundColorCA, 3, 9, 1, 1);
+        uid.addComponent(component, backgroundColorCA, 2, 9, 1, 1);
 
         //Find the Font ConfigurationAttribute
         IntegerCA alphaCA = null;
@@ -226,11 +231,11 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             if(ca.getName().equals(TextElement.sAlpha))
                 alphaCA = (IntegerCA)ca;
         //Create the list of component composing the ConfigurationAttribute representation.
-        name = new JLabel(alphaCA.getName());
+        name = new JLabel(i18n.tr(alphaCA.getName()));
         uid.addComponent(name, alphaCA, 0, 10, 1, 1);
 
         component = uic.getCAManager().getRenderer(alphaCA).createJComponentFromCA(alphaCA);
-        uid.addComponent(component, alphaCA, 1, 10, 1, 1);
+        uid.addComponent(component, alphaCA, 2, 10, 1, 1);
 
         return uid;
     }

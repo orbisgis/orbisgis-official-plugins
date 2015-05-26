@@ -33,6 +33,8 @@ import org.orbisgis.mapcomposer.view.utils.Graphics2DRenderer;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import javax.swing.ImageIcon;
 import javax.swing.JComboBox;
@@ -50,6 +52,9 @@ import static java.lang.Math.sin;
  * @author Sylvain PALOMINOS
  */
 public class MapImageRenderer implements RendererRaster, RendererVector, CustomConfigurationPanel {
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(MapImageRenderer.class);
 
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
@@ -130,7 +135,7 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
             if(ca.getName().equals(MapImage.sOWSC))
                 owscCA = (OwsContextCA)ca;
 
-        JLabel owscName = new JLabel(owscCA.getName());
+        JLabel owscName = new JLabel(i18n.tr(owscCA.getName()));
         uid.addComponent(owscName, owscCA, 0, 0, 1, 1);
 
         JComboBox owscBox = (JComboBox)uic.getCAManager().getRenderer(owscCA).createJComponentFromCA(owscCA);

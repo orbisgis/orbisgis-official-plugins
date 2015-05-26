@@ -176,11 +176,11 @@ public class ExportImageThread implements ExportThread {
         geStack = stackGEToExport;
 
         JPanel panelPNG = new JPanel(new MigLayout());
-        panelPNG.add(new JLabel("Image type : "));
+        panelPNG.add(new JLabel(i18n.tr("Image type : ")));
         imageType = new JComboBox<>();
-        imageType.addItem(I18n.marktr("png"));
-        imageType.addItem(I18n.marktr("jpg"));
-        imageType.addItem(I18n.marktr("gif"));
+        imageType.addItem(i18n.tr("png"));
+        imageType.addItem(i18n.tr("jpg"));
+        imageType.addItem(i18n.tr("gif"));
         panelPNG.add(imageType, "wrap");
         return panelPNG;
     }

@@ -30,6 +30,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GEProperties;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.Dimension;
 import java.lang.reflect.InvocationTargetException;
@@ -56,6 +57,9 @@ public class Document extends SimpleGE implements GEProperties {
 
     /**Name of the document*/
     private StringCA name;
+
+    /** Translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Document.class);
 
     /** Displayed name of the orientation*/
     public static final String sOrientation = I18n.marktr("Orientation");
@@ -233,7 +237,7 @@ public class Document extends SimpleGE implements GEProperties {
     public static enum Format{
         A4(210, 297, I18n.marktr("A4")),
         A3(297, 420, I18n.marktr("A3")),
-        CUSTOM(0, 0, I18n.marktr("CUSTOM"));
+        CUSTOM(0, 0, I18n.marktr("Custom"));
         /**Width of the format*/
         private int w;
         /**Height of the format*/
@@ -291,8 +295,13 @@ public class Document extends SimpleGE implements GEProperties {
             return this.name;
         }
 
-        public static Format getUnitFromName(String name){
-            return valueOf(name.toUpperCase());
+        public static Format getFormatFromName(String name){
+            for(Format f : Format.values()) {
+                if(f.getName().equals(name)){
+                    return f;
+                }
+            }
+            return null;
         }
     }
 
@@ -302,14 +311,14 @@ public class Document extends SimpleGE implements GEProperties {
     public static enum Unit {
         MM((double)1/25.4, I18n.marktr("mm")),
         IN((double)1, I18n.marktr("in")),
-        PIXEL(1, I18n.marktr("pixel"));
+        PIXEL(0, I18n.marktr("pixel"));
 
         /** Human readable name of the unit.**/
         private String name;
         /**
          * Width of the format
          */
-        private double conv;
+        private double ratioToPixel;
 
         /**
          * DPI of the screen. As java don't detect well the dpi, it is set manually.
@@ -319,7 +328,7 @@ public class Document extends SimpleGE implements GEProperties {
         /**
          * Main constructor.
          */
-        private Unit(double conv, String name) {
+        private Unit(double ratioToPixel, String name) {
             //To be run on a server (no GUI), try to get the default Toolkit.
             //If it is not possible use a default value for the screen resolution.
             try {
@@ -332,24 +341,42 @@ public class Document extends SimpleGE implements GEProperties {
             } catch (NoSuchMethodException | InvocationTargetException | IllegalAccessException | ClassNotFoundException e) {
                 dpi = 96;
             }
-            if (!name.equals("pixel")) {
-                this.conv = conv * dpi;
+            if (ratioToPixel != 0) {
+                this.ratioToPixel = ratioToPixel * dpi;
             } else {
-                this.conv = conv;
+                this.ratioToPixel = 1;
             }
             this.name = name;
         }
 
-        public double getConv(){
-            return conv;
+        /**
+         * Returns the conversion ratio (unit * ratio = value in pixel).
+         * @return The conversion ratio
+         */
+        public double getRatioToPixel(){
+            return ratioToPixel;
         }
 
+        /**
+         * Returns the human readable name of the unit.
+         * @return The human readable name
+         */
         public String getName(){
             return name;
         }
 
+        /**
+         * Returns the unit corresponding to the given name.
+         * @param name Name of the unit.
+         * @return The unit corresponding to the name.
+         */
         public static Unit getUnitFromName(String name){
-            return valueOf(name.toUpperCase());
+            for(Unit u : Unit.values()) {
+                if(u.getName().equals(name)){
+                    return u;
+                }
+            }
+            return null;
         }
     }
 

@@ -132,7 +132,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             if(ca.getName().equals(Document.sFormat))
                 formatCA = (SourceListCA)ca;
 
-        JLabel formatName = new JLabel(formatCA.getName());
+        JLabel formatName = new JLabel(i18n.tr(formatCA.getName()));
         uid.addComponent(formatName, formatCA, 0, 0, 1, 1);
 
         //Adds the listener and the client properties needed.
@@ -162,7 +162,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             if(ca.getName().equals(Document.sOrientation))
                 orientationCA = (SourceListCA)ca;
 
-        JLabel orientationName = new JLabel(orientationCA.getName());
+        JLabel orientationName = new JLabel(i18n.tr(orientationCA.getName()));
         uid.addComponent(orientationName, orientationCA, 0, 4, 1, 1);
 
         //Adds the listener and the client properties needed.
@@ -183,7 +183,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             if(ca.getName().equals(Document.sName))
                 nameCA = (StringCA)ca;
 
-        JLabel nameName = new JLabel(nameCA.getName());
+        JLabel nameName = new JLabel(i18n.tr(nameCA.getName()));
         uid.addComponent(nameName, nameCA, 0, 6, 1, 1);
 
         JTextArea nameArea = (JTextArea)mainController.getCAManager().getRenderer(nameCA)
@@ -231,16 +231,16 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         }
         else {
             if (orientationBox.getSelectedItem().equals(Document.Orientation.PORTRAIT.getName())){
-                width = Document.Format.getUnitFromName(
-                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
-                height = Document.Format.getUnitFromName(
-                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
+                width = Document.Format.getFormatFromName(
+                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getRatioToPixel();
+                height = Document.Format.getFormatFromName(
+                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getRatioToPixel();
             }
             else{
-                height = Document.Format.getUnitFromName(
-                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getConv();
-                width = Document.Format.getUnitFromName(
-                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getConv();
+                height = Document.Format.getFormatFromName(
+                        (String) formatBox.getSelectedItem()).getPixelWidth() / unit.getRatioToPixel();
+                width = Document.Format.getFormatFromName(
+                        (String) formatBox.getSelectedItem()).getPixelHeight() / unit.getRatioToPixel();
             }
         }
 
@@ -304,12 +304,12 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         }
 
         //Convert the value to the pixel unit
-        width *= unitBefore.getConv();
-        height *= unitBefore.getConv();
+        width *= unitBefore.getRatioToPixel();
+        height *= unitBefore.getRatioToPixel();
 
         //Convert the pixel value to the new unit
-        width /= unitNow.getConv();
-        height /= unitNow.getConv();
+        width /= unitNow.getRatioToPixel();
+        height /= unitNow.getRatioToPixel();
 
         //According to the unit set the width and height spinner model and store the new unit value
         switch(unitNow){
@@ -345,7 +345,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         JSpinner unitSpinner = (JSpinner) spinner;
         String unit = (String) ((JComboBox) unitSpinner.getClientProperty("unit")).getSelectedItem();
         double value = 1;
-        //Get the value which can be Doudle or Integer
+        //Get the value which can be Double or Integer
         if(unitSpinner.getValue() instanceof Double){
             value = (double)unitSpinner.getValue();
         }
@@ -353,6 +353,6 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             value = (int)unitSpinner.getValue();
         }
         IntegerCA ca = (IntegerCA) unitSpinner.getClientProperty("ca");
-        ca.setValue((int)(value * Document.Unit.getUnitFromName(unit).getConv()));
+        ca.setValue((int)(value * Document.Unit.getUnitFromName(unit).getRatioToPixel()));
     }
 }

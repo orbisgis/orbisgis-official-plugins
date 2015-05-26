@@ -31,6 +31,7 @@ import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.Configur
 import org.orbisgis.mapcomposer.model.graphicalelement.element.SimpleGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.Color;
 import java.util.ArrayList;
@@ -47,42 +48,42 @@ public class SimpleShapeGE extends SimpleGE {
     /**
      * Name of the line border.
      */
-    public static final String LineBorder = "Line";
+    public static final String LineBorder = I18n.marktr("Line");
 
     /**
      * Name of the empty border.
      */
-    public static final String EmptyBorder = "Empty";
+    public static final String EmptyBorder = I18n.marktr("Empty");
 
     /**
      * Name of the shape color.
      */
-    public static final String sShapeColor = "Shape color";
+    public static final String sShapeColor = I18n.marktr("Shape color");
 
     /**
      * Name of the shape alpha.
      */
-    public static final String sShapeAlpha = "Shape alpha";
+    public static final String sShapeAlpha = I18n.marktr("Shape alpha");
 
     /**
      * Name of the border width.
      */
-    public static final String sBorderWidth = "Border width";
+    public static final String sBorderWidth = I18n.marktr("Border width");
 
     /**
      * Name of the border alpha.
      */
-    public static final String sBorderAlpha = "Border alpha";
+    public static final String sBorderAlpha = I18n.marktr("Border alpha");
 
     /**
      * Name of the border color.
      */
-    public static final String sBorderColor = "Border color";
+    public static final String sBorderColor = I18n.marktr("Border color");
 
     /**
      * Name of the border style.
      */
-    public static final String sBorderStyle = "Border style";
+    public static final String sBorderStyle = I18n.marktr("Border style");
 
     /**
      * Configuration attribute of the shape color.
