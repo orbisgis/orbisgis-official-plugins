@@ -124,6 +124,11 @@ public class TextElement extends SimpleGE implements GEProperties{
     }
 
     @Override
+    public String getGEName(){
+        return i18n.tr("Text");
+    }
+
+    @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(font);

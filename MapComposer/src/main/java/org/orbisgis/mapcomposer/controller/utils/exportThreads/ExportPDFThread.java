@@ -147,6 +147,8 @@ public class ExportPDFThread implements ExportThread {
 
             progressBar.setIndeterminate(true);
             int geCount = 0;
+            int numberOfGe[] = new int[geManager.getRegisteredGEClasses().size()];
+            for(int i=0; i<numberOfGe.length; i++) {numberOfGe[i] = 0;}
             //Draw each GraphicalElement in the BufferedImage
             for(GraphicalElement ge : geStack){
                 if((ge instanceof org.orbisgis.mapcomposer.model.graphicalelement.element.Document))
@@ -159,13 +161,16 @@ public class ExportPDFThread implements ExportThread {
                 int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 int maxHeight = Math.max((int)newHeight, ge.getHeight());
 
+                String layerName = ge.getGEName() + numberOfGe[geManager.getRegisteredGEClasses().indexOf(ge.getClass())];
+
                 if(geIsVectorMap.get(ge)) {
                     PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
                     Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
-                    PdfLayer layer = new PdfLayer("layer", writer);
+                    PdfLayer layer = new PdfLayer(layerName, writer);
                     cb.beginLayer(layer);
                     ((RendererVector)geManager.getRenderer(ge.getClass())).drawGE(g2dTemplate, ge);
-                    cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
+                    cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge
+                            .getHeight() + (ge.getHeight() - maxHeight) / 2);
                     g2dTemplate.dispose();
                     cb.endLayer();
                 }
@@ -179,13 +184,14 @@ public class ExportPDFThread implements ExportThread {
 
                     PdfTemplate pdfTemplate = cb.createTemplate(maxWidth, maxHeight);
                     Graphics2D g2dTemplate = pdfTemplate.createGraphics(maxWidth, maxHeight);
-                    PdfLayer layer = new PdfLayer("layer", writer);
+                    PdfLayer layer = new PdfLayer(layerName, writer);
                     cb.beginLayer(layer);
                     g2dTemplate.drawImage(bi, 0, 0, null);
                     cb.addTemplate(pdfTemplate, ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);
                     g2dTemplate.dispose();
                     cb.endLayer();
                 }
+                numberOfGe[geManager.getRegisteredGEClasses().indexOf(ge.getClass())] ++;
 
                 progressBar.setIndeterminate(false);
                 progressBar.setValue((geCount * 100) / geIsVectorMap.keySet().size());

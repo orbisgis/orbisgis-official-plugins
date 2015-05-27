@@ -32,6 +32,8 @@ import org.orbisgis.coremap.map.MapTransform;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import org.slf4j.LoggerFactory;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 import java.awt.image.BufferedImage;
 
@@ -51,6 +53,9 @@ public class MapImage extends SimpleCartoGE implements GERefresh, GEIdentifier {
      * Unique id of the MapImage
      */
     private String id;
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(MapImage.class);
     
     /**
      * Main constructor.
@@ -59,6 +64,11 @@ public class MapImage extends SimpleCartoGE implements GERefresh, GEIdentifier {
         super();
         mapTransform = new MapTransform();
         id = this.toString();
+    }
+
+    @Override
+    public String getGEName(){
+        return i18n.tr("Map");
     }
     
     @Override
