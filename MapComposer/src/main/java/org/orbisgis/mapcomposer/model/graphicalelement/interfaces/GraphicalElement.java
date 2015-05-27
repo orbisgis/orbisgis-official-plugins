@@ -122,6 +122,13 @@ public interface GraphicalElement {
      * @return The width of the GE.
      */
     public int getWidth();
+
+    /**
+     * Returns the human readable name of the GraphicalElement.
+     * This name is only used to be displayed to the user.
+     * @return The name of the GraphicalElement.
+     */
+    public String getGEName();
     
     /**
      * Returns all the attributes that can be configured by the user EXCEPTS the x and y position, the width, the height and the rotation angle which are directly set thank to a tool bar.

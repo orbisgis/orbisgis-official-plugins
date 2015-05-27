@@ -237,7 +237,7 @@ public class CompositionArea extends JPanel {
                 //If the GE is an instance of Document, register the CompositionJPanel as this.document and adds the border to it
                 if (panel.getGE() instanceof Document) {
                     document = panel;
-                    Border border = BorderFactory.createMatteBorder(0, 0, 1, 1, Color.LIGHT_GRAY);
+                    Border border = BorderFactory.createMatteBorder(1, 1, 1, 1, Color.LIGHT_GRAY);
                     border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.GRAY));
                     border = BorderFactory.createCompoundBorder(border, BorderFactory.createMatteBorder(0, 0, 1, 1, Color.DARK_GRAY));
                     document.setBorder(border);

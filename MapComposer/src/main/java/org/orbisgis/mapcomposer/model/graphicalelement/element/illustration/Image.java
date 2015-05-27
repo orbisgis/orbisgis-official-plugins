@@ -24,10 +24,21 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element.illustration;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 /**
  * Graphical element representing a picture, an image ...
  *
  * @author Sylvain PALOMINOS
  */
 public class Image extends SimpleIllustrationGE {
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Image.class);
+
+    @Override
+    public String getGEName(){
+        return i18n.tr("Image");
+    }
 }

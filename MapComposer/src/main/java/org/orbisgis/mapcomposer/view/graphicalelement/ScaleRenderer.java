@@ -127,8 +127,8 @@ public class ScaleRenderer implements RendererRaster, RendererVector {
                     ge.getHeight()/2+1);
         }
 
-        graphics2D.setFont(graphics2D.getFont().deriveFont(Font.PLAIN, ge.getHeight() / 5 - 1));
-        graphics2D.drawString("1:" + ((int) mapScalemmR/(i+1)), x-ge.getWidth()/2, y+ge.getHeight() /4);
+        graphics2D.setFont(graphics2D.getFont().deriveFont(Font.PLAIN, ge.getHeight() / 2 - 1));
+        graphics2D.drawString("1:" + ((int) mapScalemmR/(i+1)), x-ge.getWidth()/2, y+ge.getHeight()/2-1);
         graphics2D.dispose();
     }
 

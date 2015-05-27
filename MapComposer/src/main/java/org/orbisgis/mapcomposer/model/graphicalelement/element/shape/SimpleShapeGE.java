@@ -43,7 +43,7 @@ import java.util.List;
  * @author Sylvain PALOMINOS
  */
 
-public class SimpleShapeGE extends SimpleGE {
+public abstract class SimpleShapeGE extends SimpleGE {
 
     /**
      * Name of the line border.

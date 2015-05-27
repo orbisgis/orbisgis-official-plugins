@@ -24,6 +24,9 @@
 
 package org.orbisgis.mapcomposer.model.graphicalelement.element.shape;
 
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
+
 /**
  * GraphicalElement representing a oval shape
  *
@@ -31,4 +34,12 @@ package org.orbisgis.mapcomposer.model.graphicalelement.element.shape;
  */
 
 public class OvalGE extends SimpleShapeGE {
+
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(OvalGE.class);
+
+    @Override
+    public String getGEName(){
+        return i18n.tr("Oval");
+    }
 }

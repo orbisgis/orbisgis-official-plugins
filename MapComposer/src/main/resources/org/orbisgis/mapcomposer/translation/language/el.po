@@ -7,8 +7,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OrbisGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-26 13:26+0200\n"
-"PO-Revision-Date: 2015-05-26 11:28+0000\n"
+"POT-Creation-Date: 2015-05-27 14:40+0200\n"
+"PO-Revision-Date: 2015-05-27 12:41+0000\n"
 "Last-Translator: Sylvain Palominos <SPalominos@users.noreply.github.com>\n"
 "Language-Team: Greek (http://www.transifex.com/projects/p/orbisgis/language/el/)\n"
 "MIME-Version: 1.0\n"
@@ -18,6 +18,7 @@ msgstr ""
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:65
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Orientation.java:67
 msgid "Orientation"
 msgstr ""
 
@@ -37,26 +38,30 @@ msgstr ""
 msgid "Document title"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:238
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:189
+msgid "Document"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:243
 msgid "A4"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:239
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:244
 msgid "A3"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:240
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:245
 msgid "Custom"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:312
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:317
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:202
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:419
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:472
 msgid "mm"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:313
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:318
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:124
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:208
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:413
@@ -64,20 +69,25 @@ msgstr ""
 msgid "in"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:314
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:319
 msgid "pixel"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:387
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:392
 msgid "Portrait"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:388
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:393
 msgid "Landscape"
 msgstr ""
 
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/Image.java:42
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:190
+msgid "Image"
+msgstr ""
+
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/SimpleIllustrationGE.java:50
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Orientation.java:48
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Orientation.java:51
 msgid "Path"
 msgstr ""
 
@@ -106,6 +116,7 @@ msgid "z"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:71
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/text/TextElement.java:128
 msgid "Text"
 msgstr ""
 
@@ -165,8 +176,16 @@ msgstr ""
 msgid "RIGHT"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Scale.java:46
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/MapImage.java:71
+msgid "Map"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Scale.java:49
 msgid "Link to MapImage"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/Scale.java:62
+msgid "Scale"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/cartographic/SimpleCartoGE.java:50
@@ -203,6 +222,14 @@ msgstr ""
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/shape/SimpleShapeGE.java:86
 msgid "Border style"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/shape/OvalGE.java:43
+msgid "Oval"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/shape/RectangleGE.java:43
+msgid "Rectangle"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/utils/SaveAndLoadHandler.java:189
@@ -436,23 +463,23 @@ msgid ""
 "any Document GE."
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:258
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:264
 msgid "vector"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:260
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:266
 msgid "raster"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:326
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:337
 msgid "PDF"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:331
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:342
 msgid "Export the document as a PDF file."
 msgstr ""
 
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:443
+#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportPDFThread.java:454
 msgid "PDF file"
 msgstr ""
 
@@ -470,10 +497,6 @@ msgstr ""
 
 #: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:183
 msgid "gif"
-msgstr ""
-
-#: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:190
-msgid "Image"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/controller/utils/exportThreads/ExportImageThread.java:195

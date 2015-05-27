@@ -185,6 +185,11 @@ public class Document extends SimpleGE implements GEProperties {
     }
 
     @Override
+    public String getGEName(){
+        return i18n.tr("Document");
+    }
+
+    @Override
     public List<ConfigurationAttribute> getAllAttributes() {
         List<ConfigurationAttribute> list = new ArrayList<>();
         list.add(width);

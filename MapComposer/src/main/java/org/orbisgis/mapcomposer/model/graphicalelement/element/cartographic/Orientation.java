@@ -44,6 +44,9 @@ public class Orientation extends SimpleCartoGE{
     /** Icon of the orientation*/
     private SourceCA icon;
 
+    /** Object for the translation*/
+    private static final I18n i18n = I18nFactory.getI18n(Orientation.class);
+
     /** Displayed ame of the path to the icon*/
     private static final String sIcon = I18n.marktr("Path");
 
@@ -58,13 +61,10 @@ public class Orientation extends SimpleCartoGE{
      * @return The icon source path.
      */
     public String getIconPath() {return icon.getValue();}
-    
-    /**
-     * Sets the icon source path.
-     * @param path New path of the icon.
-     */
-    public void setIconPath(String path) {
-        icon.setValue(path);
+
+    @Override
+    public String getGEName(){
+        return i18n.tr("Orientation");
     }
 
     @Override
