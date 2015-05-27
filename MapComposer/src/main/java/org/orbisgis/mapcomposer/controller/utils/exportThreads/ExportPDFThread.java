@@ -282,7 +282,12 @@ public class ExportPDFThread implements ExportThread {
         //Adds a line of radio button for each registered classes of GraphicalElement
         int i=1;
         for(Class geClass : geManager.getRegisteredGEClasses()){
-            JLabel geName = new JLabel(geClass.getSimpleName());
+            JLabel geName;
+            try {
+                geName = new JLabel(((GraphicalElement)geClass.newInstance()).getGEName());
+            } catch (InstantiationException|IllegalAccessException e) {
+                geName = new JLabel(geClass.getName());
+            }
             geName.setVisible(false);
             JRadioButton vectorButton = new JRadioButton();
             vectorButton.setVisible(false);
