@@ -75,6 +75,7 @@ public class MapImage extends SimpleCartoGE implements GERefresh, GEIdentifier {
     public void refresh() {
         if(getOwsMapContext()!=null && getOwsMapContext().getBoundingBox()!=null) {
             try {
+                owsc.refresh(null);
                 mapTransform.setExtent(this.getOwsMapContext().getBoundingBox());
                 mapTransform.setImage(new BufferedImage(this.getWidth(), this.getHeight(), BufferedImage.TYPE_INT_ARGB));
                 if (!this.getOwsMapContext().isOpen())
