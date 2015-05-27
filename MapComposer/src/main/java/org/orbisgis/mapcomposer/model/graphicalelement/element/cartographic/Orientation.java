@@ -64,7 +64,7 @@ public class Orientation extends SimpleCartoGE{
 
     @Override
     public String getGEName(){
-        return i18n.tr("Oval");
+        return i18n.tr("Orientation");
     }
 
     @Override
