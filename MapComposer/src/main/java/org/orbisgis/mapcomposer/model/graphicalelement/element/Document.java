@@ -119,19 +119,28 @@ public class Document extends SimpleGE implements GEProperties {
         unit= new SourceListCA(sUnit, false);
         name= new StringCA(sName, false, sDefaultName);
         //Sets the orientation CA
-        orientation.add(Orientation.LANDSCAPE.getName());
-        orientation.add(Orientation.PORTRAIT.getName());
-        orientation.select(Orientation.LANDSCAPE.getName());
+        orientation.add(Orientation.LANDSCAPE.name());
+        orientation.add(Orientation.PORTRAIT.name());
+        orientation.select(Orientation.LANDSCAPE.name());
+        I18n.marktr("PORTRAIT");
+        I18n.marktr("LANDSCAPE");
+
         //Sets the format CA
-        format.add(Format.A3.getName());
-        format.add(Format.A4.getName());
-        format.add(Format.CUSTOM.getName());
+        format.add(Format.A3.name());
+        format.add(Format.A4.name());
+        format.add(Format.CUSTOM.name());
         setFormat(Format.A4);
+        I18n.marktr("A3");
+        I18n.marktr("A");
+        I18n.marktr("CUSTOM");
         //Sets the unit CA
-        unit.add(Unit.MM.getName());
-        unit.add(Unit.IN.getName());
-        unit.add(Unit.PIXEL.getName());
-        unit.select(Unit.MM.getName());
+        unit.add(Unit.MM.name());
+        unit.add(Unit.IN.name());
+        unit.add(Unit.PIXEL.name());
+        unit.select(Unit.MM.name());
+        I18n.marktr("MM");
+        I18n.marktr("IN");
+        I18n.marktr("PIXEL");
     }
     
     /**
@@ -151,7 +160,7 @@ public class Document extends SimpleGE implements GEProperties {
      * @param f New format of the document.
      */
     public void setFormat(Format f){
-        format.select(f.getName());
+        format.select(f.name());
     }
 
     /**
@@ -167,14 +176,14 @@ public class Document extends SimpleGE implements GEProperties {
      * @return Unit of the document.
      */
     public Unit getUnit(){
-        return Unit.getUnitFromName(unit.getSelected());
+        return Unit.valueOf(unit.getSelected());
     }
     
     /**
      * Sets the orientation of the document.
      * @param o New document orientation.
      */
-    public void setOrientation(Orientation o){orientation.select(o.getName());}
+    public void setOrientation(Orientation o){orientation.select(o.name());}
 
     /**
      * Return the dimension of the document according to the format and to the orientation of the document.
@@ -240,15 +249,13 @@ public class Document extends SimpleGE implements GEProperties {
      * To each format the corresponding dimensions are associated.
      */
     public static enum Format{
-        A4(210, 297, I18n.marktr("A4")),
-        A3(297, 420, I18n.marktr("A3")),
-        CUSTOM(0, 0, I18n.marktr("Custom"));
+        A4(210, 297),
+        A3(297, 420),
+        CUSTOM(1, 1);
         /**Width of the format*/
         private int w;
         /**Height of the format*/
         private int h;
-        /**Name of the format*/
-        private String name;
 
         /**DPI of the screen. As java don't detect well the dpi, it is set manually.*/
         private int dpi;
@@ -258,10 +265,9 @@ public class Document extends SimpleGE implements GEProperties {
          * @param w Width of the format.
          * @param h Height of the format.
          */
-        private Format(int w, int h, String name) {
+        private Format(int w, int h) {
             this.w = w;
             this.h = h;
-            this.name = name;
 
             //To be run on a server (no GUI), try to get the default Toolkit.
             //If it is not possible use a default value for the screen resolution.
@@ -291,35 +297,15 @@ public class Document extends SimpleGE implements GEProperties {
         public int getPixelWidth(){
             return (int)(dpi*w/25.4);
         }
-
-        /**
-         * Returns the name of the format.
-         * @return The name of the format.
-         */
-        public String getName(){
-            return this.name;
-        }
-
-        public static Format getFormatFromName(String name){
-            for(Format f : Format.values()) {
-                if(f.getName().equals(name)){
-                    return f;
-                }
-            }
-            return null;
-        }
     }
 
     /**
      * Enumeration of the units that can be used
      */
     public static enum Unit {
-        MM((double)1/25.4, I18n.marktr("mm")),
-        IN((double)1, I18n.marktr("in")),
-        PIXEL(0, I18n.marktr("pixel"));
-
-        /** Human readable name of the unit.**/
-        private String name;
+        MM((double)1/25.4),
+        IN((double)1),
+        PIXEL(0);
         /**
          * Width of the format
          */
@@ -333,7 +319,7 @@ public class Document extends SimpleGE implements GEProperties {
         /**
          * Main constructor.
          */
-        private Unit(double ratioToPixel, String name) {
+        private Unit(double ratioToPixel) {
             //To be run on a server (no GUI), try to get the default Toolkit.
             //If it is not possible use a default value for the screen resolution.
             try {
@@ -351,7 +337,6 @@ public class Document extends SimpleGE implements GEProperties {
             } else {
                 this.ratioToPixel = 1;
             }
-            this.name = name;
         }
 
         /**
@@ -361,54 +346,10 @@ public class Document extends SimpleGE implements GEProperties {
         public double getRatioToPixel(){
             return ratioToPixel;
         }
-
-        /**
-         * Returns the human readable name of the unit.
-         * @return The human readable name
-         */
-        public String getName(){
-            return name;
-        }
-
-        /**
-         * Returns the unit corresponding to the given name.
-         * @param name Name of the unit.
-         * @return The unit corresponding to the name.
-         */
-        public static Unit getUnitFromName(String name){
-            for(Unit u : Unit.values()) {
-                if(u.getName().equals(name)){
-                    return u;
-                }
-            }
-            return null;
-        }
     }
 
     /**
      * Enumeration of the orientation possibilities : portrait or landscape.
      */
-    public enum Orientation{
-        PORTRAIT(I18n.marktr("Portrait")),
-        LANDSCAPE(I18n.marktr("Landscape"));
-
-        /** Orientation name */
-        private String name;
-
-        /**
-         * Main constructor.
-         * @param name Name of the orientation.
-         */
-        private Orientation(String name){
-            this.name = name;
-        }
-
-        /**
-         * Returns the name of the orientation.
-         * @return The name of the orientation.
-         */
-        public String getName(){
-            return name;
-        }
-    }
+    public enum Orientation{PORTRAIT, LANDSCAPE}
 }

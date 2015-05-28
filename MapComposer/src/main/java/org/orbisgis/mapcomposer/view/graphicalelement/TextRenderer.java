@@ -34,17 +34,19 @@ import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalEleme
 import org.orbisgis.mapcomposer.model.graphicalelement.element.text.TextElement;
 import org.orbisgis.mapcomposer.view.utils.UIDialogProperties;
 import org.orbisgis.sif.UIPanel;
+import org.orbisgis.sif.common.ContainerItem;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.ActionListener;
 import java.awt.font.LineBreakMeasurer;
 import java.awt.font.TextAttribute;
 import java.awt.font.TextLayout;
 import java.awt.image.BufferedImage;
+import java.beans.EventHandler;
 import java.text.AttributedString;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.Math.cos;
@@ -90,7 +92,8 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
             else {
                 attributedString = new AttributedString(s);
             }
-            attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize()));
+            attributedString.addAttribute(TextAttribute.FONT, new Font(te.getFont(), te.getStyle(), te.getFontSize
+                    ()));
             attributedString.addAttribute(TextAttribute.FOREGROUND, te.getColorText());
             //Cut the text if it's too wide for the BufferedImage width
             int textX = x - ge.getWidth()/2;
@@ -185,8 +188,17 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
         name = new JLabel(i18n.tr(styleCA.getName()));
         uid.addComponent(name, styleCA, 0, 6, 2, 1);
 
-        component = uic.getCAManager().getRenderer(styleCA).createJComponentFromCA(styleCA);
-        uid.addComponent(component, styleCA, 2, 6, 1, 1);
+        JComboBox<ContainerItem<TextElement.Style>> styleBox = new JComboBox<>();
+        for(TextElement.Style style : TextElement.Style.values()) {
+            styleBox.addItem(new ContainerItem<>(style, i18n.tr(style.name())));
+            if(TextElement.Style.valueOf(styleCA.getSelected()).equals(style)){
+                styleBox.setSelectedItem(styleBox.getItemAt(styleBox.getItemCount()-1));
+            }
+        }
+
+        styleBox.putClientProperty("ca", styleCA);
+        styleBox.addActionListener(EventHandler.create(ActionListener.class, this, "onStyleChanged", "source"));
+        uid.addComponent(styleBox, styleCA, 2, 6, 1, 1);
 
 
         //Find the Font ConfigurationAttribute
@@ -198,8 +210,17 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
         name = new JLabel(i18n.tr(alignmentCA.getName()));
         uid.addComponent(name, alignmentCA, 0, 7, 2, 1);
 
-        component = uic.getCAManager().getRenderer(alignmentCA).createJComponentFromCA(alignmentCA);
-        uid.addComponent(component, alignmentCA, 2, 7, 1, 1);
+        JComboBox<ContainerItem<TextElement.Alignment>> alignmentBox = new JComboBox<>();
+        for(TextElement.Alignment alignment : TextElement.Alignment.values()) {
+            alignmentBox.addItem(new ContainerItem<>(alignment, i18n.tr(alignment.name())));
+            if(TextElement.Alignment.valueOf(alignmentCA.getSelected()).equals(alignment)){
+                alignmentBox.setSelectedItem(alignmentBox.getItemAt(alignmentBox.getItemCount()-1));
+            }
+        }
+
+        alignmentBox.putClientProperty("ca", alignmentCA);
+        alignmentBox.addActionListener(EventHandler.create(ActionListener.class, this, "onAlignmentChanged", "source"));
+        uid.addComponent(alignmentBox, alignmentCA, 2, 7, 1, 1);
 
         //Find the Font ConfigurationAttribute
         ColorCA textColorCA = null;
@@ -238,5 +259,15 @@ public class TextRenderer implements RendererRaster, RendererVector, CustomConfi
         uid.addComponent(component, alphaCA, 2, 10, 1, 1);
 
         return uid;
+    }
+
+    public void onStyleChanged(JComboBox comboBox){
+        SourceListCA styleCA = (SourceListCA) comboBox.getClientProperty("ca");
+        styleCA.select(((ContainerItem<TextElement.Style>)comboBox.getSelectedItem()).getKey().name());
+    }
+
+    public void onAlignmentChanged(JComboBox comboBox){
+        SourceListCA alignmentCA = (SourceListCA) comboBox.getClientProperty("ca");
+        alignmentCA.select(((ContainerItem<TextElement.Alignment>)comboBox.getSelectedItem()).getKey().name());
     }
 }

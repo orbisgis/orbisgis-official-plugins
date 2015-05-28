@@ -8,8 +8,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OrbisGIS\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2015-05-27 14:40+0200\n"
-"PO-Revision-Date: 2015-05-27 12:41+0000\n"
+"POT-Creation-Date: 2015-05-28 15:34+0200\n"
+"PO-Revision-Date: 2015-05-28 13:36+0000\n"
 "Last-Translator: Sylvain Palominos <SPalominos@users.noreply.github.com>\n"
 "Language-Team: Spanish (http://www.transifex.com/projects/p/orbisgis/language/es/)\n"
 "MIME-Version: 1.0\n"
@@ -39,47 +39,40 @@ msgstr "Título del proyecto"
 msgid "Document title"
 msgstr "Título del proyecto"
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:189
-msgid "Document"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:125
+msgid "PORTRAIT"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:243
-msgid "A4"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:126
+msgid "LANDSCAPE"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:244
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:133
 msgid "A3"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:245
-msgid "Custom"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:134
+msgid "A"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:317
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:202
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:419
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:472
-msgid "mm"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:135
+msgid "CUSTOM"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:318
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:124
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:208
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:413
-#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:474
-msgid "in"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:141
+msgid "MM"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:319
-msgid "pixel"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:142
+msgid "IN"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:392
-msgid "Portrait"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:143
+msgid "PIXEL"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:393
-msgid "Landscape"
+#: org/orbisgis/mapcomposer/model/graphicalelement/element/Document.java:198
+msgid "Document"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/model/graphicalelement/element/illustration/Image.java:42
@@ -253,11 +246,11 @@ msgstr ""
 msgid "Save document"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:100
+#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:109
 msgid "width"
 msgstr ""
 
-#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:116
+#: org/orbisgis/mapcomposer/view/graphicalelement/DocumentRenderer.java:126
 msgid "height"
 msgstr ""
 
@@ -296,6 +289,19 @@ msgstr ""
 
 #: org/orbisgis/mapcomposer/view/configurationattribute/SourceRenderer.java:98
 msgid "Browse"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:124
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:208
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:413
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:474
+msgid "in"
+msgstr ""
+
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:202
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:419
+#: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:472
+msgid "mm"
 msgstr ""
 
 #: org/orbisgis/mapcomposer/view/ui/CompositionArea.java:409
