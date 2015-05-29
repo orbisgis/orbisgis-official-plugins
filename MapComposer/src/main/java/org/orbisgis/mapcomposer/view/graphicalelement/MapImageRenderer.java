@@ -24,6 +24,9 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.commons.progress.DefaultProgressMonitor;
+import org.orbisgis.commons.progress.NullProgressMonitor;
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.OwsContextCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.interfaces.ConfigurationAttribute;
@@ -56,6 +59,9 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
     /** Object for the translation*/
     private static final I18n i18n = I18nFactory.getI18n(MapImageRenderer.class);
 
+    /**ProgressMonitor for the map rendering */
+    ProgressMonitor progressMonitor;
+
     @Override
     public void drawGE(Graphics2D graphics2D, GraphicalElement ge) {
         //Get the MapImageObject
@@ -74,7 +80,8 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
             graphics2D.rotate(rad, ge.getWidth() / 2, ge.getHeight() / 2);
             //Render the map and draw it in the Graphics2D
             Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
-            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi
+                    .getOwsMapContext().getLayerModel(), new NullProgressMonitor());
         }
         //Else, draw the MapImage icon
         else{
@@ -86,7 +93,7 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
     }
 
     @Override
-    public BufferedImage createGEImage(GraphicalElement ge) {
+    public BufferedImage createGEImage(GraphicalElement ge, ProgressMonitor pm) {
         //Calculate the size of the GraphicalElement after rotation
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());
@@ -101,7 +108,6 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
 
         //Get the MapImageObject
         MapImage mi = (MapImage)ge;
-
         //If the MapImage object contain a valid OwsMapContext, render it with the Graphics2DRenderer
         if(mi.getOwsPath() != null) {
             //Translate the Graphics2D to draw the map at its center
@@ -110,7 +116,8 @@ public class MapImageRenderer implements RendererRaster, RendererVector, CustomC
             graphics2D.rotate(rad, ge.getWidth() / 2, ge.getHeight() / 2);
             //Render the map and draw it in the Graphics2D
             Graphics2DRenderer renderer = new Graphics2DRenderer(graphics2D, ge.getWidth(), ge.getHeight());
-            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi.getOwsMapContext().getLayerModel(), null);
+            renderer.draw(graphics2D, ge.getWidth(), ge.getHeight(), mi.getMapTransform().getExtent(), mi
+                    .getOwsMapContext().getLayerModel(), pm);
         }
         //Else, draw the MapImage icon
         else{

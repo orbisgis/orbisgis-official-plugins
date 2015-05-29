@@ -103,6 +103,8 @@ public class ExportImageThread implements ExportThread {
             }
 
             progressBar.setIndeterminate(true);
+            progressBar.setStringPainted(true);
+            progressBar.setString(i18n.tr("Exporting the document ..."));
             int geCount = 0;
             //Draw each GraphicalElement in the BufferedImage
             Graphics2D graphics2D = bi.createGraphics();
@@ -114,7 +116,8 @@ public class ExportImageThread implements ExportThread {
                 final int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 final int maxHeight = Math.max((int)newHeight, ge.getHeight());
                 //Draw the GraphicalElement in a Graphics2D
-                BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
+                BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass()))
+                        .createGEImage(ge, null);
                 graphics2D.drawImage(bufferedImage, ge.getX() + (ge.getWidth() - maxWidth) / 2, ge.getY() + (ge.getHeight() - maxHeight) / 2, null);
                 //Set the progress bar value
                 progressBar.setIndeterminate(false);
@@ -127,6 +130,7 @@ public class ExportImageThread implements ExportThread {
             ImageIO.write(bi, (String)imageType.getSelectedItem(), new File(path));
 
             progressBar.setValue(progressBar.getMaximum());
+            progressBar.setString(i18n.tr("Document successfully exported."));
             //Wait a bit before erasing the progress bar
             try {
                 Thread.sleep(1500);
@@ -134,6 +138,7 @@ public class ExportImageThread implements ExportThread {
                 LoggerFactory.getLogger(ExportImageThread.class).error(e.getMessage());
             }
             progressBar.setValue(0);
+            progressBar.setStringPainted(false);
 
         } catch (IllegalArgumentException|IOException ex) {
             LoggerFactory.getLogger(ExportImageThread.class).error(ex.getMessage());

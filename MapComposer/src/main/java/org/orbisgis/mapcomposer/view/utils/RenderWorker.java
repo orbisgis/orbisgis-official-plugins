@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.utils;
 
+import org.orbisgis.commons.progress.SwingWorkerPM;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.view.graphicalelement.GERenderer;
 import org.orbisgis.mapcomposer.view.graphicalelement.RendererRaster;
@@ -36,7 +37,7 @@ import java.awt.image.BufferedImage;
  *
  * @author Sylvain PALOMINOS
  */
-public class RenderWorker extends SwingWorker{
+public class RenderWorker extends SwingWorkerPM {
 
     private CompositionJPanel compPanel;
     private GERenderer geRenderer;
@@ -59,7 +60,7 @@ public class RenderWorker extends SwingWorker{
         //Display the wait layer in the CompositionJPanel
         compPanel.setEnabled(false);
         compPanel.getWaitLayer().start();
-        BufferedImage bi = ((RendererRaster)geRenderer).createGEImage(ge);
+        BufferedImage bi = ((RendererRaster)geRenderer).createGEImage(ge, this.getProgressMonitor());
         compPanel.refresh(bi);
         compPanel.getWaitLayer().stop();
         compPanel.setEnabled(true);
