@@ -177,7 +177,7 @@ public class ExportPDFThread implements ExportThread {
 
                 else {
                     ByteArrayOutputStream baos = new ByteArrayOutputStream();
-                    BufferedImage bi = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
+                    BufferedImage bi = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge, null);
                     ImageIO.write(bi, "png", baos);
                     Image image = Image.getInstance(baos.toByteArray());
                     image.setAbsolutePosition(ge.getX() + (ge.getWidth() - maxWidth) / 2, -ge.getY() + height - ge.getHeight() + (ge.getHeight() - maxHeight) / 2);

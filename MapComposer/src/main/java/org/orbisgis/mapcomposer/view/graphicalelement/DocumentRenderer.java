@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.mapcomposer.controller.MainController;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.IntegerCA;
 import org.orbisgis.mapcomposer.model.configurationattribute.attribute.SourceListCA;
@@ -69,7 +70,7 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
     }
 
     @Override
-    public BufferedImage createGEImage(GraphicalElement ge) {
+    public BufferedImage createGEImage(GraphicalElement ge, ProgressMonitor pm) {
         BufferedImage bi = new BufferedImage(ge.getWidth(), ge.getHeight(), BufferedImage.TYPE_INT_ARGB);
         drawGE(bi.createGraphics(), ge);
         return bi;

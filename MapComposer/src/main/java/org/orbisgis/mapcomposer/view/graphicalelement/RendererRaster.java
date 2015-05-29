@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
 import java.awt.image.BufferedImage;
@@ -43,5 +44,5 @@ public interface RendererRaster extends GERenderer{
      * @param ge  The GraphicalElement to render, not null
      * @return A BufferedImage containing the representation of the GraphicalElement.
      */
-    public BufferedImage createGEImage( GraphicalElement ge);
+    public BufferedImage createGEImage(GraphicalElement ge, ProgressMonitor pm);
 }

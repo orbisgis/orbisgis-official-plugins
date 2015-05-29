@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.cartographic.Orientation;
 import org.orbisgis.mapcomposer.view.utils.MapComposerIcon;
@@ -45,7 +46,7 @@ import static java.lang.Math.sin;
 public class OrientationRenderer implements RendererRaster {
 
     @Override
-    public BufferedImage createGEImage(GraphicalElement ge) {
+    public BufferedImage createGEImage(GraphicalElement ge, ProgressMonitor pm) {
 
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad) * ge.getWidth()) + Math.abs(cos(rad) * ge.getHeight());

@@ -114,7 +114,8 @@ public class ExportImageThread implements ExportThread {
                 final int maxWidth = Math.max((int)newWidth, ge.getWidth());
                 final int maxHeight = Math.max((int)newHeight, ge.getHeight());
                 //Draw the GraphicalElement in a Graphics2D
-                BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass())).createGEImage(ge);
+                BufferedImage bufferedImage = ((RendererRaster)geManager.getRenderer(ge.getClass()))
+                        .createGEImage(ge, null);
                 graphics2D.drawImage(bufferedImage, ge.getX() + (ge.getWidth() - maxWidth) / 2, ge.getY() + (ge.getHeight() - maxHeight) / 2, null);
                 //Set the progress bar value
                 progressBar.setIndeterminate(false);

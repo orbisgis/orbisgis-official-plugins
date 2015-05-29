@@ -69,11 +69,14 @@ public class CompositionAreaController {
     /** CompositionArea */
     private CompositionArea compositionArea;
 
+    private List<RenderWorker> renderWorkerList;
+
     public CompositionAreaController(MainController mainController){
         this.mainController = mainController;
         executorService = Executors.newFixedThreadPool(1);
         elementJPanelMap = new LinkedHashMap<>();
         zIndexStack = new Stack<>();
+        renderWorkerList = new ArrayList<>();
     }
 
     /**
@@ -280,10 +283,20 @@ public class CompositionAreaController {
         if(ge instanceof GERefresh)
             ((GERefresh)ge).refresh();
         RenderWorker worker = new RenderWorker(elementJPanelMap.get(ge), mainController.getGEManager().getRenderer(ge.getClass()), ge);
+        renderWorkerList.add(worker);
         executorService.submit(worker);
         if(ge instanceof Document) {
             compositionArea.setDocumentDimension(new Dimension(ge.getWidth(), ge.getHeight()));
             compositionArea.setInchOrCom(((Document)ge).getUnit());
+        }
+    }
+
+    /**
+     * Cancel all the rendering processes.
+     */
+    public void cancelRendering(){
+        for(RenderWorker rw : renderWorkerList){
+            rw.cancel();
         }
     }
 

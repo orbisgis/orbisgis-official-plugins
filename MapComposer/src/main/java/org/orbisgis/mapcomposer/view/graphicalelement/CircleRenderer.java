@@ -24,6 +24,7 @@
 
 package org.orbisgis.mapcomposer.view.graphicalelement;
 
+import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.mapcomposer.model.graphicalelement.element.shape.OvalGE;
 import org.orbisgis.mapcomposer.model.graphicalelement.interfaces.GraphicalElement;
 
@@ -44,7 +45,7 @@ import static java.lang.Math.sin;
 
 public class CircleRenderer implements GERenderer, RendererRaster, RendererVector {
     @Override
-    public BufferedImage createGEImage(GraphicalElement ge) {
+    public BufferedImage createGEImage(GraphicalElement ge, ProgressMonitor pm) {
 
         double rad = Math.toRadians(ge.getRotation());
         double newHeight = Math.abs(sin(rad)*ge.getWidth())+Math.abs(cos(rad)*ge.getHeight());

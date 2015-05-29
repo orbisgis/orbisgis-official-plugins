@@ -116,6 +116,7 @@ public class MainWindow extends JFrame implements EditableElement {
     public static final String REFRESH = "REFRESH";
     public static final String UNDO = "UNDO";
     public static final String REDO = "REDO";
+    public static final String CANCEL_RENDERING = "CANCEL_RENDERING";
 
     /** Spinner for the x position. */
     private JSpinner spinnerX =null;
@@ -337,14 +338,17 @@ public class MainWindow extends JFrame implements EditableElement {
                 "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), stationLocation, 0, 0, 4, 5);
         addCToolbarCItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(),
                 "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), stationLocation, 0, 0, 5, 0);
-        addCToolbarCItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController,
+        addCToolbarCItem(DELETE, i18n.tr("Cancel the redrawing"), "delete", mainController,
                 "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), stationLocation, 0, 0, 5, 1);
         addCToolbarCItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(),
                 "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), stationLocation, 0, 0, 5, 2);
+        addCToolbarCItem(CANCEL_RENDERING, i18n.tr("Delete selected elements"), "stop", mainController
+                        .getCompositionAreaController(),
+                "cancelRendering", KeyStroke.getKeyStroke("ESCAPE"), stationLocation, 0, 0, 5, 3);
         addCToolbarCItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController,
-                "undo", KeyStroke.getKeyStroke("control Z"), stationLocation, 0, 0, 5, 3);
+                "undo", KeyStroke.getKeyStroke("control Z"), stationLocation, 0, 0, 5, 4);
         addCToolbarCItem(REDO, i18n.tr("Redo the last action"), "edit_redo", mainController,
-                "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 4);
+                "redo", KeyStroke.getKeyStroke("control shift Z"), stationLocation, 0, 0, 5, 5);
 
         //Sets the spinners tool bar.
         spinnerX = createSpinner("X", 0, Integer.MIN_VALUE, Integer.MAX_VALUE);
