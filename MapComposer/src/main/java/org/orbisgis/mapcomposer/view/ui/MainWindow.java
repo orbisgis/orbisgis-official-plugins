@@ -338,11 +338,11 @@ public class MainWindow extends JFrame implements EditableElement {
                 "alignToTop", KeyStroke.getKeyStroke("alt NUMPAD8"), stationLocation, 0, 0, 4, 5);
         addCToolbarCItem(PROPERTIES, i18n.tr("Show selected elements properties"), "properties", mainController.getUIController(),
                 "showSelectedGEProperties", KeyStroke.getKeyStroke("control P"), stationLocation, 0, 0, 5, 0);
-        addCToolbarCItem(DELETE, i18n.tr("Cancel the redrawing"), "delete", mainController,
+        addCToolbarCItem(DELETE, i18n.tr("Delete selected elements"), "delete", mainController,
                 "removeSelectedGE", KeyStroke.getKeyStroke("DELETE"), stationLocation, 0, 0, 5, 1);
         addCToolbarCItem(REFRESH, i18n.tr("Redraw selected elements"), "refresh", mainController.getCompositionAreaController(),
                 "refreshSelectedGE", KeyStroke.getKeyStroke("control R"), stationLocation, 0, 0, 5, 2);
-        addCToolbarCItem(CANCEL_RENDERING, i18n.tr("Delete selected elements"), "stop", mainController
+        addCToolbarCItem(CANCEL_RENDERING, i18n.tr("Cancel the redrawing"), "stop", mainController
                         .getCompositionAreaController(),
                 "cancelRendering", KeyStroke.getKeyStroke("ESCAPE"), stationLocation, 0, 0, 5, 3);
         addCToolbarCItem(UNDO, i18n.tr("Undo the last action"), "edit_undo", mainController,

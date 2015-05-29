@@ -150,7 +150,6 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         JComboBox<ContainerItem<Document.Format>> formatBox = new JComboBox<>();
         for(Document.Format format : Document.Format.values()) {
             formatBox.addItem(new ContainerItem<>(format, i18n.tr(format.name())));
-            System.out.println(format + ", " +Document.Format.valueOf(formatCA.getSelected()));
             if(Document.Format.valueOf(formatCA.getSelected()).equals(format)){
                 formatBox.setSelectedItem(formatBox.getItemAt(formatBox.getItemCount()-1));
             }
