@@ -147,23 +147,22 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
         JLabel formatName = new JLabel(i18n.tr(formatCA.getName()));
         uid.addComponent(formatName, formatCA, 0, 0, 1, 1);
 
-        //Adds the listener and the client properties needed.
-
-
         JComboBox<ContainerItem<Document.Format>> formatBox = new JComboBox<>();
         for(Document.Format format : Document.Format.values()) {
             formatBox.addItem(new ContainerItem<>(format, i18n.tr(format.name())));
+            System.out.println(format + ", " +Document.Format.valueOf(formatCA.getSelected()));
             if(Document.Format.valueOf(formatCA.getSelected()).equals(format)){
                 formatBox.setSelectedItem(formatBox.getItemAt(formatBox.getItemCount()-1));
             }
         }
 
+        //Adds the listener and the client properties needed.
         formatBox.putClientProperty("widthLabel", widthLabel);
         formatBox.putClientProperty("widthSpinner", widthSpinner);
         formatBox.putClientProperty("heightLabel", heightLabel);
         formatBox.putClientProperty("heightSpinner", heightSpinner);
         formatBox.putClientProperty("unitBox", unitBox);
-        formatBox.putClientProperty("formatCA", formatCA);
+        formatBox.putClientProperty("ca", formatCA);
         formatBox.addActionListener(EventHandler.create(ActionListener.class, this, "onFormatChange", "source"));
 
         //Adds all the previous elements to the UIDialogProperties
@@ -278,6 +277,8 @@ public class DocumentRenderer implements RendererRaster, RendererVector, CustomC
             widthSpinner.setValue((int)Math.round(width));
             heightSpinner.setValue((int)Math.round(height));
         }
+        ((SourceListCA)formatBox.getClientProperty("ca")).select(((ContainerItem<Document.Format>) formatBox
+                .getSelectedItem()).getKey().name());
         unitBox.setSelectedItem(unitBox.getSelectedItem());
     }
 
