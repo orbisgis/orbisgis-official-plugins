@@ -146,6 +146,9 @@ public class ExportPDFThread implements ExportThread {
             PdfContentByte cb = writer.getDirectContent();
 
             progressBar.setIndeterminate(true);
+            progressBar.setStringPainted(true);
+            progressBar.setString(i18n.tr("Exporting the document ..."));
+
             int geCount = 0;
             int numberOfGe[] = new int[geManager.getRegisteredGEClasses().size()];
             for(int i=0; i<numberOfGe.length; i++) {numberOfGe[i] = 0;}
@@ -202,12 +205,14 @@ public class ExportPDFThread implements ExportThread {
             pdfDocument.close();
             //Wait a bit before erasing the progress bar
             progressBar.setValue(progressBar.getMaximum());
+            progressBar.setString(i18n.tr("Document successfully exported."));
             try {
                 Thread.sleep(1500);
             } catch (InterruptedException e) {
                 LoggerFactory.getLogger(ExportPDFThread.class).error(e.getMessage());
             }
             progressBar.setValue(0);
+            progressBar.setStringPainted(false);
 
         } catch (IllegalArgumentException|IOException|DocumentException ex) {
             LoggerFactory.getLogger(ExportPDFThread.class).error(ex.getMessage());
