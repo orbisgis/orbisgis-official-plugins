@@ -1,12 +1,12 @@
 /*
- * OrbisGIS is a GIS application dedicated to scientific spatial simulation.
- * This cross-platform GIS is developed at French IRSTV institute and is able to
- * manipulate and create vector and raster spatial information. 
+ * OrbisGIS is an open source GIS application dedicated to research for
+ * all geographic information science.
  * 
- * OrbisGIS is distributed under GPL 3 license. It is produced by the "Atelier SIG"
- * team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
- * 
- * Copyright (C) 2007-2012 IRSTV (FR CNRS 2488)
+ * OrbisGIS is distributed under GPL 3 license. It is developped by the "GIS"
+ * team of the Lab-STICC laboratory <http://www.lab-sticc.fr/>.
+ *
+ * Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
+ * Copyright (C) 2015-2016 Lab-STICC CNRS, UMR 6285.
  * 
  * This file is part of OrbisGIS.
  * 
@@ -26,35 +26,27 @@
  * or contact directly:
  * info_at_ orbisgis.org
  */
-package org.orbisgis.groovy;
+package org.orbisgis.r.console;
 
-
-import groovy.lang.GroovyShell;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
-import java.io.PrintStream;
 import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import javax.sql.DataSource;
+import javax.script.ScriptEngine;
+import javax.script.ScriptEngineManager;
+import javax.script.ScriptException;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
-import org.fife.rsta.ac.LanguageSupportFactory;
-import org.fife.rsta.ac.groovy.GroovyLanguageSupport;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
-import org.fife.ui.rsyntaxtextarea.SyntaxConstants;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
-import org.orbisgis.coremap.layerModel.MapContext;
-import org.orbisgis.groovy.icons.GroovyIcon;
-import org.orbisgis.mapeditorapi.MapElement;
+import org.orbisgis.r.console.icons.RIcon;
 import org.orbisgis.sif.CommentUtil;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
@@ -62,116 +54,77 @@ import org.orbisgis.sif.components.SaveFilePanel;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
+import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
-import org.orbisgis.sif.edition.EditableElement;
-import org.orbisgis.sif.edition.EditorDockable;
-import org.orbisgis.sif.edition.EditorManager;
+import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.osgi.service.component.annotations.ReferenceCardinality;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 /**
- * Create the groovy console panel
+ * Create the R console panel
  *
  * @author Erwan Bocher
  */
-@Component(service = EditorDockable.class)
-public class GroovyConsolePanel extends JPanel implements EditorDockable {
+@Component(immediate = true)
+public class RConsolePanel extends JPanel implements DockingPanel {
 
-    public static final String EDITOR_NAME = "Groovy";
-    private static final I18n I18N = I18nFactory.getI18n(GroovyConsolePanel.class);
-    private static final Logger LOGGER = LoggerFactory.getLogger("gui." + GroovyConsolePanel.class);
-    private static final Logger LOGGER_POPUP = LoggerFactory.getLogger("gui.popup" + GroovyConsolePanel.class);
-    private final SLF4JOutputStream infoLogger = new SLF4JOutputStream(LOGGER, SLF4JOutputStream.Level.INFO);
-    private final SLF4JOutputStream errorLogger = new SLF4JOutputStream(LOGGER, SLF4JOutputStream.Level.ERROR);
+    public static final String EDITOR_NAME = "R";
+    private static final I18n I18N = I18nFactory.getI18n(RConsolePanel.class);
+    private static final Logger LOGGER = LoggerFactory.getLogger("gui." + RConsolePanel.class);
+    private static final Logger LOGGER_POPUP = LoggerFactory.getLogger("gui.popup" + RConsolePanel.class);
     private DockingPanelParameters parameters = new DockingPanelParameters();
     private ActionCommands actions = new ActionCommands();
-    private GroovyLanguageSupport gls;
     private RTextScrollPane centerPanel;
     private RSyntaxTextArea scriptPanel;
     private DefaultAction executeAction;
     private DefaultAction clearAction;
     private DefaultAction saveAction;
     private DefaultAction findAction;
-    private DefaultAction commentAction;
-    private DefaultAction blockCommentAction;
     private FindReplaceDialog findReplaceDialog;
     private int line = 0;
     private int character = 0;
-    private MapElement mapElement;
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
-    private Map<String, Object> variables = new HashMap<String, Object>();
-    private Map<String, Object> properties = new HashMap<String, Object>();
     private ExecutorService executorService;
 
-    /**
-     * Create the groovy console panel
-     */
-    public GroovyConsolePanel() {
+    
+    @Activate
+    public void activate(){
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
         init();
     }
 
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-    public void setDataSource(DataSource ds) {
-        variables.put("ds", ds);
-    }
-
-    public void unsetDataSource(DataSource ds) {
-        variables.remove("ds");
-    }
-
-    @Reference(cardinality = ReferenceCardinality.OPTIONAL)
-    public void setEditorManager(EditorManager editorManager) {
-        // If a map is already loaded fetch it in the EditorManager
-        if(editorManager != null) {
-            try {
-                mapElement = MapElement.fetchFirstMapElement(editorManager);
-            } catch (Exception ex) {
-                LOGGER.error(ex.getLocalizedMessage(), ex);
-            }
-        }
-        if (mapElement != null) {
-            setMapContext(mapElement.getMapContext());
-        }
-    }
-
     @Reference
     public void setExecutorService(ExecutorService executorService) {
         this.executorService = executorService;
     }
+
     public void unsetExecutorService(ExecutorService executorService) {
         this.executorService = null;
     }
 
     private void execute(SwingWorker swingWorker) {
-        if(executorService != null) {
+        if (executorService != null) {
             executorService.execute(swingWorker);
         } else {
             swingWorker.execute();
         }
     }
 
-
-    public void unsetEditorManager(EditorManager editorManager) {
-    }
     /**
      * Init the groovy panel with all docking parameters and set the necessary
      * properties to the console shell
      */
     private void init() {
-        properties.put("out", new PrintStream(infoLogger));
-        properties.put("err", new PrintStream(errorLogger));
         parameters.setName(EDITOR_NAME);
-        parameters.setTitle(I18N.tr("Groovy"));
-        parameters.setTitleIcon(new ImageIcon(GroovyConsolePanel.class.getResource("icon.png")));
+        parameters.setTitle(I18N.tr("R"));
+        parameters.setTitleIcon(new ImageIcon(RConsolePanel.class.getResource("icon.png")));
         parameters.setDockActions(getActions().getActions());
     }
 
@@ -192,12 +145,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private RTextScrollPane getCenterPanel() {
         if (centerPanel == null) {
             initActions();
-            LanguageSupportFactory lsf = LanguageSupportFactory.get();
-            gls = (GroovyLanguageSupport) lsf.getSupportFor(SyntaxConstants.SYNTAX_STYLE_GROOVY);
             scriptPanel = new RSyntaxTextArea();
             scriptPanel.setLineWrap(true);
-            lsf.register(scriptPanel);
-            scriptPanel.setSyntaxEditingStyle(RSyntaxTextArea.SYNTAX_STYLE_GROOVY);
             scriptPanel.addCaretListener(EventHandler.create(CaretListener.class, this, "onScriptPanelCaretUpdate"));
             scriptPanel.getDocument().addDocumentListener(EventHandler.create(DocumentListener.class, this, "onUserSelectionChange"));
             scriptPanel.clearParsers();
@@ -221,63 +170,46 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
      */
     private void initActions() {
         //Execute action
-        executeAction = new DefaultAction(GroovyConsoleActions.A_EXECUTE, I18N.tr("Execute"),
-                I18N.tr("Execute the groovy script"),
-                GroovyIcon.getIcon("execute"),
+        executeAction = new DefaultAction(RConsoleActions.A_EXECUTE, I18N.tr("Execute"),
+                I18N.tr("Execute the R script"),
+                RIcon.getIcon("execute"),
                 EventHandler.create(ActionListener.class, this, "onExecute"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(executeAction);
 
         //Clear action
-        clearAction = new DefaultAction(GroovyConsoleActions.A_CLEAR,
+        clearAction = new DefaultAction(RConsoleActions.A_CLEAR,
                 I18N.tr("Clear"),
                 I18N.tr("Erase the content of the editor"),
-                GroovyIcon.getIcon("erase"),
+                RIcon.getIcon("erase"),
                 EventHandler.create(ActionListener.class, this, "onClear"),
                 null);
         actions.addAction(clearAction);
 
         //Open action
-        actions.addAction(new DefaultAction(GroovyConsoleActions.A_OPEN,
+        actions.addAction(new DefaultAction(RConsoleActions.A_OPEN,
                 I18N.tr("Open"),
                 I18N.tr("Load a file in this editor"),
-                GroovyIcon.getIcon("open"),
+                RIcon.getIcon("open"),
                 EventHandler.create(ActionListener.class, this, "onOpenFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_O, InputEvent.CTRL_DOWN_MASK)));
         //Save
-        saveAction = new DefaultAction(GroovyConsoleActions.A_SAVE,
+        saveAction = new DefaultAction(RConsoleActions.A_SAVE,
                 I18N.tr("Save"),
                 I18N.tr("Save the editor content into a file"),
-                GroovyIcon.getIcon("save"),
+                RIcon.getIcon("save"),
                 EventHandler.create(ActionListener.class, this, "onSaveFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(saveAction);
         //Find action
-        findAction = new DefaultAction(GroovyConsoleActions.A_SEARCH,
+        findAction = new DefaultAction(RConsoleActions.A_SEARCH,
                 I18N.tr("Search.."),
                 I18N.tr("Search text in the document"),
-                GroovyIcon.getIcon("find"),
+                RIcon.getIcon("find"),
                 EventHandler.create(ActionListener.class, this, "openFindReplaceDialog"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)).addStroke(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(findAction);
-
-        // Comment/Uncomment
-        commentAction = new DefaultAction(GroovyConsoleActions.A_COMMENT,
-                I18N.tr("(Un)comment"),
-                I18N.tr("(Un)comment the selected text"),
-                null,
-                EventHandler.create(ActionListener.class, this, "onComment"),
-                KeyStroke.getKeyStroke("alt C")).setLogicalGroup("format");
-        actions.addAction(commentAction);
-
-        // Block Comment/Uncomment
-        blockCommentAction = new DefaultAction(GroovyConsoleActions.A_BLOCKCOMMENT,
-                I18N.tr("Block (un)comment"),
-                I18N.tr("Block (un)comment the selected text."),
-                null,
-                EventHandler.create(ActionListener.class, this, "onBlockComment"),
-                KeyStroke.getKeyStroke("alt shift C")).setLogicalGroup("format");
-        actions.addAction(blockCommentAction);
+       
     }
 
     /**
@@ -296,12 +228,12 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     /**
      * Open a dialog that let the user select a file and save the content of the
-     * sql editor into this file.
+     * R editor into this file.
      */
     public void onSaveFile() {
         final SaveFilePanel outfilePanel = new SaveFilePanel(
-                "groovyConsoleOutFile", I18N.tr("Save script"));
-        outfilePanel.addFilter("groovy", I18N.tr("Groovy script (*.groovy)"));
+                "rConsoleOutFile", I18N.tr("Save script"));
+        outfilePanel.addFilter("R", I18N.tr("R script (*.r)"));
         outfilePanel.loadState();
         if (UIFactory.showDialog(outfilePanel)) {
             try {
@@ -315,12 +247,12 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     /**
      * Open a dialog that let the user select a file and add or replace the
-     * content of the sql editor.
+     * content of the R editor.
      */
     public void onOpenFile() {
-        final OpenFilePanel inFilePanel = new OpenFilePanel("groovyConsoleInFile",
+        final OpenFilePanel inFilePanel = new OpenFilePanel("rConsoleInFile",
                 I18N.tr("Open script"));
-        inFilePanel.addFilter("groovy", I18N.tr("Groovy Script (*.groovy)"));
+        inFilePanel.addFilter("R", I18N.tr("R Script (*.R)"));
         inFilePanel.loadState();
         if (UIFactory.showDialog(inFilePanel)) {
             int answer = JOptionPane.NO_OPTION;
@@ -366,15 +298,11 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             clearAction.setEnabled(false);
             saveAction.setEnabled(false);
             findAction.setEnabled(false);
-            commentAction.setEnabled(false);
-            blockCommentAction.setEnabled(false);
         } else {
             executeAction.setEnabled(true);
             clearAction.setEnabled(true);
             saveAction.setEnabled(true);
             findAction.setEnabled(true);
-            commentAction.setEnabled(true);
-            blockCommentAction.setEnabled(true);
         }
     }
 
@@ -382,56 +310,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
      * User click on execute script button
      */
     public void onExecute() {
-        if(executeAction.isEnabled()) {
+        if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            GroovyJob groovyJob = new GroovyJob(text, properties, variables,
-                    new  SLF4JOutputStream[] {infoLogger, errorLogger}, executeAction);
-            execute(groovyJob);
+            RJob rJob = new RJob(text, executeAction);
+            execute(rJob);
         }
     }
-
-    /**
-     * Expose the map context in the groovy interpreter
-     *
-     * @param mc MapContext instance
-     */
-    private void setMapContext(MapContext mc) {
-        try {
-            if(mc != null) {
-                variables.put("mc", mc);
-            } else {
-                variables.remove("mc");
-            }
-        } catch (Error ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-        }
-    }
-
-    @Override
-    public boolean match(EditableElement editableElement) {
-        return editableElement instanceof MapElement;
-    }
-
-    @Override
-    public EditableElement getEditableElement() {
-        return null;
-    }
-
-    @Override
-    public void setEditableElement(EditableElement editableElement) {
-        if(editableElement instanceof MapElement) {
-            setMapContext(((MapElement) editableElement).getMapContext());
-        }
-    }
-
-    /**
-     * Dispose
-     */
-    public void freeResources() {
-        if (gls != null) {
-            gls.uninstall(scriptPanel);
-        }
-    }
+    
 
     @Override
     public DockingPanelParameters getDockingParameters() {
@@ -442,21 +327,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     public JComponent getComponent() {
         return this;
     }
-
-    /**
-     * (Un)comment the selected text.
-     */
-    public void onComment() {
-        CommentUtil.commentOrUncommentJava(scriptPanel);
-    }
-
-    /**
-     * Block (un)comment the selected text.
-     */
-    public void onBlockComment() {
-        CommentUtil.blockCommentOrUncomment(scriptPanel);
-    }
-
+    
     /**
      * Open one instanceof the find replace dialog
      */
@@ -469,49 +340,35 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     }
 
     /**
-     * Execute the provided script in groovy
+     * Execute the provided script in R
      */
-    private static class GroovyJob extends SwingWorkerPM {
+    private static class RJob extends SwingWorkerPM {
 
         private String script;
-        private SLF4JOutputStream[] loggers;
-        private Map<String, Object> variables;
-        private Map<String, Object> properties;
         private Action executeAction;
 
-        public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, SLF4JOutputStream[] loggers, Action executeAction) {
+        public RJob(String script, Action executeAction) {
             this.script = script;
-            this.loggers = loggers;
-            this.variables = variables;
-            this.properties = properties;
             this.executeAction = executeAction;
-            setTaskName(I18N.tr("Execute Groovy script"));
+            setTaskName(I18N.tr("Execute R script"));
         }
 
         @Override
         protected Object doInBackground() throws Exception {
-            variables.put("pm", getProgressMonitor());
             executeAction.setEnabled(false);
             try {
-                GroovyShell groovyShell = new GroovyShell();
-                for(Map.Entry<String,Object> variable : variables.entrySet()) {
-                    groovyShell.setVariable("grv_"+variable.getKey(), variable.getValue());
+                ScriptEngineManager manager = new ScriptEngineManager();
+                // create a Renjin engine:
+                ScriptEngine engine = manager.getEngineByName("Renjin");
+                // check if the engine has loaded correctly:
+                if (engine == null) {
+                    LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
                 }
-                for(Map.Entry<String,Object> property : properties.entrySet()) {
-                    groovyShell.setProperty(property.getKey(), property.getValue());
-                }
-                groovyShell.evaluate(script);
-            } catch (Exception e) {
+                engine.eval(script);
+            } catch (RuntimeException | ScriptException e) {
                 LOGGER.error(I18N.tr("Cannot execute the script"), e);
             } finally {
                 executeAction.setEnabled(true);
-                for(SLF4JOutputStream logger : loggers) {
-                    try {
-                        logger.flush();
-                    } catch (IOException e) {
-                        LOGGER.error(I18N.tr("Cannot display the output of the console"), e);
-                    }
-                }
             }
             return null;
         }

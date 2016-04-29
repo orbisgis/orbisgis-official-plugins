@@ -19,6 +19,7 @@
                 <module>memory</module>
                 <module>groovyConsole</module>
                 <module>mailto</module>
+                <module>r-console</module>
         </modules>
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
