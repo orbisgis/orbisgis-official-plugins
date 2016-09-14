@@ -26,21 +26,41 @@
  * or contact directly:
  * info_at_ orbisgis.org
  */
-package org.orbisgis.r.console;
 
+package org.orbisgis.r.icons;
 
-import org.orbisgis.sif.components.actions.ActionFactoryService;
+import org.orbisgis.sif.icons.BaseIcon;
+import org.slf4j.LoggerFactory;
+
+import javax.swing.ImageIcon;
+import java.awt.Image;
 
 /**
- * @author Nicolas Fortin
+ * @author Erwan Bocher
  */
-public abstract class RConsoleActions implements ActionFactoryService<RConsolePanel> {
-    // Action, MENU IDs
-    public static final String A_EXECUTE = "M_EXECUTE";
-    public static final String A_CLEAR = "M_CLEAR";
-    public static final String A_OPEN = "M_OPEN";
-    public static final String A_SAVE = "M_SAVE";
-    public static final String A_SEARCH = "M_SEARCH";
-    public static final String A_COMMENT = "M_COMMENT";
-    public static final String A_BLOCKCOMMENT = "M_BLOCKCOMMENT";
+public class RIcon {
+    private static BaseIcon iconManager = new BaseIcon(LoggerFactory.getLogger(RIcon.class));
+
+    /**
+     * This is a static class
+     */
+    private RIcon() {
+    }
+
+    /**
+     * Retrieve icon awt Image by its name
+     * @param iconName The icon name, without extension. All icons are stored in the png format.
+     * @return The Image content requested, or an Image corresponding to a Missing Resource
+     */
+    public static Image getIconImage(String iconName) {
+        return iconManager.getIconImage(RIcon.class, iconName);
+    }
+    /**
+     * Retrieve icon by its name
+     * @param iconName The icon name, without extension. All icons are stored in the png format.
+     * @return The ImageIcon requested, or an ImageIcon corresponding to a Missing Resource
+     */
+    public static ImageIcon getIcon(String iconName) {
+        return iconManager.getIcon(RIcon.class, iconName);
+    }
 }

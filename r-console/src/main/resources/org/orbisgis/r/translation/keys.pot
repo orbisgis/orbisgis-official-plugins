@@ -1,0 +1,115 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2016-09-14 16:28+0200\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: org/orbisgis/r/console/RConsolePanel.java:128
+msgid "R"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:175
+msgid "Execute"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:176
+msgid "Execute the R script"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:184
+msgid "Clear"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:185
+msgid "Erase the content of the editor"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:193
+msgid "Open"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:194
+msgid "Load a file in this editor"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:200
+msgid "Save"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:201
+msgid "Save the editor content into a file"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:208
+msgid "Search.."
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:209
+msgid "Search text in the document"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:223
+msgid "Do you want to clear the contents of the console?"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:224
+msgid "Clear script"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:237
+msgid "Save script"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:238
+msgid "R script (*.r)"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:244
+#: org/orbisgis/r/console/RConsolePanel.java:272
+msgid "Cannot write the script."
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:246
+msgid "The file has been saved."
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:256
+msgid "Open script"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:257
+msgid "R Script (*.R)"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:264
+msgid "Do you want to clear all before loading the file ?"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:265
+msgid "Open file"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:355
+msgid "Execute R script"
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:368
+msgid "Renjin Script Engine not found on the classpath."
+msgstr ""
+
+#: org/orbisgis/r/console/RConsolePanel.java:372
+msgid "Cannot execute the script"
+msgstr ""

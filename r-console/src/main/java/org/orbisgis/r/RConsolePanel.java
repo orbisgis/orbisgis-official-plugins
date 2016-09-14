@@ -26,7 +26,7 @@
  * or contact directly:
  * info_at_ orbisgis.org
  */
-package org.orbisgis.r.console;
+package org.orbisgis.r;
 
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -46,8 +46,7 @@ import org.apache.commons.io.FileUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
-import org.orbisgis.r.console.icons.RIcon;
-import org.orbisgis.sif.CommentUtil;
+import org.orbisgis.r.icons.RIcon;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
@@ -56,9 +55,12 @@ import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
 import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.renjin.script.RenjinScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
@@ -69,8 +71,8 @@ import org.xnap.commons.i18n.I18nFactory;
  *
  * @author Erwan Bocher
  */
-@Component(immediate = true)
-public class RConsolePanel extends JPanel implements DockingPanel {
+@Component(service = EditorDockable.class)
+public class RConsolePanel extends JPanel implements EditorDockable {
 
     public static final String EDITOR_NAME = "R";
     private static final I18n I18N = I18nFactory.getI18n(RConsolePanel.class);
@@ -91,7 +93,7 @@ public class RConsolePanel extends JPanel implements DockingPanel {
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
 
-    
+
     @Activate
     public void activate(){
         setLayout(new BorderLayout());
@@ -339,6 +341,21 @@ public class RConsolePanel extends JPanel implements DockingPanel {
         findReplaceDialog.setVisible(true);
     }
 
+    @Override
+    public boolean match(EditableElement editableElement) {
+        return false;
+    }
+
+    @Override
+    public EditableElement getEditableElement() {
+        return null;
+    }
+
+    @Override
+    public void setEditableElement(EditableElement editableElement) {
+
+    }
+
     /**
      * Execute the provided script in R
      */
@@ -362,6 +379,7 @@ public class RConsolePanel extends JPanel implements DockingPanel {
                 ScriptEngine engine = manager.getEngineByName("Renjin");
                 // check if the engine has loaded correctly:
                 if (engine == null) {
+                    engine = new RenjinScriptEngineFactory().getScriptEngine();
                     LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
                 }
                 engine.eval(script);
