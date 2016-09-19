@@ -37,8 +37,6 @@ import java.io.IOException;
 import java.util.Arrays;
 import java.util.concurrent.ExecutorService;
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
-import javax.script.ScriptException;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
@@ -46,6 +44,7 @@ import org.apache.commons.io.FileUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
+import org.orbisgis.frameworkapi.CoreWorkspace;
 import org.orbisgis.r.icons.RIcon;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
@@ -53,13 +52,16 @@ import org.orbisgis.sif.components.SaveFilePanel;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
-import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditorDockable;
+import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.renjin.eval.Session;
+import org.renjin.eval.SessionBuilder;
+import org.renjin.primitives.packaging.PackageLoader;
 import org.renjin.script.RenjinScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -92,10 +94,21 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
-
+    private rConsolePackageLoader rConsolePackageLoader;
+    private CoreWorkspace coreWorkspace;
+    private ScriptEngine engine;
 
     @Activate
     public void activate(){
+        //R engine object
+        rConsolePackageLoader = new rConsolePackageLoader(coreWorkspace);
+        SessionBuilder sb = new SessionBuilder();
+        sb.bind(PackageLoader.class, rConsolePackageLoader);
+        Session session = sb.build();
+        engine = new RenjinScriptEngineFactory().getScriptEngine(session);
+        engine.getContext().getWriter().;
+        engine.getContext().setErrorWriter();
+
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
@@ -314,7 +327,7 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     public void onExecute() {
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            RJob rJob = new RJob(text, executeAction);
+            RJob rJob = new RJob(text, executeAction, rConsolePackageLoader);
             execute(rJob);
         }
     }
@@ -352,8 +365,14 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     }
 
     @Override
-    public void setEditableElement(EditableElement editableElement) {
+    public void setEditableElement(EditableElement editableElement) {}
 
+    @Reference
+    public void setCoreWorkspace(CoreWorkspace coreWorkspace) {
+        this.coreWorkspace = coreWorkspace;
+    }
+    public void unsetCoreWorkspace(CoreWorkspace coreWorkspace) {
+        this.coreWorkspace = null;
     }
 
     /**
@@ -363,10 +382,13 @@ public class RConsolePanel extends JPanel implements EditorDockable {
 
         private String script;
         private Action executeAction;
+        private rConsolePackageLoader rConsolePackageLoader;
+        private BundleContext bc;
 
-        public RJob(String script, Action executeAction) {
+        public RJob(String script, Action executeAction, rConsolePackageLoader rConsolePackageLoader) {
             this.script = script;
             this.executeAction = executeAction;
+            this.rConsolePackageLoader = rConsolePackageLoader;
             setTaskName(I18N.tr("Execute R script"));
         }
 
@@ -374,16 +396,8 @@ public class RConsolePanel extends JPanel implements EditorDockable {
         protected Object doInBackground() throws Exception {
             executeAction.setEnabled(false);
             try {
-                ScriptEngineManager manager = new ScriptEngineManager();
-                // create a Renjin engine:
-                ScriptEngine engine = manager.getEngineByName("Renjin");
-                // check if the engine has loaded correctly:
-                if (engine == null) {
-                    engine = new RenjinScriptEngineFactory().getScriptEngine();
-                    LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
-                }
                 engine.eval(script);
-            } catch (RuntimeException | ScriptException e) {
+            } catch (Exception e) {
                 LOGGER.error(I18N.tr("Cannot execute the script"), e);
             } finally {
                 executeAction.setEnabled(true);
