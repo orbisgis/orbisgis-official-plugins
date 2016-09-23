@@ -28,23 +28,10 @@
  */
 package org.orbisgis.r;
 
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.EventHandler;
-import java.io.IOException;
-import java.util.Arrays;
-import java.util.concurrent.ExecutorService;
-import javax.script.ScriptEngine;
-import javax.swing.*;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
-import org.orbisgis.frameworkapi.CoreWorkspace;
 import org.orbisgis.r.icons.RIcon;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
@@ -52,29 +39,48 @@ import org.orbisgis.sif.components.SaveFilePanel;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
+import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
-import org.orbisgis.sif.edition.EditableElement;
-import org.orbisgis.sif.edition.EditorDockable;
-import org.osgi.framework.BundleContext;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.renjin.aether.AetherPackageLoader;
+import org.renjin.aether.ConsoleRepositoryListener;
+import org.renjin.aether.ConsoleTransferListener;
 import org.renjin.eval.Session;
 import org.renjin.eval.SessionBuilder;
 import org.renjin.primitives.packaging.PackageLoader;
+import org.renjin.repackaged.guava.collect.Sets;
 import org.renjin.script.RenjinScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
+import javax.script.ScriptEngine;
+import javax.script.ScriptException;
+import javax.swing.*;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
+import java.io.IOException;
+import java.io.OutputStreamWriter;
+import java.lang.reflect.Field;
+import java.util.Arrays;
+import java.util.Set;
+import java.util.concurrent.ExecutorService;
+
 /**
  * Create the R console panel
  *
  * @author Erwan Bocher
  */
-@Component(service = EditorDockable.class)
-public class RConsolePanel extends JPanel implements EditorDockable {
+@Component()
+public class RConsolePanel extends JPanel implements DockingPanel{
 
     public static final String EDITOR_NAME = "R";
     private static final I18n I18N = I18nFactory.getI18n(RConsolePanel.class);
@@ -94,25 +100,41 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
-    private rConsolePackageLoader rConsolePackageLoader;
-    private CoreWorkspace coreWorkspace;
     private ScriptEngine engine;
+    public static final Set<String> CORE_PACKAGES = Sets.newHashSet(/*"renjin-core", "renjin-appl", "renjin-gnur-runtime",*/
+            "datasets", "graphics", "grDevices", "hamcrest", "methods", "splines", "stats", "stats4", "utils", "grid",
+            "parallel", "tools", "tcltk", "compiler");
 
     @Activate
     public void activate(){
         //R engine object
-        rConsolePackageLoader = new rConsolePackageLoader(coreWorkspace);
-        SessionBuilder sb = new SessionBuilder();
-        sb.bind(PackageLoader.class, rConsolePackageLoader);
-        Session session = sb.build();
+        AetherPackageLoader aetherLoader = new AetherPackageLoader();
+        aetherLoader.setTransferListener(new ConsoleTransferListener());
+        aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
+        Session session = new SessionBuilder()
+                .bind(ClassLoader.class, aetherLoader.getClassLoader())
+                .bind(PackageLoader.class, aetherLoader)
+                .build();
         engine = new RenjinScriptEngineFactory().getScriptEngine(session);
-        engine.getContext().getWriter().;
-        engine.getContext().setErrorWriter();
+        engine.getContext().setWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, false)));
+        engine.getContext().setErrorWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, true)));
 
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
         init();
+
+        execute(new LoadingEngineJob(aetherLoader, executeAction, engine));
+    }
+
+    /**
+     * Workaround to remove the org.renjin R package from the Loader and reload them :
+     * As renjin is loaded by OSGI, the org.renjin packages (like stats, graphics ...) were not loaded by the
+     *  ClassLoader so they are not already loaded by the AetherPackageLoader. They need to be removed to be sure
+     * that they will be downloaded. Then download them.
+     */
+    private void workaround(AetherPackageLoader aetherLoader){
+
     }
 
     @Reference
@@ -327,11 +349,10 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     public void onExecute() {
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            RJob rJob = new RJob(text, executeAction, rConsolePackageLoader);
+            RJob rJob = new RJob(text, executeAction, engine);
             execute(rJob);
         }
     }
-    
 
     @Override
     public DockingPanelParameters getDockingParameters() {
@@ -342,7 +363,7 @@ public class RConsolePanel extends JPanel implements EditorDockable {
     public JComponent getComponent() {
         return this;
     }
-    
+
     /**
      * Open one instanceof the find replace dialog
      */
@@ -354,27 +375,6 @@ public class RConsolePanel extends JPanel implements EditorDockable {
         findReplaceDialog.setVisible(true);
     }
 
-    @Override
-    public boolean match(EditableElement editableElement) {
-        return false;
-    }
-
-    @Override
-    public EditableElement getEditableElement() {
-        return null;
-    }
-
-    @Override
-    public void setEditableElement(EditableElement editableElement) {}
-
-    @Reference
-    public void setCoreWorkspace(CoreWorkspace coreWorkspace) {
-        this.coreWorkspace = coreWorkspace;
-    }
-    public void unsetCoreWorkspace(CoreWorkspace coreWorkspace) {
-        this.coreWorkspace = null;
-    }
-
     /**
      * Execute the provided script in R
      */
@@ -382,13 +382,12 @@ public class RConsolePanel extends JPanel implements EditorDockable {
 
         private String script;
         private Action executeAction;
-        private rConsolePackageLoader rConsolePackageLoader;
-        private BundleContext bc;
+        private ScriptEngine engine;
 
-        public RJob(String script, Action executeAction, rConsolePackageLoader rConsolePackageLoader) {
+        public RJob(String script, Action executeAction, ScriptEngine engine) {
             this.script = script;
             this.executeAction = executeAction;
-            this.rConsolePackageLoader = rConsolePackageLoader;
+            this.engine = engine;
             setTaskName(I18N.tr("Execute R script"));
         }
 
@@ -402,6 +401,57 @@ public class RConsolePanel extends JPanel implements EditorDockable {
             } finally {
                 executeAction.setEnabled(true);
             }
+            return null;
+        }
+    }
+
+    private static class LoadingEngineJob extends SwingWorkerPM {
+
+        private AetherPackageLoader aetherLoader;
+        private Action executeAction;
+        private ScriptEngine engine;
+        private static final Logger LOGGER = LoggerFactory.getLogger(LoadingEngineJob.class);
+
+        public LoadingEngineJob(AetherPackageLoader aetherLoader, Action executeAction, ScriptEngine engine) {
+            this.executeAction = executeAction;
+            this.aetherLoader = aetherLoader;
+            this.engine = engine;
+            setTaskName(I18N.tr("Execute R script"));
+        }
+
+        @Override
+        protected Object doInBackground() throws Exception {
+            executeAction.setEnabled(false);
+            LOGGER.info("Starting the loading of the R core packages.");
+            try {
+                Field f = aetherLoader.getClass().getDeclaredField("loadedPackages");
+                f.setAccessible(true);
+                Set<String> loadedPackages = (Set<String>) f.get(aetherLoader);
+                loadedPackages.clear();
+                f.setAccessible(false);
+            } catch (NoSuchFieldException e) {
+                LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving won't" +
+                        " work for most of the packages.\nCause : field 'loadedPackages' not found."), e);
+                LOGGER.info("Ending the loading of the R core packages.");
+                executeAction.setEnabled(true);
+            } catch (IllegalAccessException e) {
+                LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving won't" +
+                        " work for most of the packages.\nCause : unable to get the field 'loadedPackages'."), e);
+                LOGGER.info("Ending the loading of the R core packages.");
+                executeAction.setEnabled(true);
+            }
+            for(String pkg : CORE_PACKAGES) {
+                try {
+                    engine.eval("library(org.renjin."+pkg+")");
+                } catch (ScriptException e) {
+                    LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving " +
+                            "won't work for most of the packages.\nCause : unable to load library '" + pkg + "'."), e);
+                    LOGGER.info("Ending the loading of the R core packages.");
+                    executeAction.setEnabled(true);
+                }
+            }
+            LOGGER.info("Ending the loading of the R core packages.");
+            executeAction.setEnabled(true);
             return null;
         }
     }
