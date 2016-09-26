@@ -29,6 +29,18 @@
 package org.orbisgis.r;
 
 import org.apache.commons.io.FileUtils;
+import org.eclipse.aether.DefaultRepositorySystemSession;
+import org.eclipse.aether.RepositoryListener;
+import org.eclipse.aether.RepositorySystem;
+import org.eclipse.aether.artifact.Artifact;
+import org.eclipse.aether.artifact.DefaultArtifact;
+import org.eclipse.aether.collection.CollectRequest;
+import org.eclipse.aether.graph.Dependency;
+import org.eclipse.aether.graph.DependencyNode;
+import org.eclipse.aether.repository.RemoteRepository;
+import org.eclipse.aether.resolution.*;
+import org.eclipse.aether.transfer.TransferListener;
+import org.eclipse.aether.version.Version;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
@@ -44,13 +56,10 @@ import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.renjin.aether.AetherPackageLoader;
-import org.renjin.aether.ConsoleRepositoryListener;
-import org.renjin.aether.ConsoleTransferListener;
+import org.renjin.aether.*;
 import org.renjin.eval.Session;
 import org.renjin.eval.SessionBuilder;
-import org.renjin.primitives.packaging.PackageLoader;
-import org.renjin.repackaged.guava.collect.Sets;
+import org.renjin.primitives.packaging.*;
 import org.renjin.script.RenjinScriptEngineFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -69,9 +78,12 @@ import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.Field;
-import java.util.Arrays;
-import java.util.Set;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
+import java.io.File;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -101,9 +113,8 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
     private ScriptEngine engine;
-    public static final Set<String> CORE_PACKAGES = Sets.newHashSet(/*"renjin-core", "renjin-appl", "renjin-gnur-runtime",*/
-            "datasets", "graphics", "grDevices", "hamcrest", "methods", "splines", "stats", "stats4", "utils", "grid",
-            "parallel", "tools", "tcltk", "compiler");
+    public static final String[] CORE_PACKAGES = new String[]{"datasets", "graphics", "grDevices", "hamcrest",
+            "methods", "splines", "stats", "stats4", "utils", "grid", "parallel", "tools", "tcltk", "compiler"};
 
     @Activate
     public void activate(){
@@ -123,18 +134,17 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
         init();
-
-        execute(new LoadingEngineJob(aetherLoader, executeAction, engine));
+        rWorkaround();
     }
 
-    /**
-     * Workaround to remove the org.renjin R package from the Loader and reload them :
-     * As renjin is loaded by OSGI, the org.renjin packages (like stats, graphics ...) were not loaded by the
-     *  ClassLoader so they are not already loaded by the AetherPackageLoader. They need to be removed to be sure
-     * that they will be downloaded. Then download them.
-     */
-    private void workaround(AetherPackageLoader aetherLoader){
-
+    private void rWorkaround(){
+        for(String pkg : CORE_PACKAGES) {
+            try {
+                engine.eval("library(" + pkg + ")");
+            } catch (Exception e) {
+                LOGGER.warn("Unable to load the library '" + pkg + "'.\nCause : " + e.getMessage());
+            }
+        }
     }
 
     @Reference
@@ -397,61 +407,10 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             try {
                 engine.eval(script);
             } catch (Exception e) {
-                LOGGER.error(I18N.tr("Cannot execute the script"), e);
+                LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
             } finally {
                 executeAction.setEnabled(true);
             }
-            return null;
-        }
-    }
-
-    private static class LoadingEngineJob extends SwingWorkerPM {
-
-        private AetherPackageLoader aetherLoader;
-        private Action executeAction;
-        private ScriptEngine engine;
-        private static final Logger LOGGER = LoggerFactory.getLogger(LoadingEngineJob.class);
-
-        public LoadingEngineJob(AetherPackageLoader aetherLoader, Action executeAction, ScriptEngine engine) {
-            this.executeAction = executeAction;
-            this.aetherLoader = aetherLoader;
-            this.engine = engine;
-            setTaskName(I18N.tr("Execute R script"));
-        }
-
-        @Override
-        protected Object doInBackground() throws Exception {
-            executeAction.setEnabled(false);
-            LOGGER.info("Starting the loading of the R core packages.");
-            try {
-                Field f = aetherLoader.getClass().getDeclaredField("loadedPackages");
-                f.setAccessible(true);
-                Set<String> loadedPackages = (Set<String>) f.get(aetherLoader);
-                loadedPackages.clear();
-                f.setAccessible(false);
-            } catch (NoSuchFieldException e) {
-                LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving won't" +
-                        " work for most of the packages.\nCause : field 'loadedPackages' not found."), e);
-                LOGGER.info("Ending the loading of the R core packages.");
-                executeAction.setEnabled(true);
-            } catch (IllegalAccessException e) {
-                LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving won't" +
-                        " work for most of the packages.\nCause : unable to get the field 'loadedPackages'."), e);
-                LOGGER.info("Ending the loading of the R core packages.");
-                executeAction.setEnabled(true);
-            }
-            for(String pkg : CORE_PACKAGES) {
-                try {
-                    engine.eval("library(org.renjin."+pkg+")");
-                } catch (ScriptException e) {
-                    LOGGER.warn(I18N.tr("Unable to initialize the AetherPackageLoader correctly. The library resolving " +
-                            "won't work for most of the packages.\nCause : unable to load library '" + pkg + "'."), e);
-                    LOGGER.info("Ending the loading of the R core packages.");
-                    executeAction.setEnabled(true);
-                }
-            }
-            LOGGER.info("Ending the loading of the R core packages.");
-            executeAction.setEnabled(true);
             return null;
         }
     }
