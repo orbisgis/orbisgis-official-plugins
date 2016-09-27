@@ -11,14 +11,15 @@
                 <version>1</version>
         </parent>
         <organization>
-                <name>IRSTV CNRS-FR-2488</name>
-                <url>http://www.irstv.fr/</url>
+                <name>Lab-STICC - UMR CNRS 6285</name>
+                <url>http://www.labsticc.fr/</url>
         </organization>
         <url>http://www.orbisgis.org</url>
         <modules>
                 <module>memory</module>
                 <module>groovyConsole</module>
                 <module>mailto</module>
+                <module>r-engine</module>
                 <module>r-console</module>
         </modules>
         <properties>
@@ -29,8 +30,8 @@
         </properties>
         <repositories>
                 <repository>
-                        <id>IRSTV</id>
-                        <name>IRSTV repository</name>
+                        <id>OrbisGIS</id>
+                        <name>OrbisGIS repository</name>
                         <url>http://repo.orbisgis.org</url>
                 </repository>
                 <repository>
@@ -41,8 +42,8 @@
         </repositories>
         <pluginRepositories>
                 <pluginRepository>
-                        <id>IRSTV</id>
-                        <name>IRSTV repository</name>
+                        <id>OrbisGIS</id>
+                        <name>OrbisGIS repository</name>
                         <url>http://repo.orbisgis.org</url>
                 </pluginRepository>
         </pluginRepositories>

@@ -1,4 +1,4 @@
-package org.orbisgis.r;
+package org.orbisgis.r_engine;
 
 import org.slf4j.Logger;
 

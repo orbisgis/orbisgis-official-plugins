@@ -29,22 +29,11 @@
 package org.orbisgis.r;
 
 import org.apache.commons.io.FileUtils;
-import org.eclipse.aether.DefaultRepositorySystemSession;
-import org.eclipse.aether.RepositoryListener;
-import org.eclipse.aether.RepositorySystem;
-import org.eclipse.aether.artifact.Artifact;
-import org.eclipse.aether.artifact.DefaultArtifact;
-import org.eclipse.aether.collection.CollectRequest;
-import org.eclipse.aether.graph.Dependency;
-import org.eclipse.aether.graph.DependencyNode;
-import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.*;
-import org.eclipse.aether.transfer.TransferListener;
-import org.eclipse.aether.version.Version;
 import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
 import org.orbisgis.r.icons.RIcon;
+import org.orbisgis.r_engine.REngine;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
@@ -65,9 +54,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+import sun.font.Script;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptException;
+import javax.script.ScriptEngineManager;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
@@ -78,12 +68,7 @@ import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.OutputStreamWriter;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.util.*;
-import java.io.File;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -112,39 +97,15 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
-    private ScriptEngine engine;
-    public static final String[] CORE_PACKAGES = new String[]{"datasets", "graphics", "grDevices", "hamcrest",
-            "methods", "splines", "stats", "stats4", "utils", "grid", "parallel", "tools", "tcltk", "compiler"};
 
     @Activate
     public void activate(){
         //R engine object
-        AetherPackageLoader aetherLoader = new AetherPackageLoader();
-        aetherLoader.setTransferListener(new ConsoleTransferListener());
-        aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
-        Session session = new SessionBuilder()
-                .bind(ClassLoader.class, aetherLoader.getClassLoader())
-                .bind(PackageLoader.class, aetherLoader)
-                .build();
-        engine = new RenjinScriptEngineFactory().getScriptEngine(session);
-        engine.getContext().setWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, false)));
-        engine.getContext().setErrorWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, true)));
 
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
         init();
-        rWorkaround();
-    }
-
-    private void rWorkaround(){
-        for(String pkg : CORE_PACKAGES) {
-            try {
-                engine.eval("library(" + pkg + ")");
-            } catch (Exception e) {
-                LOGGER.warn("Unable to load the library '" + pkg + "'.\nCause : " + e.getMessage());
-            }
-        }
     }
 
     @Reference
@@ -359,7 +320,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     public void onExecute() {
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            RJob rJob = new RJob(text, executeAction, engine);
+            RJob rJob = new RJob(text, executeAction);
             execute(rJob);
         }
     }
@@ -392,25 +353,29 @@ public class RConsolePanel extends JPanel implements DockingPanel{
 
         private String script;
         private Action executeAction;
-        private ScriptEngine engine;
 
-        public RJob(String script, Action executeAction, ScriptEngine engine) {
+        public RJob(String script, Action executeAction) {
             this.script = script;
             this.executeAction = executeAction;
-            this.engine = engine;
             setTaskName(I18N.tr("Execute R script"));
         }
 
         @Override
         protected Object doInBackground() throws Exception {
             executeAction.setEnabled(false);
-            try {
-                engine.eval(script);
-            } catch (Exception e) {
-                LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
-            } finally {
-                executeAction.setEnabled(true);
+            ScriptEngine engine = REngine.getScriptEngine();
+            // check if the engine has loaded correctly:
+            if (engine == null) {
+                LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
             }
+            else {
+                try{
+                    engine.eval(script);
+                } catch (Exception e) {
+                    LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
+                }
+            }
+            executeAction.setEnabled(true);
             return null;
         }
     }
