@@ -28,8 +28,6 @@
  */
 package org.orbisgis.r_engine;
 
-import org.osgi.service.component.annotations.Activate;
-import org.osgi.service.component.annotations.Component;
 import org.renjin.aether.AetherPackageLoader;
 import org.renjin.aether.ConsoleRepositoryListener;
 import org.renjin.aether.ConsoleTransferListener;
@@ -56,20 +54,9 @@ public class REngine {
     private static final Logger LOGGER = LoggerFactory.getLogger("gui." + REngine.class);
     private static final String[] CORE_PACKAGES = new String[]{"datasets", "graphics", "grDevices", "hamcrest",
             "methods", "splines", "stats", "stats4", "utils", "grid", "parallel", "tools", "tcltk", "compiler"};
-    private static RenjinScriptEngine engine = null;
+    private RenjinScriptEngine engine = null;
 
-    /**
-     * Returns the R ScriptEngine
-     * @return The R ScriptEngine
-     */
-    public static RenjinScriptEngine getScriptEngine() {
-        if(engine == null){
-            initEngine();
-        }
-        return engine;
-    }
-
-    private static void initEngine(){
+    public REngine(){
         AetherPackageLoader aetherLoader = new AetherPackageLoader();
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
@@ -89,5 +76,13 @@ public class REngine {
                 LOGGER.warn(I18N.tr("Unable to load the library '" + pkg + "'.\nCause : " + e.getMessage()));
             }
         }
+    }
+
+    /**
+     * Returns the R ScriptEngine
+     * @return The R ScriptEngine
+     */
+    public RenjinScriptEngine getScriptEngine() {
+        return engine;
     }
 }

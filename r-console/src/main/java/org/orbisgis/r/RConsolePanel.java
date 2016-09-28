@@ -45,19 +45,15 @@ import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.renjin.aether.*;
-import org.renjin.eval.Session;
-import org.renjin.eval.SessionBuilder;
-import org.renjin.primitives.packaging.*;
-import org.renjin.script.RenjinScriptEngineFactory;
+import org.renjin.sexp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
-import sun.font.Script;
+import org.h2.jdbc.JdbcConnection;
 
 import javax.script.ScriptEngine;
-import javax.script.ScriptEngineManager;
+import javax.sql.DataSource;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
 import javax.swing.event.DocumentListener;
@@ -67,14 +63,16 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
-import java.io.OutputStreamWriter;
+import java.sql.SQLException;
 import java.util.*;
+import java.util.List;
 import java.util.concurrent.ExecutorService;
 
 /**
  * Create the R console panel
  *
  * @author Erwan Bocher
+ * @author Sylvain PALOMINOS
  */
 @Component()
 public class RConsolePanel extends JPanel implements DockingPanel{
@@ -97,11 +95,11 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
+    private Map<String, Object> variables = new HashMap<>();
+    private DataSource dataSource;
 
     @Activate
     public void activate(){
-        //R engine object
-
         setLayout(new BorderLayout());
         add(getCenterPanel(), BorderLayout.CENTER);
         add(statusMessage, BorderLayout.SOUTH);
@@ -115,6 +113,27 @@ public class RConsolePanel extends JPanel implements DockingPanel{
 
     public void unsetExecutorService(ExecutorService executorService) {
         this.executorService = null;
+    }
+
+    @Reference()
+    public void setDataSource(DataSource ds) {
+        try {
+            //Generate the R object containing the connection to pass it to the console.
+            List<SEXP> sexpList = new ArrayList<>();
+            sexpList.add(new ExternalPtr<>(ds.getConnection().unwrap(JdbcConnection.class)));
+            AttributeMap attributeMap = AttributeMap.builder()
+                    .setClass("H2GISConnection", "JDBCConnection", "DBIConnection")
+                    .setNames(new StringArrayVector("conn"))
+                    .build();
+            ListVector listVector = new ListVector(sexpList, attributeMap);
+            variables.put("con", listVector);
+        } catch (SQLException e) {
+            LOGGER.warn(I18N.tr("Unable to get the OrbisGIS JdbcConnection.\nCause : " + e.getMessage()));
+        }
+    }
+
+    public void unsetDataSource(DataSource ds) {
+        variables.remove("con");
     }
 
     private void execute(SwingWorker swingWorker) {
@@ -320,7 +339,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     public void onExecute() {
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            RJob rJob = new RJob(text, executeAction);
+            RJob rJob = new RJob(text, executeAction, variables);
             execute(rJob);
         }
     }
@@ -353,17 +372,23 @@ public class RConsolePanel extends JPanel implements DockingPanel{
 
         private String script;
         private Action executeAction;
+        private Map<String, Object> variables;
 
-        public RJob(String script, Action executeAction) {
+        public RJob(String script, Action executeAction, Map<String, Object> variables) {
             this.script = script;
             this.executeAction = executeAction;
+            this.variables = variables;
             setTaskName(I18N.tr("Execute R script"));
         }
 
         @Override
         protected Object doInBackground() throws Exception {
             executeAction.setEnabled(false);
-            ScriptEngine engine = REngine.getScriptEngine();
+            ScriptEngine engine = new REngine().getScriptEngine();
+            //give to the engine some variables
+            for(Map.Entry<String, Object> entry : variables.entrySet()) {
+                engine.put(entry.getKey(), entry.getValue());
+            }
             // check if the engine has loaded correctly:
             if (engine == null) {
                 LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
