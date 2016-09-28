@@ -29,6 +29,7 @@
 package org.orbisgis.groovy;
 
 
+
 import groovy.lang.GroovyShell;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
@@ -207,8 +208,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             scriptPanel.getPopupMenu().addSeparator();
             actions.registerContainer(scriptPanel.getPopupMenu());
             centerPanel = new RTextScrollPane(scriptPanel);
-            onUserSelectionChange();
-
+            onUserSelectionChange();            
+            
         }
         return centerPanel;
     }
@@ -502,7 +503,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 }
                 groovyShell.evaluate(script);
             } catch (Exception e) {
-                LOGGER.error(I18N.tr("Cannot execute the script"), e);
+                LOGGER.error(I18N.tr("Cannot execute the script")+"\n" + e.getLocalizedMessage());
             } finally {
                 executeAction.setEnabled(true);
                 for(SLF4JOutputStream logger : loggers) {
@@ -515,5 +516,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             }
             return null;
         }
-    }
+    }  
+    
+    
 }
