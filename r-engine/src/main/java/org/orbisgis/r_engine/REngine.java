@@ -36,12 +36,16 @@ import org.renjin.eval.SessionBuilder;
 import org.renjin.primitives.packaging.PackageLoader;
 import org.renjin.script.RenjinScriptEngine;
 import org.renjin.script.RenjinScriptEngineFactory;
+import org.renjin.sexp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import java.io.OutputStreamWriter;
+import java.sql.Connection;
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * Class managing and configuring the R engine get from Renjin.
@@ -84,5 +88,19 @@ public class REngine {
      */
     public RenjinScriptEngine getScriptEngine() {
         return engine;
+    }
+
+    /**
+     * Generate the R object containing the connection to pass it to the RenjinScripEngine.
+     * @return The R object containing the connection
+     */
+    public static ListVector getConnectionRObject(Connection connection){
+        List<SEXP> sexpList = new ArrayList<>();
+        sexpList.add(new ExternalPtr<>(connection));
+        AttributeMap attributeMap = AttributeMap.builder()
+                .setClass("JDBCConnection", "DBIConnection")
+                .setNames(new StringArrayVector("conn"))
+                .build();
+        return new ListVector(sexpList, attributeMap);
     }
 }

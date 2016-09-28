@@ -45,12 +45,10 @@ import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
-import org.renjin.sexp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
-import org.h2.jdbc.JdbcConnection;
 
 import javax.script.ScriptEngine;
 import javax.sql.DataSource;
@@ -63,9 +61,11 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
+import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.*;
-import java.util.List;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -118,15 +118,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     @Reference()
     public void setDataSource(DataSource ds) {
         try {
-            //Generate the R object containing the connection to pass it to the console.
-            List<SEXP> sexpList = new ArrayList<>();
-            sexpList.add(new ExternalPtr<>(ds.getConnection().unwrap(JdbcConnection.class)));
-            AttributeMap attributeMap = AttributeMap.builder()
-                    .setClass("H2GISConnection", "JDBCConnection", "DBIConnection")
-                    .setNames(new StringArrayVector("conn"))
-                    .build();
-            ListVector listVector = new ListVector(sexpList, attributeMap);
-            variables.put("con", listVector);
+            variables.put("con", REngine.getConnectionRObject(ds.getConnection().unwrap(Connection.class)));
         } catch (SQLException e) {
             LOGGER.warn(I18N.tr("Unable to get the OrbisGIS JdbcConnection.\nCause : " + e.getMessage()));
         }
