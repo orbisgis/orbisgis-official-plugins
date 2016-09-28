@@ -11,14 +11,16 @@
                 <version>1</version>
         </parent>
         <organization>
-            <name>LAB-STICC UMR 6285 CNRS</name>
-            <url>http://www.lab-sticc.fr/</url>
+                <name>Lab-STICC - UMR CNRS 6285</name>
+                <url>http://www.labsticc.fr/</url>
         </organization>
         <url>http://www.orbisgis.org</url>
         <modules>
                 <module>memory</module>
                 <module>groovyConsole</module>
                 <module>mailto</module>
+                <module>r-engine</module>
+                <module>r-console</module>
         </modules>
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
