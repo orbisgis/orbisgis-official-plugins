@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import org.orbisgis.sif.CommentUtil;
 
 /**
  * Create the R console panel
@@ -89,14 +90,15 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private DefaultAction clearAction;
     private DefaultAction saveAction;
     private DefaultAction findAction;
+    private DefaultAction executeSelectedAction;
     private FindReplaceDialog findReplaceDialog;
+    private DefaultAction commentAction;
     private int line = 0;
     private int character = 0;
     private static final String MESSAGEBASE = "%d | %d";
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
     private Map<String, Object> variables = new HashMap<>();
-    private DataSource dataSource;
 
     @Activate
     public void activate(){
@@ -195,6 +197,16 @@ public class RConsolePanel extends JPanel implements DockingPanel{
                 EventHandler.create(ActionListener.class, this, "onExecute"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(executeAction);
+        
+        //Execute Selected SQL
+        executeSelectedAction = new DefaultAction(RConsoleActions.A_EXECUTE_SELECTION,
+                I18N.tr("Execute selected"),
+                I18N.tr("Run selected code"),
+                RIcon.getIcon("execute_selection"),
+                EventHandler.create(ActionListener.class, this, "onExecuteSelected"),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)
+        ).setLogicalGroup("custom").setAfter(RConsoleActions.A_EXECUTE);
+        actions.addAction(executeSelectedAction);
 
         //Clear action
         clearAction = new DefaultAction(RConsoleActions.A_CLEAR,
@@ -228,6 +240,15 @@ public class RConsolePanel extends JPanel implements DockingPanel{
                 EventHandler.create(ActionListener.class, this, "openFindReplaceDialog"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)).addStroke(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(findAction);
+        
+        // Comment/Uncomment
+        commentAction = new DefaultAction(RConsoleActions.A_COMMENT,
+                I18N.tr("(Un)comment"),
+                I18N.tr("(Un)comment the selected text"),
+                null,
+                EventHandler.create(ActionListener.class, this, "onComment"),
+                KeyStroke.getKeyStroke("alt C")).setLogicalGroup("format");
+        actions.addAction(commentAction);
        
     }
 
@@ -314,14 +335,18 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         String text = scriptPanel.getText().trim();
         if (text.isEmpty()) {
             executeAction.setEnabled(false);
+            executeSelectedAction.setEnabled(false);
             clearAction.setEnabled(false);
             saveAction.setEnabled(false);
             findAction.setEnabled(false);
+            commentAction.setEnabled(false);
         } else {
             executeAction.setEnabled(true);
+            executeSelectedAction.setEnabled(true);
             clearAction.setEnabled(true);
             saveAction.setEnabled(true);
             findAction.setEnabled(true);
+            commentAction.setEnabled(true);
         }
     }
 
@@ -335,6 +360,28 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             execute(rJob);
         }
     }
+    
+    /**
+     * Execute the selected R code
+     */
+    public void onExecuteSelected() {
+        if(executeSelectedAction.isEnabled()) {
+            String selected = scriptPanel.getSelectedText();
+            if(selected!=null){
+            RJob rJob = new RJob(selected, executeSelectedAction, variables);
+            execute(rJob);
+            }
+        }
+    }
+    
+    
+    /**
+     * (Un)comment the selected text.
+     */
+    public void onComment() {
+        CommentUtil.commentOrUncommentR(scriptPanel);
+    }
+    
 
     @Override
     public DockingPanelParameters getDockingParameters() {
