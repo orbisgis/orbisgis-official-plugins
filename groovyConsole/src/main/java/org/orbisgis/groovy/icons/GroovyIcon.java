@@ -11,7 +11,7 @@ import java.awt.Image;
  */
 public class GroovyIcon {
     private static BaseIcon iconManager = new BaseIcon(LoggerFactory.getLogger(GroovyIcon.class));
-
+    
     /**
      * This is a static class
      */

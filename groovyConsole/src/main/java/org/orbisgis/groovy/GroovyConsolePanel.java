@@ -31,6 +31,7 @@ package org.orbisgis.groovy;
 
 
 import groovy.lang.GroovyShell;
+import groovy.sql.Sql;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -79,6 +80,7 @@ import org.xnap.commons.i18n.I18nFactory;
  * Create the groovy console panel
  *
  * @author Erwan Bocher
+ * @author Sylvain Palominos
  */
 @Component(service = EditorDockable.class)
 public class GroovyConsolePanel extends JPanel implements EditorDockable {
@@ -95,6 +97,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private RTextScrollPane centerPanel;
     private RSyntaxTextArea scriptPanel;
     private DefaultAction executeAction;
+    private DefaultAction executeSelectedAction;
     private DefaultAction clearAction;
     private DefaultAction saveAction;
     private DefaultAction findAction;
@@ -122,11 +125,11 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public void setDataSource(DataSource ds) {
-        variables.put("ds", ds);
+        properties.put("sql", new Sql(ds));
     }
 
     public void unsetDataSource(DataSource ds) {
-        variables.remove("ds");
+        properties.remove("sql");
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
@@ -226,8 +229,18 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 I18N.tr("Execute the groovy script"),
                 GroovyIcon.getIcon("execute"),
                 EventHandler.create(ActionListener.class, this, "onExecute"),
-                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK));
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.CTRL_DOWN_MASK)).setLogicalGroup("custom");
         actions.addAction(executeAction);
+        
+        //Execute Selected SQL
+        executeSelectedAction = new DefaultAction(GroovyConsoleActions.A_EXECUTE_SELECTION,
+                I18N.tr("Execute selected"),
+                I18N.tr("Run selected code"),
+                GroovyIcon.getIcon("execute_selection"),
+                EventHandler.create(ActionListener.class, this, "onExecuteSelected"),
+                KeyStroke.getKeyStroke(KeyEvent.VK_ENTER, InputEvent.ALT_DOWN_MASK)
+        ).setLogicalGroup("custom").setAfter(GroovyConsoleActions.A_EXECUTE);
+        actions.addAction(executeSelectedAction);
 
         //Clear action
         clearAction = new DefaultAction(GroovyConsoleActions.A_CLEAR,
@@ -364,6 +377,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         String text = scriptPanel.getText().trim();
         if (text.isEmpty()) {
             executeAction.setEnabled(false);
+            executeSelectedAction.setEnabled(false);
             clearAction.setEnabled(false);
             saveAction.setEnabled(false);
             findAction.setEnabled(false);
@@ -371,6 +385,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             blockCommentAction.setEnabled(false);
         } else {
             executeAction.setEnabled(true);
+            executeSelectedAction.setEnabled(true);
             clearAction.setEnabled(true);
             saveAction.setEnabled(true);
             findAction.setEnabled(true);
@@ -388,6 +403,20 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             GroovyJob groovyJob = new GroovyJob(text, properties, variables,
                     new  SLF4JOutputStream[] {infoLogger, errorLogger}, executeAction);
             execute(groovyJob);
+        }
+    }
+    
+     /**
+     * Execute the selected groovy code
+     */
+    public void onExecuteSelected() {
+        if(executeSelectedAction.isEnabled()) {
+            String selected = scriptPanel.getSelectedText();
+            if(selected!=null){
+            GroovyJob groovyJob = new GroovyJob(selected.trim(), properties, variables,
+                    new  SLF4JOutputStream[] {infoLogger, errorLogger}, executeAction);
+            execute(groovyJob);
+            }
         }
     }
 
@@ -516,7 +545,5 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             }
             return null;
         }
-    }  
-    
-    
+    } 
 }
