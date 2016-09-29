@@ -31,6 +31,7 @@ package org.orbisgis.groovy;
 
 
 import groovy.lang.GroovyShell;
+import groovy.sql.Sql;
 import java.awt.BorderLayout;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -122,11 +123,11 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
     public void setDataSource(DataSource ds) {
-        variables.put("ds", ds);
+        properties.put("sql", new Sql(ds));
     }
 
     public void unsetDataSource(DataSource ds) {
-        variables.remove("ds");
+        properties.remove("sql");
     }
 
     @Reference(cardinality = ReferenceCardinality.OPTIONAL)
@@ -516,7 +517,5 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             }
             return null;
         }
-    }  
-    
-    
+    } 
 }
