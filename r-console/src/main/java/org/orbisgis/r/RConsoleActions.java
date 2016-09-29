@@ -33,6 +33,7 @@ import org.orbisgis.sif.components.actions.ActionFactoryService;
 
 /**
  * @author Nicolas Fortin
+ * @author Erwan Bocher
  */
 public abstract class RConsoleActions implements ActionFactoryService<RConsolePanel> {
     // Action, MENU IDs
@@ -42,4 +43,5 @@ public abstract class RConsoleActions implements ActionFactoryService<RConsolePa
     public static final String A_SAVE = "M_SAVE";
     public static final String A_SEARCH = "M_SEARCH";
     public static final String A_COMMENT = "M_COMMENT";
+    public static final String A_EXECUTE_SELECTION = "M_EXECUTE_SELECTION";
 }
