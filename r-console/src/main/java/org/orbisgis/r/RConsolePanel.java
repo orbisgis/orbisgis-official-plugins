@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import org.orbisgis.sif.CommentUtil;
 
 /**
  * Create the R console panel
@@ -90,6 +91,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private DefaultAction saveAction;
     private DefaultAction findAction;
     private FindReplaceDialog findReplaceDialog;
+    private DefaultAction commentAction;
     private int line = 0;
     private int character = 0;
     private static final String MESSAGEBASE = "%d | %d";
@@ -228,6 +230,15 @@ public class RConsolePanel extends JPanel implements DockingPanel{
                 EventHandler.create(ActionListener.class, this, "openFindReplaceDialog"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_F, InputEvent.CTRL_DOWN_MASK)).addStroke(KeyStroke.getKeyStroke(KeyEvent.VK_H, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(findAction);
+        
+        // Comment/Uncomment
+        commentAction = new DefaultAction(RConsoleActions.A_COMMENT,
+                I18N.tr("(Un)comment"),
+                I18N.tr("(Un)comment the selected text"),
+                null,
+                EventHandler.create(ActionListener.class, this, "onComment"),
+                KeyStroke.getKeyStroke("alt C")).setLogicalGroup("format");
+        actions.addAction(commentAction);
        
     }
 
@@ -317,11 +328,13 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             clearAction.setEnabled(false);
             saveAction.setEnabled(false);
             findAction.setEnabled(false);
+            commentAction.setEnabled(false);
         } else {
             executeAction.setEnabled(true);
             clearAction.setEnabled(true);
             saveAction.setEnabled(true);
             findAction.setEnabled(true);
+            commentAction.setEnabled(true);
         }
     }
 
@@ -335,6 +348,14 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             execute(rJob);
         }
     }
+    
+    /**
+     * (Un)comment the selected text.
+     */
+    public void onComment() {
+        CommentUtil.commentOrUncommentR(scriptPanel);
+    }
+    
 
     @Override
     public DockingPanelParameters getDockingParameters() {
