@@ -39,8 +39,6 @@ import org.renjin.script.RenjinScriptEngineFactory;
 import org.renjin.sexp.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 import java.io.OutputStreamWriter;
 import java.sql.Connection;
@@ -54,17 +52,14 @@ import java.util.List;
  */
 public class REngine {
 
-    private static final I18n I18N = I18nFactory.getI18n(REngine.class);
     private static final Logger LOGGER = LoggerFactory.getLogger("gui." + REngine.class);
-    private static final String[] CORE_PACKAGES = new String[]{"datasets", "graphics", "grDevices", "hamcrest",
-            "methods", "splines", "stats", "stats4", "utils", "grid", "parallel", "tools", "tcltk", "compiler"};
     private RenjinScriptEngine engine = null;
 
     public REngine(){
         AetherPackageLoader aetherLoader = new AetherPackageLoader();
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
-        Session session = new SessionBuilder()
+        Session session = new SessionBuilder().withDefaultPackages()
                 .bind(ClassLoader.class, aetherLoader.getClassLoader())
                 .bind(PackageLoader.class, aetherLoader)
                 .build();
@@ -72,14 +67,6 @@ public class REngine {
         engine = new RenjinScriptEngineFactory().getScriptEngine(session);
         engine.getContext().setWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, false)));
         engine.getContext().setErrorWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, true)));
-
-        for (String pkg : CORE_PACKAGES) {
-            try {
-                engine.eval("library(" + pkg + ")");
-            } catch (Exception e) {
-                LOGGER.warn(I18N.tr("Unable to load the library '" + pkg + "'.\nCause : " + e.getMessage()));
-            }
-        }
     }
 
     /**
