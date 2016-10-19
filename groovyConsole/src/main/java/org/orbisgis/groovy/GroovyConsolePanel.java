@@ -525,7 +525,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             try {
                 GroovyShell groovyShell = new GroovyShell();
                 for(Map.Entry<String,Object> variable : variables.entrySet()) {
-                    groovyShell.setVariable("grv_"+variable.getKey(), variable.getValue());
+                    groovyShell.setVariable(variable.getKey(), variable.getValue());
                 }
                 for(Map.Entry<String,Object> property : properties.entrySet()) {
                     groovyShell.setProperty(property.getKey(), property.getValue());
