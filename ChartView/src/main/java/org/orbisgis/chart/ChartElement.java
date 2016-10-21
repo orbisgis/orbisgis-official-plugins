@@ -3,8 +3,13 @@ package org.orbisgis.chart;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
+import org.jfree.chart.ChartPanel;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.sif.docking.XElement;
@@ -17,6 +22,8 @@ import org.orbisgis.sif.edition.EditableElementException;
  */
 public class ChartElement extends AbstractEditableElement implements DocumentListener, DockingPanelLayout {
 
+    JFreeChart chart;
+    
     @Override
     public String getTypeId() {
         return "ChartElement";
@@ -39,8 +46,7 @@ public class ChartElement extends AbstractEditableElement implements DocumentLis
 
     @Override
     public Object getObject() throws UnsupportedOperationException {
-    //TODO : set the ChartPanel ?
-    return null;
+        return chart;
     }
 
     @Override
@@ -76,6 +82,20 @@ public class ChartElement extends AbstractEditableElement implements DocumentLis
     @Override
     public void readXML(XElement element) {
         //TODO
+    }
+    
+    /**
+     * Create a bar chart
+     * @param con
+     * @param title
+     * @param categoryAxisLabel
+     * @param valueAxisLabel
+     * @param sqlQuery
+     * @throws SQLException 
+     */
+    public void createBarChart(Connection con, String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) throws SQLException{
+        JDBCCategoryDataset dataset = new JDBCCategoryDataset(con, sqlQuery);
+        chart = org.jfree.chart.ChartFactory.createBarChart(title, categoryAxisLabel, valueAxisLabel, dataset); 
     }
     
 }

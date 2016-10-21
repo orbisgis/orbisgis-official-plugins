@@ -23,57 +23,38 @@ import org.osgi.service.component.annotations.Reference;
 @Component(service = {ChartPanelView.class}, factory = ChartPanelView.SERVICE_FACTORY_ID)
 public class ChartPanelView implements EditorDockable {
     
+    private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
     
     public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanel";       
+    private ChartPanel chartPanel;
+    private ChartElement chartElement;
     
-    
-    private Connection con;
-    
-    
-    /**
-     * Create a bar chart
-     * @param title
-     * @param categoryAxisLabel
-     * @param valueAxisLabel
-     * @param query
-     * @throws SQLException 
-     */
-    public void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String query) throws SQLException{
-        JDBCCategoryDataset dataset = new JDBCCategoryDataset(con, query);
-        JFreeChart chart = ChartFactory.createBarChart(title, categoryAxisLabel, valueAxisLabel, dataset);
-        ChartPanel chartPanel = new ChartPanel(chart);     
-        //Populate the docking view
-    }
-    
-    
-    @Reference
-    public void setDataSource(DataSource ds) throws SQLException {
-        con = ds.getConnection();
-    }
 
     @Override
     public DockingPanelParameters getDockingParameters() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return dockingPanelParameters;
     }
 
     @Override
     public JComponent getComponent() {
-        //Must return the chart panel....
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return chartPanel;
     }
 
     @Override
     public boolean match(EditableElement editableElement) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return editableElement instanceof ChartElement;
     }
 
     @Override
     public EditableElement getEditableElement() {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        return chartElement;
     }
 
     @Override
     public void setEditableElement(EditableElement editableElement) {
-        throw new UnsupportedOperationException("Not supported yet."); //To change body of generated methods, choose Tools | Templates.
+        if (editableElement instanceof ChartElement) {
+            this.chartElement = (ChartElement) editableElement;
+            chartPanel = new ChartPanel((JFreeChart) chartElement.getObject());
+        }    
     }
 }
