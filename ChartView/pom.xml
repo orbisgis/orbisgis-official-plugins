@@ -58,7 +58,7 @@
                 </executions>
                 <configuration>
                     <poDirectory>${project.build.sourceDirectory}/../resources/org/orbisgis/chartview/translation/</poDirectory>
-                    <targetBundle>org.orbisgis.groovy.Messages</targetBundle>
+                    <targetBundle>org.orbisgis.chart.Messages</targetBundle>
                     <keywords>-ktr</keywords>
                     <outputFormat>properties</outputFormat>
                 </configuration>

@@ -26,38 +26,40 @@
  * or contact directly:
  * info_at_ orbisgis.org
  */
-package org.orbisgis.chart;
+package org.orbisgis.chart.icons;
 
-import java.sql.Connection;
-import java.sql.SQLException;
-import org.orbisgis.sif.edition.EditorManager;
+import org.orbisgis.sif.icons.BaseIcon;
+import org.slf4j.LoggerFactory;
 
+import javax.swing.ImageIcon;
+import java.awt.Image;
 
-
-public class ChartFactory {
-
-    private final EditorManager editorManager;
-    private final Connection con;
-    
-    
-    public ChartFactory(Connection con, EditorManager editorManager){
-        this.con = con;
-        this.editorManager =editorManager;
-    }
-    
-    
+/**
+ * @author Erwan Bocher
+ */
+public class ChartIcon {
+    private static BaseIcon iconManager = new BaseIcon(LoggerFactory.getLogger(ChartIcon.class));
     
     /**
-     * Create a bar chart
-     * 
-     * @param title
-     * @param categoryAxisLabel
-     * @param valueAxisLabel
-     * @param sqlQuery 
+     * This is a static class
      */
-    public void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) throws SQLException{
-        ChartElement chart = new ChartElement();
-        chart.createBarChart(con, title, categoryAxisLabel, valueAxisLabel, sqlQuery);        
-        editorManager.openEditable(chart);
+    private ChartIcon() {
+    }
+
+    /**
+     * Retrieve icon awt Image by its name
+     * @param iconName The icon name, without extension. All icons are stored in the png format.
+     * @return The Image content requested, or an Image corresponding to a Missing Resource
+     */
+    public static Image getIconImage(String iconName) {
+        return iconManager.getIconImage(ChartIcon.class, iconName);
+    }
+    /**
+     * Retrieve icon by its name
+     * @param iconName The icon name, without extension. All icons are stored in the png format.
+     * @return The ImageIcon requested, or an ImageIcon corresponding to a Missing Resource
+     */
+    public static ImageIcon getIcon(String iconName) {
+        return iconManager.getIcon(ChartIcon.class, iconName);
     }
 }
