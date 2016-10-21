@@ -35,11 +35,11 @@
                 <extensions>true</extensions>
                 <configuration>
                     <instructions>
-                        <Private-Package>org.orbisgis.chartview.*</Private-Package>
+                        <Private-Package>org.orbisgis.chart.*</Private-Package>
                         <Import-Package>org.jfree.chart.*,*</Import-Package>
                         <Bundle-Vendor>LAB-STICC UMR 6285 CNRS</Bundle-Vendor>
                         <Bundle-Category>OrbisGIS, Chart</Bundle-Category>
-                        <Bundle-Icon>org/orbisgis/chartview/icon.png;size=32</Bundle-Icon>
+                        <Bundle-Icon>org/orbisgis/chart/icon.png;size=32</Bundle-Icon>
                     </instructions>
                 </configuration>
             </plugin>
@@ -57,7 +57,7 @@
                     </execution>
                 </executions>
                 <configuration>
-                    <poDirectory>${project.build.sourceDirectory}/../resources/org/orbisgis/chartview/translation/</poDirectory>
+                    <poDirectory>${project.build.sourceDirectory}/../resources/org/orbisgis/chart/translation/</poDirectory>
                     <targetBundle>org.orbisgis.chart.Messages</targetBundle>
                     <keywords>-ktr</keywords>
                     <outputFormat>properties</outputFormat>
