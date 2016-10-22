@@ -30,6 +30,8 @@ package org.orbisgis.chart;
 
 import java.util.Map;
 import javax.swing.JComponent;
+import javax.swing.JPanel;
+import net.miginfocom.swing.MigLayout;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.orbisgis.chart.icons.ChartIcon;
@@ -48,20 +50,20 @@ import org.xnap.commons.i18n.I18nFactory;
  */
 
 @Component(service = {ChartPanelView.class}, factory = ChartPanelView.SERVICE_FACTORY_ID)
-public class ChartPanelView implements EditorDockable {
+public class ChartPanelView extends JPanel implements EditorDockable {
     
-    private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
+    //private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
     private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
     
-    public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanelView";       
-    private ChartPanel chartPanel;
+    public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanelView";   
     private ChartElement chartElement;
-     public static final String EDITOR_NAME = "Chart";
+    public static final String EDITOR_NAME = "Chart";
     
     @Activate
     public void init(Map<String, Object> attributes) {
+        this.setLayout(new MigLayout("fill"));
         dockingPanelParameters.setName(EDITOR_NAME);
-        dockingPanelParameters.setTitle(I18N.tr("Chart"));
+        dockingPanelParameters.setTitle("Chart");
         dockingPanelParameters.setTitleIcon(ChartIcon.getIcon("icon"));
         dockingPanelParameters.setDefaultDockingLocation(new DockingLocation(DockingLocation.Location.STACKED_ON, ChartEditorFactory.class.getSimpleName()));
 
@@ -75,7 +77,7 @@ public class ChartPanelView implements EditorDockable {
 
     @Override
     public JComponent getComponent() {
-        return chartPanel;
+        return this;
     }
 
     @Override
@@ -92,7 +94,8 @@ public class ChartPanelView implements EditorDockable {
     public void setEditableElement(EditableElement editableElement) {
         if (editableElement instanceof ChartElement) {
             this.chartElement = (ChartElement) editableElement;
-            chartPanel = new ChartPanel((JFreeChart) chartElement.getObject());       
+            ChartPanel chartPanel = new ChartPanel((JFreeChart) chartElement.getObject());      
+            add(chartPanel, "growx, growy");
         }    
     }
 }
