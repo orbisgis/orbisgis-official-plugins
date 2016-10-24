@@ -55,15 +55,15 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     private String valueAxisLabel;
     private String sqlQuery;
     private CHART chartType;
-    private JFreeChart jfreeChart;
     private DataManager dataManager;
     
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartElement.class);
     
-    public enum CHART { BARCHART, AREACHART, BARCHART3D, BUBBLECHART, HISTOGRAM, LINECHART, LINECHART3D, PIECHART, PIECHART3D,
+    public enum CHART {BARCHART, AREACHART, BARCHART3D, BUBBLECHART, HISTOGRAM, LINECHART, LINECHART3D, PIECHART, PIECHART3D,
     SCATTERPLOT, TIMESERIESCHART, XYAREACHART, XYBARCHART, XYLINECHART}; 
 
     public ChartElement(DataManager dataManager, String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        this.dataManager=dataManager;
         this.title = title;
         this.categoryAxisLabel = categoryAxisLabel;
         this.valueAxisLabel = valueAxisLabel;
@@ -71,7 +71,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     }
 
     public ChartElement(DataManager dataManager) {
-        this.dataManager=dataManager;
+        this.dataManager=dataManager;        
     }
 
     @Override
@@ -80,21 +80,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     }
 
     @Override
-    public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
-        if (chartType != null) {
-            switch (chartType) {
-                case BARCHART:
-                    try (Connection connection = dataManager.getDataSource().getConnection()) {
-                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, getSqlQuery());
-                        jfreeChart = org.jfree.chart.ChartFactory.createBarChart(getTitle(),
-                                getCategoryAxisLabel(), getValueAxisLabel(), dataset);
-                    } catch (SQLException ex) {
-                        LOGGER.error(ex.getLocalizedMessage(), ex);
-                    }
-                    break;
-                default:
-            }
-        }
+    public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {        
 
     }
 
@@ -158,9 +144,31 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     public void setChart(CHART chart){
         this.chartType =chart;        
     }
+    
 
+    /**
+     * Return a  JFreeChart object
+     * 
+     * @return 
+     */
     public JFreeChart getJfreeChart() {
-        return jfreeChart;
-    }   
+        if (chartType != null) {
+            switch (chartType) {
+                case BARCHART:
+                    try (Connection connection = dataManager.getDataSource().getConnection()) {
+                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, getSqlQuery());
+                        return org.jfree.chart.ChartFactory.createBarChart(getTitle(),
+                                getCategoryAxisLabel(), getValueAxisLabel(), dataset);
+                    } catch (SQLException ex) {
+                        LOGGER.error(ex.getLocalizedMessage(), ex);
+                    }
+                    break;
+                default:
+            }
+        }
+        return null;
+    }
+    
+    
     
 }
