@@ -37,7 +37,6 @@ import org.osgi.framework.ServiceReference;
 public class ChartFactory {
     /**
      * Create a bar chart
-     * @param editorManager Instance of editor manager
      * @param title title
      * @param categoryAxisLabel YAxis label
      * @param valueAxisLabel XAxis label
