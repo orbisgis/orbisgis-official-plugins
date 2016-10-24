@@ -31,12 +31,6 @@ package org.orbisgis.chart;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import javax.swing.event.DocumentEvent;
-import javax.swing.event.DocumentListener;
-import org.jfree.chart.JFreeChart;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.orbisgis.commons.progress.ProgressMonitor;
 import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.sif.docking.XElement;
@@ -47,10 +41,22 @@ import org.orbisgis.sif.edition.EditableElementException;
  * Chart serialisation
  * @author Erwan Bocher
  */
-public class ChartElement extends AbstractEditableElement implements DocumentListener, DockingPanelLayout {
+public class ChartElement extends AbstractEditableElement implements DockingPanelLayout {
+    private String title;
+    private String categoryAxisLabel;
+    private String valueAxisLabel;
+    private String sqlQuery;
 
-    JFreeChart chart;
-    
+    public ChartElement(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        this.title = title;
+        this.categoryAxisLabel = categoryAxisLabel;
+        this.valueAxisLabel = valueAxisLabel;
+        this.sqlQuery = sqlQuery;
+    }
+
+    public ChartElement() {
+    }
+
     @Override
     public String getTypeId() {
         return "ChartElement";
@@ -58,71 +64,63 @@ public class ChartElement extends AbstractEditableElement implements DocumentLis
 
     @Override
     public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
-        //TODO
+        // No file to read
     }
 
     @Override
     public void save() throws UnsupportedOperationException, EditableElementException {
-        //TODO
+        // No file to save
     }
 
     @Override
     public void close(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
-        //TODO
+        // No cache data
     }
 
     @Override
     public Object getObject() throws UnsupportedOperationException {
-        return chart;
-    }
-
-    @Override
-    public void insertUpdate(DocumentEvent e) {
-        //TODO
-    }
-
-    @Override
-    public void removeUpdate(DocumentEvent e) {
-        //TODO
-    }
-
-    @Override
-    public void changedUpdate(DocumentEvent e) {
-        //TODO
+        return null;
     }
 
     @Override
     public void writeStream(DataOutputStream out) throws IOException {
-        //TODO
+
     }
 
     @Override
     public void readStream(DataInputStream in) throws IOException {
-        //TODO
+
     }
 
     @Override
     public void writeXML(XElement element) {
-        //TODO
+        element.addString("title", title);
+        element.addString("query", sqlQuery);
+        element.addString("categoryAxisLabel", categoryAxisLabel);
+        element.addString("valueAxisLabel", valueAxisLabel);
     }
 
     @Override
     public void readXML(XElement element) {
-        //TODO
+        title = element.getString("title");
+        sqlQuery = element.getString("query");
+        categoryAxisLabel = element.getString("categoryAxisLabel");
+        valueAxisLabel = element.getString("valueAxisLabel");
     }
-    
-    /**
-     * Create a bar chart
-     * @param con
-     * @param title
-     * @param categoryAxisLabel
-     * @param valueAxisLabel
-     * @param sqlQuery
-     * @throws SQLException 
-     */
-    public void createBarChart(Connection con, String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) throws SQLException{
-        JDBCCategoryDataset dataset = new JDBCCategoryDataset(con, sqlQuery);
-        chart = org.jfree.chart.ChartFactory.createBarChart(title, categoryAxisLabel, valueAxisLabel, dataset); 
+
+    public String getTitle() {
+        return title;
     }
-    
+
+    public String getCategoryAxisLabel() {
+        return categoryAxisLabel;
+    }
+
+    public String getValueAxisLabel() {
+        return valueAxisLabel;
+    }
+
+    public String getSqlQuery() {
+        return sqlQuery;
+    }
 }

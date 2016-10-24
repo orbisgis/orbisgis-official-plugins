@@ -28,36 +28,29 @@
  */
 package org.orbisgis.chart;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import org.orbisgis.sif.edition.EditorManager;
-
+import org.osgi.framework.BundleContext;
+import org.osgi.framework.FrameworkUtil;
+import org.osgi.framework.ServiceReference;
 
 
 public class ChartFactory {
-
-    private final EditorManager editorManager;
-    private final Connection con;
-    
-    
-    public ChartFactory(Connection con, EditorManager editorManager){
-        this.con = con;
-        this.editorManager =editorManager;
-    }
-    
-    
-    
     /**
      * Create a bar chart
-     * 
-     * @param title
-     * @param categoryAxisLabel
-     * @param valueAxisLabel
-     * @param sqlQuery 
+     * @param title title
+     * @param categoryAxisLabel YAxis label
+     * @param valueAxisLabel XAxis label
+     * @param sqlQuery SQL Query
      */
-    public void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) throws SQLException{
-        ChartElement chart = new ChartElement();
-        chart.createBarChart(con, title, categoryAxisLabel, valueAxisLabel, sqlQuery);        
-        editorManager.openEditable(chart);
+    public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(title, categoryAxisLabel, valueAxisLabel, sqlQuery);
+        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
+        ServiceReference<?> serviceReference = thisBundle.getServiceReference(EditorManager.class.getName());
+        // serviceReference  may be null if not available
+        if(serviceReference != null) {
+            EditorManager editorManager= (EditorManager ) thisBundle .
+                    getService(serviceReference );
+            editorManager.openEditable(chart);
+        }
     }
 }
