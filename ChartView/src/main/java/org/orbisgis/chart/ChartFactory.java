@@ -28,13 +28,18 @@
  */
 package org.orbisgis.chart;
 
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.edition.EditorManager;
 import org.osgi.framework.BundleContext;
 import org.osgi.framework.FrameworkUtil;
 import org.osgi.framework.ServiceReference;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 public class ChartFactory {
+    
+    private static final Logger LOGGER = LoggerFactory.getLogger(ChartFactory.class);
     /**
      * Create a bar chart
      * @param title title
@@ -43,8 +48,34 @@ public class ChartFactory {
      * @param sqlQuery SQL Query
      */
     public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
-        ChartElement chart = new ChartElement(title, categoryAxisLabel, valueAxisLabel, sqlQuery);
-        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
+        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();       
+        
+        ChartElement chart = new ChartElement(getDataManager(thisBundle), title, categoryAxisLabel, valueAxisLabel, sqlQuery);
+        chart.setChart(ChartElement.CHART.BARCHART);
+        ServiceReference<?> serviceReference = thisBundle.getServiceReference(EditorManager.class.getName());
+        // serviceReference  may be null if not available
+        if (serviceReference != null) {
+            EditorManager editorManager = (EditorManager) thisBundle.
+                    getService(serviceReference);
+            editorManager.openEditable(chart);
+        } else {
+            LOGGER.error("Cannot create the bar chart");
+        }
+        
+    }
+    
+    /**
+     * Creates an area chart with default settings.
+     * 
+     * @param title
+     * @param categoryAxisLabel
+     * @param valueAxisLabel
+     * @param sqlQuery 
+     */
+    public static void createAreaChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {        
+        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();        
+        ChartElement chart = new ChartElement(getDataManager(thisBundle),title, categoryAxisLabel, valueAxisLabel, sqlQuery);
+        chart.setChart(ChartElement.CHART.AREACHART);
         ServiceReference<?> serviceReference = thisBundle.getServiceReference(EditorManager.class.getName());
         // serviceReference  may be null if not available
         if(serviceReference != null) {
@@ -52,5 +83,15 @@ public class ChartFactory {
                     getService(serviceReference );
             editorManager.openEditable(chart);
         }
+    }
+    
+    public static DataManager getDataManager(BundleContext thisBundle) {
+        ServiceReference<?> serviceDataManager = thisBundle.getServiceReference(DataManager.class.getName());
+        if (serviceDataManager != null) {
+            return (DataManager) thisBundle.getService(serviceDataManager);
+        } else {
+            LOGGER.error("Cannot access to the data");
+        }
+        return null;
     }
 }

@@ -32,6 +32,7 @@ import java.util.ArrayList;
 import java.util.Dictionary;
 import java.util.Hashtable;
 import java.util.List;
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditorDockable;
@@ -54,6 +55,7 @@ public class ChartEditorFactory implements EditorFactory {
     //protected final static I18n I18N = I18nFactory.getI18n(ChartEditorFactory.class);
     private ComponentFactory componentFactory;
     private List<ComponentInstance> instanceList = new ArrayList<>();   
+    private DataManager dataManager;
     /**
      * Default constructor
      */
@@ -69,6 +71,23 @@ public class ChartEditorFactory implements EditorFactory {
     public void unsetComponentFactory(ComponentFactory componentFactory) {
         this.componentFactory = null;
     }
+    
+    
+    /**
+     * @param dataManager JDBC DataManager factory
+     */
+    @Reference
+    public void setDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+
+    /**
+     * @param dataManager JDBC DataManager factory
+     */
+    public void unsetDataManager(DataManager dataManager) {
+        this.dataManager = dataManager;
+    }
+    
 
     @Override
     public String getId() {
@@ -98,7 +117,7 @@ public class ChartEditorFactory implements EditorFactory {
 
     @Override
     public DockingPanelLayout makeEmptyLayout() {
-        return new ChartElement();
+        return new ChartElement(dataManager);
     }
 
     @Override

@@ -31,11 +31,19 @@ package org.orbisgis.chart;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
+import java.sql.Connection;
+import java.sql.SQLException;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.orbisgis.commons.progress.ProgressMonitor;
+import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.sif.docking.XElement;
 import org.orbisgis.sif.edition.AbstractEditableElement;
 import org.orbisgis.sif.edition.EditableElementException;
+import org.slf4j.LoggerFactory;
 
 /**
  * Chart serialisation
@@ -46,15 +54,24 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     private String categoryAxisLabel;
     private String valueAxisLabel;
     private String sqlQuery;
+    private CHART chartType;
+    private JFreeChart jfreeChart;
+    private DataManager dataManager;
+    
+    private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartElement.class);
+    
+    public enum CHART { BARCHART, AREACHART, BARCHART3D, BUBBLECHART, HISTOGRAM, LINECHART, LINECHART3D, PIECHART, PIECHART3D,
+    SCATTERPLOT, TIMESERIESCHART, XYAREACHART, XYBARCHART, XYLINECHART}; 
 
-    public ChartElement(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+    public ChartElement(DataManager dataManager, String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
         this.title = title;
         this.categoryAxisLabel = categoryAxisLabel;
         this.valueAxisLabel = valueAxisLabel;
         this.sqlQuery = sqlQuery;
     }
 
-    public ChartElement() {
+    public ChartElement(DataManager dataManager) {
+        this.dataManager=dataManager;
     }
 
     @Override
@@ -64,7 +81,21 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
 
     @Override
     public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
-        // No file to read
+        if (chartType != null) {
+            switch (chartType) {
+                case BARCHART:
+                    try (Connection connection = dataManager.getDataSource().getConnection()) {
+                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, getSqlQuery());
+                        jfreeChart = org.jfree.chart.ChartFactory.createBarChart(getTitle(),
+                                getCategoryAxisLabel(), getValueAxisLabel(), dataset);
+                    } catch (SQLException ex) {
+                        LOGGER.error(ex.getLocalizedMessage(), ex);
+                    }
+                    break;
+                default:
+            }
+        }
+
     }
 
     @Override
@@ -123,4 +154,13 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     public String getSqlQuery() {
         return sqlQuery;
     }
+    
+    public void setChart(CHART chart){
+        this.chartType =chart;        
+    }
+
+    public JFreeChart getJfreeChart() {
+        return jfreeChart;
+    }   
+    
 }

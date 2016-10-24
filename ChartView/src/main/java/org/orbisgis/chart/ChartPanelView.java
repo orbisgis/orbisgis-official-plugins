@@ -28,13 +28,10 @@
  */
 package org.orbisgis.chart;
 
-import java.sql.Connection;
-import java.sql.SQLException;
 import java.util.Map;
-import javax.sql.DataSource;
 import javax.swing.JComponent;
 import org.jfree.chart.ChartPanel;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
+import org.jfree.chart.JFreeChart;
 import org.orbisgis.chart.icons.ChartIcon;
 import org.orbisgis.sif.docking.DockingLocation;
 import org.orbisgis.sif.docking.DockingPanelParameters;
@@ -42,9 +39,6 @@ import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.osgi.service.component.annotations.Reference;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  *
@@ -56,13 +50,12 @@ public class ChartPanelView implements EditorDockable {
     
     //private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
     private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
-    private static final Logger LOGGER = LoggerFactory.getLogger(ChartPanelView.class);
+    
     public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanelView";   
     private ChartElement chartElement;
     public static final String EDITOR_NAME = "Chart";
     private ChartPanel chartPanel;
-    private DataSource dataSource;
-
+   
     @Activate
     public void init(Map<String, Object> attributes) {
         dockingPanelParameters.setName(EDITOR_NAME);
@@ -70,16 +63,7 @@ public class ChartPanelView implements EditorDockable {
         dockingPanelParameters.setTitleIcon(ChartIcon.getIcon("icon"));
         dockingPanelParameters.setDefaultDockingLocation(new DockingLocation(DockingLocation.Location.STACKED_ON, ChartEditorFactory.class.getSimpleName()));
         setEditableElement((ChartElement) attributes.get("editableElement"));
-    }
-
-    @Reference
-    public void setDataSource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
-    public void unsetDataSource(DataSource dataSource) {
-        this.dataSource = null;
-    }
+    }    
 
     @Override
     public DockingPanelParameters getDockingParameters() {
@@ -105,13 +89,10 @@ public class ChartPanelView implements EditorDockable {
     public void setEditableElement(EditableElement editableElement) {
         if (editableElement instanceof ChartElement) {
             ChartElement externalChartData = (ChartElement) editableElement;
-            try(Connection connection = dataSource.getConnection()) {
-                JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, externalChartData.getSqlQuery());
-                chartPanel = new ChartPanel(org.jfree.chart.ChartFactory.createBarChart(externalChartData.getTitle(),
-                        externalChartData.getCategoryAxisLabel(), externalChartData.getValueAxisLabel(), dataset));
+            JFreeChart jfreechart = externalChartData.getJfreeChart();
+            if (jfreechart != null) {
+                chartPanel = new ChartPanel(jfreechart);
                 this.chartElement = externalChartData;
-            } catch (SQLException ex) {
-                LOGGER.error(ex.getLocalizedMessage(), ex);
             }
         }
     }
