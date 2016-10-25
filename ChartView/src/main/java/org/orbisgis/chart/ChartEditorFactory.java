@@ -117,7 +117,7 @@ public class ChartEditorFactory implements EditorFactory {
 
     @Override
     public DockingPanelLayout makeEmptyLayout() {
-        return new ChartElement(dataManager);
+        return new ChartElement();
     }
 
     @Override

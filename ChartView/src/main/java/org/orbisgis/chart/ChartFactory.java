@@ -28,6 +28,11 @@
  */
 package org.orbisgis.chart;
 
+import java.sql.Connection;
+import java.sql.SQLException;
+import org.jfree.chart.JFreeChart;
+import org.jfree.data.jdbc.JDBCCategoryDataset;
+import org.jfree.data.jdbc.JDBCXYDataset;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.edition.EditorManager;
 import org.osgi.framework.BundleContext;
@@ -48,34 +53,63 @@ public class ChartFactory {
      * @param sqlQuery SQL Query
      */
     public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
-        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();       
-        
-        ChartElement chart = new ChartElement(getDataManager(thisBundle), title, categoryAxisLabel, valueAxisLabel, sqlQuery);
-        chart.setChart(ChartElement.CHART.BARCHART);
-        ServiceReference<?> serviceReference = thisBundle.getServiceReference(EditorManager.class.getName());
-        // serviceReference  may be null if not available
-        if (serviceReference != null) {
-            EditorManager editorManager = (EditorManager) thisBundle.
-                    getService(serviceReference);
-            editorManager.openEditable(chart);
-        } else {
-            LOGGER.error("Cannot create the bar chart");
+        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
+        ChartElement chart = new ChartElement(sqlQuery);
+        try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
+            JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, sqlQuery);
+            JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart(title,
+                    categoryAxisLabel, valueAxisLabel, dataset);
+            chart.setJFreeChart(jfreechart);
+            openChartElement(thisBundle, chart);
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getLocalizedMessage(), ex);
         }
-        
+
     }
     
     /**
-     * Creates an area chart with default settings.
+     * Creates a scatter plot with default settings.
      * 
      * @param title
-     * @param categoryAxisLabel
-     * @param valueAxisLabel
+     * @param xAxisLabel
+     * @param yAxisLabel
      * @param sqlQuery 
      */
-    public static void createAreaChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {        
+    public static void createScatterPlot(String title, String xAxisLabel, String yAxisLabel, String sqlQuery) {        
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();        
-        ChartElement chart = new ChartElement(getDataManager(thisBundle),title, categoryAxisLabel, valueAxisLabel, sqlQuery);
-        chart.setChart(ChartElement.CHART.AREACHART);
+        ChartElement chart = new ChartElement(sqlQuery);
+        try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
+            JDBCXYDataset dataset = new JDBCXYDataset(connection, sqlQuery);
+            JFreeChart jfreechart = org.jfree.chart.ChartFactory.createScatterPlot(title,
+                    xAxisLabel, yAxisLabel, dataset);
+            chart.setJFreeChart(jfreechart);
+            openChartElement(thisBundle, chart);
+        } catch (SQLException ex) {
+            LOGGER.error(ex.getLocalizedMessage(), ex);
+        }
+    }
+    
+    /**
+     * Get the dataManager 
+     * @param thisBundle
+     * @return 
+     */
+    public static DataManager getDataManager(BundleContext thisBundle) {
+        ServiceReference<?> serviceDataManager = thisBundle.getServiceReference(DataManager.class.getName());
+        if (serviceDataManager != null) {
+            return (DataManager) thisBundle.getService(serviceDataManager);
+        } else {
+            throw new IllegalArgumentException("Cannot access to the data");
+        }
+    }
+    
+    /**
+     * Open the chartElement
+     * 
+     * @param thisBundle
+     * @param chart 
+     */
+    public static void openChartElement(BundleContext thisBundle, ChartElement chart){
         ServiceReference<?> serviceReference = thisBundle.getServiceReference(EditorManager.class.getName());
         // serviceReference  may be null if not available
         if(serviceReference != null) {
@@ -85,13 +119,5 @@ public class ChartFactory {
         }
     }
     
-    public static DataManager getDataManager(BundleContext thisBundle) {
-        ServiceReference<?> serviceDataManager = thisBundle.getServiceReference(DataManager.class.getName());
-        if (serviceDataManager != null) {
-            return (DataManager) thisBundle.getService(serviceDataManager);
-        } else {
-            LOGGER.error("Cannot access to the data");
-        }
-        return null;
-    }
+    
 }
