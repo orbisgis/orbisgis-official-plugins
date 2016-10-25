@@ -28,17 +28,24 @@
  */
 package org.orbisgis.chart;
 
+import java.awt.event.ActionListener;
+import java.beans.EventHandler;
 import java.util.Map;
 import javax.swing.JComponent;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
 import org.orbisgis.chart.icons.ChartIcon;
+import org.orbisgis.sif.components.actions.ActionCommands;
+import org.orbisgis.sif.components.actions.ActionDockingListener;
+import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.docking.DockingLocation;
 import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
+import org.xnap.commons.i18n.I18n;
+import org.xnap.commons.i18n.I18nFactory;
 
 /**
  *
@@ -48,7 +55,7 @@ import org.osgi.service.component.annotations.Component;
 @Component(service = {ChartPanelView.class}, factory = ChartPanelView.SERVICE_FACTORY_ID)
 public class ChartPanelView implements EditorDockable {
     
-    //private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
+    private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
     private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
     
     public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanelView";   
@@ -62,6 +69,19 @@ public class ChartPanelView implements EditorDockable {
         dockingPanelParameters.setTitle("Chart");
         dockingPanelParameters.setTitleIcon(ChartIcon.getIcon("icon"));
         dockingPanelParameters.setDefaultDockingLocation(new DockingLocation(DockingLocation.Location.STACKED_ON, ChartEditorFactory.class.getSimpleName()));
+        
+        ActionCommands dockingActions = new ActionCommands();
+        dockingPanelParameters.setDockActions(dockingActions.getActions());
+        dockingActions.addPropertyChangeListener(new ActionDockingListener(dockingPanelParameters));
+        dockingActions.addAction(
+                new DefaultAction("ACTION_REFRESH",
+                        "ACTION_REFRESH",
+                        I18N.tr("Refresh the chart."),
+                        ChartIcon.getIcon("refresh"),
+                        EventHandler.create(ActionListener.class, this, "onRefreshChart"),
+                        null)
+        );
+        
         setEditableElement((ChartElement) attributes.get("editableElement"));
     }    
 
@@ -95,5 +115,12 @@ public class ChartPanelView implements EditorDockable {
                 this.chartElement = externalChartData;
             }
         }
+    }
+    
+    /**
+     * The user can refresh the chart if the data change
+     */
+    public void onRefreshChart(){
+        
     }
 }
