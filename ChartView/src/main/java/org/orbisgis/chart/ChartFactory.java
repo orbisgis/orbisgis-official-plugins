@@ -32,6 +32,7 @@ import java.sql.Connection;
 import java.sql.SQLException;
 import java.util.concurrent.ExecutorService;
 import org.jfree.chart.JFreeChart;
+import org.jfree.data.general.Dataset;
 import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.jfree.data.jdbc.JDBCXYDataset;
 import org.orbisgis.commons.progress.SwingWorkerPM;
@@ -72,12 +73,80 @@ public class ChartFactory {
      * @param sqlQuery SQL Query
      */
     public static void createBarChart3D(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
-        ChartElement chart = new ChartElement(ChartElement.CHART.BARCHART, sqlQuery, title);        
+        ChartElement chart = new ChartElement(ChartElement.CHART.BARCHART3D, sqlQuery, title);        
         JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart3D(title,
                 categoryAxisLabel, valueAxisLabel, null);
         chart.setJFreeChart(jfreechart);
         buildChartElement(chart);
-
+    }
+    
+    /**
+     * Creates an area chart with default settings.
+     * @param title title
+     * @param categoryAxisLabel YAxis label
+     * @param valueAxisLabel XAxis label
+     * @param sqlQuery SQL Query
+     */
+    public static void createAreaChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.AREACHART, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createAreaChart(title,
+                categoryAxisLabel, valueAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
+    }
+    
+     /**
+     * Creates a line chart with default settings.
+     *
+     * @param title - the chart title (null permitted).
+     * @param categoryAxisLabel - the label for the category axis (null
+     * permitted).
+     * @param valueAxisLabel - the label for the value axis (null permitted).
+     * @param sqlQuery SQL Query
+     */
+    public static void  createLineChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.LINECHART, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createLineChart(title,
+                categoryAxisLabel
+                , valueAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
+    }
+    
+    /**
+     * Creates a line chart with default settings.
+     *
+     * @param title - the chart title (null permitted).
+     * @param categoryAxisLabel - the label for the category axis (null
+     * permitted).
+     * @param valueAxisLabel - the label for the value axis (null permitted).
+     * @param sqlQuery SQL Query
+     */
+    public static void  createLineChart3D(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.LINECHART3D, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createLineChart3D(title,
+                categoryAxisLabel
+                , valueAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
+    }
+    
+    
+     /**
+     * Creates a scatter plot with default settings.
+     *
+     * @param title - the chart title (null permitted).
+     * @param xAxisLabel - a label for the X-axis (null permitted).
+     * @param yAxisLabel - a label for the Y-axis (null permitted).
+     * @param sqlQuery SQL Query
+     */
+    public static void  createScatterPlot(String title, String xAxisLabel, String yAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.SCATTERPLOT, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createScatterPlot(title,
+                xAxisLabel
+                , yAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
     }
     
     /**
@@ -96,29 +165,7 @@ public class ChartFactory {
         } else {
             loadCategoryDataset.execute();
         }  
-    }
-    
-    /**
-     * Creates a scatter plot with default settings.
-     * 
-     * @param title
-     * @param xAxisLabel
-     * @param yAxisLabel
-     * @param sqlQuery 
-     */
-    public static void createScatterPlot(String title, String xAxisLabel, String yAxisLabel, String sqlQuery) {        
-        BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();        
-        ChartElement chart = new ChartElement(ChartElement.CHART.SCATTERPLOT, sqlQuery, title);
-        try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
-            JDBCXYDataset dataset = new JDBCXYDataset(connection, sqlQuery);
-            JFreeChart jfreechart = org.jfree.chart.ChartFactory.createScatterPlot(title,
-                    xAxisLabel, yAxisLabel, dataset);
-            chart.setJFreeChart(jfreechart);
-            openChartElement(thisBundle, chart);
-        } catch (SQLException ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
-        }
-    }
+    }   
     
     /**
      * Get the dataManager 
@@ -189,17 +236,20 @@ public class ChartFactory {
                 switch (chart.getChartType()) {
                     case BARCHART:
                     case BARCHART3D:
-                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, chart.getSqlQuery());
-                        chart.getJfreeChart().getCategoryPlot().setDataset(dataset);
-                        break;
                     case AREACHART:
-                    case BUBBLECHART:
-                    case HISTOGRAM:
                     case LINECHART:
                     case LINECHART3D:
-                    case PIECHART:
-                    case PIECHART3D:
+                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, chart.getSqlQuery());
+                        chart.getJfreeChart().getCategoryPlot().setDataset(dataset);
+                        break;    
                     case SCATTERPLOT:
+                        JDBCXYDataset datasetXY = new JDBCXYDataset(connection, chart.getSqlQuery());
+                        chart.getJfreeChart().getXYPlot().setDataset(datasetXY);
+                        break;
+                    case BUBBLECHART:
+                    case HISTOGRAM: 
+                    case PIECHART:
+                    case PIECHART3D:                    
                     case TIMESERIESCHART:
                     case XYAREACHART:
                     case XYBARCHART:

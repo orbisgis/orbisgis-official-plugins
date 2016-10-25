@@ -76,12 +76,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     @Override
     public String getTypeId() {
         return "ChartElement";
-    }
-
-    @Override
-    public boolean isModified() {
-        return true;
-    }   
+    }      
     
 
     @Override
@@ -200,6 +195,6 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
      */
     public CHART getChartType() {
         return chartType;
-    }
+    }  
     
 }

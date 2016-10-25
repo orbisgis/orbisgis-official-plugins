@@ -34,8 +34,6 @@ import java.util.Map;
 import javax.swing.JComponent;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
-import org.jfree.chart.plot.CategoryPlot;
-import org.jfree.chart.plot.Plot;
 import org.orbisgis.chart.icons.ChartIcon;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.ActionDockingListener;
@@ -46,8 +44,6 @@ import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
-import org.xnap.commons.i18n.I18n;
-import org.xnap.commons.i18n.I18nFactory;
 
 /**
  *
@@ -78,13 +74,12 @@ public class ChartPanelView implements EditorDockable {
         dockingActions.addPropertyChangeListener(new ActionDockingListener(dockingPanelParameters));
         dockingActions.addAction(
                 new DefaultAction("ACTION_REFRESH",
-                        "ACTION_REFRESH",
+                        "Refresh",
                         "Refresh the chart.",
                         ChartIcon.getIcon("refresh"),
                         EventHandler.create(ActionListener.class, this, "onRefreshChart"),
                         null)
-        );
-        
+        );       
         setEditableElement((ChartElement) attributes.get("editableElement"));
     }    
 
@@ -116,7 +111,8 @@ public class ChartPanelView implements EditorDockable {
             if (jfreechart != null) {
                 sqlQuery =  externalChartData.getSqlQuery();
                 chartPanel = new ChartPanel(jfreechart);
-                this.chartElement = externalChartData;
+                this.chartElement = externalChartData;                
+                updateTitle(); 
             }
         }
     }
@@ -131,5 +127,12 @@ public class ChartPanelView implements EditorDockable {
                 ChartFactory.buildChartElement(chartElement);
             }
         }
+    }
+    
+    /**
+     * Update the label of the component
+     */
+    private void updateTitle(){
+        dockingPanelParameters.setTitle(chartElement.toString());
     }
 }
