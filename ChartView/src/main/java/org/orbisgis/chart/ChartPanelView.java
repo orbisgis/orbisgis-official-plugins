@@ -128,10 +128,7 @@ public class ChartPanelView implements EditorDockable {
         JFreeChart chart = chartPanel.getChart();
         if(chart!=null){
             if(!sqlQuery.isEmpty()){
-                Plot plot = chart.getPlot();
-                if(plot instanceof CategoryPlot){
-                    
-                }
+                ChartFactory.buildChartElement(chartElement);
             }
         }
     }

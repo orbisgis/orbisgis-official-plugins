@@ -56,8 +56,16 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     private String CHART_QUERY = "CHART_QUERY";
     private String title = "A chart element";
 
+    private CHART chartType;
+
+    public enum CHART {
+        BARCHART, AREACHART, BARCHART3D, BUBBLECHART, HISTOGRAM, LINECHART, LINECHART3D, PIECHART, PIECHART3D,
+        SCATTERPLOT, TIMESERIESCHART, XYAREACHART, XYBARCHART, XYLINECHART
+    };
+
    
-    public ChartElement(String sqlQuery, String title) {
+    public ChartElement(CHART chartType, String sqlQuery, String title) {
+        this.chartType=chartType;
         this.sqlQuery = sqlQuery;
         this.title=title;
     }
@@ -128,12 +136,9 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
                 sqlQuery = element.getString(CHART_QUERY);
             } catch (IOException | ClassNotFoundException ex) {
                 LOGGER.error("Cannot read the chart",ex);
-            }
-           
-        }
-        
-    }
-    
+            }           
+        }        
+    }    
 
     public String getSqlQuery() {
         return sqlQuery;
@@ -158,7 +163,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     }
     
     /**
-     * Convert the JFreeChart object  to byte array
+     * Convert the JFreeChart object to byte array
      * @param jFreeChart
      * @return
      * @throws IOException 
@@ -189,7 +194,12 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     public String toString() {
         return "Chart : " + title;
     }
-    
-    
+
+    /*
+    * Return the type of chart
+     */
+    public CHART getChartType() {
+        return chartType;
+    }
     
 }

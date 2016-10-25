@@ -56,20 +56,46 @@ public class ChartFactory {
      * @param sqlQuery SQL Query
      */
     public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.BARCHART, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart(title,
+                categoryAxisLabel, valueAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
+
+    }
+    
+    /**
+     * Creates a bar chart with a 3D effect. 
+     * @param title title
+     * @param categoryAxisLabel YAxis label
+     * @param valueAxisLabel XAxis label
+     * @param sqlQuery SQL Query
+     */
+    public static void createBarChart3D(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
+        ChartElement chart = new ChartElement(ChartElement.CHART.BARCHART, sqlQuery, title);        
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart3D(title,
+                categoryAxisLabel, valueAxisLabel, null);
+        chart.setJFreeChart(jfreechart);
+        buildChartElement(chart);
+
+    }
+    
+    /**
+     * Build a chart element
+     * 
+     * @param chart 
+     */
+    public static void buildChartElement(ChartElement chart) {
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
-        ChartElement chart = new ChartElement(sqlQuery, title);
+        
         ExecutorService executorService = getExecutorService(thisBundle);
-        LoadCategoryDataset loadCategoryDataset = new LoadCategoryDataset(sqlQuery, thisBundle);
+        CreateJFreeChart loadCategoryDataset = new CreateJFreeChart(chart, thisBundle);
+        
         if (executorService != null) {
             executorService.execute(loadCategoryDataset);
         } else {
             loadCategoryDataset.execute();
-        }
-        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart(title,
-                categoryAxisLabel, valueAxisLabel, loadCategoryDataset.getDataset());
-        chart.setJFreeChart(jfreechart);
-        openChartElement(thisBundle, chart);
-
+        }  
     }
     
     /**
@@ -82,7 +108,7 @@ public class ChartFactory {
      */
     public static void createScatterPlot(String title, String xAxisLabel, String yAxisLabel, String sqlQuery) {        
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();        
-        ChartElement chart = new ChartElement(sqlQuery, title);
+        ChartElement chart = new ChartElement(ChartElement.CHART.SCATTERPLOT, sqlQuery, title);
         try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
             JDBCXYDataset dataset = new JDBCXYDataset(connection, sqlQuery);
             JFreeChart jfreechart = org.jfree.chart.ChartFactory.createScatterPlot(title,
@@ -134,38 +160,59 @@ public class ChartFactory {
         if(serviceReference != null) {
             EditorManager editorManager= (EditorManager ) thisBundle .
                     getService(serviceReference );
-            editorManager.openEditable(chart);
+            if (!editorManager.getEditableElements().contains(chart)) {
+                editorManager.openEditable(chart);
+            }
         }
     }
     
     /**
-     * Load the table data into a CategoryDataset
+     * Create a JFreeChart object from a chartElement
+     *
      *
      * @author Erwan Bocher
      */
-    public static class LoadCategoryDataset extends SwingWorkerPM {
+    public static class CreateJFreeChart extends SwingWorkerPM {
 
-        private final String sqlQuery;
         private final BundleContext thisBundle;
-        private JDBCCategoryDataset dataset;
+        private final ChartElement chart;
 
-        public  LoadCategoryDataset(String sqlQuery, BundleContext thisBundle){
-            this.sqlQuery=sqlQuery;
-            this.thisBundle=thisBundle;
-            setTaskName("Preparing chart data");
+        public CreateJFreeChart(ChartElement chart, BundleContext thisBundle) {
+            this.thisBundle = thisBundle;
+            this.chart = chart;
+            setTaskName("Preparing chart...");
         }
+
         @Override
         protected Object doInBackground() throws Exception {
             try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
-                dataset = new JDBCCategoryDataset(connection, sqlQuery);
+                switch (chart.getChartType()) {
+                    case BARCHART:
+                    case BARCHART3D:
+                        JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, chart.getSqlQuery());
+                        chart.getJfreeChart().getCategoryPlot().setDataset(dataset);
+                        break;
+                    case AREACHART:
+                    case BUBBLECHART:
+                    case HISTOGRAM:
+                    case LINECHART:
+                    case LINECHART3D:
+                    case PIECHART:
+                    case PIECHART3D:
+                    case SCATTERPLOT:
+                    case TIMESERIESCHART:
+                    case XYAREACHART:
+                    case XYBARCHART:
+                    case XYLINECHART:
+                        break;
+                    default:
+                        break;
+                }
+                openChartElement(thisBundle, chart);
             } catch (SQLException ex) {
                 LOGGER.error(ex.getLocalizedMessage(), ex);
             }
             return null;
-        }
-
-        public JDBCCategoryDataset getDataset() {
-            return dataset;
         }
     }
     
