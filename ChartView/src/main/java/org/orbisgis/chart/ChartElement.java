@@ -54,10 +54,12 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     private JFreeChart jfreechart;
     private String CHART_OBJECT = "CHART_OBJECT";
     private String CHART_QUERY = "CHART_QUERY";
+    private String title = "A chart element";
 
    
-    public ChartElement(String sqlQuery) {
+    public ChartElement(String sqlQuery, String title) {
         this.sqlQuery = sqlQuery;
+        this.title=title;
     }
 
     public ChartElement() {   
@@ -182,5 +184,12 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
             return (JFreeChart) in.readObject();
         }
     }
+
+    @Override
+    public String toString() {
+        return "Chart : " + title;
+    }
+    
+    
     
 }

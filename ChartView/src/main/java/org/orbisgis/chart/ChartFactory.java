@@ -57,11 +57,11 @@ public class ChartFactory {
      */
     public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
-        ChartElement chart = new ChartElement(sqlQuery);
+        ChartElement chart = new ChartElement(sqlQuery, title);
         ExecutorService executorService = getExecutorService(thisBundle);
         LoadCategoryDataset loadCategoryDataset = new LoadCategoryDataset(sqlQuery, thisBundle);
         if (executorService != null) {
-            loadCategoryDataset.equals(executorService);
+            executorService.execute(loadCategoryDataset);
         } else {
             loadCategoryDataset.execute();
         }
@@ -82,7 +82,7 @@ public class ChartFactory {
      */
     public static void createScatterPlot(String title, String xAxisLabel, String yAxisLabel, String sqlQuery) {        
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();        
-        ChartElement chart = new ChartElement(sqlQuery);
+        ChartElement chart = new ChartElement(sqlQuery, title);
         try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
             JDBCXYDataset dataset = new JDBCXYDataset(connection, sqlQuery);
             JFreeChart jfreechart = org.jfree.chart.ChartFactory.createScatterPlot(title,
