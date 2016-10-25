@@ -30,9 +30,11 @@ package org.orbisgis.chart;
 
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.concurrent.ExecutorService;
 import org.jfree.chart.JFreeChart;
 import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.jfree.data.jdbc.JDBCXYDataset;
+import org.orbisgis.commons.progress.SwingWorkerPM;
 import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.edition.EditorManager;
 import org.osgi.framework.BundleContext;
@@ -45,6 +47,7 @@ import org.slf4j.LoggerFactory;
 public class ChartFactory {
     
     private static final Logger LOGGER = LoggerFactory.getLogger(ChartFactory.class);
+    
     /**
      * Create a bar chart
      * @param title title
@@ -55,15 +58,17 @@ public class ChartFactory {
     public static void createBarChart(String title, String categoryAxisLabel, String valueAxisLabel, String sqlQuery) {
         BundleContext thisBundle = FrameworkUtil.getBundle(ChartFactory.class).getBundleContext();
         ChartElement chart = new ChartElement(sqlQuery);
-        try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
-            JDBCCategoryDataset dataset = new JDBCCategoryDataset(connection, sqlQuery);
-            JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart(title,
-                    categoryAxisLabel, valueAxisLabel, dataset);
-            chart.setJFreeChart(jfreechart);
-            openChartElement(thisBundle, chart);
-        } catch (SQLException ex) {
-            LOGGER.error(ex.getLocalizedMessage(), ex);
+        ExecutorService executorService = getExecutorService(thisBundle);
+        LoadCategoryDataset loadCategoryDataset = new LoadCategoryDataset(sqlQuery, thisBundle);
+        if (executorService != null) {
+            loadCategoryDataset.equals(executorService);
+        } else {
+            loadCategoryDataset.execute();
         }
+        JFreeChart jfreechart = org.jfree.chart.ChartFactory.createBarChart(title,
+                categoryAxisLabel, valueAxisLabel, loadCategoryDataset.getDataset());
+        chart.setJFreeChart(jfreechart);
+        openChartElement(thisBundle, chart);
 
     }
     
@@ -104,7 +109,21 @@ public class ChartFactory {
     }
     
     /**
-     * Open the chartElement
+     * Get the ExecutorService 
+     * @param thisBundle
+     * @return 
+     */
+    public static ExecutorService getExecutorService(BundleContext thisBundle) {
+        ServiceReference<?> serviceExecutor = thisBundle.getServiceReference(ExecutorService.class.getName());
+        if (serviceExecutor != null) {
+            return (ExecutorService) thisBundle.getService(serviceExecutor);
+        } else {
+            return null;
+        }
+    }
+    
+    /**
+     * Open the {@link org.orbisgis.char.ChartElement}
      * 
      * @param thisBundle
      * @param chart 
@@ -116,6 +135,37 @@ public class ChartFactory {
             EditorManager editorManager= (EditorManager ) thisBundle .
                     getService(serviceReference );
             editorManager.openEditable(chart);
+        }
+    }
+    
+    /**
+     * Load the table data into a CategoryDataset
+     *
+     * @author Erwan Bocher
+     */
+    public static class LoadCategoryDataset extends SwingWorkerPM {
+
+        private final String sqlQuery;
+        private final BundleContext thisBundle;
+        private JDBCCategoryDataset dataset;
+
+        public  LoadCategoryDataset(String sqlQuery, BundleContext thisBundle){
+            this.sqlQuery=sqlQuery;
+            this.thisBundle=thisBundle;
+            setTaskName("Preparing chart data");
+        }
+        @Override
+        protected Object doInBackground() throws Exception {
+            try (Connection connection = getDataManager(thisBundle).getDataSource().getConnection()) {
+                dataset = new JDBCCategoryDataset(connection, sqlQuery);
+            } catch (SQLException ex) {
+                LOGGER.error(ex.getLocalizedMessage(), ex);
+            }
+            return null;
+        }
+
+        public JDBCCategoryDataset getDataset() {
+            return dataset;
         }
     }
     

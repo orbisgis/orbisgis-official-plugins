@@ -34,6 +34,8 @@ import java.util.Map;
 import javax.swing.JComponent;
 import org.jfree.chart.ChartPanel;
 import org.jfree.chart.JFreeChart;
+import org.jfree.chart.plot.CategoryPlot;
+import org.jfree.chart.plot.Plot;
 import org.orbisgis.chart.icons.ChartIcon;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.ActionDockingListener;
@@ -55,13 +57,14 @@ import org.xnap.commons.i18n.I18nFactory;
 @Component(service = {ChartPanelView.class}, factory = ChartPanelView.SERVICE_FACTORY_ID)
 public class ChartPanelView implements EditorDockable {
     
-    private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
+    //private static final I18n I18N = I18nFactory.getI18n(ChartPanelView.class);
     private DockingPanelParameters dockingPanelParameters = new DockingPanelParameters();
     
     public static final String SERVICE_FACTORY_ID = "org.orbisgis.chart.ChartPanelView";   
     private ChartElement chartElement;
     public static final String EDITOR_NAME = "Chart";
     private ChartPanel chartPanel;
+    private String sqlQuery="";
    
     @Activate
     public void init(Map<String, Object> attributes) {
@@ -76,7 +79,7 @@ public class ChartPanelView implements EditorDockable {
         dockingActions.addAction(
                 new DefaultAction("ACTION_REFRESH",
                         "ACTION_REFRESH",
-                        I18N.tr("Refresh the chart."),
+                        "Refresh the chart.",
                         ChartIcon.getIcon("refresh"),
                         EventHandler.create(ActionListener.class, this, "onRefreshChart"),
                         null)
@@ -111,6 +114,7 @@ public class ChartPanelView implements EditorDockable {
             ChartElement externalChartData = (ChartElement) editableElement;
             JFreeChart jfreechart = externalChartData.getJfreeChart();
             if (jfreechart != null) {
+                sqlQuery =  externalChartData.getSqlQuery();
                 chartPanel = new ChartPanel(jfreechart);
                 this.chartElement = externalChartData;
             }
@@ -121,6 +125,14 @@ public class ChartPanelView implements EditorDockable {
      * The user can refresh the chart if the data change
      */
     public void onRefreshChart(){
-        
+        JFreeChart chart = chartPanel.getChart();
+        if(chart!=null){
+            if(!sqlQuery.isEmpty()){
+                Plot plot = chart.getPlot();
+                if(plot instanceof CategoryPlot){
+                    
+                }
+            }
+        }
     }
 }

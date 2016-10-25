@@ -28,17 +28,15 @@
  */
 package org.orbisgis.chart;
 
+import java.io.ByteArrayInputStream;
+import java.io.ByteArrayOutputStream;
 import java.io.DataInputStream;
 import java.io.DataOutputStream;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.util.logging.Level;
-import java.util.logging.Logger;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import org.jfree.chart.JFreeChart;
-import org.jfree.data.jdbc.JDBCCategoryDataset;
 import org.orbisgis.commons.progress.ProgressMonitor;
-import org.orbisgis.corejdbc.DataManager;
 import org.orbisgis.sif.docking.DockingPanelLayout;
 import org.orbisgis.sif.docking.XElement;
 import org.orbisgis.sif.edition.AbstractEditableElement;
@@ -54,6 +52,8 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     
     private static final org.slf4j.Logger LOGGER = LoggerFactory.getLogger(ChartElement.class);
     private JFreeChart jfreechart;
+    private String CHART_OBJECT = "CHART_OBJECT";
+    private String CHART_QUERY = "CHART_QUERY";
 
    
     public ChartElement(String sqlQuery) {
@@ -69,6 +69,12 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
     }
 
     @Override
+    public boolean isModified() {
+        return true;
+    }   
+    
+
+    @Override
     public void open(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {        
 
     }
@@ -80,7 +86,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
 
     @Override
     public void close(ProgressMonitor progressMonitor) throws UnsupportedOperationException, EditableElementException {
-        // No cache data
+        // No cache data       
     }
 
     @Override
@@ -90,20 +96,40 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
 
     @Override
     public void writeStream(DataOutputStream out) throws IOException {
-
     }
 
     @Override
     public void readStream(DataInputStream in) throws IOException {
-
+        
     }
 
     @Override
     public void writeXML(XElement element) {
+        if(jfreechart!=null){
+            try { 
+                byte[] bytes = convertToBytes(jfreechart);
+                element.addByteArray(CHART_OBJECT, bytes);
+                element.addString(CHART_QUERY, getSqlQuery());
+            } catch (IOException ex) {
+                LOGGER.error("Cannot save the chart", ex);
+            }
+        
+        }
     }
 
     @Override
     public void readXML(XElement element) {
+        byte[] chartBytes = element.getByteArray(CHART_OBJECT);
+        if(chartBytes!=null){
+            try {
+                jfreechart = convertFromBytes(chartBytes);
+                sqlQuery = element.getString(CHART_QUERY);
+            } catch (IOException | ClassNotFoundException ex) {
+                LOGGER.error("Cannot read the chart",ex);
+            }
+           
+        }
+        
     }
     
 
@@ -127,6 +153,34 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
      */
     public void setJFreeChart(JFreeChart jfreechart) {
         this.jfreechart=jfreechart;
+    }
+    
+    /**
+     * Convert the JFreeChart object  to byte array
+     * @param jFreeChart
+     * @return
+     * @throws IOException 
+     */
+    private byte[] convertToBytes(JFreeChart jFreeChart) throws IOException {
+        try (ByteArrayOutputStream bos = new ByteArrayOutputStream();
+                ObjectOutputStream out = new ObjectOutputStream(bos)) {
+            out.writeObject(jFreeChart);
+            return bos.toByteArray();
+        }
+    }
+
+    /**
+     * Get the JFreeChart object
+     * @param bytes
+     * @return
+     * @throws IOException
+     * @throws ClassNotFoundException 
+     */
+    private JFreeChart convertFromBytes(byte[] bytes) throws IOException, ClassNotFoundException {
+        try (ByteArrayInputStream bis = new ByteArrayInputStream(bytes);
+                ObjectInputStream in = new ObjectInputStream(bis)) {
+            return (JFreeChart) in.readObject();
+        }
     }
     
 }
