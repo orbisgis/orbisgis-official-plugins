@@ -189,7 +189,7 @@ public class ChartElement extends AbstractEditableElement implements DockingPane
 
     @Override
     public String toString() {
-        return "Chart : " + title;
+        return I18N.tr("Chart: {0}", title);
     }
 
     /*
