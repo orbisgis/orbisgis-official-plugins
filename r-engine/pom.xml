@@ -57,26 +57,6 @@
                     </instructions>
                 </configuration>
             </plugin>
-            <plugin>
-                <groupId>com.googlecode.gettext-commons</groupId>
-                <version>${gettext-maven-plugin-version}</version>
-                <artifactId>gettext-maven-plugin</artifactId>
-                <executions>
-                    <execution>
-                        <id>convert-po-class</id>
-                        <phase>compile</phase>
-                        <goals>
-                            <goal>dist</goal>
-                        </goals>
-                    </execution>
-                </executions>
-                <configuration>
-                    <poDirectory>${project.build.sourceDirectory}/../resources/org/orbisgis/r_engine/translation/</poDirectory>
-                    <targetBundle>org.orbisgis.r_engine.Messages</targetBundle>
-                    <keywords>-ktr</keywords>
-                    <outputFormat>properties</outputFormat>
-                </configuration>
-            </plugin>
         </plugins>
     </build>
     <properties>
