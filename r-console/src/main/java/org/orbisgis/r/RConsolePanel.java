@@ -413,6 +413,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         private String script;
         private Action executeAction;
         private Map<String, Object> variables;
+        private long startScript;
 
         public RJob(String script, Action executeAction, Map<String, Object> variables) {
             this.script = script;
@@ -435,15 +436,22 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             }
             else {
                 try{
-                    long startScript = System.currentTimeMillis();
+                    startScript = System.currentTimeMillis();
                     engine.eval(script);
-                        LOGGER.info(I18N.tr("Script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
-                } catch (ScriptException e) {
-                    LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
+                      } catch (ScriptException e) {
+                    LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));
                 }
             }
             executeAction.setEnabled(true);
             return null;
         }
+
+        @Override
+        protected void done() {
+            super.done();
+            LOGGER.info(I18N.tr("R script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));              
+        }
+        
+        
     }
 }
