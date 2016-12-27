@@ -437,7 +437,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
                 try{
                     long startScript = System.currentTimeMillis();
                     engine.eval(script);
-                    LOGGER.info(I18N.tr("Script executed in seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
+                        LOGGER.info(I18N.tr("Script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
                 } catch (ScriptException e) {
                     LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
                 }
