@@ -67,6 +67,7 @@ import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
+import javax.script.ScriptException;
 import org.orbisgis.sif.CommentUtil;
 
 /**
@@ -420,6 +421,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         private Action executeAction;
         private Map<String, Object> variables;
         private ScriptEngine engine;
+        private long startScript;
 
         public RJob(String script, Action executeAction, Map<String, Object> variables, ScriptEngine engine) {
             this.script = script;
@@ -442,13 +444,22 @@ public class RConsolePanel extends JPanel implements DockingPanel{
             }
             else {
                 try{
+                    startScript = System.currentTimeMillis();
                     engine.eval(script);
-                } catch (Exception e) {
-                    LOGGER.error(I18N.tr("Cannot execute the script.\nCause : " + e.getMessage()));
+                      } catch (ScriptException e) {
+                    LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));
                 }
             }
             executeAction.setEnabled(true);
             return null;
         }
+
+        @Override
+        protected void done() {
+            super.done();
+            LOGGER.info(I18N.tr("R script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));              
+        }
+        
+        
     }
 }

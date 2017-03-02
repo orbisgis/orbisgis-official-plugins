@@ -508,6 +508,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         private Map<String, Object> variables;
         private Map<String, Object> properties;
         private Action executeAction;
+        private long startScript;
 
         public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, SLF4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
@@ -530,9 +531,10 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 for(Map.Entry<String,Object> property : properties.entrySet()) {
                     groovyShell.setProperty(property.getKey(), property.getValue());
                 }
+                startScript = System.currentTimeMillis();
                 groovyShell.evaluate(script);
             } catch (Exception e) {
-                LOGGER.error(I18N.tr("Cannot execute the script")+"\n" + e.getLocalizedMessage());
+                LOGGER.error(I18N.tr("Cannot execute the Groovy script")+"\n" + e.getLocalizedMessage());
             } finally {
                 executeAction.setEnabled(true);
                 for(SLF4JOutputStream logger : loggers) {
@@ -545,5 +547,13 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             }
             return null;
         }
+
+        @Override
+        protected void done() {
+            super.done();    
+            LOGGER.info(I18N.tr("Groovy script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
+
+        }
+        
     } 
 }
