@@ -33,7 +33,7 @@ import org.fife.ui.rsyntaxtextarea.RSyntaxTextArea;
 import org.fife.ui.rtextarea.RTextScrollPane;
 import org.orbisgis.commons.progress.SwingWorkerPM;
 import org.orbisgis.r.icons.RIcon;
-import org.orbisgis.r_engine.REngine;
+import org.orbisgis.rscriptengine.REngineFactory;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
 import org.orbisgis.sif.components.SaveFilePanel;
@@ -100,6 +100,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private JLabel statusMessage = new JLabel();
     private ExecutorService executorService;
     private Map<String, Object> variables = new HashMap<>();
+    private ScriptEngine engine = null;
 
     @Activate
     public void activate(){
@@ -121,7 +122,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     @Reference()
     public void setDataSource(DataSource ds) {
         try {
-            variables.put("con", REngine.getConnectionRObject(ds.getConnection().unwrap(Connection.class)));
+            variables.put("con", REngineFactory.getConnectionRObject(ds.getConnection().unwrap(Connection.class)));
         } catch (SQLException e) {
             LOGGER.warn(I18N.tr("Unable to get the OrbisGIS JdbcConnection.\nCause : " + e.getMessage()));
         }
@@ -357,7 +358,10 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     public void onExecute() {
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
-            RJob rJob = new RJob(text, executeAction, variables);
+            if(engine == null){
+                engine = REngineFactory.createRScriptEngine();
+            }
+            RJob rJob = new RJob(text, executeAction, variables, engine);
             execute(rJob);
         }
     }
@@ -368,8 +372,11 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     public void onExecuteSelected() {
         if(executeSelectedAction.isEnabled()) {
             String selected = scriptPanel.getSelectedText();
+            if(engine == null){
+                engine = REngineFactory.createRScriptEngine();
+            }
             if(selected!=null){
-            RJob rJob = new RJob(selected, executeSelectedAction, variables);
+            RJob rJob = new RJob(selected, executeSelectedAction, variables, engine);
             execute(rJob);
             }
         }
@@ -413,19 +420,20 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         private String script;
         private Action executeAction;
         private Map<String, Object> variables;
+        private ScriptEngine engine;
         private long startScript;
 
-        public RJob(String script, Action executeAction, Map<String, Object> variables) {
+        public RJob(String script, Action executeAction, Map<String, Object> variables, ScriptEngine engine) {
             this.script = script;
             this.executeAction = executeAction;
             this.variables = variables;
+            this.engine = engine;
             setTaskName(I18N.tr("Execute R script"));
         }
 
         @Override
         protected Object doInBackground() throws Exception {
             executeAction.setEnabled(false);
-            ScriptEngine engine = new REngine().getScriptEngine();
             //give to the engine some variables
             for(Map.Entry<String, Object> entry : variables.entrySet()) {
                 engine.put(entry.getKey(), entry.getValue());

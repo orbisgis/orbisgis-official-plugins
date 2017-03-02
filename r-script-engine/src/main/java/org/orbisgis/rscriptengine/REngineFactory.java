@@ -26,7 +26,7 @@
  * or contact directly:
  * info_at_ orbisgis.org
  */
-package org.orbisgis.r_engine;
+package org.orbisgis.rscriptengine;
 
 import org.renjin.aether.AetherPackageLoader;
 import org.renjin.aether.ConsoleRepositoryListener;
@@ -50,12 +50,15 @@ import java.util.List;
  *
  * @author Erwan Bocher
  */
-public class REngine {
+public class REngineFactory {
 
-    private static final Logger LOGGER = LoggerFactory.getLogger("gui." + REngine.class);
-    private RenjinScriptEngine engine = null;
+    private static final Logger LOGGER = LoggerFactory.getLogger("gui." + REngineFactory.class);
 
-    public REngine(){
+    /**
+     * Returns the R ScriptEngine
+     * @return The R ScriptEngine
+     */
+    public static RenjinScriptEngine createRScriptEngine() {
         AetherPackageLoader aetherLoader = new AetherPackageLoader();
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
@@ -64,16 +67,9 @@ public class REngine {
                 .bind(PackageLoader.class, aetherLoader)
                 .build();
 
-        engine = new RenjinScriptEngineFactory().getScriptEngine(session);
+        RenjinScriptEngine engine = new RenjinScriptEngineFactory().getScriptEngine(session);
         engine.getContext().setWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, false)));
         engine.getContext().setErrorWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, true)));
-    }
-
-    /**
-     * Returns the R ScriptEngine
-     * @return The R ScriptEngine
-     */
-    public RenjinScriptEngine getScriptEngine() {
         return engine;
     }
 
