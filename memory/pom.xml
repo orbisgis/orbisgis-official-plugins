@@ -9,7 +9,7 @@
         <url>http://orbisgis.org</url>
         <parent>
             <groupId>org.orbisgis</groupId>
-            <artifactId>orbisgis-view-plugins</artifactId>
+            <artifactId>orbisgis-official-plugins</artifactId>
             <version>5.1</version>
             <relativePath>../</relativePath>
         </parent>
