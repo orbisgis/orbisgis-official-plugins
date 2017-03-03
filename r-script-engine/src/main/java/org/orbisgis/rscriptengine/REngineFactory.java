@@ -6,7 +6,7 @@
  * team of the Lab-STICC laboratory <http://www.lab-sticc.fr/>.
  *
  * Copyright (C) 2007-2014 IRSTV (FR CNRS 2488)
- * Copyright (C) 2015-2016 Lab-STICC CNRS, UMR 6285.
+ * Copyright (C) 2015-2017 Lab-STICC CNRS, UMR 6285.
  * 
  * This file is part of OrbisGIS.
  * 
