@@ -4,7 +4,6 @@
     <groupId>org.orbisgis</groupId>
     <artifactId>map-composer</artifactId>
     <name>Map Composer</name>
-    <version>5.1.0</version>
     <url>http://orbisgis.org</url>
     <packaging>bundle</packaging>
     <description>OrbisGIS plugin to create cartographic documents.</description>
