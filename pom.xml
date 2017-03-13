@@ -22,6 +22,7 @@
                 <module>r-script-engine</module>
                 <module>r-console</module>
                 <module>chartView</module>
+                <module>mapComposer</module>
         </modules>
         <properties>
                 <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
