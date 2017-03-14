@@ -1,4 +1,4 @@
-### Official OrbisGIS plugins
+# Official OrbisGIS plugins
 
 
 This repository contains a set of optional and official plugins to extend OrbisGIS 5.X with new features.
