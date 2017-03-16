@@ -3,7 +3,7 @@
 ## Introduction
 
 The "Map Composer" plugin allows to create cartographic documents (usually called "a map"). Here, such a document is made of:
-* a map context: the content displayed in the map window of OrbisGIS. A map context is structured as an .ows file, which fit with the [OGC OWS-Context](http://www.opengeospatial.org/standards/owc) standard,
+* a map context: the content displayed in the map window of OrbisGIS. A map context is structured as an .ows file, which fit with a custom version of [OGC OWS-Context](http://www.opengeospatial.org/standards/owc) standard, available [HERE](https://github.com/orbisgis/ogc-custom-jaxb/tree/master/src/main/resources/owc),
 * additionnal elements such as title, scale, orientation, ...
 
 ## Install
@@ -105,6 +105,11 @@ Press "OK" to finish.
 ### Fill the document
 
 Then, you can fill the cartographic document with the map context (the map you have in OrbisGIS) and other elements such as title, scale, ...
+
+To add an element, follow these steps:
+1. click on the icon,
+2. in the new panel, configure your element and click on "OK",
+3. with the mouse, draw a rectangle which will correspond to the element's extent.
 
 ![Fill the map](img/mapcomposer_map.png)
 
