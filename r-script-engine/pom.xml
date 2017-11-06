@@ -61,7 +61,7 @@
     </build>
     <properties>
         <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
-        <renjin-version>0.8.2340</renjin-version>
+        <renjin-version>0.8.2515</renjin-version>
     </properties>
     <dependencies>
         <dependency>
