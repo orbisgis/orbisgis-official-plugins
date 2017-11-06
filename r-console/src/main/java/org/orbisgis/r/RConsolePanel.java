@@ -359,7 +359,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         if (executeAction.isEnabled()) {
             String text = scriptPanel.getText().trim();
             if(engine == null){
-                engine = REngineFactory.createRScriptEngine();
+                engine = REngineFactory.createRScriptEngine();      
             }
             RJob rJob = new RJob(text, executeAction, variables, engine);
             execute(rJob);
@@ -443,14 +443,15 @@ public class RConsolePanel extends JPanel implements DockingPanel{
                 LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
             }
             else {
-                try{
+                try {
                     startScript = System.currentTimeMillis();
                     engine.eval(script);
-                      } catch (ScriptException e) {
-                    LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));
+                } catch (Exception e) {
+                    LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));                
+                } finally {
+                  executeAction.setEnabled(true); 
                 }
             }
-            executeAction.setEnabled(true);
             return null;
         }
 
