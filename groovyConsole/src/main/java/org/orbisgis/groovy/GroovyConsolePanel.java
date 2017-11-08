@@ -32,21 +32,6 @@ package org.orbisgis.groovy;
 
 import groovy.lang.GroovyShell;
 import groovy.sql.Sql;
-import java.awt.BorderLayout;
-import java.awt.event.ActionListener;
-import java.awt.event.InputEvent;
-import java.awt.event.KeyEvent;
-import java.beans.EventHandler;
-import java.io.IOException;
-import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.concurrent.ExecutorService;
-import javax.sql.DataSource;
-import javax.swing.*;
-import javax.swing.event.CaretListener;
-import javax.swing.event.DocumentListener;
 import org.apache.commons.io.FileUtils;
 import org.fife.rsta.ac.LanguageSupportFactory;
 import org.fife.rsta.ac.groovy.GroovyLanguageSupport;
@@ -75,6 +60,22 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
+
+import javax.sql.DataSource;
+import javax.swing.*;
+import javax.swing.event.CaretListener;
+import javax.swing.event.DocumentListener;
+import java.awt.*;
+import java.awt.event.ActionListener;
+import java.awt.event.InputEvent;
+import java.awt.event.KeyEvent;
+import java.beans.EventHandler;
+import java.io.IOException;
+import java.io.PrintStream;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.ExecutorService;
 
 /**
  * Create the groovy console panel
@@ -501,7 +502,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     /**
      * Execute the provided script in groovy
      */
-    private static class GroovyJob extends SwingWorkerPM {
+    public static class GroovyJob extends SwingWorkerPM {
 
         private String script;
         private SLF4JOutputStream[] loggers;
@@ -509,6 +510,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         private Map<String, Object> properties;
         private Action executeAction;
         private long startScript;
+        private Thread thread;
 
         public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, SLF4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
@@ -532,6 +534,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                     groovyShell.setProperty(property.getKey(), property.getValue());
                 }
                 startScript = System.currentTimeMillis();
+                thread = Thread.currentThread();
                 groovyShell.evaluate(script);
             } catch (Exception e) {
                 LOGGER.error(I18N.tr("Cannot execute the Groovy script")+"\n" + e.getLocalizedMessage());
@@ -550,7 +553,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
         @Override
         protected void done() {
-            super.done();    
+            super.done();
+            thread.interrupt();
             LOGGER.info(I18N.tr("Groovy script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
 
         }
