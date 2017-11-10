@@ -28,8 +28,6 @@
  */
 package org.orbisgis.groovy;
 
-
-
 import groovy.lang.GroovyShell;
 import groovy.sql.Sql;
 import org.apache.commons.io.FileUtils;
@@ -72,9 +70,7 @@ import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.io.IOException;
 import java.io.PrintStream;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 import java.util.concurrent.ExecutorService;
 
 /**
@@ -511,6 +507,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         private Action executeAction;
         private long startScript;
         private Thread thread;
+        private CancelClosure closure;
 
         public GroovyJob(String script,Map<String, Object> properties, Map<String, Object> variables, SLF4JOutputStream[] loggers, Action executeAction) {
             this.script = script;
@@ -518,6 +515,12 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             this.variables = variables;
             this.properties = properties;
             this.executeAction = executeAction;
+            this.closure = new CancelClosure(this);
+            //Try to set the cancel closure with the groovy Sql object if found.
+            Sql sql = (Sql)properties.get("sql");
+            if(sql != null) {
+                sql.withStatement(closure);
+            }
             setTaskName(I18N.tr("Execute Groovy script"));
         }
 
@@ -554,7 +557,15 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         @Override
         protected void done() {
             super.done();
-            thread.interrupt();
+            //Try to cancel a running sql statement
+            if(closure != null){
+                closure.cancel();
+            }
+            //If there is no statement to close or if the closed statements was not running, stop the groovy thread.
+            //It avoids to stop the groovy thread while it is cancelling a sql statement and lock the SYS database table.
+            if(closure == null || !closure.wasRunningStatement()) {
+                thread.interrupt();
+            }
             LOGGER.info(I18N.tr("Groovy script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
 
         }
