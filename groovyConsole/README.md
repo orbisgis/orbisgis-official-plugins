@@ -79,7 +79,7 @@ How to create a layer based on a SQL query ?
 ```groovy
 import org.orbisgis.coremap.layerModel.ILayer;
 sql.execute "Create table test as select * from BATI_INDIFFERENCIE limit 2"
-ILayer layer = gmc.createLayer("test");
+ILayer layer = mc.createLayer("test");
 mc.getLayerModel().addLayer(layer);
 ```
 
