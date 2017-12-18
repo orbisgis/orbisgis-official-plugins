@@ -38,7 +38,7 @@
                         <Private-Package>org.orbisgis.chart.*</Private-Package>
                         <Import-Package>org.jfree.chart.*,*</Import-Package>
                         <Bundle-Vendor>LAB-STICC UMR 6285 CNRS</Bundle-Vendor>
-                        <Bundle-Category>OrbisGIS, Chart</Bundle-Category>
+                        <Bundle-Category>OrbisGIS, Chart, 5.1</Bundle-Category>
                         <Bundle-Icon>org/orbisgis/chart/icon.png;size=32</Bundle-Icon>
                     </instructions>
                 </configuration>

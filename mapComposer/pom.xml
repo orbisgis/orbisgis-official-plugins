@@ -36,7 +36,7 @@
                 <configuration>
                     <instructions>
                         <Private-Package>org.orbisgis.mapcomposer.*</Private-Package>
-                        <Bundle-Category>orbisgis</Bundle-Category>
+                        <Bundle-Category>orbisgis, 5.1</Bundle-Category>
                         <Bundle-Icon>org/orbisgis/mapcomposer/view/utils/map_composer.png</Bundle-Icon>
                         <Embed-Dependency>docking-frames-ext-toolbar-common;scope=compile;inline=true,
                             docking-frames-ext-toolbar;scope=compile;inline=true,
