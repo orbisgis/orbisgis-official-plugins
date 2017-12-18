@@ -37,6 +37,7 @@
                     <instructions>
                         <Bundle-Vendor>LabSTICC - CNRS, UMR 6285.</Bundle-Vendor>
                         <Bundle-Icon>org/orbisgis/r_engine/icon.png;size=32</Bundle-Icon>
+                        <OrbisGIS-Version>5.1</OrbisGIS-Version>
                         <Import-Package>
                             org.renjin.compiler,
                             org.renjin.datasets,
