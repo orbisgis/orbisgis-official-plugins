@@ -39,7 +39,8 @@
                                                 <Private-Package>org.orbisgis.memory.*</Private-Package>
                                                 <Bundle-Vendor>LAB-STICC UMR 6285 CNRS</Bundle-Vendor>
                                                 <Bundle-Icon>org/orbisgis/memory/icon.png;size=32</Bundle-Icon>
-                                                <Bundle-Category>OrbisGIS, System, 5.1</Bundle-Category>
+                                                <Bundle-Category>OrbisGIS, System</Bundle-Category>
+                                                <OrbisGIS-Version>5.1</OrbisGIS-Version>
                                         </instructions>
                                 </configuration>
                         </plugin>

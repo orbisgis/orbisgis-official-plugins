@@ -37,7 +37,8 @@
                     <instructions>
                         <Private-Package>org.orbisgis.r.*</Private-Package>
                         <Bundle-Vendor>LabSTICC - CNRS, UMR 6285.</Bundle-Vendor>
-                        <Bundle-Category>OrbisGIS, Console, Language, 5.1</Bundle-Category>
+                        <Bundle-Category>OrbisGIS, Console, Language</Bundle-Category>
+                        <OrbisGIS-Version>5.1</OrbisGIS-Version>
                         <Bundle-Icon>org/orbisgis/r/icon.png;size=32</Bundle-Icon>
                     </instructions>
                 </configuration>
