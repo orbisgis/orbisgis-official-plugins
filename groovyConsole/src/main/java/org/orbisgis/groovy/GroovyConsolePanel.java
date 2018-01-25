@@ -322,6 +322,8 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         if (UIFactory.showDialog(outfilePanel)) {
             try {
                 FileUtils.writeLines(outfilePanel.getSelectedFile(), Arrays.asList(scriptPanel.getText()));
+                groovyElement.setDocumentPath(outfilePanel.getSelectedFile());
+                groovyElement.setModified(false);
             } catch (IOException e1) {
                 LOGGER.error(I18N.tr("Cannot write the script."), e1);
             }
@@ -456,15 +458,19 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             groovyElement.setDocument(scriptPanel);
             groovyElement.addPropertyChangeListener(GroovyElement.PROP_DOCUMENT_PATH,
                     EventHandler.create(PropertyChangeListener.class, this , "onPathChanged"));
-            if(!groovyElement.getDocumentPathString().isEmpty()) {
-                getDockingParameters().setTitle(groovyElement.getDocumentPath().getName());
-            }
+            onPathChanged();
             LoadScript loadScript = new LoadScript(groovyElement);
             if(executorService != null) {
                 executorService.execute(loadScript);
             } else {
                 loadScript.execute();
             }
+        }
+    }
+
+    public void onPathChanged() {
+        if(!groovyElement.getDocumentPathString().isEmpty()) {
+            getDockingParameters().setTitle(groovyElement.getDocumentPath().getName());
         }
     }
 
