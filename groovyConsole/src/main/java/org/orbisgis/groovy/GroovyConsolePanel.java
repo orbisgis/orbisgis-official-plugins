@@ -7,6 +7,7 @@
  * team of the IRSTV Institute <http://www.irstv.fr/> CNRS FR 2488.
  * 
  * Copyright (C) 2007-2012 IRSTV (FR CNRS 2488)
+ * Copyright (C) 2015-2018 Lab-STICC CNRS, UMR 6285.
  * 
  * This file is part of OrbisGIS.
  * 
@@ -49,6 +50,7 @@ import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
 import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.Editor;
 import org.orbisgis.sif.edition.EditorDockable;
 import org.orbisgis.sif.edition.EditorManager;
 import org.osgi.service.component.annotations.Component;
@@ -68,6 +70,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
@@ -109,6 +112,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private Map<String, Object> variables = new HashMap<String, Object>();
     private Map<String, Object> properties = new HashMap<String, Object>();
     private ExecutorService executorService;
+    private GroovyElement groovyElement;
 
     /**
      * Create the groovy console panel
@@ -174,6 +178,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
         parameters.setTitle(I18N.tr("Groovy"));
         parameters.setTitleIcon(new ImageIcon(GroovyConsolePanel.class.getResource("icon.png")));
         parameters.setDockActions(getActions().getActions());
+        this.setEditableElement(new GroovyElement());
     }
 
     /**
@@ -441,13 +446,25 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
     @Override
     public EditableElement getEditableElement() {
-        return null;
+        return groovyElement;
     }
 
     @Override
     public void setEditableElement(EditableElement editableElement) {
-        if(editableElement instanceof MapElement) {
-            setMapContext(((MapElement) editableElement).getMapContext());
+        if(editableElement instanceof GroovyElement) {
+            this.groovyElement = (GroovyElement) editableElement;
+            groovyElement.setDocument(scriptPanel);
+            groovyElement.addPropertyChangeListener(GroovyElement.PROP_DOCUMENT_PATH,
+                    EventHandler.create(PropertyChangeListener.class, this , "onPathChanged"));
+            if(!groovyElement.getDocumentPathString().isEmpty()) {
+                getDockingParameters().setTitle(groovyElement.getDocumentPath().getName());
+            }
+            LoadScript loadScript = new LoadScript(groovyElement);
+            if(executorService != null) {
+                executorService.execute(loadScript);
+            } else {
+                loadScript.execute();
+            }
         }
     }
 
