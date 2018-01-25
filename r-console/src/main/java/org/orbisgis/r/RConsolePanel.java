@@ -42,6 +42,8 @@ import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
 import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
+import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
@@ -60,6 +62,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
+import java.beans.PropertyChangeListener;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -76,8 +79,8 @@ import org.orbisgis.sif.CommentUtil;
  * @author Erwan Bocher
  * @author Sylvain PALOMINOS
  */
-@Component()
-public class RConsolePanel extends JPanel implements DockingPanel{
+@Component(service = EditorDockable.class)
+public class RConsolePanel extends JPanel implements EditorDockable{
 
     public static final String EDITOR_NAME = "R";
     private static final I18n I18N = I18nFactory.getI18n(RConsolePanel.class);
@@ -101,6 +104,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
     private ExecutorService executorService;
     private Map<String, Object> variables = new HashMap<>();
     private ScriptEngine engine = null;
+    private RElement rElement;
 
     @Activate
     public void activate(){
@@ -149,6 +153,7 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         parameters.setTitle(I18N.tr("R"));
         parameters.setTitleIcon(new ImageIcon(RConsolePanel.class.getResource("icon.png")));
         parameters.setDockActions(getActions().getActions());
+        this.setEditableElement(new RElement());
     }
 
     /**
@@ -280,6 +285,8 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         if (UIFactory.showDialog(outfilePanel)) {
             try {
                 FileUtils.writeLines(outfilePanel.getSelectedFile(), Arrays.asList(scriptPanel.getText()));
+                rElement.setDocumentPath(outfilePanel.getSelectedFile());
+                rElement.setModified(false);
             } catch (IOException e1) {
                 LOGGER.error(I18N.tr("Cannot write the script."), e1);
             }
@@ -410,6 +417,39 @@ public class RConsolePanel extends JPanel implements DockingPanel{
         }
         findReplaceDialog.setAlwaysOnTop(true);
         findReplaceDialog.setVisible(true);
+    }
+
+    @Override
+    public boolean match(EditableElement editableElement) {
+        return false;
+    }
+
+    @Override
+    public EditableElement getEditableElement() {
+        return rElement;
+    }
+
+    @Override
+    public void setEditableElement(EditableElement editableElement) {
+        if(editableElement instanceof RElement) {
+            this.rElement = (RElement) editableElement;
+            rElement.setDocument(scriptPanel);
+            rElement.addPropertyChangeListener(RElement.PROP_DOCUMENT_PATH,
+                    EventHandler.create(PropertyChangeListener.class, this , "onPathChanged"));
+            onPathChanged();
+            LoadScript loadScript = new LoadScript(rElement);
+            if(executorService != null) {
+                executorService.execute(loadScript);
+            } else {
+                loadScript.execute();
+            }
+        }
+    }
+
+    public void onPathChanged() {
+        if(!rElement.getDocumentPathString().isEmpty()) {
+            getDockingParameters().setTitle(rElement.getDocumentPath().getName());
+        }
     }
 
     /**
