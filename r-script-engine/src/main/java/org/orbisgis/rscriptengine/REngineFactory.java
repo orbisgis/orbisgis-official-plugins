@@ -28,12 +28,12 @@
  */
 package org.orbisgis.rscriptengine;
 
+import org.eclipse.aether.repository.RemoteRepository;
 import org.renjin.aether.AetherPackageLoader;
 import org.renjin.aether.ConsoleRepositoryListener;
 import org.renjin.aether.ConsoleTransferListener;
 import org.renjin.eval.Session;
 import org.renjin.eval.SessionBuilder;
-import org.renjin.primitives.packaging.PackageLoader;
 import org.renjin.script.RenjinScriptEngine;
 import org.renjin.script.RenjinScriptEngineFactory;
 import org.renjin.sexp.*;
@@ -59,13 +59,17 @@ public class REngineFactory {
      * @return The R ScriptEngine
      */
     public static RenjinScriptEngine createRScriptEngine() {
-        AetherPackageLoader aetherLoader = new AetherPackageLoader();
+        List<RemoteRepository> repoList = AetherPackageLoader.defaultRepositories();
+        repoList.add(new RemoteRepository.Builder("renjindbi", "default", "https://nexus.bedatadriven.com/content/repositories/renjin-dbi/").build());
+        AetherPackageLoader aetherLoader = new AetherPackageLoader(AetherPackageLoader.class.getClassLoader(), repoList);
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
-        Session session = new SessionBuilder().withDefaultPackages()
-                .bind(ClassLoader.class, aetherLoader.getClassLoader())
-                .bind(PackageLoader.class, aetherLoader)
-                .build();
+
+        SessionBuilder builder = new SessionBuilder();
+        builder.withDefaultPackages();
+        builder.setClassLoader(aetherLoader.getClassLoader());
+        builder.setPackageLoader(aetherLoader);
+        Session session = builder.build();
 
         RenjinScriptEngine engine = new RenjinScriptEngineFactory().getScriptEngine(session);
         engine.getContext().setWriter(new OutputStreamWriter(new LoggingOutputStream(LOGGER, false)));
