@@ -60,8 +60,8 @@ public class REngineFactory {
      */
     public static RenjinScriptEngine createRScriptEngine() {
         List<RemoteRepository> repoList = new ArrayList<>(AetherPackageLoader.defaultRepositories());
-        RemoteRepository repo = new RemoteRepository.Builder("renjindbi", "default", "https://nexus.bedatadriven.com/content/repositories/renjin-dbi/").build();
-        repoList.add(repo);
+        repoList.add(new RemoteRepository.Builder("renjindbi", "default", "https://nexus.bedatadriven.com/content/repositories/renjin-dbi/").build());
+        repoList.add(new RemoteRepository.Builder("orbisgis", "default", "http://nexus.orbisgis.org/content/repositories/osgi-maven/").build());
         AetherPackageLoader aetherLoader = new AetherPackageLoader(AetherPackageLoader.class.getClassLoader(), repoList);
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
