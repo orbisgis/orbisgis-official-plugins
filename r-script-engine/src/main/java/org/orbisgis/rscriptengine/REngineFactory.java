@@ -59,8 +59,9 @@ public class REngineFactory {
      * @return The R ScriptEngine
      */
     public static RenjinScriptEngine createRScriptEngine() {
-        List<RemoteRepository> repoList = AetherPackageLoader.defaultRepositories();
-        repoList.add(new RemoteRepository.Builder("renjindbi", "default", "https://nexus.bedatadriven.com/content/repositories/renjin-dbi/").build());
+        List<RemoteRepository> repoList = new ArrayList<>(AetherPackageLoader.defaultRepositories());
+        RemoteRepository repo = new RemoteRepository.Builder("renjindbi", "default", "https://nexus.bedatadriven.com/content/repositories/renjin-dbi/").build();
+        repoList.add(repo);
         AetherPackageLoader aetherLoader = new AetherPackageLoader(AetherPackageLoader.class.getClassLoader(), repoList);
         aetherLoader.setTransferListener(new ConsoleTransferListener());
         aetherLoader.setRepositoryListener(new ConsoleRepositoryListener(System.out));
