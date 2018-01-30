@@ -44,15 +44,11 @@ import org.orbisgis.mapeditorapi.MapElement;
 import org.orbisgis.sif.CommentUtil;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
-import org.orbisgis.sif.components.SaveFilePanel;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
 import org.orbisgis.sif.docking.DockingPanelParameters;
-import org.orbisgis.sif.edition.EditableElement;
-import org.orbisgis.sif.edition.Editor;
-import org.orbisgis.sif.edition.EditorDockable;
-import org.orbisgis.sif.edition.EditorManager;
+import org.orbisgis.sif.edition.*;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
 import org.osgi.service.component.annotations.ReferenceCardinality;
@@ -71,6 +67,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.io.PrintStream;
 import java.util.*;
@@ -100,6 +97,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     private DefaultAction executeSelectedAction;
     private DefaultAction clearAction;
     private DefaultAction saveAction;
+    private DefaultAction saveAsAction;
     private DefaultAction findAction;
     private DefaultAction commentAction;
     private DefaultAction blockCommentAction;
@@ -268,6 +266,14 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                 EventHandler.create(ActionListener.class, this, "onSaveFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(saveAction);
+        // Save As
+        saveAsAction = new DefaultAction(GroovyConsoleActions.A_SAVE,
+                I18N.tr("Save As"),
+                I18N.tr("Save the editor content into a new file"),
+                GroovyIcon.getIcon("page_white_save"),
+                EventHandler.create(ActionListener.class,this,"onSaveAsNewFile"),
+                KeyStroke.getKeyStroke("ctrl maj s"));
+        actions.addAction(saveAsAction);
         //Find action
         findAction = new DefaultAction(GroovyConsoleActions.A_SEARCH,
                 I18N.tr("Search.."),
@@ -311,23 +317,31 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
     }
 
     /**
+     * Open a dialog that let the user to select a file and save the content
+     * of the Groovy editor into this file.
+     */
+    public void onSaveAsNewFile() {
+        File oldDocPath = groovyElement.getDocumentPath();
+        groovyElement.setDocumentPath(null);
+        onSaveFile();
+        if(groovyElement.getDocumentPath() == null && oldDocPath != null) {
+            // If canceled
+            groovyElement.setDocumentPath(oldDocPath);
+        }
+    }
+
+    /**
      * Open a dialog that let the user select a file and save the content of the
-     * sql editor into this file.
+     * Groovy editor into this file.
      */
     public void onSaveFile() {
-        final SaveFilePanel outfilePanel = new SaveFilePanel(
-                "groovyConsoleOutFile", I18N.tr("Save script"));
-        outfilePanel.addFilter("groovy", I18N.tr("Groovy script (*.groovy)"));
-        outfilePanel.loadState();
-        if (UIFactory.showDialog(outfilePanel)) {
-            try {
-                FileUtils.writeLines(outfilePanel.getSelectedFile(), Arrays.asList(scriptPanel.getText()));
-                groovyElement.setDocumentPath(outfilePanel.getSelectedFile());
-                groovyElement.setModified(false);
-            } catch (IOException e1) {
-                LOGGER.error(I18N.tr("Cannot write the script."), e1);
-            }
-            LOGGER_POPUP.info(I18N.tr("The file has been saved."));
+        try {
+            groovyElement.save();
+        } catch (EditableElementException ex) {
+            LOGGER.error(ex.getLocalizedMessage(), ex);
+        }
+        if (!groovyElement.isModified()) {
+            LOGGER.info(I18N.tr("The file has been saved."));
         }
     }
 
