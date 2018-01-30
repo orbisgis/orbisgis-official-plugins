@@ -43,6 +43,7 @@ import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
 import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.orbisgis.sif.edition.EditableElement;
+import org.orbisgis.sif.edition.EditableElementException;
 import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
@@ -63,6 +64,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.beans.EventHandler;
 import java.beans.PropertyChangeListener;
+import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
@@ -93,6 +95,7 @@ public class RConsolePanel extends JPanel implements EditorDockable{
     private DefaultAction executeAction;
     private DefaultAction clearAction;
     private DefaultAction saveAction;
+    private DefaultAction saveAsAction;
     private DefaultAction findAction;
     private DefaultAction executeSelectedAction;
     private FindReplaceDialog findReplaceDialog;
@@ -239,6 +242,14 @@ public class RConsolePanel extends JPanel implements EditorDockable{
                 EventHandler.create(ActionListener.class, this, "onSaveFile"),
                 KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         actions.addAction(saveAction);
+        // Save As
+        saveAsAction = new DefaultAction(RConsoleActions.A_SAVE,
+                I18N.tr("Save As"),
+                I18N.tr("Save the editor content into a new file"),
+                RIcon.getIcon("page_white_save"),
+                EventHandler.create(ActionListener.class,this,"onSaveAsNewFile"),
+                KeyStroke.getKeyStroke("ctrl maj s"));
+        actions.addAction(saveAsAction);
         //Find action
         findAction = new DefaultAction(RConsoleActions.A_SEARCH,
                 I18N.tr("Search.."),
@@ -274,23 +285,31 @@ public class RConsolePanel extends JPanel implements EditorDockable{
     }
 
     /**
+     * Open a dialog that let the user to select a file and save the content
+     * of the R editor into this file.
+     */
+    public void onSaveAsNewFile() {
+        File oldDocPath = rElement.getDocumentPath();
+        rElement.setDocumentPath(null);
+        onSaveFile();
+        if(rElement.getDocumentPath() == null && oldDocPath != null) {
+            // If canceled
+            rElement.setDocumentPath(oldDocPath);
+        }
+    }
+
+    /**
      * Open a dialog that let the user select a file and save the content of the
      * R editor into this file.
      */
     public void onSaveFile() {
-        final SaveFilePanel outfilePanel = new SaveFilePanel(
-                "rConsoleOutFile", I18N.tr("Save script"));
-        outfilePanel.addFilter("R", I18N.tr("R script (*.r)"));
-        outfilePanel.loadState();
-        if (UIFactory.showDialog(outfilePanel)) {
-            try {
-                FileUtils.writeLines(outfilePanel.getSelectedFile(), Arrays.asList(scriptPanel.getText()));
-                rElement.setDocumentPath(outfilePanel.getSelectedFile());
-                rElement.setModified(false);
-            } catch (IOException e1) {
-                LOGGER.error(I18N.tr("Cannot write the script."), e1);
-            }
-            LOGGER_POPUP.info(I18N.tr("The file has been saved."));
+        try {
+            rElement.save();
+        } catch (EditableElementException ex) {
+            LOGGER.error(ex.getLocalizedMessage(), ex);
+        }
+        if (!rElement.isModified()) {
+            LOGGER.info(I18N.tr("The file has been saved."));
         }
     }
 
