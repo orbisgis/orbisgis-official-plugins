@@ -36,11 +36,9 @@ import org.orbisgis.r.icons.RIcon;
 import org.orbisgis.rscriptengine.REngineFactory;
 import org.orbisgis.sif.UIFactory;
 import org.orbisgis.sif.components.OpenFilePanel;
-import org.orbisgis.sif.components.SaveFilePanel;
 import org.orbisgis.sif.components.actions.ActionCommands;
 import org.orbisgis.sif.components.actions.DefaultAction;
 import org.orbisgis.sif.components.findReplace.FindReplaceDialog;
-import org.orbisgis.sif.docking.DockingPanel;
 import org.orbisgis.sif.docking.DockingPanelParameters;
 import org.orbisgis.sif.edition.EditableElement;
 import org.orbisgis.sif.edition.EditableElementException;
@@ -48,12 +46,14 @@ import org.orbisgis.sif.edition.EditorDockable;
 import org.osgi.service.component.annotations.Activate;
 import org.osgi.service.component.annotations.Component;
 import org.osgi.service.component.annotations.Reference;
+import org.renjin.sexp.SEXP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.xnap.commons.i18n.I18n;
 import org.xnap.commons.i18n.I18nFactory;
 
 import javax.script.ScriptEngine;
+import javax.script.ScriptException;
 import javax.sql.DataSource;
 import javax.swing.*;
 import javax.swing.event.CaretListener;
@@ -68,11 +68,9 @@ import java.io.File;
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ExecutorService;
-import javax.script.ScriptException;
 import org.orbisgis.sif.CommentUtil;
 
 /**
@@ -481,6 +479,7 @@ public class RConsolePanel extends JPanel implements EditorDockable{
         private Map<String, Object> variables;
         private ScriptEngine engine;
         private long startScript;
+        private Thread thread;
 
         public RJob(String script, Action executeAction, Map<String, Object> variables, ScriptEngine engine) {
             this.script = script;
@@ -502,14 +501,22 @@ public class RConsolePanel extends JPanel implements EditorDockable{
                 LOGGER.error(I18N.tr("Renjin Script Engine not found on the classpath."));
             }
             else {
-                try {
-                    startScript = System.currentTimeMillis();
-                    engine.eval(script);
-                } catch (Exception e) {
-                    LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));                
-                } finally {
-                  executeAction.setEnabled(true); 
-                }
+                startScript = System.currentTimeMillis();
+                Runnable scriptRun = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            engine.eval(script);
+                        } catch (Exception e) {
+                            LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));
+                        } finally {
+                            executeAction.setEnabled(true);
+                        }
+                    }
+                };
+                thread = new Thread(scriptRun);
+                thread.start();
+                thread.join();
             }
             return null;
         }
@@ -517,9 +524,23 @@ public class RConsolePanel extends JPanel implements EditorDockable{
         @Override
         protected void done() {
             super.done();
-            LOGGER.info(I18N.tr("R script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));              
+            LOGGER.info(I18N.tr("R script executed in {0} seconds", (System.currentTimeMillis() - startScript) / 1000.));
         }
-        
-        
+
+        @Override
+        public void cancel(){
+            super.cancel();
+            thread.interrupt();
+            try {
+                thread.join(500);
+            } catch (InterruptedException ignored) {}
+            if(thread.isAlive()) {
+                LOGGER.info(I18N.tr("Forcing script to cancel."));
+                //TODO find a good way to kill the script thread
+                thread.stop();
+            }
+            LOGGER.info(I18N.tr("Script canceled."));
+            executeAction.setEnabled(true);
+        }
     }
 }

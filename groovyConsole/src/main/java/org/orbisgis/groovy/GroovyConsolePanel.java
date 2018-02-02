@@ -566,7 +566,7 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
             variables.put("pm", getProgressMonitor());
             executeAction.setEnabled(false);
             try {
-                GroovyShell groovyShell = new GroovyShell();
+                final GroovyShell groovyShell = new GroovyShell();
                 for(Map.Entry<String,Object> variable : variables.entrySet()) {
                     groovyShell.setVariable(variable.getKey(), variable.getValue());
                 }
@@ -574,8 +574,21 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
                     groovyShell.setProperty(property.getKey(), property.getValue());
                 }
                 startScript = System.currentTimeMillis();
-                thread = Thread.currentThread();
-                groovyShell.evaluate(script);
+                Runnable scriptRun = new Runnable() {
+                    @Override
+                    public void run() {
+                        try {
+                            groovyShell.evaluate(script);
+                        } catch (Exception e) {
+                            LOGGER.error(I18N.tr("Cannot execute this R script.\nCause : " + e.getMessage()));
+                        } finally {
+                            executeAction.setEnabled(true);
+                        }
+                    }
+                };
+                thread = new Thread(scriptRun);
+                thread.start();
+                thread.join();
             } catch (Exception e) {
                 LOGGER.error(I18N.tr("Cannot execute the Groovy script")+"\n" + e.getLocalizedMessage());
             } finally {
@@ -593,19 +606,28 @@ public class GroovyConsolePanel extends JPanel implements EditorDockable {
 
         @Override
         protected void done() {
-            super.done();
+            LOGGER.info(I18N.tr("Groovy script executed in {0} seconds", (System.currentTimeMillis() - startScript) / 1000.));
+
+        }
+
+        @Override
+        public void cancel(){
+            super.cancel();
             //Try to cancel a running sql statement
             if(closure != null){
                 closure.cancel();
             }
-            //If there is no statement to close or if the closed statements was not running, stop the groovy thread.
-            //It avoids to stop the groovy thread while it is cancelling a sql statement and lock the SYS database table.
-            if(closure == null || !closure.wasRunningStatement()) {
-                thread.interrupt();
+            thread.interrupt();
+            try {
+                thread.join(500);
+            } catch (InterruptedException ignored) {}
+            if(thread.isAlive()) {
+                LOGGER.info(I18N.tr("Forcing script to cancel."));
+                //TODO find a good way to kill the script thread
+                thread.stop();
             }
-            LOGGER.info(I18N.tr("Groovy script executed in {0} seconds\n", (System.currentTimeMillis() - startScript) / 1000.));
-
+            LOGGER.info(I18N.tr("Script canceled."));
+            executeAction.setEnabled(true);
         }
-        
-    } 
+    }
 }
