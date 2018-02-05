@@ -8,7 +8,7 @@
         <parent>
                 <groupId>org.orbisgis</groupId>
                 <artifactId>orbisgis-nexus</artifactId>
-                <version>1</version>
+                <version>5.1.0</version>
         </parent>
         <organization>
                 <name>Lab-STICC - UMR CNRS 6285</name>
@@ -32,21 +32,22 @@
         </properties>
         <repositories>
                 <repository>
-                        <id>OrbisGIS</id>
-                        <name>OrbisGIS repository</name>
-                        <url>http://repo.orbisgis.org</url>
+                        <id>osgi-maven-5.1</id>
+                        <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-5.1</url>
                 </repository>
                 <repository>
-                        <id>repo2.maven.org</id>
-                        <name>Maven2 repository 2</name>
-                        <url>http://repo2.maven.org/maven2</url>
+                        <id>osgi-maven-5.1-snapshot</id>
+                        <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-5.1-snapshot</url>
                 </repository>
         </repositories>
         <pluginRepositories>
                 <pluginRepository>
-                        <id>OrbisGIS</id>
-                        <name>OrbisGIS repository</name>
-                        <url>http://repo.orbisgis.org</url>
+                        <id>osgi-maven-5.1</id>
+                        <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-5.1</url>
+                </pluginRepository>
+                <pluginRepository>
+                        <id>osgi-maven-5.1-snapshot</id>
+                        <url>http://nexus.orbisgis.org/content/repositories/osgi-maven-5.1-snapshot</url>
                 </pluginRepository>
         </pluginRepositories>
         <build>
