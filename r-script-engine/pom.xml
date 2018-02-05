@@ -3,12 +3,12 @@
     <modelVersion>4.0.0</modelVersion>
     <artifactId>r-script-engine</artifactId>
     <name>R script engine</name>
-    <version>5.1.0</version>
+    <version>5.1.0-SNAPSHOT</version>
     <url>http://orbisgis.org</url>
     <parent>
         <groupId>org.orbisgis</groupId>
         <artifactId>orbisgis-official-plugins</artifactId>
-        <version>5.1</version>
+        <version>5.1.0-SNAPSHOT</version>
         <relativePath>../</relativePath>
     </parent>
     <description>A R script engine based on Renjin.</description>
